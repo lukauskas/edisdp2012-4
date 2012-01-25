@@ -15,19 +15,7 @@ public interface World {
 	 * Gets the best guess of the coordinates of the robot (our team's robot).
 	 * @return coordinates of the robot.
 	 */
-	SomeType getPosition();
-	
-	/***
-	 * Gets the best guess of the coordinates of the robot opponent.
-	 * @return coordinates of the opponent robot.
-	 */
-	SomeType getOpponentPosition();
-	
-	/***
-	 * Gets the best guess of the coordinates of the ball.
-	 * @return coordinates of the opponent robot.
-	 */
-	SomeType getBallPosition();
+	Snapshot getSnapshot();
 	
 	
 }
