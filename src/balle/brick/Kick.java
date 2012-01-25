@@ -1,4 +1,4 @@
-package brick;
+package balle.brick;
 
 import lejos.nxt.Motor;
 

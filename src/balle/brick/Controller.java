@@ -1,4 +1,4 @@
-package brick;
+package balle.brick;
 import lejos.nxt.Motor;
 import lejos.robotics.navigation.Pilot;
 import lejos.robotics.navigation.TachoPilot;
