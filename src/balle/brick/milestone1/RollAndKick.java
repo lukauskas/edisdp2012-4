@@ -52,14 +52,8 @@ public class RollAndKick {
 			else
 			{
 				float distance = controller.getTravelDistance();
-				if (distance > 100)
+				if (distance > 80)
 				{
-					drawMessage("Stop!");
-					controller.floatWheels();
-					try {
-						Thread.sleep(100);
-					} catch (InterruptedException e) {
-					}
 					drawMessage("Kick!");
 					controller.kick();
 					break;
