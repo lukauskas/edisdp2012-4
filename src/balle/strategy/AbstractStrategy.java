@@ -1,4 +1,8 @@
-package balle.world;
+package balle.strategy;
+
+import balle.brick.Controller;
+import balle.world.AbstractWorld;
+import balle.world.Snapshot;
 
 public abstract class AbstractStrategy extends Thread {
 
@@ -30,6 +34,6 @@ public abstract class AbstractStrategy extends Thread {
 	}
 	
 	protected abstract void aiStep();
-	protected abstract void aiMove();
+	protected abstract void aiMove(Controller controller);
 	
 }

@@ -26,7 +26,7 @@ public abstract class AbstractWorld extends Thread {
 	 * Gets the best guess of the coordinates of the robot (our team's robot).
 	 * @return coordinates of the robot.
 	 */
-	abstract Snapshot getSnapshot();
+	public abstract Snapshot getSnapshot();
 	
 	@Override
 	public void run() {
@@ -61,7 +61,7 @@ public abstract class AbstractWorld extends Thread {
 		}
 	}
 	
-	abstract void interprett(	double yPosX, double yPosY, double yRad,
+	abstract void interpret(	double yPosX, double yPosY, double yRad,
 								double bPosX, double bPosY, double bRad,
 								double ballPosX, double ballPosY,
 								long timestamp	);
