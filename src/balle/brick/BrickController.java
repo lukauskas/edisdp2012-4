@@ -93,4 +93,12 @@ public class BrickController implements Controller{
 		KICKER.rotateTo(90);
 		KICKER.rotateTo(0);
 	}
+	
+	public float getTravelDistance() {
+		return pilot.getTravelDistance();
+	}
+	
+	public void reset() {
+		pilot.reset();
+	}
 }
