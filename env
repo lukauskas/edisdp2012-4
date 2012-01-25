@@ -1,0 +1,6 @@
+BASE="/group/teaching/sdp/sdp4/secure"
+
+export PYTHONPATH=$PYTHONPATH:$BASE/libs/lib/python2.6/site-packages
+export LOCALBASE=$LOCALBASE:$BASE/libs
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$BASE/libs/lib
+
