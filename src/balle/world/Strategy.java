@@ -1,4 +1,5 @@
 package balle.world;
+import balle.brick.Controller;
 
 public abstract class Strategy {
 

@@ -8,7 +8,7 @@ public class Kick {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Controller control = new Controller();
+		Controller control = new BrickController();
 		
 		control.kick();
 		try {
