@@ -2,7 +2,7 @@ SDP_HOME=`pwd`
 LIB="$SDP_HOME/lib"
 LD_LIBRARY_DIR="$LIB/lib"
 function add_to_bashrc {
-    grep -Fxq "$1" ~/.bashrc || echo "$1" >> ~/.bashrc
+    grep -Fxq "$*" ~/.bashrc || echo "$*" >> ~/.bashrc
 }
 function install_lejos {
     local lLOCATION="`mktemp /tmp/lejos_NXJ_0_8_5beta.XXXXXX.tar.gz`"
@@ -13,17 +13,17 @@ function install_lejos {
     && echo "> extracting $lLOCATION" \
     && cd $LIB \
     && tar xvf $lLOCATION \
+    && chmod +x lejos_nxj/bin/* \
     && rm $lLOCATION \
-
-    STR="export PATH=\$PATH:$LIB/lejos_nxt/bin"
-    add_to_bashrc $STR
+    && STR="export PATH=\$PATH:$LIB/lejos_nxj/bin" \
+    && add_to_bashrc $STR
 }
 function cleanup {
     rm -rf $LIB 
     mkdir -p $LIB
     mkdir -p $LD_LIBRARY_DIR
-    STR="export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:$LIB/LD_LIBRARY_DIR"
-
+    STR="export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:$LD_LIBRARY_DIR"
+    add_to_bashrc $STR
 }
 function install_bluetooth {
     local lTMP_BLUETOOTH_LIB="`mktemp /tmp/libbluetooth.XXXXX.tar.gz`"
