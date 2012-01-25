@@ -2,7 +2,7 @@ package balle.controller;
 
 import balle.bluetooth.Communicator;
 import balle.brick.Controller;
-import balle.brick.BotCommunication;
+import balle.brick.Roboto;
 
 public class BluetoothController implements Controller {
 	Communicator connection;
@@ -12,32 +12,32 @@ public class BluetoothController implements Controller {
 		connection = communicator;
 	}
 	@Override
-	public void reverse() {
-		connection.send(BotCommunication.MESSAGE_BACKWARD);
+	public void backward() {
+		connection.send(Roboto.MESSAGE_BACKWARD);
 	}
 
 	@Override
-	public void go() {
-		connection.send(BotCommunication.MESSAGE_FORWARD);
+	public void forward() {
+		connection.send(Roboto.MESSAGE_FORWARD);
 
 	}
 
 	@Override
 	public void floatWheels() {
-		connection.send(BotCommunication.MESSAGE_FLOAT_WHEELS);
-
+		System.out.println("IMPLEMENT");
+		//connection.send(Roboto.MESSAGE_FLOAT_WHEELS);
 	}
 
 	@Override
 	public void stop() {
-		connection.send(BotCommunication.MESSAGE_STOP);
+		connection.send(Roboto.MESSAGE_STOP);
 
 	}
 
 	@Override
-	public void rotate(int deg) {
-		System.out.println("IMPLEMENT");
-
+	public void rotate(int degrees) {
+		connection.send(Roboto.MESSAGE_ROTATE);
+		connection.send(degrees);
 	}
 
 	@Override
@@ -54,7 +54,7 @@ public class BluetoothController implements Controller {
 
 	@Override
 	public void kick() {
-		connection.send(BotCommunication.MESSAGE_KICK);
+		connection.send(Roboto.MESSAGE_KICK);
 	}
 
 }

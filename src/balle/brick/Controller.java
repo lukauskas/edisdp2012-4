@@ -5,12 +5,12 @@ public interface Controller {
 	/**
 	 * Makes the robot reverse until it receives a stop() command.
 	 */
-	public abstract void reverse();
+	public abstract void backward();
 
 	/**
 	 * Makes the robot go until it receives a stop() command.
 	 */
-	public abstract void go();
+	public abstract void forward();
 
 	/**
 	 * Floats the motors, allowing the robot to drift.

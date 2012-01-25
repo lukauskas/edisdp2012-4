@@ -1,3 +1,5 @@
+package balle.brick;
+
 import lejos.nxt.LCD;
 import lejos.nxt.SensorPort;
 import lejos.nxt.TouchSensor;

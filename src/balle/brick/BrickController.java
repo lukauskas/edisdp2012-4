@@ -8,7 +8,7 @@ import lejos.robotics.navigation.TachoPilot;
  * 
  * That is -- defines the behaviour of the bot when it receives the command.
  * 
- * Adapted from SDP2011 group 10 code -- original author shearn89
+ * Adapted from SDP2011 groups 10 code -- original author shearn89
  * @author sauliusl
  */
 public class BrickController implements Controller{
@@ -19,32 +19,32 @@ public class BrickController implements Controller{
 	public final Motor RIGHT_WHEEL = Motor.C;
 	public final Motor KICKER      = Motor.A;
 	
-	public final float LEFT_WHEEL_DIAMETER = 3.0f; // TODO: Measure these properly
-	public final float RIGHT_WHEEL_DIAMETER = 3.0f;
-	/**
-	 * Constructor method: takes the Pilot object from the main program.
-	 * @param pilot
-	 */
+	public final float WHEEL_DIAMETER = 8.0f; // TODO: Measure these properly
+	public final float TRACK_WIDTH =  10.3f;
+
 	public BrickController () {
-		TachoPilot pilot = new TachoPilot(8, 16, LEFT_WHEEL, RIGHT_WHEEL);
+		
+		pilot = new TachoPilot(WHEEL_DIAMETER, TRACK_WIDTH, LEFT_WHEEL, RIGHT_WHEEL);
 		pilot.setMoveSpeed(maxSpeed);
-		pilot.setTurnSpeed(35); // 45 has been working fine.
+		pilot.setTurnSpeed(45); // 45 has been working fine.
 		pilot.regulateSpeed(true);
 		LEFT_WHEEL.smoothAcceleration(true);
 		RIGHT_WHEEL.smoothAcceleration(true);
 	}
+	
+	
 	/* (non-Javadoc)
-	 * @see balle.brick.Controller#reverse()
+	 * @see balle.brick.Controller#backward()
 	 */
 	@Override
-	public void reverse(){
+	public void backward(){
 		pilot.backward();
 	}
 	/* (non-Javadoc)
-	 * @see balle.brick.Controller#go()
+	 * @see balle.brick.Controller#forward()
 	 */
 	@Override
-	public void go(){
+	public void forward(){
 		pilot.forward();
 	}
 	/* (non-Javadoc)
