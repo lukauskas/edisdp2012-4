@@ -14,7 +14,6 @@ import lejos.robotics.navigation.TachoPilot;
 public class BrickController implements Controller{
 	TachoPilot pilot;
 	public int maxSpeed=30; // 20 for friendlies
-	public boolean ballCarrier = false;
 	
 	public final Motor LEFT_WHEEL  = Motor.B;
 	public final Motor RIGHT_WHEEL = Motor.C;

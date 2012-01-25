@@ -27,7 +27,13 @@ public class BotCommunication
 	Sensors sensor;
 //	Defend defense;
 	
-	
+	public static final int MESSAGE_FORWARD = 1;
+	public static final int MESSAGE_BACKWARD = 2;
+	public static final int MESSAGE_STOP = 3;
+	public static final int MESSAGE_KICK = 5;
+	public static final int MESSAGE_FLOAT_WHEELS = 6;
+	public static final int MESSAGE_DEFEND = 7;
+		
 	
 	/**
 	 * Constructor method. Takes robot dimensions as arguments, sets the pilot object.
@@ -81,10 +87,15 @@ public class BotCommunication
 			// rotating due to sensor input, so ignore this command.
 			return true;
 		}
-		if (n == 1){
+		if (n == MESSAGE_FORWARD){
 			control.go();
 			return true;
-		} else if (n == 2){
+		} 
+		else if (n == MESSAGE_BACKWARD) 
+	    {
+			control.reverse();
+	    }
+	    else if (n == MESSAGE_STOP){
 			control.stop();
 			return true;
 //		} else if (n == 3){
@@ -95,13 +106,13 @@ public class BotCommunication
 //			control.ballCarrier = false;
 //			// pilot.setTurnSpeed(45);
 //			return true;
-		} else if (n == 5){
+		} else if (n == MESSAGE_KICK){
 			control.kick();
 			return true;
-		} else if (n == 6){
+		} else if (n == MESSAGE_FLOAT_WHEELS){
 			control.floatWheels();
 			return true;
-		} else if (n == 7){
+		} else if (n == MESSAGE_DEFEND){
 			control.setSpeed(15);
 			control.travel(10);
 			control.travel(-10);
