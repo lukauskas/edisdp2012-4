@@ -15,6 +15,7 @@ import com.sun.org.apache.xml.internal.utils.UnImplNode;
  */
 public abstract class AbstractWorld extends Thread {
 
+	// JEV: Scanner is final and can't be extended, makes it difficult for the simulator.
 	Scanner visionInput;
 	
 	public AbstractWorld(Scanner visionInput) {
@@ -37,7 +38,7 @@ public abstract class AbstractWorld extends Thread {
 			if (line.indexOf('#') != 0) {
 				String[] tokens = line.split(" ");
 				
-				interprett(	Double.parseDouble(tokens[0]),
+				interpret(	Double.parseDouble(tokens[0]),
 							Double.parseDouble(tokens[1]),
 							Double.parseDouble(tokens[2]),
 							
