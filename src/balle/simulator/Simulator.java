@@ -4,6 +4,10 @@ import java.util.Scanner;
 
 public class Simulator implements Controller {
 	
+	public static void main(String[] args) {
+		System.out.println("HI");
+	}
+	
 	public void backward() {
 		
 	}
