@@ -12,35 +12,22 @@ public class Simulator implements Controller {
 	//----------------------\\
 	// Controller Interface \\
 	//----------------------\\
-
-	public void backward() {
-
-	}
-
-	public void forward() {
-
-	}
-
+    @Override
 	public void floatWheels() {
 
 	}
-
+    
+    @Override
 	public void stop() {
 
 	}
 
-	public void rotate(int deg) {
-
-	}
-
+    @Override
 	public void travel(int dist) {
 
 	}
 
-	public void setForwardSpeed(int speed) {
-
-	}
-
+    @Override
 	public void kick() {
 
 	}
@@ -127,5 +114,35 @@ public class Simulator implements Controller {
 			}
 		}
 
+	}
+
+	@Override
+	public void backward(int speed) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void forward(int speed) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void rotate(int deg, int speed) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setWheelSpeeds(int leftWheelSpeed, int rightWheelSpeed) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getMaximumWheelSpeed() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }
