@@ -6,5 +6,9 @@
 	<classpathentry kind="lib" path="lib/lejos_nxj/lib/jtools.jar"/>
 	<classpathentry kind="lib" path="lib/lejos_nxj/lib/pccomm.jar"/>
 	<classpathentry kind="lib" path="lib/lejos_nxj/lib/pctools.jar"/>
+	<classpathentry kind="lib" path="lib/ASM3.1/asm-all-3.1.jar"/>
+	<classpathentry kind="lib" path="lib/jstackalloc/stack-alloc.jar"/>
+	<classpathentry kind="lib" path="lib/swing-layout/swing-layout-1.0.3.jar"/>
+	<classpathentry kind="lib" path="lib/vecmath/vecmath.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
