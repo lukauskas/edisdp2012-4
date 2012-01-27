@@ -51,13 +51,6 @@ public class BrickController implements Controller{
 		pilot.stop();
 	}
 	/* (non-Javadoc)
-	 * @see balle.brick.Controller#rotate(int)
-	 */
-	@Override
-	public void rotate(int deg){
-		pilot.rotate(-deg);
-	}
-	/* (non-Javadoc)
 	 * @see balle.brick.Controller#travel(int)
 	 */
 	@Override
