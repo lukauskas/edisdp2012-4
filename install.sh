@@ -18,6 +18,22 @@ function install_lejos {
     && STR="export PATH=\$PATH:$LIB/lejos_nxj/bin" \
     && add_to_bashrc $STR
 }
+
+function install_jbullet {
+    local lLOCATION="`mktemp /tmp/jbullet.XXXXXX.zip`"
+    local lEXTRACT_DIR="`mktemp -d /tmp/jbullet_extracted.XXXXXX`"
+
+    echo "> Downloading jbullet to $lLOCATION"
+
+    wget -O "$lLOCATION" "http://jbullet.advel.cz/download/jbullet-20101010.zip" \
+    && echo "> extracting $lLOCATION" \
+    && cd $lEXTRACT_DIR \
+    && unzip $lLOCATION \
+    && cp -R $lEXTRACT_DIR/jbullet-20101010/lib/* $LIB \
+    && rm $lLOCATION \
+    && rm -rf $lEXTRACT_DIR
+}
+
 function cleanup {
     rm -rf $LIB 
     mkdir -p $LIB
@@ -37,4 +53,5 @@ function install_bluetooth {
 cleanup
 install_lejos
 install_bluetooth
+install_jbullet
 
