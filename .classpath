@@ -6,9 +6,5 @@
 	<classpathentry kind="lib" path="lib/lejos_nxj/lib/jtools.jar"/>
 	<classpathentry kind="lib" path="lib/lejos_nxj/lib/pccomm.jar"/>
 	<classpathentry kind="lib" path="lib/lejos_nxj/lib/pctools.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/jbox2d-library"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/jbox2d-serialization"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/jbox2d-testbed"/>
-	<classpathentry kind="lib" path="C:/Users/James Vaughan/Documents/University/edisdp2012-4/slf4j-nop-1.6.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
