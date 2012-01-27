@@ -2,22 +2,13 @@ package balle.brick;
 
 public interface Controller {
 
-	/**
-	 * Makes the robot reverse until it receives a stop() command.
-	 */
-	public abstract void backward();
-	
+
 	/**
 	 * Makes the robot go backward with the specified speed
 	 * @param speed
 	 */
 	public abstract void backward(int speed);
 
-	/**
-	 * Makes the robot go until it receives a stop() command.
-	 */
-	public abstract void forward();
-	
 	/**
 	 * Makes robot go forward with the specified speed
 	 * @param speed
@@ -33,12 +24,6 @@ public interface Controller {
 	 * Makes the robot stop.
 	 */
 	public abstract void stop();
-
-	/**
-	 * The robot will rotate deg degrees.
-	 * @param deg The degree to rotate. +ve is right, -ve left.
-	 */
-	public abstract void rotate(int deg);
 	
 	/**
 	 * The robot will rotate deg degrees at specified speed.

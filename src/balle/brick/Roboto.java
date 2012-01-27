@@ -22,11 +22,10 @@ import lejos.nxt.comm.Bluetooth;
 public class Roboto {
 
 	public static final int MESSAGE_EXIT = -1;
-	public static final int MESSAGE_FORWARD = 1;
-	public static final int MESSAGE_BACKWARD = 2;
 	public static final int MESSAGE_ROTATE = 3;
 	public static final int MESSAGE_STOP = 4;
 	public static final int MESSAGE_KICK = 5;
+	public static final int MESSAGE_MOVE = 6;	
 
 	/**
 	 * Main program
@@ -74,7 +73,7 @@ public class Roboto {
 					drawMessage(Integer.toString(command));
 
 					if (touchLeft.isPressed() || touchRight.isPressed()){
-						controller.backward();
+						controller.backward(controller.getMaximumWheelSpeed());
 						Thread.sleep(400);
 					} 
 
@@ -83,11 +82,11 @@ public class Roboto {
 						controller.stop();
 						// stop
 						break mainLoop;
-					case MESSAGE_FORWARD:
-						controller.forward();
-					    break;
-					case MESSAGE_BACKWARD:
-						controller.backward();
+					case MESSAGE_MOVE:
+						int leftWheelSpeed = input.readInt();
+						int rightWheelSpeed = input.readInt();
+						drawMessage("Speeds: " + leftWheelSpeed + " " + rightWheelSpeed);
+						controller.setWheelSpeeds(leftWheelSpeed, rightWheelSpeed);
 						break;
 					case MESSAGE_KICK:
 						controller.kick();
@@ -97,7 +96,9 @@ public class Roboto {
 						break;
 					case MESSAGE_ROTATE:
 						int theta = input.readInt();
-						controller.rotate(theta);
+						int speed = input.readInt();
+						controller.rotate(theta, speed);
+					default:
 						break;
 					}
 //					case MOVE:

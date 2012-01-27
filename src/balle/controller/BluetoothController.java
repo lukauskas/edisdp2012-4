@@ -12,17 +12,6 @@ public class BluetoothController implements Controller {
 		connection = communicator;
 	}
 	@Override
-	public void backward() {
-		connection.send(Roboto.MESSAGE_BACKWARD);
-	}
-
-	@Override
-	public void forward() {
-		connection.send(Roboto.MESSAGE_FORWARD);
-
-	}
-
-	@Override
 	public void floatWheels() {
 		System.out.println("IMPLEMENT");
 		//connection.send(Roboto.MESSAGE_FLOAT_WHEELS);
@@ -31,13 +20,6 @@ public class BluetoothController implements Controller {
 	@Override
 	public void stop() {
 		connection.send(Roboto.MESSAGE_STOP);
-
-	}
-
-	@Override
-	public void rotate(int degrees) {
-		connection.send(Roboto.MESSAGE_ROTATE);
-		connection.send(degrees);
 	}
 
 	@Override
@@ -47,14 +29,38 @@ public class BluetoothController implements Controller {
 	}
 
 	@Override
-	public void setForwardSpeed(int speed) {
-		 System.out.println("IMPLEMENT");
-
-	}
-
-	@Override
 	public void kick() {
 		connection.send(Roboto.MESSAGE_KICK);
+	}
+	@Override
+	public void backward(int speed) {
+		connection.send(Roboto.MESSAGE_MOVE);
+		connection.send(-speed);
+		connection.send(-speed);
+		
+	}
+	@Override
+	public void forward(int speed) {
+		connection.send(Roboto.MESSAGE_MOVE);
+		connection.send(speed);
+		connection.send(speed);
+	}
+	@Override
+	public void rotate(int degrees, int speed) {
+		connection.send(Roboto.MESSAGE_ROTATE);
+		connection.send(degrees);
+		connection.send(speed);
+		
+	}
+	@Override
+	public void setWheelSpeeds(int leftWheelSpeed, int rightWheelSpeed) {
+		connection.send(Roboto.MESSAGE_MOVE);
+		connection.send(leftWheelSpeed);
+		connection.send(rightWheelSpeed);		
+	}
+	@Override
+	public int getMaximumWheelSpeed() {
+		return 720;
 	}
 
 }

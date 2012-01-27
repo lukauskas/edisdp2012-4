@@ -34,23 +34,7 @@ public class BrickController implements Controller{
 		RIGHT_WHEEL.smoothAcceleration(true);
 	}
 	
-	
-	/* (non-Javadoc)
-	 * @see balle.brick.Controller#backward()
-	 */
-	@Override
-	public void backward(){
-		pilot.backward();
-	}
-	
-	/* (non-Javadoc)
-	 * @see balle.brick.Controller#forward()
-	 */
-	@Override
-	public void forward(){
-		pilot.forward();
-	}
-	
+		
 	/* (non-Javadoc)
 	 * @see balle.brick.Controller#floatWheels()
 	 */
@@ -98,14 +82,27 @@ public class BrickController implements Controller{
 	public void reset() {
 		pilot.reset();
 	}
-
+    
+	private void setMotorSpeed(Motor motor, int speed)
+	{
+	    boolean forward = true;
+	 	if (speed < 0)
+	 	{
+	 		forward = false;
+	 		speed = -1 * speed;
+	 	}
+	 	
+	 	motor.setSpeed(speed);
+	 	if (forward) motor.forward();
+	 	else motor.backward();
+	}
 	@Override
 	public void setWheelSpeeds(int leftWheelSpeed, int rightWheelSpeed) {
 		if (leftWheelSpeed > MAXIMUM_MOTOR_SPEED) leftWheelSpeed = MAXIMUM_MOTOR_SPEED;
 		if (rightWheelSpeed > MAXIMUM_MOTOR_SPEED) rightWheelSpeed = MAXIMUM_MOTOR_SPEED;
 		
-		LEFT_WHEEL.setSpeed(leftWheelSpeed);
-		RIGHT_WHEEL.setSpeed(rightWheelSpeed);
+		setMotorSpeed(LEFT_WHEEL, leftWheelSpeed);
+		setMotorSpeed(RIGHT_WHEEL, rightWheelSpeed);
 	}
 
 	@Override
@@ -123,13 +120,13 @@ public class BrickController implements Controller{
 	@Override
 	public void forward(int speed) {
 		pilot.setMoveSpeed(speed);
-	    this.forward();
+	    pilot.forward();
 		
 	}
 	
 	@Override
 	public void rotate(int deg, int speed) {
 		pilot.setTurnSpeed(speed);
-		this.forward();		
+		pilot.forward();		
 	}
 }
