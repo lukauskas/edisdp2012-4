@@ -1,40 +1,34 @@
 package balle.simulator;
 
-import balle.brick.*;
+import balle.world.DataReader;
 
 /** A tool for testing the robot strategy without the need for a robot.
  * 
  * @author James Vaughan
  */
-public class Simulator implements Controller {
+public class Simulator implements DataReader {
 	
-	
-	//----------------------\\
-	// Controller Interface \\
-	//----------------------\\
-    @Override
-	public void floatWheels() {
-
-	}
-    
-    @Override
-	public void stop() {
-
-	}
-
-    @Override
-	public void travel(int dist) {
-
-	}
-
-    @Override
-	public void kick() {
-
-	}
-
 	// -------------------\\
 	// Utility and Tools \\
 	// -------------------\\
+
+	private SoftBot yellow, blue;
+	
+	public SoftBot getYellow() {
+		return yellow;
+	}
+	
+	public SoftBot getBlue() {
+		return blue;
+	}
+	
+	/** Updates world object.
+	 * 
+	 */
+	@Override
+	public String nextLine() {
+		return "#";
+	}
 
 	/** A Main Method:
 	 *  	For testing the simulator.
@@ -115,34 +109,5 @@ public class Simulator implements Controller {
 		}
 
 	}
-
-	@Override
-	public void backward(int speed) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void forward(int speed) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void rotate(int deg, int speed) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void setWheelSpeeds(int leftWheelSpeed, int rightWheelSpeed) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public int getMaximumWheelSpeed() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+	
 }

@@ -16,9 +16,9 @@ import com.sun.org.apache.xml.internal.utils.UnImplNode;
 public abstract class AbstractWorld extends Thread {
 
 	// JEV: Scanner is final and can't be extended, makes it difficult for the simulator.
-	Scanner visionInput;
+	DataReader visionInput;
 	
-	public AbstractWorld(Scanner visionInput) {
+	public AbstractWorld(DataReader visionInput) {
 		this.visionInput = visionInput;
 		this.start();
 	}
