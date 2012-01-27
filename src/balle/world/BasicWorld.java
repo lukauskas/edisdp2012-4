@@ -6,18 +6,18 @@ public class BasicWorld extends AbstractWorld {
 	
 	private Snapshot prev; 
 	
-	public BasicWorld(Scanner visionInput) {
+	public BasicWorld(DataReader visionInput) {
 		super(visionInput);
 	}
 
 	@Override
-	Snapshot getSnapshot() {
+	public Snapshot getSnapshot() {
 		return prev;
 	}
 
 	/**
 	 *  NOTE: DO ROBOTS ALWAYS MOVE FORWARD !?
-	 *  NO, treat angle ov velocity different from angle the robot is facing.
+	 *  NO, treat angle of velocity different from angle the robot is facing.
 	 * 
 	 */
 	@Override
