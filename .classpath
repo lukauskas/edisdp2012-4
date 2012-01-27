@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/lejos_nxj/lib/classes.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/java-1.6.0-openjdk-1.6.0.0.x86_64"/>
 	<classpathentry kind="lib" path="lib/lejos_nxj/lib/jtools.jar"/>
 	<classpathentry kind="lib" path="lib/lejos_nxj/lib/pccomm.jar"/>
 	<classpathentry kind="lib" path="lib/lejos_nxj/lib/pctools.jar"/>
-	<classpathentry kind="lib" path="lib/ASM3.1/asm-all-3.1.jar"/>
-	<classpathentry kind="lib" path="lib/jstackalloc/stack-alloc.jar"/>
-	<classpathentry kind="lib" path="lib/swing-layout/swing-layout-1.0.3.jar"/>
-	<classpathentry kind="lib" path="lib/vecmath/vecmath.jar"/>
+	<classpathentry kind="lib" path="/afs/inf.ed.ac.uk/user/s09/s0906575/Desktop/jbox2d-2.1.2.1/jbox2d-library/target/jbox2d-library-2.1.2.1-SNAPSHOT-jar-with-dependencies.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

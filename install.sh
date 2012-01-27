@@ -34,6 +34,21 @@ function install_jbullet {
     && rm -rf $lEXTRACT_DIR
 }
 
+function install_jbox2d {
+    local lLOCATION="`mktemp /tmp/jbox2d.XXXXXX.zip`"
+    local lEXTRACT_DIR="`mktemp -d /tmp/jbox2d_extracted.XXXXXX`"
+
+    echo "> Downloading jbox2d to $lLOCATION"
+
+    wget -O "$lLOCATION" "http://jbox2d.googlecode.com/files/jbox2d-2.1.2.1.zip" \
+    && echo "> extracting $lLOCATION" \
+    && cd $lEXTRACT_DIR \
+    && unzip $lLOCATION \
+    && cp $lEXTRACT_DIR/jbox2d-library/target/jbox2d-library-2.1.2.1-SNAPSHOT-jar-with-dependencies.jar $LIB \
+    && rm $lLOCATION \
+    && rm -rf $lEXTRACT_DIR
+}
+
 function cleanup {
     rm -rf $LIB 
     mkdir -p $LIB
@@ -53,5 +68,5 @@ function install_bluetooth {
 cleanup
 install_lejos
 install_bluetooth
-install_jbullet
-
+#install_jbullet
+install_jbox2d
