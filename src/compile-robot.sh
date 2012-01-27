@@ -6,6 +6,6 @@ nxjc balle/brick/Controller.java balle/brick/BrickController.java balle/brick/Ro
 && nxjlink balle.brick.Roboto -o Roboto.nxj \
 && nxjlink balle.brick.Kick -o M1Kick.nxj \
 && nxjlink balle.brick.milestone1.RollAndKick -o M1RollAndKick.nxj \
-&& nxjlink balle.brick.milestone1.RollThroughField -o M1RollThroughField.nxj \
+&& nxjlink balle.brick.milestone1.RollThroughField -o M1Roll.nxj \
 && nxjpcc balle/bluetooth/Communicator.java balle/controller/BluetoothController.java balle/bluetooth/TestBluetooth.java \
 
