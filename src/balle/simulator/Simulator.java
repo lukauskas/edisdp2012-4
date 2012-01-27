@@ -37,7 +37,7 @@ public class Simulator implements Controller {
 
 	}
 
-	public void setSpeed(int speed) {
+	public void setForwardSpeed(int speed) {
 
 	}
 

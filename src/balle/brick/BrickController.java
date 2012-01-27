@@ -13,7 +13,7 @@ import lejos.robotics.navigation.TachoPilot;
  */
 public class BrickController implements Controller{
 	TachoPilot pilot;
-	public int maxSpeed=30; // 20 for friendlies
+	public int maxPilotSpeed=30; // 20 for friendlies
 	
 	public final Motor LEFT_WHEEL  = Motor.B;
 	public final Motor RIGHT_WHEEL = Motor.C;
@@ -21,11 +21,13 @@ public class BrickController implements Controller{
 	
 	public final float WHEEL_DIAMETER = 8.0f; // TODO: Measure these properly
 	public final float TRACK_WIDTH =  10.3f;
+	
+	public final int MAXIMUM_MOTOR_SPEED = 720;
 
 	public BrickController () {
 		
 		pilot = new TachoPilot(WHEEL_DIAMETER, TRACK_WIDTH, LEFT_WHEEL, RIGHT_WHEEL);
-		pilot.setMoveSpeed(maxSpeed);
+		pilot.setMoveSpeed(maxPilotSpeed);
 		pilot.setTurnSpeed(45); // 45 has been working fine.
 		pilot.regulateSpeed(true);
 		LEFT_WHEEL.smoothAcceleration(true);
@@ -40,6 +42,7 @@ public class BrickController implements Controller{
 	public void backward(){
 		pilot.backward();
 	}
+	
 	/* (non-Javadoc)
 	 * @see balle.brick.Controller#forward()
 	 */
@@ -47,6 +50,7 @@ public class BrickController implements Controller{
 	public void forward(){
 		pilot.forward();
 	}
+	
 	/* (non-Javadoc)
 	 * @see balle.brick.Controller#floatWheels()
 	 */
@@ -77,20 +81,13 @@ public class BrickController implements Controller{
 		pilot.travel(dist);
 	}
 	/* (non-Javadoc)
-	 * @see balle.brick.Controller#setSpeed(int)
-	 */
-	@Override
-	public void setSpeed(int speed){
-		pilot.setMoveSpeed(speed);
-	}
-	/* (non-Javadoc)
 	 * @see balle.brick.Controller#kick()
 	 */
 	@Override
 	public void kick(){
 		KICKER.setSpeed(900);
 		KICKER.resetTachoCount();
-		KICKER.rotateTo(90);
+		KICKER.rotateTo(60);
 		KICKER.rotateTo(0);
 	}
 	
@@ -100,5 +97,39 @@ public class BrickController implements Controller{
 	
 	public void reset() {
 		pilot.reset();
+	}
+
+	@Override
+	public void setWheelSpeeds(int leftWheelSpeed, int rightWheelSpeed) {
+		if (leftWheelSpeed > MAXIMUM_MOTOR_SPEED) leftWheelSpeed = MAXIMUM_MOTOR_SPEED;
+		if (rightWheelSpeed > MAXIMUM_MOTOR_SPEED) rightWheelSpeed = MAXIMUM_MOTOR_SPEED;
+		
+		LEFT_WHEEL.setSpeed(leftWheelSpeed);
+		RIGHT_WHEEL.setSpeed(rightWheelSpeed);
+	}
+
+	@Override
+	public int getMaximumWheelSpeed() {
+		return MAXIMUM_MOTOR_SPEED;
+	}
+
+
+	@Override
+	public void backward(int speed) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void forward(int speed) {
+		pilot.setMoveSpeed(speed);
+	    this.forward();
+		
+	}
+	
+	@Override
+	public void rotate(int deg, int speed) {
+		pilot.setTurnSpeed(speed);
+		this.forward();		
 	}
 }

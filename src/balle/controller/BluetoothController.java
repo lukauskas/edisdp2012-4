@@ -47,7 +47,7 @@ public class BluetoothController implements Controller {
 	}
 
 	@Override
-	public void setSpeed(int speed) {
+	public void setForwardSpeed(int speed) {
 		 System.out.println("IMPLEMENT");
 
 	}
