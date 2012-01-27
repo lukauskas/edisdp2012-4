@@ -28,7 +28,7 @@ public class RollAndKick {
 			{
 				drawMessage("Whoops, wall!");
 				controller.stop();
-				controller.backward();
+				controller.setWheelSpeeds(-controller.getMaximumWheelSpeed(), -controller.getMaximumWheelSpeed());
 				try {
 					Thread.sleep(200);
 					break;
@@ -47,7 +47,7 @@ public class RollAndKick {
 				drawMessage("Roll");
 				movingForward = true;
 				controller.reset();
-				controller.forward();
+				controller.forward(20);
 			}			
 			else
 			{

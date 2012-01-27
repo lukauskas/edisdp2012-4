@@ -27,7 +27,7 @@ public class RollThroughField {
 			{
 				drawMessage("Whoops, wall!");
 				controller.stop();
-				controller.backward();
+				controller.setWheelSpeeds(-controller.getMaximumWheelSpeed(), -controller.getMaximumWheelSpeed());
 				try {
 					Thread.sleep(200);
 					break;
@@ -40,7 +40,7 @@ public class RollThroughField {
 			}
 			if (!movingForward)
 			{
-				controller.forward();
+				controller.setWheelSpeeds(controller.getMaximumWheelSpeed(), controller.getMaximumWheelSpeed());
 				drawMessage("Roll");
 				movingForward = true;
 			}			
