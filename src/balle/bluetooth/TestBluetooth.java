@@ -7,7 +7,6 @@ import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-import balle.brick.Controller;
 import balle.controller.BluetoothController;
 
 public class TestBluetooth extends Frame implements KeyListener {
@@ -16,7 +15,8 @@ public class TestBluetooth extends Frame implements KeyListener {
 	 * 
 	 */
 	TextField t1;
-	Controller controller;
+	BluetoothController controller;
+	int currentWheelSpeed = 500;
 
 	public TestBluetooth() {
 		super();
@@ -36,22 +36,22 @@ public class TestBluetooth extends Frame implements KeyListener {
 		if (e.getKeyChar() == 'w')
 		{
 			System.out.println("Forward!");
-			controller.forward();
+			controller.forward(currentWheelSpeed);
 		}
 		else if (e.getKeyChar() == 's')
 		{
 			System.out.println("Backward!");
-			controller.backward();
+			controller.backward(currentWheelSpeed);
 		}		
 		else if (e.getKeyChar() == 'd')
 		{
 			System.out.println("Right");
-			controller.rotate(45);
+			controller.setWheelSpeeds(currentWheelSpeed, currentWheelSpeed * 3 / 4);
 		}
 		else if (e.getKeyChar() == 'a')
 		{
 			System.out.println("Left");
-			controller.rotate(-45);
+			controller.setWheelSpeeds(currentWheelSpeed * 3 / 4, currentWheelSpeed);
 		}
 		else if (e.getKeyChar() == 'x')
 		{
@@ -62,6 +62,18 @@ public class TestBluetooth extends Frame implements KeyListener {
 		{
 			System.out.println("Stop!");
 			controller.stop();
+		}
+		else if (e.getKeyChar() == 'e')
+		{
+			currentWheelSpeed += 10;
+			if (currentWheelSpeed > controller.getMaximumWheelSpeed()) currentWheelSpeed = controller.getMaximumWheelSpeed();
+			System.out.println("Speed: " +  currentWheelSpeed);
+		}
+		else if (e.getKeyChar() == 'r')
+		{
+			currentWheelSpeed -= 10;
+			if (currentWheelSpeed < 0) currentWheelSpeed = 0;
+			System.out.println("Speed: " +  currentWheelSpeed);
 		}
 		else
 		{
