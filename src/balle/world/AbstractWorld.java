@@ -43,6 +43,8 @@ public abstract class AbstractWorld extends Thread {
     public void run() {
         while (true) {
             String line = visionInput.nextLine();
+            if (line == null)
+                continue;
 
             // Ignore Comments
             if (line.charAt(0) != '#') {
