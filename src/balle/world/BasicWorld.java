@@ -22,7 +22,6 @@ public class BasicWorld extends AbstractWorld {
     void interpret(double yPosX, double yPosY, double yRad, double bPosX,
             double bPosY, double bRad, double ballPosX, double ballPosY,
             long timestamp) {
-
         Robot ours, them;
         FieldObject ball;
 

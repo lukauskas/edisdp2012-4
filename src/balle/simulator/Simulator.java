@@ -1,6 +1,6 @@
 package balle.simulator;
 
-import balle.world.DataReader;
+import balle.io.reader.DataReader;
 
 /** A tool for testing the robot strategy without the need for a robot.
  * 

@@ -1,5 +1,8 @@
 package balle.world;
 
+import balle.io.listener.Listener;
+import balle.io.reader.DataReader;
+
 /***
  * 
  * This class will take raw data from the vision system and model the world
@@ -38,8 +41,9 @@ public abstract class AbstractWorld implements Listener {
     public abstract Snapshot getSnapshot();
 
     @Override
-    public void propagate(Object input) {
+    public void update(Object input) {
         String line = (String) input; // TODO: type checking
+        System.out.println(line);
         // Ignore Comments
         if (line.charAt(0) != '#') {
             String[] tokens = line.split(" ");
