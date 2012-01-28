@@ -6,7 +6,6 @@ import balle.strategy.AbstractStrategy;
 import balle.strategy.DummyStrategy;
 import balle.world.AbstractWorld;
 import balle.world.BasicWorld;
-import balle.world.DataReader;
 import balle.world.ScannerReader;
 
 /**
@@ -19,7 +18,7 @@ import balle.world.ScannerReader;
  */
 public class Runner {
     protected AbstractWorld    world;
-    protected DataReader       visionInput;
+    protected ScannerReader    visionInput;
     protected Controller       controller;
     protected AbstractStrategy strategy;
 
@@ -27,6 +26,7 @@ public class Runner {
 
         // Create visionInput buffer
         visionInput = new ScannerReader();
+        visionInput.start();
 
         // Initialise world
         world = new BasicWorld(visionInput, balleIsBlue);
