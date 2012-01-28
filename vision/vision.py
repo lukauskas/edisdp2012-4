@@ -1,8 +1,7 @@
-from __future__ import print_function
+import time
 import cv
+from __future__ import print_function
 from SimpleCV import Image, Camera
-from capture import Capture
-from threshold import Threshold
 from features import Features
 from display import Display
 
@@ -38,15 +37,13 @@ def output(ents):
 
         print('{0} {1} {2} '.format(x, y, angle), end='')
 
-    print()
+    print(int(time.time() * 1000))
 
 
 #try:
 
 cap = Camera() #Capture()
-cv.NamedWindow('camera')
 
-threshold = Threshold()
 features = Features()
 display = Display.getDisplay()
 
@@ -63,10 +60,8 @@ while True:
 
     output(ents)
 
-
-    cv.ShowImage('camera', frame.getBitmap())
     key = cv.WaitKey(16)
-    if key != -1:
+    if key == 113 or key == 27:
         break
 
 #finally:
