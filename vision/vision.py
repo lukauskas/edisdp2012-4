@@ -63,8 +63,10 @@ while True:
 
     output(ents)
 
-    key = cv.WaitKey(16)
-    if key == 113 or key == 27:
+    c = cv.WaitKey(16)
+    k = chr(c % 0x100)
+
+    if k == 'q' or k == 27: # ESC
         break
 
 #finally:
