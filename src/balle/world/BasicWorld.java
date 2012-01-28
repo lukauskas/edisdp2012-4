@@ -58,6 +58,13 @@ public class BasicWorld extends AbstractWorld {
             // change in time
             long deltaT = timestamp - prev.getTimestamp();
 
+            // Special case when we get two inputs with the same timestamp:
+            if (deltaT == 0) {
+                // This will just keep the prev world in the memory, not doing
+                // anything
+                return;
+            }
+
             // Change in position
             Coord oursDPos, themDPos, ballDPos;
             oursDPos = (new Coord(oPosX, oPosY)).sub(prev.getBalle()
