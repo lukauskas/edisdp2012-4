@@ -24,7 +24,7 @@ class PhysicsDemo {
 		b.createFixture(fd);
 		
 		for(int i = 0; i < 10; i++) {
-			System.out.println((int)(b.getPosition().x*1000));
+			System.out.println( (b.getPosition().x*1000));
 			w.step(0.01f, 1, 1);
 		}
 

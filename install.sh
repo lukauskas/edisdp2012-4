@@ -45,6 +45,7 @@ function install_jbox2d {
     && cd $lEXTRACT_DIR \
     && unzip $lLOCATION \
     && cp $lEXTRACT_DIR/jbox2d-library/target/jbox2d-library-2.1.2.1-SNAPSHOT-jar-with-dependencies.jar $LIB \
+    && cp $lEXTRACT_DIR/jbox2d-testbed/target/jbox2d-testbed-2.1.2.1-SNAPSHOT.jar $LIB \
     && rm $lLOCATION \
     && rm -rf $lEXTRACT_DIR
 }
