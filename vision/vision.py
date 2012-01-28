@@ -35,7 +35,10 @@ def output(ents):
             x, y = entity.coordinates()
             angle = entity.angle()
 
-        print('{0} {1} {2} '.format(x, y, angle), end='')
+        if name == 'ball':
+            print('{0} {1}'.format(x, y), end=' ')
+        else:
+            print('{0} {1} {2}'.format(x, y, angle), end=' ')
 
     print(int(time.time() * 1000))
 
