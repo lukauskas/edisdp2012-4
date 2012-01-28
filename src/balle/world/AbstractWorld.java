@@ -1,6 +1,5 @@
 package balle.world;
 
-
 /***
  * 
  * This class will take raw data from the vision system and model the world
@@ -15,11 +14,22 @@ public abstract class AbstractWorld extends Thread {
 
     // JEV: Scanner is final and can't be extended, makes it difficult for the
     // simulator.
-    DataReader visionInput;
+    DataReader      visionInput;
+    private boolean balleIsBlue;
 
-    public AbstractWorld(DataReader visionInput) {
+    public AbstractWorld(DataReader visionInput, boolean isBalleBlue) {
         this.visionInput = visionInput;
+        this.balleIsBlue = isBalleBlue;
         this.start();
+    }
+
+    /**
+     * Returns whether our robot is blue or not
+     * 
+     * @return true if our robot is the blue one, false otherwise
+     */
+    protected boolean isBlue() {
+        return balleIsBlue;
     }
 
     /***
