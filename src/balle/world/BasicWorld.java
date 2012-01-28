@@ -4,8 +4,8 @@ public class BasicWorld extends AbstractWorld {
 
     private Snapshot prev = null;
 
-    public BasicWorld(DataReader visionInput, boolean balleIsBlue) {
-        super(visionInput, balleIsBlue);
+    public BasicWorld(boolean balleIsBlue) {
+        super(balleIsBlue);
     }
 
     @Override

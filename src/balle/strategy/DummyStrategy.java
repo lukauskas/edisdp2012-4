@@ -27,6 +27,7 @@ public class DummyStrategy extends AbstractStrategy {
 
     @Override
     protected void aiMove(Controller controller) {
+        System.out.println("MOVE!");
         if (timesMoveCalledOnThisStep > 0)
             return;
 
