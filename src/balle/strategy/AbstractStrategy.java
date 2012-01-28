@@ -24,6 +24,9 @@ public abstract class AbstractStrategy extends Thread {
         while (true) {
 
             Snapshot newSnapshot = world.getSnapshot();
+            if (newSnapshot != null)
+                System.out.println(newSnapshot.getTimestamp());
+
             if ((newSnapshot != null) && (!newSnapshot.equals(prevSnapshot))) {
                 System.out.println("New snapshot received");
                 this.aiStep();

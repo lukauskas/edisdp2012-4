@@ -2,12 +2,11 @@ package balle.main;
 
 import balle.brick.Controller;
 import balle.controller.DummyController;
+import balle.io.reader.ScannerReader;
 import balle.strategy.AbstractStrategy;
 import balle.strategy.DummyStrategy;
 import balle.world.AbstractWorld;
 import balle.world.BasicWorld;
-import balle.world.ScannerReader;
-import balle.world.VisionListener;
 
 /**
  * This is where the main executable code for BALL-E lies. It is responsible of
@@ -22,15 +21,16 @@ public class Runner {
     protected ScannerReader    visionInput;
     protected Controller       controller;
     protected AbstractStrategy strategy;
-    protected VisionListener   listener;
 
     public Runner(boolean balleIsBlue) {
 
-        listener = new VisionListener();
         // Initialise world
         world = new BasicWorld(balleIsBlue);
         // Create visionInput buffer
-        visionInput = new ScannerReader(world);
+        visionInput = new ScannerReader();
+        visionInput.addListener(world);
+        visionInput.setPriority(Thread.MAX_PRIORITY);
+        // visionInput.setPriority(Thread.MAX_PRIORITY);
         visionInput.start();
 
         // Initialise world
