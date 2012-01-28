@@ -20,12 +20,15 @@ public abstract class AbstractStrategy extends Thread {
 
     @Override
     public void run() {
+        snapshot = null;
         while (true) {
-            prevSnapshot = snapshot;
-            snapshot = world.getSnapshot();
 
-            if (snapshot.equals(prevSnapshot)) {
+            Snapshot newSnapshot = world.getSnapshot();
+            if ((newSnapshot != null) && (!newSnapshot.equals(prevSnapshot))) {
+                System.out.println("New snapshot received");
                 this.aiStep();
+                prevSnapshot = snapshot;
+                snapshot = newSnapshot;
             }
             this.aiMove(controller);
         }
