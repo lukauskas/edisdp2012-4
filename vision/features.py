@@ -28,9 +28,9 @@ class Features:
         ents['blue'] = self.findEntity(blue, 'T')
         ents['ball'] = self.findEntity(ball, 'ball')
 
-        display.putFeature('yellow', ents['yellow'])
-        display.putFeature('blue', ents['blue'])
-        display.putFeature('ball', ents['ball'])
+        display.updateFeature('yellow', ents['yellow'])
+        display.updateFeature('blue', ents['blue'])
+        display.updateFeature('ball', ents['ball'])
 
         return ents
 

@@ -24,7 +24,7 @@ class Display:
         self._base.show()
          
 
-    def putBase(self, image):
+    def updateBase(self, image):
         if self._base is not None:
             self._base.clearLayers()
 
@@ -39,7 +39,7 @@ class Display:
 
         #self.draw()
 
-    def putFeature(self, name, feature):
+    def updateFeature(self, name, feature):
         """
         make a layer available to show on the display
         """
