@@ -1,3 +1,4 @@
+from __future__ import print_function
 import cv
 from SimpleCV import Image, Camera
 from capture import Capture
@@ -27,6 +28,19 @@ def undistort(image):
     
     return image2
 
+def output(ents):
+    for name in ['yellow', 'blue', 'ball']:
+        x = y = angle = -1
+        entity = ents[name]
+        if entity is not None:
+            x, y = entity.coordinates()
+            angle = entity.angle()
+
+        print('{0} {1} {2} '.format(x, y, angle), end='')
+
+    print()
+
+
 #try:
 
 cap = Camera() #Capture()
@@ -41,18 +55,14 @@ while True:
     #frame = Image('global05.jpg')
     #frame = Image(frame)
 
-    display.putBase(frame)
+    display.updateBase(frame)
 
     ents = features.extractFeatures(frame)
     
     display.draw()
 
-    print ents
-    if ents['blue'] is not None:
-        print ents['blue'].angle()
+    output(ents)
 
-    if ents['yellow'] is not None:
-        print ents['yellow'].angle()
 
     cv.ShowImage('camera', frame.getBitmap())
     key = cv.WaitKey(16)

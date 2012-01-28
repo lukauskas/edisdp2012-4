@@ -45,9 +45,22 @@ function install_jbox2d {
     && cd $lEXTRACT_DIR \
     && unzip $lLOCATION \
     && cp $lEXTRACT_DIR/jbox2d-library/target/jbox2d-library-2.1.2.1-SNAPSHOT-jar-with-dependencies.jar $LIB \
-    && cp $lEXTRACT_DIR/jbox2d-testbed/target/jbox2d-testbed-2.1.2.1-SNAPSHOT.jar $LIB \
+    && cp $lEXTRACT_DIR/jbox2d-testbed/target/jbox2d-testbed-2.1.2.1-SNAPSHOT-jar-with-dependencies.jar $LIB \
     && rm $lLOCATION \
     && rm -rf $lEXTRACT_DIR
+}
+
+function install_slf4j {
+   local lLOCATION="`mktemp /tmp/slf4j.XXXXXXX.tar.gz`"
+   local lEXTRACT_DIR="`mktemp -d /tmp/slf4j_extracted.XXXXXX`"
+
+   wget -O "$lLOCATION" "http://www.slf4j.org/dist/slf4j-1.6.4.tar.gz" \
+   && echo "> extractiong $lLOCATION" \
+   && cd $lEXTRACT_DIR \
+   && tar xvf $lLOCATION \
+   && cp "$lEXTRACT_DIR/slf4j-1.6.4/slf4j-simple-1.6.4.jar" $LIB \
+   && rm $lLOCATION \
+   && rm -rf $lEXTRACT_DIR
 }
 
 function cleanup {
@@ -69,5 +82,6 @@ function install_bluetooth {
 cleanup
 install_lejos
 install_bluetooth
+install_slf4j # Seems to be required for the physics demo
 #install_jbullet
 install_jbox2d
