@@ -2,24 +2,18 @@ package balle.world;
 
 import java.util.Scanner;
 
-public class ScannerReader extends Thread implements DataReader {
+public class ScannerReader implements DataReader {
 
     private Scanner scanner;
-    private String  newestLine = null;
 
     public ScannerReader() {
         scanner = new Scanner(System.in);
     }
 
     @Override
-    public void run() {
-        while (true) {
-            newestLine = scanner.nextLine();
-        }
-    }
-
-    @Override
     public String nextLine() {
-        return newestLine;
+        String line = scanner.nextLine();
+        System.out.println(line);
+        return line;
     }
 }

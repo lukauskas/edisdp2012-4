@@ -26,7 +26,6 @@ public class Runner {
 
         // Create visionInput buffer
         visionInput = new ScannerReader();
-        visionInput.start();
 
         // Initialise world
         world = new BasicWorld(visionInput, balleIsBlue);
