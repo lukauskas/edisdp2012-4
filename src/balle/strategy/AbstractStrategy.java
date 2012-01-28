@@ -10,6 +10,7 @@ public abstract class AbstractStrategy extends Thread {
     private AbstractWorld world;
 
     private Snapshot      snapshot;
+    private Snapshot      prevSnapshot;
 
     public AbstractStrategy(Controller controller, AbstractWorld world) {
         super();
@@ -20,8 +21,12 @@ public abstract class AbstractStrategy extends Thread {
     @Override
     public void run() {
         while (true) {
+            prevSnapshot = snapshot;
             snapshot = world.getSnapshot();
-            this.aiStep();
+
+            if (snapshot.equals(prevSnapshot)) {
+                this.aiStep();
+            }
             this.aiMove(controller);
         }
     }
@@ -34,8 +39,18 @@ public abstract class AbstractStrategy extends Thread {
         return snapshot;
     }
 
+    /**
+     * This function is a step counter for the vision input. It is increased
+     * every time a new snapshot of the world is received.
+     */
     protected abstract void aiStep();
 
+    /**
+     * The code that implements movement strategy should go here
+     * 
+     * @param controller
+     *            -- robot's controller to use
+     */
     protected abstract void aiMove(Controller controller);
 
 }
