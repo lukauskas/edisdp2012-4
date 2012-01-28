@@ -1,6 +1,6 @@
+from __future__ import print_function
 import time
 import cv
-from __future__ import print_function
 from SimpleCV import Image, Camera
 from features import Features
 from display import Display
