@@ -22,8 +22,8 @@ public class Simulator implements DataReader {
 		return blue;
 	}
 	
-	/** Updates world object.
-	 * 
+	/** 
+	 * Updates world object.
 	 */
 	@Override
 	public String nextLine() {
