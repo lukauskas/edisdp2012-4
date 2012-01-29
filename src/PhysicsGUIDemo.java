@@ -7,8 +7,11 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
+import org.jbox2d.dynamics.Filter;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
+import org.jbox2d.dynamics.joints.FrictionJointDef;
+import org.jbox2d.dynamics.joints.WeldJointDef;
 import org.jbox2d.testbed.framework.TestbedFrame;
 import org.jbox2d.testbed.framework.TestbedModel;
 import org.jbox2d.testbed.framework.TestbedPanel;
@@ -19,6 +22,17 @@ import org.jbox2d.testbed.framework.j2d.TestPanelJ2D;
 public class PhysicsGUIDemo extends TestbedTest {
 
 	private final float scale = 10;
+	
+	// Robot Variables
+	private final Vec2 leftWheelPos = new Vec2(0.01f*scale, -0.04f*scale);
+	private final Vec2 rightWheelPos = new Vec2(0.01f*scale, 0.04f*scale);
+	private final float robotWidth = 0.15f*scale;
+	private final float robotLength = 0.2f*scale;
+	private final float wheelWidth = 0.02f*scale;
+	private final float wheelLength = 0.05f*scale;
+
+	private Body ground;
+	private Body robot;
 	private Body ball;
 	
 	@Override
@@ -42,11 +56,26 @@ public class PhysicsGUIDemo extends TestbedTest {
 	
 	@Override
 	public void initTest(boolean arg0) {
-		World w = getWorld();
 		
+		// center the camera
+		setCamera(new Vec2(1.22f*scale,1.22f*scale), getCachedCameraScale());
 		// No Gravity
+		World w = getWorld();
 		w.setGravity(new Vec2(0,0));
-
+		
+		// Ground
+		PolygonShape groundShape = new PolygonShape();
+		groundShape.setAsBox(2.64f*scale,1.42f*scale);
+		BodyDef groundBodyDef = new BodyDef();
+		groundBodyDef.type = BodyType.STATIC;
+		groundBodyDef.position.set(1.22f*scale,0.61f*scale);
+		ground = w.createBody(groundBodyDef);
+		FixtureDef groundF = new FixtureDef();
+		groundF.shape = groundShape;
+		groundF.density = (1f/0.36f)/scale;
+		groundF.filter.maskBits = 0;
+		ground.createFixture(groundF);
+		
 		// Edges of field
 		// Main Pitch
 		addEdge(0f*scale,0f*scale,2.44f*scale,0f*scale);
@@ -64,19 +93,63 @@ public class PhysicsGUIDemo extends TestbedTest {
 		addEdge(0f*scale,0.91f*scale,-0.1f*scale,0.91f*scale);
 		addEdge(2.54f*scale,0.31f*scale,2.54f*scale,0.91f*scale);
 		
-		CircleShape b = new CircleShape();
-		b.m_radius = 0.02135f*scale;
+		CircleShape ballShape = new CircleShape();
+		ballShape.m_radius = 0.02135f*scale;
 		FixtureDef f = new FixtureDef();
-		f.shape = b;
+		f.shape = ballShape;
+		f.density = (1f/0.36f)/scale;
 		BodyDef bd = new BodyDef();
 		bd.type = BodyType.DYNAMIC;
 		bd.position.set(1.22f*scale,0.61f*scale);
+		bd.bullet = true;
 		ball = w.createBody(bd);
 		ball.createFixture(f);
-		// TODO fid correct dampening
-		ball.setLinearDamping(0.5f);
+		ball.setLinearDamping(0);
 		ball.setLinearVelocity(new Vec2(10f, 10f));
 		
+		// TODO correct friction
+		FrictionJointDef ballFriction = new FrictionJointDef();
+		ballFriction.initialize(ball, ground, ball.getWorldCenter());
+		ballFriction.maxForce = 0.2f;
+		ballFriction.maxTorque = 0.001f;
+		w.createJoint(ballFriction);
+		
+		PolygonShape robotShape = new PolygonShape();
+		robotShape.setAsBox(robotWidth, robotLength);
+		BodyDef robotBodyDef = new BodyDef();
+		robotBodyDef.type = BodyType.DYNAMIC;
+		robotBodyDef.angle = (float)Math.PI/2;
+		robotBodyDef.position.set(0.22f*scale,0.61f*scale);
+		robot = w.createBody(robotBodyDef);
+		FixtureDef robotF = new FixtureDef();
+		robotF.shape = robotShape;
+		robotF.density = (1f/0.36f)/scale;
+		robotF.filter.groupIndex = -1;
+		robot.createFixture(robotF);
+
+		PolygonShape wheelShape = new PolygonShape();
+		wheelShape.setAsBox(wheelWidth, wheelLength);
+		BodyDef wheelBodyDef = new BodyDef();
+		wheelBodyDef.type = BodyType.DYNAMIC;
+		wheelBodyDef.angle = (float)Math.PI/2;
+		FixtureDef wheelF = new FixtureDef();
+		wheelF.filter.groupIndex = -1;
+		wheelF.density = (1f/0.36f)/scale;
+		wheelF.shape = wheelShape;
+		
+		wheelBodyDef.position.set(robot.getWorldCenter().clone().add(leftWheelPos));
+		Body wheelL = w.createBody(wheelBodyDef);
+		wheelL.createFixture(wheelF);
+
+		wheelBodyDef.position.set(robot.getWorldCenter().clone().add(rightWheelPos));
+		Body wheelR = w.createBody(wheelBodyDef);
+		wheelR.createFixture(wheelF);
+		
+		WeldJointDef wjd = new WeldJointDef();
+		wjd.initialize(robot, wheelL, wheelL.getWorldCenter());
+		w.createJoint(wjd);
+		wjd.initialize(robot, wheelR, wheelR.getWorldCenter());
+		w.createJoint(wjd);
 	}
 
 	public static void main(String[] args) {
