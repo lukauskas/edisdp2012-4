@@ -3,7 +3,7 @@ import time
 import cv
 from SimpleCV import Image, Camera
 from features import Features
-from display import Display
+from display import Gui
 
 def undistort(image):
     intrinsics = cv.CreateMat(3, 3, cv.CV_64FC1)
@@ -48,18 +48,18 @@ def output(ents):
 cap = Camera() #Capture()
 
 features = Features()
-display = Display.getDisplay()
+gui = Gui.getGui()
 
 while True:
     frame = cap.getImage()
     #frame = Image('global05.jpg')
     #frame = Image(frame)
 
-    display.updateBase(frame)
+    gui.updateBase(frame)
 
     ents = features.extractFeatures(frame)
     
-    display.draw()
+    gui.loop()
 
     output(ents)
 

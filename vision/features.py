@@ -1,9 +1,9 @@
 import cv
 from SimpleCV import Image, Features
 from threshold import Threshold
-from display import Display
+from display import Gui
 
-display = Display.getDisplay()
+display = Gui.getGui()
 
 class Features:
     # Sizes of various features

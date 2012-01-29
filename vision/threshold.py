@@ -1,5 +1,6 @@
 import cv
 from SimpleCV import Image
+from display import Gui
 
 
 
@@ -74,6 +75,21 @@ class Threshold:
             self.currentEntity = 'yellow'
 
             self.__createTrackbars()
+            self.__setupKeyEvents()
+            
+        def __setupKeyEvents(self):
+            """
+            Adds key listeners to the main gui for switching between entities
+            """
+            
+            def yellow(): self.changeEntity('yellow')
+            def blue(): self.changeEntity('blue')
+            def ball(): self.changeEntity('ball')
+            
+            keyHandler = Gui.getGui().getKeyHandler()
+            keyHandler.addListener('y', yellow)
+            keyHandler.addListener('b', blue)
+            keyHandler.addListener('r', ball)
 
         def __createTrackbars(self):
 
@@ -101,6 +117,11 @@ class Threshold:
             self.threshold.updateValues(self.currentEntity, allvalues)
 
         def changeEntity(self, name):
+            """
+            Change which entity to adjust thresholding
+            Can be 'blue', 'yellow' or 'ball'
+            """
+            
             self.currentEntity = name
             self.setTrackbarValues(self.threshold._values[name])
 
