@@ -38,6 +38,8 @@ public class BrickController implements Controller {
         RIGHT_WHEEL.regulateSpeed(true);
         LEFT_WHEEL.smoothAcceleration(true);
         RIGHT_WHEEL.smoothAcceleration(true);
+        KICKER.smoothAcceleration(false);
+        KICKER.regulateSpeed(false);
     }
 
     /*
