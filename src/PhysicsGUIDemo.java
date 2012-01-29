@@ -24,8 +24,8 @@ public class PhysicsGUIDemo extends TestbedTest {
 	private final float scale = 10;
 	
 	// Robot Variables
-	private final Vec2 leftWheelPos = new Vec2(0.01f*scale, -0.04f*scale);
-	private final Vec2 rightWheelPos = new Vec2(0.01f*scale, 0.04f*scale);
+	private final Vec2 leftWheelPos = new Vec2(0.01f*scale, 0.05f*scale);
+	private final Vec2 rightWheelPos = new Vec2(0.01f*scale, -0.05f*scale);
 	private final float robotWidth = 0.15f*scale;
 	private final float robotLength = 0.2f*scale;
 	private final float wheelWidth = 0.02f*scale;
@@ -33,7 +33,13 @@ public class PhysicsGUIDemo extends TestbedTest {
 
 	private Body ground;
 	private Body robot;
+	private Body wheelL;
+	private Body wheelR;
 	private Body ball;
+	
+	// wheel power (-1 for lock and 0 for float and (0,100] for power )
+	private float wheelLPower;
+	private float wheelRPower;
 	
 	@Override
 	public String getTestName() {
@@ -115,10 +121,9 @@ public class PhysicsGUIDemo extends TestbedTest {
 		w.createJoint(ballFriction);
 		
 		PolygonShape robotShape = new PolygonShape();
-		robotShape.setAsBox(robotWidth, robotLength);
+		robotShape.setAsBox(robotLength,robotWidth);
 		BodyDef robotBodyDef = new BodyDef();
 		robotBodyDef.type = BodyType.DYNAMIC;
-		robotBodyDef.angle = (float)Math.PI/2;
 		robotBodyDef.position.set(0.22f*scale,0.61f*scale);
 		robot = w.createBody(robotBodyDef);
 		FixtureDef robotF = new FixtureDef();
@@ -128,21 +133,20 @@ public class PhysicsGUIDemo extends TestbedTest {
 		robot.createFixture(robotF);
 
 		PolygonShape wheelShape = new PolygonShape();
-		wheelShape.setAsBox(wheelWidth, wheelLength);
+		wheelShape.setAsBox(wheelLength, wheelWidth);
 		BodyDef wheelBodyDef = new BodyDef();
 		wheelBodyDef.type = BodyType.DYNAMIC;
-		wheelBodyDef.angle = (float)Math.PI/2;
 		FixtureDef wheelF = new FixtureDef();
 		wheelF.filter.groupIndex = -1;
 		wheelF.density = (1f/0.36f)/scale;
 		wheelF.shape = wheelShape;
 		
 		wheelBodyDef.position.set(robot.getWorldCenter().clone().add(leftWheelPos));
-		Body wheelL = w.createBody(wheelBodyDef);
+		wheelL = w.createBody(wheelBodyDef);
 		wheelL.createFixture(wheelF);
 
 		wheelBodyDef.position.set(robot.getWorldCenter().clone().add(rightWheelPos));
-		Body wheelR = w.createBody(wheelBodyDef);
+		wheelR = w.createBody(wheelBodyDef);
 		wheelR.createFixture(wheelF);
 		
 		WeldJointDef wjd = new WeldJointDef();
@@ -151,7 +155,33 @@ public class PhysicsGUIDemo extends TestbedTest {
 		wjd.initialize(robot, wheelR, wheelR.getWorldCenter());
 		w.createJoint(wjd);
 	}
+	
+	@Override
+	public void keyPressed(char c, int keyCode) {
+	}
+	
+	@Override
+	public void update() {
+		//System.out.println(robot.getAngle()%(2*Math.PI));
+		killAllOrtogonal(robot);
+		//killAllOrtogonal(wheelL);
+		//killAllOrtogonal(wheelR);
+		super.update();
+		float mag = 5f;
+		double ang = robot.getAngle();
+		wheelL.applyForce(new Vec2(-(float)(mag*Math.cos(ang)), -(float)(mag*Math.sin(ang))), wheelL.getWorldCenter());
+		wheelR.applyForce(new Vec2((float)(mag*Math.cos(ang)), (float)(mag*Math.sin(ang))), wheelR.getWorldCenter());
+	}
 
+	private void killAllOrtogonal(Body b) {
+		Vec2 v = b.getLinearVelocity();
+		double ang = b.getAngle();
+		Vec2 unitDir = new Vec2((float)(Math.cos(ang)), (float)(Math.sin(ang)));
+		float newMag = Vec2.dot(v, unitDir);
+		b.setLinearVelocity(new Vec2(newMag*unitDir.x, newMag*unitDir.y));
+		//b.setLinearVelocity(new Vec2(0, 0));
+	}
+	
 	public static void main(String[] args) {
 	    try {
 	      UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
