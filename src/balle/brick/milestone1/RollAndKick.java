@@ -39,10 +39,10 @@ public class RollAndKick {
                 drawMessage("Roll");
                 movingForward = true;
                 controller.reset();
-                controller.forward(50);
+                controller.forward(300);
             } else {
                 float distance = controller.getTravelDistance();
-                if (distance > 80) {
+                if (distance > 500) {
                     drawMessage("Kick!");
                     controller.kick();
                     break;
