@@ -14,8 +14,8 @@ class Features:
           'dirmarker' : (3,  12, 3,  12),
         }
 
-    def __init__(self):
-        self.threshold = Threshold();
+    def __init__(self, pitch):
+        self.threshold = Threshold(pitch);
 
     def extractFeatures(self, frame):
         
@@ -27,7 +27,7 @@ class Features:
         ents['yellow'] = self.findEntity(yellow, 'T')
         ents['blue'] = self.findEntity(blue, 'T')
         ents['ball'] = self.findEntity(ball, 'ball')
-
+        
         display.updateFeature('yellow', ents['yellow'])
         display.updateFeature('blue', ents['blue'])
         display.updateFeature('ball', ents['ball'])

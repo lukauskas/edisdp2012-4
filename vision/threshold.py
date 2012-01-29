@@ -6,13 +6,13 @@ from display import Gui
 
 class Threshold:
 
-    def __init__(self):
+    def __init__(self, pitch):
 
         self._values = {}
 
-        self._values['yellow'] = defaults['yellow']
-        self._values['blue'] = defaults['blue']
-        self._values['ball'] = defaults['ball']
+        self._values['yellow'] = defaults[pitch]['yellow']
+        self._values['blue'] = defaults[pitch]['blue']
+        self._values['ball'] = defaults[pitch]['ball']
 
         self._gui = Threshold.Gui(self)
         self._gui.changeEntity('ball')
@@ -130,12 +130,19 @@ class Threshold:
                 for j, channel in enumerate(['H', 'S', 'V']):
                     cv.SetTrackbarPos('{0} {1}'.format(channel, which), \
                             self.window, values[i][j])
-                    
 
-
-defaults = {
+"""
+defaults[0] for the main pitch, and defaults[1] for the other table
+"""        
+defaults =[
+        {
         'yellow' : [[14, 54, 235], [45, 255, 255]],
         'blue' : [[84,  100,  108], [132, 255, 255]],
         'ball' : [[0, 160, 100], [13, 255, 255]]
-        }
+        },
+        {
+        'yellow' : [[17, 147, 183], [44, 255, 255]],
+        'blue' : [[57,  29,  43], [92, 255, 255]],
+        'ball' : [[0, 160, 100], [7, 255, 255]]
+        }]
 

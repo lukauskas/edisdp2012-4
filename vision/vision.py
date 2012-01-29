@@ -1,4 +1,5 @@
 from __future__ import print_function
+import sys
 import time
 import cv
 from SimpleCV import Image, Camera
@@ -44,10 +45,15 @@ def output(ents):
 
 
 #try:
+if len(sys.argv) > 1:
+    pitchnum = int(sys.argv[1])
+else:
+    # Default to the main pitch
+    pitchnum = 0
 
 cap = Camera() #Capture()
 
-features = Features()
+features = Features(pitchnum)
 gui = Gui.getGui()
 
 while True:
