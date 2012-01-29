@@ -26,8 +26,8 @@ public class PhysicsGUIDemo extends TestbedTest {
 	// Robot Variables
 	private final Vec2 leftWheelPos = new Vec2(0.01f*scale, 0.05f*scale);
 	private final Vec2 rightWheelPos = new Vec2(0.01f*scale, -0.05f*scale);
-	private final float robotWidth = 0.15f*scale;
-	private final float robotLength = 0.2f*scale;
+	private final float robotWidth = 0.15f*scale/2;
+	private final float robotLength = 0.2f*scale/2;
 	private final float wheelWidth = 0.02f*scale;
 	private final float wheelLength = 0.05f*scale;
 
@@ -90,7 +90,7 @@ public class PhysicsGUIDemo extends TestbedTest {
 		addEdge(2.44f*scale,0f*scale,2.44f*scale,0.31f*scale);
 		addEdge(0f*scale,1.22f*scale,0f*scale,0.91f*scale);
 		addEdge(2.44f*scale,1.22f*scale,2.44f*scale,0.91f*scale);
-		// Lef*scalet-hand goal area
+		// Left-hand goal area
 		addEdge(0f*scale,0.31f*scale,-0.1f*scale,0.31f*scale);
 		addEdge(-0.1f*scale,0.31f*scale,-0.1f*scale,0.91f*scale);
 		addEdge(2.44f*scale,0.31f*scale,2.54f*scale,0.31f*scale);		
@@ -169,8 +169,8 @@ public class PhysicsGUIDemo extends TestbedTest {
 		super.update();
 		float mag = 5f;
 		double ang = robot.getAngle();
-		wheelL.applyForce(new Vec2(-(float)(mag*Math.cos(ang)), -(float)(mag*Math.sin(ang))), wheelL.getWorldCenter());
-		wheelR.applyForce(new Vec2((float)(mag*Math.cos(ang)), (float)(mag*Math.sin(ang))), wheelR.getWorldCenter());
+		//wheelL.applyForce(new Vec2(-(float)(mag*Math.cos(ang)), -(float)(mag*Math.sin(ang))), wheelL.getWorldCenter());
+		//wheelR.applyForce(new Vec2((float)(mag*Math.cos(ang)), (float)(mag*Math.sin(ang))), wheelR.getWorldCenter());
 	}
 
 	private void killAllOrtogonal(Body b) {
