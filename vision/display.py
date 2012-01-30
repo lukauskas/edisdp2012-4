@@ -1,4 +1,5 @@
 import pygame
+import cv
 from SimpleCV import Display, DrawingLayer
 
 class Gui:
@@ -34,10 +35,12 @@ class Gui:
         
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
-                self._keyListener.processKey(chr(event.key))
+                self._keyListener.processKey(chr(event.key % 0x100))
             
-        # Todo: process openCV events here too
-        
+        # Process OpenCV events (for if the focus is on the thresholding window)
+        c = cv.WaitKey(16)
+        self._keyListener.processKey(chr(c % 0x100))
+
     def getKeyHandler(self):
         return self._keyListener   
 
@@ -54,7 +57,6 @@ class Gui:
 
             self._layers[key] = layer
 
-        #self.draw()
 
     def updateFeature(self, name, feature):
         """

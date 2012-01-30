@@ -16,4 +16,4 @@ Run vision.py
 
 where pitch is 0 for the main pitch, or 1 for the other one
     
-To switch between yellow/blue robots and the ball, press `y`, `b` and `r` respectively (focus must be on the video window at the moment).
+To switch between yellow/blue robots and the ball, press `y`, `b` and `r` respectively.
