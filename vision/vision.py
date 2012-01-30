@@ -1,9 +1,10 @@
 from __future__ import print_function
+import sys
 import time
 import cv
 from SimpleCV import Image, Camera
 from features import Features
-from display import Display
+from display import Gui
 
 def undistort(image):
     intrinsics = cv.CreateMat(3, 3, cv.CV_64FC1)
@@ -44,27 +45,34 @@ def output(ents):
 
 
 #try:
+if len(sys.argv) > 1:
+    pitchnum = int(sys.argv[1])
+else:
+    # Default to the main pitch
+    pitchnum = 0
 
 cap = Camera() #Capture()
 
-features = Features()
-display = Display.getDisplay()
+features = Features(pitchnum)
+gui = Gui.getGui()
 
 while True:
     frame = cap.getImage()
     #frame = Image('global05.jpg')
     #frame = Image(frame)
 
-    display.updateBase(frame)
+    gui.updateBase(frame)
 
     ents = features.extractFeatures(frame)
     
-    display.draw()
+    gui.loop()
 
     output(ents)
 
-    key = cv.WaitKey(16)
-    if key == 113 or key == 27:
+    c = cv.WaitKey(16)
+    k = chr(c % 0x100)
+
+    if k == 'q' or k == 27: # ESC
         break
 
 #finally:
