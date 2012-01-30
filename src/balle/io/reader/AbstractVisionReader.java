@@ -5,7 +5,7 @@ import java.util.List;
 
 import balle.io.listener.Listener;
 
-public abstract class AbstractReader extends Thread {
+public abstract class AbstractVisionReader {
     private final List<Listener> listeners = new ArrayList<Listener>();
 
     public void addListener(Listener listener) {
@@ -18,4 +18,6 @@ public abstract class AbstractReader extends Thread {
             listener.update(str);
         }
     }
+    
+    public abstract void start();
 }

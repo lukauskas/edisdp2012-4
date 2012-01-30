@@ -1,10 +1,8 @@
 package balle.main;
 
 import balle.brick.Controller;
-import balle.controller.DummyController;
-import balle.io.reader.ScannerReader;
+import balle.io.reader.SocketVisionReader;
 import balle.strategy.AbstractStrategy;
-import balle.strategy.DummyStrategy;
 import balle.world.AbstractWorld;
 import balle.world.BasicWorld;
 
@@ -18,7 +16,7 @@ import balle.world.BasicWorld;
  */
 public class Runner {
     protected AbstractWorld    world;
-    protected ScannerReader    visionInput;
+    protected SocketVisionReader visionInput;
     protected Controller       controller;
     protected AbstractStrategy strategy;
 
@@ -28,7 +26,7 @@ public class Runner {
         world = new BasicWorld(balleIsBlue);
         
         // Create visionInput buffer
-        visionInput = new ScannerReader();
+        visionInput = new SocketVisionReader();
         visionInput.addListener(world);
         visionInput.start();
 

@@ -42,7 +42,7 @@ public abstract class AbstractWorld implements Listener {
     @Override
     public void update(Object input) {
 
-        // TODO: surely this should be parsed in ScannerReader?
+        // TODO: surely this should be parsed in SocketVisionReader?
         // I don't see why the simulator would be outputting text
         // - Ben
 
