@@ -1,13 +1,14 @@
 package balle.io.reader;
 
+import java.io.BufferedInputStream;
 import java.util.Scanner;
 
 public class ScannerReader extends AbstractReader {
 
-    private Scanner scanner;
+    private final Scanner scanner;
 
     public ScannerReader() {
-        scanner = new Scanner(System.in);
+        scanner = new Scanner(new BufferedInputStream(System.in));
     }
 
     @Override

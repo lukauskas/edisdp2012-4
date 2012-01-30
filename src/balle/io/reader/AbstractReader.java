@@ -6,7 +6,7 @@ import java.util.List;
 import balle.io.listener.Listener;
 
 public abstract class AbstractReader extends Thread {
-    private List<Listener> listeners = new ArrayList<Listener>();
+    private final List<Listener> listeners = new ArrayList<Listener>();
 
     public void addListener(Listener listener) {
         listeners.add(listener);
