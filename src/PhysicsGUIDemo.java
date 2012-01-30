@@ -37,9 +37,13 @@ public class PhysicsGUIDemo extends TestbedTest {
 	private Body wheelR;
 	private Body ball;
 	
+	
+	
 	// wheel power (-1 for lock and 0 for float and (0,100] for power )
-	private float wheelLPower;
-	private float wheelRPower;
+	
+	private Robot blue = new Robot();
+	private Robot yellow = new Robot();
+
 	
 	@Override
 	public String getTestName() {
@@ -120,40 +124,43 @@ public class PhysicsGUIDemo extends TestbedTest {
 		ballFriction.maxTorque = 0.001f;
 		w.createJoint(ballFriction);
 		
-		PolygonShape robotShape = new PolygonShape();
-		robotShape.setAsBox(robotLength,robotWidth);
-		BodyDef robotBodyDef = new BodyDef();
-		robotBodyDef.type = BodyType.DYNAMIC;
-		robotBodyDef.position.set(0.22f*scale,0.61f*scale);
-		robot = w.createBody(robotBodyDef);
-		FixtureDef robotF = new FixtureDef();
-		robotF.shape = robotShape;
-		robotF.density = (1f/0.36f)/scale;
-		robotF.filter.groupIndex = -1;
-		robot.createFixture(robotF);
-
-		PolygonShape wheelShape = new PolygonShape();
-		wheelShape.setAsBox(wheelLength, wheelWidth);
-		BodyDef wheelBodyDef = new BodyDef();
-		wheelBodyDef.type = BodyType.DYNAMIC;
-		FixtureDef wheelF = new FixtureDef();
-		wheelF.filter.groupIndex = -1;
-		wheelF.density = (1f/0.36f)/scale;
-		wheelF.shape = wheelShape;
+		blue = new Robot();
+		yellow = new Robot();
 		
-		wheelBodyDef.position.set(robot.getWorldCenter().clone().add(leftWheelPos));
-		wheelL = w.createBody(wheelBodyDef);
-		wheelL.createFixture(wheelF);
-
-		wheelBodyDef.position.set(robot.getWorldCenter().clone().add(rightWheelPos));
-		wheelR = w.createBody(wheelBodyDef);
-		wheelR.createFixture(wheelF);
-		
-		WeldJointDef wjd = new WeldJointDef();
-		wjd.initialize(robot, wheelL, wheelL.getWorldCenter());
-		w.createJoint(wjd);
-		wjd.initialize(robot, wheelR, wheelR.getWorldCenter());
-		w.createJoint(wjd);
+//		PolygonShape robotShape = new PolygonShape();
+//		robotShape.setAsBox(robotLength,robotWidth);
+//		BodyDef robotBodyDef = new BodyDef();
+//		robotBodyDef.type = BodyType.DYNAMIC;
+//		robotBodyDef.position.set(0.22f*scale,0.61f*scale);
+//		robot = w.createBody(robotBodyDef);
+//		FixtureDef robotF = new FixtureDef();
+//		robotF.shape = robotShape;
+//		robotF.density = (1f/0.36f)/scale;
+//		robotF.filter.groupIndex = -1;
+//		robot.createFixture(robotF);
+//
+//		PolygonShape wheelShape = new PolygonShape();
+//		wheelShape.setAsBox(wheelLength, wheelWidth);
+//		BodyDef wheelBodyDef = new BodyDef();
+//		wheelBodyDef.type = BodyType.DYNAMIC;
+//		FixtureDef wheelF = new FixtureDef();
+//		wheelF.filter.groupIndex = -1;
+//		wheelF.density = (1f/0.36f)/scale;
+//		wheelF.shape = wheelShape;
+//		
+//		wheelBodyDef.position.set(robot.getWorldCenter().clone().add(leftWheelPos));
+//		wheelL = w.createBody(wheelBodyDef);
+//		wheelL.createFixture(wheelF);
+//
+//		wheelBodyDef.position.set(robot.getWorldCenter().clone().add(rightWheelPos));
+//		wheelR = w.createBody(wheelBodyDef);
+//		wheelR.createFixture(wheelF);
+//		
+//		WeldJointDef wjd = new WeldJointDef();
+//		wjd.initialize(robot, wheelL, wheelL.getWorldCenter());
+//		w.createJoint(wjd);
+//		wjd.initialize(robot, wheelR, wheelR.getWorldCenter());
+//		w.createJoint(wjd);
 	}
 	
 	@Override
@@ -163,7 +170,9 @@ public class PhysicsGUIDemo extends TestbedTest {
 	@Override
 	public void update() {
 		//System.out.println(robot.getAngle()%(2*Math.PI));
-		killAllOrtogonal(robot);
+		//killAllOrtogonal(robot);		
+		killAllOrtogonal(yellow);
+		killAllOrtogonal(blue);
 		//killAllOrtogonal(wheelL);
 		//killAllOrtogonal(wheelR);
 		super.update();
@@ -197,4 +206,68 @@ public class PhysicsGUIDemo extends TestbedTest {
 	    testbed.setVisible(true);
 	    testbed.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	  }
+	
+	
+	class Robot {
+			private int scale = 10;
+			
+			private Body ground;
+			private Body robot;
+			private Body wheelL;
+			private Body wheelR;
+			private Body ball;
+			
+			private final Vec2 leftWheelPos = new Vec2(0.01f*scale, 0.05f*scale);
+			private final Vec2 rightWheelPos;
+			private final float robotWidth = 0.15f*scale/2;
+			private final float robotLength = 0.2f*scale/2;
+			private final float wheelWidth = 0.02f*scale;
+			private final float wheelLength = 0.05f*scale;
+			
+			// wheel power (-1 for lock and 0 for float and (0,100] for power )
+			private float wheelLPower;
+			private float wheelRPower;
+			
+			
+			public Robot(Vec2 middlePos, float angle) {
+				World w = getWorld();
+				leftWheelPos =  new Vec2();
+
+				PolygonShape robotShape = new PolygonShape();
+				robotShape.setAsBox(robotLength,robotWidth);
+				BodyDef robotBodyDef = new BodyDef();
+				robotBodyDef.type = BodyType.DYNAMIC;
+				robotBodyDef.position.set(0.22f*scale,0.61f*scale);
+				robot = w.createBody(robotBodyDef);
+				FixtureDef robotF = new FixtureDef();
+				robotF.shape = robotShape;
+				robotF.density = (1f/0.36f)/scale;
+				robotF.filter.groupIndex = -1;
+				robot.createFixture(robotF);
+
+				PolygonShape wheelShape = new PolygonShape();
+				wheelShape.setAsBox(wheelLength, wheelWidth);
+				BodyDef wheelBodyDef = new BodyDef();
+				wheelBodyDef.type = BodyType.DYNAMIC;
+				FixtureDef wheelF = new FixtureDef();
+				wheelF.filter.groupIndex = -1;
+				wheelF.density = (1f/0.36f)/scale;
+				wheelF.shape = wheelShape;
+
+				wheelBodyDef.position.set(robot.getWorldCenter().clone().add(leftWheelPos));
+				wheelL = w.createBody(wheelBodyDef);
+				wheelL.createFixture(wheelF);
+
+				wheelBodyDef.position.set(robot.getWorldCenter().clone().add(rightWheelPos));
+				wheelR = w.createBody(wheelBodyDef);
+				wheelR.createFixture(wheelF);
+
+				WeldJointDef wjd = new WeldJointDef();
+				wjd.initialize(robot, wheelL, wheelL.getWorldCenter());
+				w.createJoint(wjd);
+				wjd.initialize(robot, wheelR, wheelR.getWorldCenter());
+				w.createJoint(wjd);
+
+			}
+	}
 }
