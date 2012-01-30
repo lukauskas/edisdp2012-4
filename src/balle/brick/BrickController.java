@@ -126,8 +126,8 @@ public class BrickController implements Controller {
 
     @Override
     public void backward(int speed) {
-        // TODO Auto-generated method stub
-
+    	pilot.setMoveSpeed(speed);
+        pilot.backward();
     }
 
     @Override
