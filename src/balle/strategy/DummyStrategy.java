@@ -12,7 +12,8 @@ import balle.world.AbstractWorld;
  */
 public class DummyStrategy extends AbstractStrategy {
 
-    protected int stepNumber = -1;
+    protected int stepNumber                = -1;
+    protected int timesMoveCalledOnThisStep = 0;
 
     public DummyStrategy(Controller controller, AbstractWorld world) {
         super(controller, world);
@@ -20,14 +21,26 @@ public class DummyStrategy extends AbstractStrategy {
 
     @Override
     protected void aiStep() {
+        System.out.println("STEO! " + stepNumber);
         stepNumber = (stepNumber + 1) % 100;
+        timesMoveCalledOnThisStep = 0;
     }
 
     @Override
     protected void aiMove(Controller controller) {
-        if (stepNumber == 0)
+
+        if (timesMoveCalledOnThisStep > 0)
+            return;
+
+        timesMoveCalledOnThisStep++;
+
+        if (stepNumber == 0) {
+            System.out.println("StepNumber=0");
             controller.forward(controller.getMaximumWheelSpeed());
+        }
+
         else if (stepNumber == 50)
             controller.backward(controller.getMaximumWheelSpeed());
+
     }
 }

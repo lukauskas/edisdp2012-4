@@ -2,14 +2,14 @@ package balle.world;
 
 public class BasicWorld extends AbstractWorld {
 
-    private Snapshot prev;
+    private Snapshot prev = null;
 
-    public BasicWorld(DataReader visionInput, boolean balleIsBlue) {
-        super(visionInput, balleIsBlue);
+    public BasicWorld(boolean balleIsBlue) {
+        super(balleIsBlue);
     }
 
     @Override
-    public Snapshot getSnapshot() {
+    public synchronized Snapshot getSnapshot() {
         return prev;
     }
 
@@ -19,10 +19,9 @@ public class BasicWorld extends AbstractWorld {
      * 
      */
     @Override
-    void interpret(double yPosX, double yPosY, double yRad, double bPosX,
+    public void update(double yPosX, double yPosY, double yRad, double bPosX,
             double bPosY, double bRad, double ballPosX, double ballPosY,
             long timestamp) {
-
         Robot ours, them;
         FieldObject ball;
 
@@ -48,6 +47,8 @@ public class BasicWorld extends AbstractWorld {
             tPosY = bPosY;
             tRad = bRad;
         }
+        
+        Snapshot prev = getSnapshot();
 
         // First case when there is no past snapshot (assume velocities are 0)
         if (prev == null) {
@@ -57,6 +58,13 @@ public class BasicWorld extends AbstractWorld {
         } else {
             // change in time
             long deltaT = timestamp - prev.getTimestamp();
+
+            // Special case when we get two inputs with the same timestamp:
+            if (deltaT == 0) {
+                // This will just keep the prev world in the memory, not doing
+                // anything
+                return;
+            }
 
             // Change in position
             Coord oursDPos, themDPos, ballDPos;
@@ -87,8 +95,10 @@ public class BasicWorld extends AbstractWorld {
                     ballVel);
         }
 
-        // pack into a snapshot
-        prev = new Snapshot(them, ours, ball, timestamp);
+        synchronized (this) {
+            // pack into a snapshot
+            this.prev = new Snapshot(them, ours, ball, timestamp);
+        }
     }
 
 }
