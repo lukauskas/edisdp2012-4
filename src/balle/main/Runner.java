@@ -26,21 +26,16 @@ public class Runner {
 
         // Initialise world
         world = new BasicWorld(balleIsBlue);
+        
         // Create visionInput buffer
         visionInput = new ScannerReader();
         visionInput.addListener(world);
-        visionInput.setPriority(Thread.MAX_PRIORITY);
-        // visionInput.setPriority(Thread.MAX_PRIORITY);
         visionInput.start();
 
-        // Initialise world
-        world = new BasicWorld(balleIsBlue);
-
-        // Initialise controller
-        controller = new DummyController();
-        strategy = new DummyStrategy(controller, world);
-        strategy.setPriority(Thread.MAX_PRIORITY);
-        strategy.start();
+//        // Initialise controller
+//        controller = new DummyController();
+//        strategy = new DummyStrategy(controller, world);
+//        strategy.start();
 
     }
 
