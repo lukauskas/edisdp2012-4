@@ -17,8 +17,7 @@ public abstract class AbstractWorld implements Listener {
 
     // JEV: Scanner is final and can't be extended, makes it difficult for the
     // simulator.
-    DataReader      visionInput;
-    private boolean balleIsBlue;
+    private final boolean balleIsBlue;
 
     public AbstractWorld(boolean isBalleBlue) {
         this.balleIsBlue = isBalleBlue;
@@ -42,6 +41,11 @@ public abstract class AbstractWorld implements Listener {
 
     @Override
     public void update(Object input) {
+
+        // TODO: surely this should be parsed in ScannerReader?
+        // I don't see why the simulator would be outputting text
+        // - Ben
+
         String line = (String) input; // TODO: type checking
         System.out.println(line);
         // Ignore Comments

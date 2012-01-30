@@ -9,7 +9,7 @@ public class BasicWorld extends AbstractWorld {
     }
 
     @Override
-    public Snapshot getSnapshot() {
+    public synchronized Snapshot getSnapshot() {
         return prev;
     }
 
@@ -47,6 +47,8 @@ public class BasicWorld extends AbstractWorld {
             tPosY = bPosY;
             tRad = bRad;
         }
+        
+        Snapshot prev = getSnapshot();
 
         // First case when there is no past snapshot (assume velocities are 0)
         if (prev == null) {
@@ -93,8 +95,10 @@ public class BasicWorld extends AbstractWorld {
                     ballVel);
         }
 
-        // pack into a snapshot
-        prev = new Snapshot(them, ours, ball, timestamp);
+        synchronized (this) {
+            // pack into a snapshot
+            this.prev = new Snapshot(them, ours, ball, timestamp);
+        }
     }
 
 }
