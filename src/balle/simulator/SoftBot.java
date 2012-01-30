@@ -3,6 +3,17 @@ package balle.simulator;
 import balle.brick.Controller;
 
 public class SoftBot implements Controller {
+	
+	private float leftWheelSpeed = 0;
+	private float rightWheelSpeed = 0;
+	
+	public float getLeftWheelSpeed() {
+		return leftWheelSpeed;
+	}
+	
+	public float getRightWheelSpeed() {
+		return rightWheelSpeed;
+	}
 
 	@Override
 	public void backward(int speed) {
@@ -42,7 +53,8 @@ public class SoftBot implements Controller {
 
 	@Override
 	public void setWheelSpeeds(int leftWheelSpeed, int rightWheelSpeed) {
-		// TODO Auto-generated method stub
+		this.leftWheelSpeed = leftWheelSpeed;
+		this.rightWheelSpeed = rightWheelSpeed;
 		
 	}
 
