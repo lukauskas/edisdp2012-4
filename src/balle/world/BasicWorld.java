@@ -19,7 +19,7 @@ public class BasicWorld extends AbstractWorld {
      * 
      */
     @Override
-    void interpret(double yPosX, double yPosY, double yRad, double bPosX,
+    public void update(double yPosX, double yPosY, double yRad, double bPosX,
             double bPosY, double bRad, double ballPosX, double ballPosY,
             long timestamp) {
         Robot ours, them;

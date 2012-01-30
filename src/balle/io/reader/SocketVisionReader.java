@@ -30,7 +30,7 @@ public class SocketVisionReader extends AbstractVisionReader implements Runnable
     
                 while (scanner.hasNextLine()) {
                     try {
-                        propagateString(scanner.nextLine());
+                        parse(scanner.nextLine());
                     } catch (java.util.NoSuchElementException e) {
                         System.out.println("No input from camera!");
                     }
@@ -42,6 +42,30 @@ public class SocketVisionReader extends AbstractVisionReader implements Runnable
             e.printStackTrace();
         }
         
+    }
+    
+    private void parse(String line) {
+
+        // Ignore Comments
+        if (line.charAt(0) != '#') {
+
+            System.out.println("Updating: " + line);
+
+            String[] tokens = line.split(" ");
+
+            propagate(Double.parseDouble(tokens[0]),
+                    Double.parseDouble(tokens[1]),
+                    Double.parseDouble(tokens[2]),
+
+                    Double.parseDouble(tokens[3]),
+                    Double.parseDouble(tokens[4]),
+                    Double.parseDouble(tokens[5]),
+
+                    Double.parseDouble(tokens[6]),
+                    Double.parseDouble(tokens[7]),
+
+                    Long.parseLong(tokens[8]));
+        }
     }
 
 }

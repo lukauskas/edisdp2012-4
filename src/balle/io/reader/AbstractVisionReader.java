@@ -12,10 +12,12 @@ public abstract class AbstractVisionReader {
         listeners.add(listener);
     }
 
-    protected void propagateString(String str) {
-        System.out.println("Updating: " + str);
+    protected void propagate(double yPosX, double yPosY, double yRad,
+                             double bPosX, double bPosY, double bRad, double ballPosX,
+                             double ballPosY, long timestamp) {
+
         for (Listener listener : listeners) {
-            listener.update(str);
+            listener.update(yPosX, yPosY, yRad, bPosX, bPosY, bRad, ballPosX, ballPosY, timestamp);
         }
     }
     
