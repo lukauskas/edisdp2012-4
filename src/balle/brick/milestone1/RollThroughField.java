@@ -6,6 +6,9 @@ import lejos.nxt.TouchSensor;
 import balle.brick.BrickController;
 
 public class RollThroughField {
+	
+	private static final int ROLL_SPEED = 400;
+	private static final int ROLL_DISTANCE = 1800;
 
     private static void drawMessage(String message) {
         LCD.clear();
@@ -20,7 +23,8 @@ public class RollThroughField {
         TouchSensor sensorRight = new TouchSensor(SensorPort.S2);
 
         boolean movingForward = false;
-        int speed = 400;
+        int speed = ROLL_SPEED;
+        int rollDistance = ROLL_DISTANCE;
         while (true) {
             if (sensorLeft.isPressed() || sensorRight.isPressed()) {
                 drawMessage("Whoops, wall!");
@@ -37,11 +41,19 @@ public class RollThroughField {
                 break;
             }
             if (!movingForward) {
-                controller.forward(speed);
                 drawMessage("Roll");
                 movingForward = true;
+                controller.reset();
+                controller.forward(speed);
+                
             } else {
-                drawMessage("Keep rollin, rollin..");
+            	float distance = controller.getTravelDistance();
+                if (distance > rollDistance) {
+                	controller.stop();
+                    break;
+                } else {
+                    drawMessage(Float.toString(distance));
+                }
             }
         }
     }
