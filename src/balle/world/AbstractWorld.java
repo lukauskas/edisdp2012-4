@@ -39,36 +39,4 @@ public abstract class AbstractWorld implements Listener {
      */
     public abstract Snapshot getSnapshot();
 
-    @Override
-    public void update(Object input) {
-
-        // TODO: surely this should be parsed in ScannerReader?
-        // I don't see why the simulator would be outputting text
-        // - Ben
-
-        String line = (String) input; // TODO: type checking
-        System.out.println(line);
-        // Ignore Comments
-        if (line.charAt(0) != '#') {
-            String[] tokens = line.split(" ");
-
-            interpret(Double.parseDouble(tokens[0]),
-                    Double.parseDouble(tokens[1]),
-                    Double.parseDouble(tokens[2]),
-
-                    Double.parseDouble(tokens[3]),
-                    Double.parseDouble(tokens[4]),
-                    Double.parseDouble(tokens[5]),
-
-                    Double.parseDouble(tokens[6]),
-                    Double.parseDouble(tokens[7]),
-
-                    Long.parseLong(tokens[8]));
-        }
-    }
-
-    abstract void interpret(double yPosX, double yPosY, double yRad,
-            double bPosX, double bPosY, double bRad, double ballPosX,
-            double ballPosY, long timestamp);
-
 }
