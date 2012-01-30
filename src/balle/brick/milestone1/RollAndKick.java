@@ -20,6 +20,7 @@ public class RollAndKick {
         TouchSensor sensorRight = new TouchSensor(SensorPort.S2);
 
         boolean movingForward = false;
+        boolean isAccelerating = false;
         while (true) {
             if (sensorLeft.isPressed() || sensorRight.isPressed()) {
                 drawMessage("Whoops, wall!");
@@ -38,14 +39,19 @@ public class RollAndKick {
             if (!movingForward) {
                 drawMessage("Roll");
                 movingForward = true;
+                isAccelerating = true;
                 controller.reset();
-                controller.forward(300);
+                controller.forward(200);
             } else {
                 float distance = controller.getTravelDistance();
-                if (distance > 500) {
+                if (distance > 1000) {
                     drawMessage("Kick!");
                     controller.kick();
-                    break;
+                    break;             
+                }
+                else  if (distance > 100 && isAccelerating) {
+                	controller.forward(300);
+                	isAccelerating = false;
                 } else {
                     drawMessage(Float.toString(distance));
                 }
