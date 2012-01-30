@@ -17,6 +17,7 @@ public class TestBluetooth extends Frame implements KeyListener {
 	TextField t1;
 	BluetoothController controller;
 	int currentWheelSpeed = 500;
+	int currentTurnAngle = 180;
 
 	public TestBluetooth() {
 		super();
@@ -74,6 +75,17 @@ public class TestBluetooth extends Frame implements KeyListener {
 			currentWheelSpeed -= 10;
 			if (currentWheelSpeed < 0) currentWheelSpeed = 0;
 			System.out.println("Speed: " +  currentWheelSpeed);
+		}
+		else if (e.getKeyChar() == 't') {
+			currentTurnAngle += 5;
+			System.out.println("Angle: " + currentTurnAngle);
+		}
+		else if (e.getKeyChar() == 'y') {
+			currentTurnAngle -= 5;
+			System.out.println("Angle: " + currentTurnAngle);
+		}
+		else if (e.getKeyChar() == ' '){
+			controller.rotate(currentTurnAngle,180);
 		}
 		else
 		{
