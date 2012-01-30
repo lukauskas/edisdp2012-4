@@ -87,6 +87,10 @@ public class TestBluetooth extends Frame implements KeyListener {
 		else if (e.getKeyChar() == ' '){
 			controller.rotate(currentTurnAngle,180);
 		}
+		else if (e.getKeyChar() == 'k'){
+			System.out.println("Penalty Kick!");
+			controller.penaltyKick();
+		}
 		else
 		{
 			System.out.println("pressed: " + e.getKeyChar());
