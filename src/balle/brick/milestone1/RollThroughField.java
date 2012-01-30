@@ -25,6 +25,7 @@ public class RollThroughField {
         boolean movingForward = false;
         int speed = ROLL_SPEED;
         int rollDistance = ROLL_DISTANCE;
+        boolean hasStoppedOnce = false;
         while (true) {
             if (sensorLeft.isPressed() || sensorRight.isPressed()) {
                 drawMessage("Whoops, wall!");
@@ -37,7 +38,7 @@ public class RollThroughField {
                     drawMessage(";/");
                     break;
                 }
-                controller.rotate(180, 200);
+                controller.rotate(180, 120);
                 break;
             }
             if (!movingForward) {
@@ -50,7 +51,13 @@ public class RollThroughField {
             	float distance = controller.getTravelDistance();
                 if (distance > rollDistance) {
                 	controller.stop();
-                    break;
+                	if (!hasStoppedOnce) {
+                		controller.rotate(180, 120);
+                		controller.reset();
+                        controller.forward(speed);
+                        hasStoppedOnce = true;
+                	}
+                	else break;
                 } else {
                     drawMessage(Float.toString(distance));
                 }
