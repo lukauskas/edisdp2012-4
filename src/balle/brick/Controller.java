@@ -56,5 +56,11 @@ public interface Controller {
 	 * Kicks the ball.
 	 */
 	public abstract void kick();
+	
+	/**
+	 * Penalty kick
+	 */
+	public abstract void penaltyKick();
+	
 
 }

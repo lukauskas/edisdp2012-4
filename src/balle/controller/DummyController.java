@@ -105,4 +105,10 @@ public class DummyController implements Controller {
         System.out.println("Kick");
     }
 
+	@Override
+	public void penaltyKick() {
+		System.out.println("Penalty Kick!");
+		
+	}
+
 }

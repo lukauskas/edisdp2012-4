@@ -26,6 +26,7 @@ public class Roboto {
 	public static final int MESSAGE_STOP = 4;
 	public static final int MESSAGE_KICK = 5;
 	public static final int MESSAGE_MOVE = 6;	
+	public static final int MESSAGE_PENALTY = 7;
 
 	/**
 	 * Main program
@@ -98,6 +99,10 @@ public class Roboto {
 						int theta = input.readInt();
 						int speed = input.readInt();
 						controller.rotate(theta, speed);
+						break;
+					case MESSAGE_PENALTY:
+						controller.penaltyKick();
+						break;
 					default:
 						break;
 					}

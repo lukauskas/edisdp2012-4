@@ -58,5 +58,11 @@ public class SoftBot implements Controller {
 		
 	}
 
+	@Override
+	public void penaltyKick() {
+		// TODO Auto-generated method stub
+		
+	}
+
 
 }

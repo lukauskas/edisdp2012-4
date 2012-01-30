@@ -62,5 +62,9 @@ public class BluetoothController implements Controller {
 	public int getMaximumWheelSpeed() {
 		return 720;
 	}
+	@Override
+	public void penaltyKick() {
+		connection.send(Roboto.MESSAGE_PENALTY);		
+	}
 
 }
