@@ -35,6 +35,12 @@ class Features:
         return ents
 
     def findEntity(self, image, which):
+
+        # Work around OpenCV crash on some nearly black images
+        nonZero = cv.FindNonZero(image.getBitmap())
+        if nonZero < 10:
+            return None
+
         blobs = image.findBlobs()
 
         if blobs is None:
