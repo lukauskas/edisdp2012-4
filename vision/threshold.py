@@ -17,17 +17,42 @@ class Threshold:
         self._gui = Threshold.Gui(self)
         self._gui.changeEntity('ball')
 
+        # Whether to show the currently thresholded image on the gui
+        self._showOnMainGui = False
+
     def getGui(self):
         return self._gui
 
+    def toggleShowOnGui(self):
+        self._showOnMainGui = not self._showOnMainGui
+
     def yellowT(self, frame):
-        return self.threshold(frame, self._values['yellow'][0], self._values['yellow'][1])
+        result = self.threshold(frame, self._values['yellow'][0], self._values['yellow'][1])
+
+        # TODO: make this nice
+        if self._showOnMainGui and self._gui.currentEntity == 'yellow':
+            Gui.getGui().updateBase(result)
+
+        return result
+
 
     def blueT(self, frame):
-        return self.threshold(frame, self._values['blue'][0], self._values['blue'][1])
+        result = self.threshold(frame, self._values['blue'][0], self._values['blue'][1])
+
+        if self._showOnMainGui and self._gui.currentEntity == 'blue':
+            Gui.getGui().updateBase(result)
+
+        return result
+
 
     def ball(self, frame):
-        return self.threshold(frame, self._values['ball'][0], self._values['ball'][1])
+        result = self.threshold(frame, self._values['ball'][0], self._values['ball'][1])
+
+        if self._showOnMainGui and self._gui.currentEntity == 'ball':
+            Gui.getGui().updateBase(result)
+
+        return result
+
     
     def threshold(self, frame, threshmin, threshmax):
         
@@ -61,6 +86,8 @@ class Threshold:
     def updateValues(self, entity, newValues):
         self._values[entity] = newValues
 
+    # TODO: Integrate this more with the main gui class/module?
+    # Might make providing the current thresholded layer nicer
     class Gui:
 
         def __init__(self, thresholdinstance, window=None):
@@ -90,6 +117,10 @@ class Threshold:
             keyHandler.addListener('y', yellow)
             keyHandler.addListener('b', blue)
             keyHandler.addListener('r', ball)
+
+            def toggleBase(): self.threshold.toggleShowOnGui()
+
+            keyHandler.addListener('t', toggleBase)
 
         def __createTrackbars(self):
 
