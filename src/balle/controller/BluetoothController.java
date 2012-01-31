@@ -69,8 +69,7 @@ public class BluetoothController implements Controller {
 
     @Override
     public boolean isReady() {
-        // TODO Auto-generated method stub
-        return true;
+        return connection.isConnected();
     }
 
 }
