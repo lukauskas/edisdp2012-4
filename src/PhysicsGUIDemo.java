@@ -18,6 +18,9 @@ import org.jbox2d.testbed.framework.TestbedTest;
 import org.jbox2d.testbed.framework.j2d.TestPanelJ2D;
 
 import balle.simulator.SoftBot;
+import balle.strategy.AbstractStrategy;
+import balle.strategy.UserInputStrategy;
+import balle.world.BasicWorld;
 
 public class PhysicsGUIDemo extends TestbedTest {
 
@@ -118,6 +121,9 @@ public class PhysicsGUIDemo extends TestbedTest {
 		yellow = new Robot(new Vec2((float) (2.34 * scale), (float) (0.61 * scale)), 0f);
 		blueSoft = new SoftBot();
 		yellowSoft = new SoftBot();
+		
+		AbstractStrategy s = new UserInputStrategy(yellowSoft, new BasicWorld(true));
+		s.start();
 	}
 
 	@Override
@@ -173,10 +179,12 @@ public class PhysicsGUIDemo extends TestbedTest {
 		TestbedModel model = new TestbedModel();
 		TestbedPanel panel = new TestPanelJ2D(model);
 		model.addCategory("Buggy");
-		model.addTest(new PhysicsGUIDemo());
+		PhysicsGUIDemo pgui = new PhysicsGUIDemo();
+		model.addTest(pgui);
 		JFrame testbed = new TestbedFrame(model, panel);
 		testbed.setVisible(true);
 		testbed.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
 	}
 
 	private static int robotNo = -20;
@@ -195,8 +203,6 @@ public class PhysicsGUIDemo extends TestbedTest {
 		private final float wheelLength = 0.05f * scale;
 
 		// wheel power (-1 for lock and 0 for float and (0,100] for power )
-		private float leftWheelSpeed;
-		private float rightWheelSpeed;
 
 		public Robot(Vec2 startingPos, float angle) {
 			World w = getWorld();
