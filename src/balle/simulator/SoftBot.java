@@ -7,12 +7,11 @@ public class SoftBot implements Controller {
     @Override
     public void backward(int speed) {
         // TODO Auto-generated method stub
+    }
 
-	@Override
-	public void penaltyKick() {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public void penaltyKick() {
+        // TODO Auto-generated method stub
 
     }
 

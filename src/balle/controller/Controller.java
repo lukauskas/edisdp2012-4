@@ -74,4 +74,8 @@ public interface Controller {
      */
     public abstract void kick();
 
+    /**
+     * Penalty kick
+     */
+    public abstract void penaltyKick();
 }
