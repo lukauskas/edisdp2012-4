@@ -24,13 +24,17 @@ class Features:
         blue = self.threshold.blueT(frame)
         ball = self.threshold.ball(frame)
 
+        display.updateLayer('threshY', yellow)
+        display.updateLayer('threshB', blue)
+        display.updateLayer('threshR', ball)
+
         ents['yellow'] = self.findEntity(yellow, 'T')
         ents['blue'] = self.findEntity(blue, 'T')
         ents['ball'] = self.findEntity(ball, 'ball')
         
-        display.updateFeature('yellow', ents['yellow'])
-        display.updateFeature('blue', ents['blue'])
-        display.updateFeature('ball', ents['ball'])
+        display.updateLayer('yellow', ents['yellow'])
+        display.updateLayer('blue', ents['blue'])
+        display.updateLayer('ball', ents['ball'])
 
         return ents
 
@@ -39,7 +43,6 @@ class Features:
         # Work around OpenCV crash on some nearly black images
         nonZero = cv.CountNonZero(image.getGrayscaleMatrix())
         if nonZero < 10:
-            print nonZero
             return None
 
         blobs = image.findBlobs()
@@ -87,3 +90,4 @@ class Entity:
 
     def angle(self):
         return self._angle
+
