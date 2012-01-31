@@ -3,7 +3,6 @@
  */
 package balle.controller;
 
-
 /**
  * @author s0909773
  * 
@@ -102,6 +101,11 @@ public class DummyController implements Controller {
     @Override
     public void kick() {
         System.out.println("Kick");
+    }
+
+    @Override
+    public boolean isReady() {
+        return true;
     }
 
 }

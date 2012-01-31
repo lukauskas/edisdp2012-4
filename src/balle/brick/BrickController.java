@@ -1,8 +1,8 @@
 package balle.brick;
 
-import balle.controller.Controller;
 import lejos.nxt.Motor;
 import lejos.robotics.navigation.TachoPilot;
+import balle.controller.Controller;
 
 /**
  * The Control class. Handles the actual driving and movement of the bot, once
@@ -127,7 +127,7 @@ public class BrickController implements Controller {
 
     @Override
     public void backward(int speed) {
-    	pilot.setMoveSpeed(speed);
+        pilot.setMoveSpeed(speed);
         pilot.backward();
     }
 
@@ -143,4 +143,10 @@ public class BrickController implements Controller {
         pilot.setTurnSpeed(speed);
         pilot.rotate(deg);
     }
+
+    @Override
+    public boolean isReady() {
+        return true;
+    }
+
 }
