@@ -33,6 +33,7 @@ public class Runner {
         visionInput.start();
 
         // Initialise controller
+        // controller = new BluetoothController(new Communicator());
         controller = new DummyController();
         strategy = new DummyStrategy(controller, world);
         // Wait for controller to initialise
