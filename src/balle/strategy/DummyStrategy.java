@@ -21,7 +21,6 @@ public class DummyStrategy extends AbstractStrategy {
 
     @Override
     protected void aiStep() {
-        System.out.println("STEO! " + stepNumber);
         stepNumber = (stepNumber + 1) % 100;
         timesMoveCalledOnThisStep = 0;
     }
@@ -35,7 +34,6 @@ public class DummyStrategy extends AbstractStrategy {
         timesMoveCalledOnThisStep++;
 
         if (stepNumber == 0) {
-            System.out.println("StepNumber=0");
             controller.forward(controller.getMaximumWheelSpeed());
         }
 
