@@ -1,9 +1,6 @@
 package balle.brick;
 
-import balle.controller.Controller;
-import lejos.nxt.Motor;
-
-public class Kick {
+public class PenaltyKick {
 
 	/**
 	 * @param args
@@ -11,12 +8,11 @@ public class Kick {
 	public static void main(String[] args) {
 		Controller control = new BrickController();
 		
-		control.kick();
+		control.penaltyKick();
 		try {
 			Thread.sleep(1000);
 		} catch (Exception e){
 			// 
 		}
 	}
-
 }

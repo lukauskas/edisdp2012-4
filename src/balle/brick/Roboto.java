@@ -1,6 +1,8 @@
 package balle.brick;
 
 import java.io.DataInputStream;
+
+import balle.controller.Controller;
 import lejos.robotics.navigation.Pilot;
 import lejos.robotics.navigation.TachoPilot;
 

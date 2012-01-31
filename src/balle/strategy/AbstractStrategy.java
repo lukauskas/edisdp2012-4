@@ -1,6 +1,6 @@
 package balle.strategy;
 
-import balle.brick.Controller;
+import balle.controller.Controller;
 import balle.world.AbstractWorld;
 import balle.world.Snapshot;
 
@@ -10,6 +10,7 @@ public abstract class AbstractStrategy extends Thread {
     private AbstractWorld world;
 
     private Snapshot      snapshot;
+    private Snapshot      prevSnapshot;
 
     public AbstractStrategy(Controller controller, AbstractWorld world) {
         super();
@@ -19,9 +20,16 @@ public abstract class AbstractStrategy extends Thread {
 
     @Override
     public void run() {
+        snapshot = null;
         while (true) {
-            snapshot = world.getSnapshot();
-            this.aiStep();
+
+            Snapshot newSnapshot = world.getSnapshot();
+
+            if ((newSnapshot != null) && (!newSnapshot.equals(prevSnapshot))) {
+                this.aiStep();
+                prevSnapshot = snapshot;
+                snapshot = newSnapshot;
+            }
             this.aiMove(controller);
         }
     }
@@ -34,8 +42,18 @@ public abstract class AbstractStrategy extends Thread {
         return snapshot;
     }
 
+    /**
+     * This function is a step counter for the vision input. It is increased
+     * every time a new snapshot of the world is received.
+     */
     protected abstract void aiStep();
 
+    /**
+     * The code that implements movement strategy should go here
+     * 
+     * @param controller
+     *            -- robot's controller to use
+     */
     protected abstract void aiMove(Controller controller);
 
 }

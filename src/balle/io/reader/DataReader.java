@@ -1,4 +1,4 @@
-package balle.world;
+package balle.io.reader;
 
 public interface DataReader {
 	

@@ -3,8 +3,6 @@
  */
 package balle.controller;
 
-import balle.brick.Controller;
-
 /**
  * @author s0909773
  * 
@@ -110,5 +108,10 @@ public class DummyController implements Controller {
 		System.out.println("Penalty Kick!");
 		
 	}
+
+    @Override
+    public boolean isReady() {
+        return true;
+    }
 
 }

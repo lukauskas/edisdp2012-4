@@ -1,5 +1,8 @@
 package balle.world;
 
+import balle.io.listener.Listener;
+import balle.io.reader.DataReader;
+
 /***
  * 
  * This class will take raw data from the vision system and model the world
@@ -10,17 +13,14 @@ package balle.world;
  * All tweaking of the raw values recieved from the vision system is done here.
  * 
  */
-public abstract class AbstractWorld extends Thread {
+public abstract class AbstractWorld implements Listener {
 
     // JEV: Scanner is final and can't be extended, makes it difficult for the
     // simulator.
-    DataReader      visionInput;
-    private boolean balleIsBlue;
+    private final boolean balleIsBlue;
 
-    public AbstractWorld(DataReader visionInput, boolean isBalleBlue) {
-        this.visionInput = visionInput;
+    public AbstractWorld(boolean isBalleBlue) {
         this.balleIsBlue = isBalleBlue;
-        this.start();
     }
 
     /**
@@ -38,39 +38,5 @@ public abstract class AbstractWorld extends Thread {
      * @return coordinates of the robot.
      */
     public abstract Snapshot getSnapshot();
-
-    @Override
-    public void run() {
-        while (true) {
-            String line = visionInput.nextLine();
-
-            // Ignore Comments
-            if (line.charAt(0) != '#') {
-                String[] tokens = line.split(" ");
-
-                interpret(Double.parseDouble(tokens[0]),
-                        Double.parseDouble(tokens[1]),
-                        Double.parseDouble(tokens[2]),
-
-                        Double.parseDouble(tokens[3]),
-                        Double.parseDouble(tokens[4]),
-                        Double.parseDouble(tokens[5]),
-
-                        Double.parseDouble(tokens[6]),
-                        Double.parseDouble(tokens[7]),
-
-                        Long.parseLong(tokens[8]));
-            }
-
-            /*
-             * try { Thread.sleep(10); } catch (InterruptedException e) {
-             * e.printStackTrace(); }
-             */
-        }
-    }
-
-    abstract void interpret(double yPosX, double yPosY, double yRad,
-            double bPosX, double bPosY, double bRad, double ballPosX,
-            double ballPosY, long timestamp);
 
 }

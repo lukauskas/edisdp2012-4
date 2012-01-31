@@ -2,78 +2,83 @@ from __future__ import print_function
 import sys
 import time
 import cv
+import socket
 from SimpleCV import Image, Camera
+from preprocess import Preprocessor
 from features import Features
 from display import Gui
 
-def undistort(image):
-    intrinsics = cv.CreateMat(3, 3, cv.CV_64FC1)
-    cv.Zero(intrinsics)
-    #camera data
-    intrinsics[0, 0] = 1100.850708957251072
-    intrinsics[1, 1] = 778.955239997982062
-    intrinsics[2, 2] = 1.0
-    intrinsics[0, 2] = 348.898495232253822
-    intrinsics[1, 2] = 320.213734835526282
-    dist_coeffs = cv.CreateMat(1, 4, cv.CV_64FC1)
-    cv.Zero(dist_coeffs)
-    dist_coeffs[0, 0] = -0.326795877008420
-    dist_coeffs[0, 1] = 0.139445565548056
-    dist_coeffs[0, 2] = 0.001245710462327
-    dist_coeffs[0, 3] = -0.001396618726445
-    
-    size = cv.GetSize(image)
-    image2 = cv.CreateImage(size, image.depth, image.nChannels)
-    cv.Undistort2(image, image2, intrinsics, dist_coeffs)
-    
-    return image2
+HOST = 'localhost' 
+PORT = 28546 
 
-def output(ents):
-    for name in ['yellow', 'blue', 'ball']:
-        x = y = angle = -1
-        entity = ents[name]
-        if entity is not None:
-            x, y = entity.coordinates()
-            angle = entity.angle()
+class Vision:
+    
+    def __init__(self, pitchnum):
+               
+        self.running = True
+        
+        self.stdout = False
+        
+        self.cap = Camera()
+        self.preprocessor = Preprocessor()
+        self.features = Features(pitchnum)
+        self.gui = Gui.getGui()
+        
+        self.gui.getKeyHandler().addListener('q', self.quit)
+        
+        if not self.stdout:
+            self.connect()
+            
+        self.doStuff()
+        
+    def connect(self):
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket.connect( (HOST, PORT) )
 
-        if name == 'ball':
-            print('{0} {1}'.format(x, y), end=' ')
+    def quit(self):
+        self.running = False
+        
+    def doStuff(self):
+        while self.running:
+            frame = self.cap.getImage()
+            #frame = Image('global05.jpg')
+            frame = self.preprocessor.preprocess(frame)
+            
+            self.gui.updateBase(frame)
+
+            ents = self.features.extractFeatures(frame)
+            
+            self.gui.loop()
+
+            self.outputEnts(ents)
+        
+        self.socket.close()
+
+    def outputEnts(self, ents):
+        for name in ['yellow', 'blue', 'ball']:
+            x = y = angle = -1
+            entity = ents[name]
+            if entity is not None:
+                x, y = entity.coordinates()
+                angle = entity.angle()
+
+            if name == 'ball':
+                self.send('{0} {1} '.format(x, y))
+            else:
+                self.send('{0} {1} {2} '.format(x, y, angle))
+
+        self.send(str(int(time.time() * 1000)) + " \n")
+        
+    def send(self, string):
+        if self.stdout:
+            sys.stdout.write(string)
         else:
-            print('{0} {1} {2}'.format(x, y, angle), end=' ')
+            self.socket.send(string)
 
-    print(int(time.time() * 1000))
+if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        Vision(int(sys.argv[1]))
+    else:
+        # Default to the main pitch
+        Vision(0)
 
-
-#try:
-if len(sys.argv) > 1:
-    pitchnum = int(sys.argv[1])
-else:
-    # Default to the main pitch
-    pitchnum = 0
-
-cap = Camera() #Capture()
-
-features = Features(pitchnum)
-gui = Gui.getGui()
-
-while True:
-    frame = cap.getImage()
-    #frame = Image('global05.jpg')
-    #frame = Image(frame)
-
-    gui.updateBase(frame)
-
-    ents = features.extractFeatures(frame)
-    
-    gui.loop()
-
-    output(ents)
-
-    c = cv.WaitKey(16)
-    k = chr(c % 0x100)
-
-    if k == 'q' or k == 27: # ESC
-        break
-
-#finally:
-#    cap.stop()

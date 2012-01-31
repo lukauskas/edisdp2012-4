@@ -1,4 +1,5 @@
 import pygame
+import cv
 from SimpleCV import Display, DrawingLayer
 
 class Gui:
@@ -28,33 +29,34 @@ class Gui:
         """
         Draw the image to the display, and process any events
         """
-        self._base.save(self._display)
         
+        baseLayer = self._base
+        size = baseLayer.size()
+        for key in self._layers.keys():
+            layer = DrawingLayer(size)
+            baseLayer.addDrawingLayer(layer)
+
+            self._layers[key] = layer
+
+        baseLayer.save(self._display)
+        
+
+        # Process any keyboard events
         #self._display.checkEvents()
         
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
-                self._keyListener.processKey(chr(event.key))
+                self._keyListener.processKey(chr(event.key % 0x100))
             
-        # Todo: process openCV events here too
-        
+        # Process OpenCV events (for if the focus is on the thresholding window)
+        c = cv.WaitKey(16)
+        self._keyListener.processKey(chr(c % 0x100))
+
     def getKeyHandler(self):
         return self._keyListener   
 
     def updateBase(self, image):
-        if self._base is not None:
-            self._base.clearLayers()
-
         self._base = image
-
-        size = image.size()
-        for key in self._layers.keys():
-            layer = DrawingLayer(size)
-            image.addDrawingLayer(layer)
-
-            self._layers[key] = layer
-
-        #self.draw()
 
     def updateFeature(self, name, feature):
         """
