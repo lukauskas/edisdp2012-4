@@ -1,7 +1,6 @@
 package balle.controller;
 
 import balle.bluetooth.Communicator;
-import balle.brick.Controller;
 import balle.brick.Roboto;
 
 public class BluetoothController implements Controller {

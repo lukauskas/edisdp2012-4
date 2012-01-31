@@ -1,6 +1,6 @@
 package balle.strategy;
 
-import balle.brick.Controller;
+import balle.controller.Controller;
 import balle.world.AbstractWorld;
 import balle.world.Snapshot;
 

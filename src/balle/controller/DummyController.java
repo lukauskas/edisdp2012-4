@@ -3,7 +3,6 @@
  */
 package balle.controller;
 
-import balle.brick.Controller;
 
 /**
  * @author s0909773

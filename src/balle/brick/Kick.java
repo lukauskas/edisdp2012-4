@@ -1,5 +1,6 @@
 package balle.brick;
 
+import balle.controller.Controller;
 import lejos.nxt.Motor;
 
 public class Kick {

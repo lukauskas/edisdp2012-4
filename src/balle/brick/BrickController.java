@@ -1,5 +1,6 @@
 package balle.brick;
 
+import balle.controller.Controller;
 import lejos.nxt.Motor;
 import lejos.robotics.navigation.TachoPilot;
 

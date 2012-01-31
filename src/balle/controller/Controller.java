@@ -1,4 +1,4 @@
-package balle.brick;
+package balle.controller;
 
 public interface Controller {
 

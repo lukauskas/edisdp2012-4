@@ -1,6 +1,6 @@
 package balle.main;
 
-import balle.brick.Controller;
+import balle.controller.Controller;
 import balle.io.reader.SocketVisionReader;
 import balle.strategy.AbstractStrategy;
 import balle.world.AbstractWorld;

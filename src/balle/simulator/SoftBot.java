@@ -1,6 +1,6 @@
 package balle.simulator;
 
-import balle.brick.Controller;
+import balle.controller.Controller;
 
 public class SoftBot implements Controller {
 
