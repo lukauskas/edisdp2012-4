@@ -40,8 +40,8 @@ class Vision:
         
     def doStuff(self):
         while self.running:
-            #frame = self.cap.getImage()
-            frame = Image('global05.jpg')
+            frame = self.cap.getImage()
+            #frame = Image('global05.jpg')
             frame = self.preprocessor.preprocess(frame)
             
             self.gui.updateLayer('raw', frame)

@@ -90,10 +90,6 @@ class Gui:
         Update the layer specified by 'name'
         """
 
-        if layer is None:
-            #self._layers[name].clear()
-            return
-
         assert name in self._layers.keys(), \
                 name + ' is not in the known list of layers'
         
