@@ -2,20 +2,27 @@ package balle.world;
 
 public class Coord {
 
-    private final double x;
-    private final double y;
+    private final double  x;
+    private final double  y;
 
-    private boolean      estimated = false;
+    private final boolean estimated;
 
     public Coord(double x, double y) {
         super();
         this.x = x;
         this.y = y;
+        this.estimated = false;
     }
 
     public Coord(double x, double y, boolean estimated) {
-        this(x, y);
+        super();
+        this.x = x;
+        this.y = y;
         this.estimated = estimated;
+    }
+
+    public Coord(Coord coordinate, boolean estimated) {
+        this(coordinate.getX(), coordinate.getY(), estimated);
     }
 
     public double getX() {
