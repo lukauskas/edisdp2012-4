@@ -20,11 +20,24 @@ public class BasicWorld extends AbstractWorld {
             return a.sub(b);
     }
 
-    private Coord estimatedPosition(Coord prevCoordinate, Velocity prevVelocity) {
-        if (prevCoordinate == null)
+    /**
+     * Estimated position of the object after timestep (in miliseconds)
+     * 
+     * @param object
+     *            object which position to estimate
+     * @param timestep
+     *            time in miliseconds after which to estiamte the position of
+     *            the object
+     * @return new coordinate for the position of the object after timestep
+     */
+    private Coord estimatedPosition(FieldObject object, double timestep) {
+        if ((object == null) || (object.getPosition() == null))
             return null;
         else
-            return new Coord(prevCoordinate.add(prevVelocity), true);
+            // TODO: Make sure the robot does not go through the wall
+            // make sure the ball bounces from the wall, etc.
+            return new Coord(object.getPosition().add(
+                    object.getVelocity().adjustLength(timestep)), true);
     }
 
     /**
@@ -108,14 +121,11 @@ public class BasicWorld extends AbstractWorld {
             }
 
             if (ourPosition == null)
-                ourPosition = estimatedPosition(prev.getBalle().getPosition(),
-                        prev.getBalle().getVelocity());
+                ourPosition = estimatedPosition(prev.getBalle(), deltaT);
             if (theirsPosition == null)
-                theirsPosition = estimatedPosition(prev.getOpponent()
-                        .getPosition(), prev.getOpponent().getVelocity());
+                theirsPosition = estimatedPosition(prev.getOpponent(), deltaT);
             if (ballPosition == null)
-                ballPosition = estimatedPosition(prev.getBall().getPosition(),
-                        prev.getBall().getVelocity());
+                ballPosition = estimatedPosition(prev.getBall(), deltaT);
 
             // Change in position
             Coord oursDPos, themDPos, ballDPos;

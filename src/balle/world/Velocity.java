@@ -18,4 +18,8 @@ public class Velocity extends Coord {
         this(coord.getX() / timeDelta, coord.getY() / timeDelta, timeDelta,
                 coord.isEstimated());
     }
+
+    public Velocity adjustLength(double newTimeDelta) {
+        return new Velocity(this.mult(newTimeDelta / timeDelta), newTimeDelta);
+    }
 }

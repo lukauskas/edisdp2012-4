@@ -38,11 +38,15 @@ public class Coord {
     }
 
     public Coord sub(Coord c) {
-        return new Coord(x - c.getX(), y - c.getY());
+        return new Coord(x - c.getX(), y - c.getY(), estimated);
     }
 
     public Coord add(Coord c) {
-        return new Coord(x + c.getX(), y + c.getY());
+        return new Coord(x + c.getX(), y + c.getY(), estimated);
+    }
+
+    public Coord mult(double scalar) {
+        return new Coord(x * scalar, y * scalar, estimated);
     }
 
     public double dist(Coord c) {
