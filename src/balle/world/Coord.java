@@ -42,6 +42,15 @@ public class Coord {
         return c.sub(this).abs();
     }
 
+    /**
+     * Returns whether the coordinates have been estimated or not. By convention
+     * the coordinates from the vision are not estimated, whereas the
+     * coordinates that are updated from velocities e.g. when the vision returns
+     * -1 are.
+     * 
+     * @return true or false depending whether the coordinates were estimated or
+     *         not
+     */
     public boolean isEstimated() {
         return estimated;
     }
