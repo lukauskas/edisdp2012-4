@@ -113,7 +113,7 @@ public class BasicWorld extends AbstractWorld {
                     prev.getBalle().getPosition()) : null;
             themDPos = prev.getOpponent() != null ? subtractOrNull(
                     theirsPosition, prev.getOpponent().getPosition()) : null;
-            ballDPos = prev.getBall() == null ? subtractOrNull(ballPosition,
+            ballDPos = prev.getBall() != null ? subtractOrNull(ballPosition,
                     prev.getBall().getPosition()) : null;
 
             // velocities
