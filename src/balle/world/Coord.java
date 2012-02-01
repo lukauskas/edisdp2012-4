@@ -5,10 +5,17 @@ public class Coord {
     private final double x;
     private final double y;
 
+    private boolean      estimated = false;
+
     public Coord(double x, double y) {
         super();
         this.x = x;
         this.y = y;
+    }
+
+    public Coord(double x, double y, boolean estimated) {
+        this(x, y);
+        this.estimated = estimated;
     }
 
     public double getX() {
@@ -35,4 +42,7 @@ public class Coord {
         return c.sub(this).abs();
     }
 
+    public boolean isEstimated() {
+        return estimated;
+    }
 }
