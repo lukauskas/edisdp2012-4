@@ -5,15 +5,13 @@ package balle.world;
  */
 public class FieldObject {
 
-    private final Coord  position;
-    private final double angle;
-    private final double velocity;
+    private final Coord    position;
+    private final Velocity velocity;
 
-    public FieldObject(Coord position, double angle, double velocity) {
+    public FieldObject(Coord position, Velocity velocity) {
         super();
 
         this.position = position;
-        this.angle = angle;
         this.velocity = velocity;
     }
 
@@ -21,11 +19,7 @@ public class FieldObject {
         return position;
     }
 
-    public double getAngle() {
-        return angle;
-    }
-
-    public double getVelocity() {
+    public Velocity getVelocity() {
         return velocity;
     }
 

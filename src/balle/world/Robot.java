@@ -8,9 +8,9 @@ public class Robot extends FieldObject {
         return orientation;
     }
 
-    public Robot(Coord position, double angle, double velocity, double facing) {
-        super(position, angle, velocity);
-        this.orientation = facing;
+    public Robot(Coord position, Velocity velocity, double orientation) {
+        super(position, velocity);
+        this.orientation = orientation;
     }
 
 }

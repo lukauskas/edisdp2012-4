@@ -13,6 +13,13 @@ public class BasicWorld extends AbstractWorld {
         return prev;
     }
 
+    private Coord subtractOrNull(Coord a, Coord b) {
+        if ((a == null) && (b == null))
+            return null;
+        else
+            return a.sub(b);
+    }
+
     /**
      * NOTE: DO ROBOTS ALWAYS MOVE FORWARD !? NO, treat angle of velocity
      * different from angle the robot is facing.
@@ -22,8 +29,9 @@ public class BasicWorld extends AbstractWorld {
     public void update(double yPosX, double yPosY, double yRad, double bPosX,
             double bPosY, double bRad, double ballPosX, double ballPosY,
             long timestamp) {
-        Robot ours, them;
-        FieldObject ball;
+        Robot ours = null;
+        Robot them = null;
+        FieldObject ball = null;
 
         // Coordinates
         Coord ourPosition, theirsPosition;
@@ -32,28 +40,53 @@ public class BasicWorld extends AbstractWorld {
 
         // Adjust based on our color.
         if (isBlue()) {
-            ourPosition = new Coord(bPosX, bPosY);
-            theirsPosition = new Coord(yPosX, yPosY);
+            if ((bPosX == UNKNOWN_VALUE) || (bPosY == UNKNOWN_VALUE))
+                ourPosition = null;
+            else
+                ourPosition = new Coord(bPosX, bPosY);
+
             ourOrientation = bRad;
+
+            if ((yPosX == UNKNOWN_VALUE) || (yPosY == UNKNOWN_VALUE))
+                theirsPosition = null;
+            else
+                theirsPosition = new Coord(yPosX, yPosY);
+
             theirsOrientation = yRad;
         } else {
-            ourPosition = new Coord(yPosX, yPosY);
-            theirsPosition = new Coord(bPosX, bPosY);
+            if ((yPosX == UNKNOWN_VALUE) || (yPosY == UNKNOWN_VALUE))
+                ourPosition = null;
+            else
+                ourPosition = new Coord(yPosX, yPosY);
+
             ourOrientation = yRad;
+
+            if ((bPosX == UNKNOWN_VALUE) || (bPosY == UNKNOWN_VALUE))
+                theirsPosition = null;
+            else
+                theirsPosition = new Coord(bPosX, bPosY);
+
             theirsOrientation = bRad;
         }
 
+        Coord ballPosition;
         // Ball position
-        Coord ballPos = new Coord(ballPosX, ballPosY);
+        if ((bPosX == UNKNOWN_VALUE) || (bPosY == UNKNOWN_VALUE))
+            ballPosition = null;
+        else
+            ballPosition = new Coord(ballPosX, ballPosY);
 
         Snapshot prev = getSnapshot();
 
         // First case when there is no past snapshot (assume velocities are 0)
         if (prev == null) {
-
-            them = new Robot(theirsPosition, 0, 0, theirsOrientation);
-            ours = new Robot(ourPosition, 0, 0, ourOrientation);
-            ball = new FieldObject(ballPos, 0, 0);
+            if ((theirsPosition != null)
+                    && (theirsOrientation != UNKNOWN_VALUE))
+                them = new Robot(theirsPosition, 0, 0, theirsOrientation);
+            if ((ourPosition != null) && (ourOrientation != UNKNOWN_VALUE))
+                ours = new Robot(ourPosition, 0, 0, ourOrientation);
+            if (ballPosition != null)
+                ball = new FieldObject(ballPosition, 0, 0);
         } else {
             // change in time
             long deltaT = timestamp - prev.getTimestamp();
@@ -65,29 +98,31 @@ public class BasicWorld extends AbstractWorld {
                 return;
             }
 
+            if (ourPosition == null)
+                ourPosition = prev.getBalle().getPosition();
+            if (theirsPosition == null)
+                theirsPosition = prev.getOpponent().getPosition();
+            if (ballPosition == null)
+                ballPosition = prev.getOpponent().getPosition();
             // Change in position
             Coord oursDPos, themDPos, ballDPos;
-            oursDPos = (ourPosition).sub(prev.getBalle().getPosition());
-            themDPos = (theirsPosition).sub(prev.getOpponent().getPosition());
-            ballDPos = (ballPos).sub(prev.getBall().getPosition());
+            oursDPos = subtractOrNull(ourPosition, prev.getBalle()
+                    .getPosition());
+            themDPos = subtractOrNull(theirsPosition, prev.getOpponent()
+                    .getPosition());
+            ballDPos = subtractOrNull(ballPosition, prev.getBall()
+                    .getPosition());
 
             // velocities
-            double oursVel, themVel, ballVel;
-            oursVel = oursDPos.abs() / deltaT;
-            themVel = themDPos.abs() / deltaT;
-            ballVel = ballDPos.abs() / deltaT;
-
-            // angles (of velocity)
-            double oursAngle, themAngle, ballAngle;
-            // TODO: does this fit the angle conventions?
-            oursAngle = Math.atan2(oursDPos.getY(), oursDPos.getX());
-            themAngle = Math.atan2(oursDPos.getY(), oursDPos.getX());
-            ballAngle = Math.atan2(oursDPos.getY(), oursDPos.getX());
+            Velocity oursVel, themVel, ballVel;
+            oursVel = oursDPos != null ? new Velocity(oursDPos, deltaT) : null;
+            themVel = themDPos != null ? new Velocity(themDPos, deltaT) : null;
+            ballVel = ballDPos != null ? new Velocity(ballDPos, deltaT) : null;
 
             // put it all together (almost)
-            them = new Robot(theirsPosition, themAngle, themVel, theirsOrientation);
-            ours = new Robot(ourPosition, oursAngle, oursVel, ourOrientation);
-            ball = new FieldObject(ballPos, ballAngle, ballVel);
+            them = new Robot(theirsPosition, themVel, theirsOrientation);
+            ours = new Robot(ourPosition, oursVel, ourOrientation);
+            ball = new FieldObject(ballPosition, ballVel);
         }
 
         synchronized (this) {

@@ -42,6 +42,10 @@ public class Coord {
         return c.sub(this).abs();
     }
 
+    public double orientation() {
+        return Math.atan2(this.getY(), this.getX());
+    }
+
     /**
      * Returns whether the coordinates have been estimated or not. By convention
      * the coordinates from the vision are not estimated, whereas the
