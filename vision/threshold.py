@@ -1,21 +1,33 @@
 import cv
+import os
+import cPickle
 from SimpleCV import Image
 from display import Gui, ThresholdGui
 
-
-
 class Threshold:
+    
+    # File for storing temporary threshold defaults
+    filepath = "threshdefaults"
 
     def __init__(self, pitch):
-
-        self._values = {}
-
-        self._values['yellow'] = defaults[pitch]['yellow']
-        self._values['blue'] = defaults[pitch]['blue']
-        self._values['ball'] = defaults[pitch]['ball']
+        
+        self.__getDefaults(pitch)
 
         self._gui = ThresholdGui(self)
         self._gui.changeEntity('ball')
+        
+    def __getDefaults(self, pitch):
+        self._values = {}
+        
+        if os.path.exists(self.filepath):
+            f = open(self.filepath, 'r')
+            self._values = cPickle.load(f)
+        else:
+            self._values = defaults[pitch]
+            
+    def __saveDefaults(self):
+        f = open(self.filepath, 'w')
+        cPickle.dump(self._values, f)
 
     def yellowT(self, frame):
         return self.threshold(frame, self._values['yellow'][0], self._values['yellow'][1])
@@ -57,13 +69,12 @@ class Threshold:
 
     def updateValues(self, entity, newValues):
         self._values[entity] = newValues
-
-    # TODO: Integrate this more with the main gui class/module?
-    # Might make providing the current thresholded layer nicer
+        
+        self.__saveDefaults()
 
 """
 defaults[0] for the main pitch, and defaults[1] for the other table
-"""        
+"""
 defaults =[
         {
         'yellow' : [[14, 40, 97], [50, 150, 255]],
