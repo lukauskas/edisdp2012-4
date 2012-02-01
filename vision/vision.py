@@ -44,7 +44,7 @@ class Vision:
             #frame = Image('global05.jpg')
             frame = self.preprocessor.preprocess(frame)
             
-            self.gui.updateBase(frame)
+            self.gui.updateLayer('raw', frame)
 
             ents = self.features.extractFeatures(frame)
             
