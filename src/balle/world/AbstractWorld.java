@@ -1,7 +1,6 @@
 package balle.world;
 
 import balle.io.listener.Listener;
-import balle.io.reader.DataReader;
 
 /***
  * 
@@ -14,6 +13,8 @@ import balle.io.reader.DataReader;
  * 
  */
 public abstract class AbstractWorld implements Listener {
+
+    public final int      UNKNOWN_VALUE = -1;
 
     // JEV: Scanner is final and can't be extended, makes it difficult for the
     // simulator.

@@ -25,36 +25,35 @@ public class BasicWorld extends AbstractWorld {
         Robot ours, them;
         FieldObject ball;
 
-        // Our Robot
-        double oPosX, oPosY, oRad;
-
-        // Their Robot
-        double tPosX, tPosY, tRad;
+        // Coordinates
+        Coord ourPosition, theirsPosition;
+        // Orientations
+        double ourOrientation, theirsOrientation;
 
         // Adjust based on our color.
         if (isBlue()) {
-            oPosX = bPosX;
-            oPosY = bPosY;
-            oRad = bRad;
-            tPosX = yPosX;
-            tPosY = yPosY;
-            tRad = yRad;
+            ourPosition = new Coord(bPosX, bPosY);
+            theirsPosition = new Coord(yPosX, yPosY);
+            ourOrientation = bRad;
+            theirsOrientation = yRad;
         } else {
-            oPosX = yPosX;
-            oPosY = yPosY;
-            oRad = yRad;
-            tPosX = bPosX;
-            tPosY = bPosY;
-            tRad = bRad;
+            ourPosition = new Coord(yPosX, yPosY);
+            theirsPosition = new Coord(bPosX, bPosY);
+            ourOrientation = yRad;
+            theirsOrientation = bRad;
         }
-        
+
+        // Ball position
+        Coord ballPos = new Coord(ballPosX, ballPosY);
+
         Snapshot prev = getSnapshot();
 
         // First case when there is no past snapshot (assume velocities are 0)
         if (prev == null) {
-            them = new Robot(new Coord(tPosX, tPosY), 0, 0, tRad);
-            ours = new Robot(new Coord(oPosX, oPosY), 0, 0, oRad);
-            ball = new FieldObject(new Coord(ballPosX, ballPosY), 0, 0);
+
+            them = new Robot(theirsPosition, 0, 0, theirsOrientation);
+            ours = new Robot(ourPosition, 0, 0, ourOrientation);
+            ball = new FieldObject(ballPos, 0, 0);
         } else {
             // change in time
             long deltaT = timestamp - prev.getTimestamp();
@@ -68,12 +67,9 @@ public class BasicWorld extends AbstractWorld {
 
             // Change in position
             Coord oursDPos, themDPos, ballDPos;
-            oursDPos = (new Coord(oPosX, oPosY)).sub(prev.getBalle()
-                    .getPosition());
-            themDPos = (new Coord(tPosX, tPosY)).sub(prev.getOpponent()
-                    .getPosition());
-            ballDPos = (new Coord(ballPosX, ballPosY)).sub(prev.getBall()
-                    .getPosition());
+            oursDPos = (ourPosition).sub(prev.getBalle().getPosition());
+            themDPos = (theirsPosition).sub(prev.getOpponent().getPosition());
+            ballDPos = (ballPos).sub(prev.getBall().getPosition());
 
             // velocities
             double oursVel, themVel, ballVel;
@@ -89,10 +85,9 @@ public class BasicWorld extends AbstractWorld {
             ballAngle = Math.atan2(oursDPos.getY(), oursDPos.getX());
 
             // put it all together (almost)
-            them = new Robot(new Coord(tPosX, tPosY), themAngle, themVel, tRad);
-            ours = new Robot(new Coord(oPosX, oPosY), oursAngle, oursVel, oRad);
-            ball = new FieldObject(new Coord(ballPosX, ballPosY), ballAngle,
-                    ballVel);
+            them = new Robot(theirsPosition, themAngle, themVel, theirsOrientation);
+            ours = new Robot(ourPosition, oursAngle, oursVel, ourOrientation);
+            ball = new FieldObject(ballPos, ballAngle, ballVel);
         }
 
         synchronized (this) {
@@ -100,5 +95,4 @@ public class BasicWorld extends AbstractWorld {
             this.prev = new Snapshot(them, ours, ball, timestamp);
         }
     }
-
 }
