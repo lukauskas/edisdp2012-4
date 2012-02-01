@@ -144,16 +144,16 @@ public class BrickController implements Controller {
         pilot.rotate(deg);
     }
 
-	@Override
-	public void penaltyKick() {
-		int turnAmount;
-		if (Math.random() > 0.5)
-			turnAmount = 30;
-		else turnAmount = -30;
-		rotate(turnAmount, 180);
-		kick();
-		
-	}
+    @Override
+    public void penaltyKick() {
+        int turnAmount = 28;
+        if (Math.random() <= 0.5)
+            turnAmount *= -1;
+        rotate(turnAmount, 180);
+        kick();
+
+    }
+
     @Override
     public boolean isReady() {
         return true;
