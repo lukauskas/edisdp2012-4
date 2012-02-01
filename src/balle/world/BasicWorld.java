@@ -21,26 +21,6 @@ public class BasicWorld extends AbstractWorld {
     }
 
     /**
-     * Estimated position of the object after timestep (in miliseconds)
-     * 
-     * @param object
-     *            object which position to estimate
-     * @param timestep
-     *            time in miliseconds after which to estiamte the position of
-     *            the object
-     * @return new coordinate for the position of the object after timestep
-     */
-    private Coord estimatedPosition(FieldObject object, double timestep) {
-        if ((object == null) || (object.getPosition() == null))
-            return null;
-        else
-            // TODO: Make sure the robot does not go through the wall
-            // make sure the ball bounces from the wall, etc.
-            return new Coord(object.getPosition().add(
-                    object.getVelocity().adjustLength(timestep)), true);
-    }
-
-    /**
      * NOTE: DO ROBOTS ALWAYS MOVE FORWARD !? NO, treat angle of velocity
      * different from angle the robot is facing.
      * 

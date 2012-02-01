@@ -33,6 +33,26 @@ public abstract class AbstractWorld implements Listener {
         return balleIsBlue;
     }
 
+    /**
+     * Estimated position of the object after timestep (in miliseconds)
+     * 
+     * @param object
+     *            object which position to estimate
+     * @param timestep
+     *            time in miliseconds after which to estiamte the position of
+     *            the object
+     * @return new coordinate for the position of the object after timestep
+     */
+    public Coord estimatedPosition(FieldObject object, double timestep) {
+        if ((object == null) || (object.getPosition() == null))
+            return null;
+        else
+            // TODO: Make sure the robot does not go through the wall
+            // make sure the ball bounces from the wall, etc.
+            return new Coord(object.getPosition().add(
+                    object.getVelocity().adjustLength(timestep)), true);
+    }
+
     /***
      * Gets the best guess of the coordinates of the robot (our team's robot).
      * 
