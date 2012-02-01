@@ -46,7 +46,9 @@ public abstract class AbstractWorld implements Listener {
     public Coord estimatedPosition(FieldObject object, double timestep) {
         if ((object == null) || (object.getPosition() == null))
             return null;
-        else
+        else if (timestep == 0) {
+            return object.getPosition();
+        } else
             // TODO: Make sure the robot does not go through the wall
             // make sure the ball bounces from the wall, etc.
             return new Coord(object.getPosition().add(
