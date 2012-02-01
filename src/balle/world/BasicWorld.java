@@ -20,6 +20,13 @@ public class BasicWorld extends AbstractWorld {
             return a.sub(b);
     }
 
+    private Coord estimatedPosition(Coord prevCoordinate, Velocity prevVelocity) {
+        if (prevCoordinate == null)
+            return null;
+        else
+            return prevCoordinate.add(prevVelocity);
+    }
+
     /**
      * NOTE: DO ROBOTS ALWAYS MOVE FORWARD !? NO, treat angle of velocity
      * different from angle the robot is facing.
@@ -101,11 +108,15 @@ public class BasicWorld extends AbstractWorld {
             }
 
             if (ourPosition == null)
-                ourPosition = prev.getBalle().getPosition();
+                ourPosition = estimatedPosition(prev.getBalle().getPosition(),
+                        prev.getBalle().getVelocity());
             if (theirsPosition == null)
-                theirsPosition = prev.getOpponent().getPosition();
+                theirsPosition = estimatedPosition(prev.getOpponent()
+                        .getPosition(), prev.getOpponent().getVelocity());
             if (ballPosition == null)
-                ballPosition = prev.getOpponent().getPosition();
+                ballPosition = estimatedPosition(prev.getBall().getPosition(),
+                        prev.getBall().getVelocity());
+
             // Change in position
             Coord oursDPos, themDPos, ballDPos;
             oursDPos = subtractOrNull(ourPosition, prev.getBalle()
