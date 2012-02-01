@@ -44,11 +44,11 @@ public class UserInputStrategy extends AbstractStrategy {
         	System.out.println(cmd);
                 
                 switch (cmd) {
-                case 'w':       controller.setWheelSpeeds( 1,  1);
-                case 'a':       controller.setWheelSpeeds(-1,  1);
-                case 's':       controller.setWheelSpeeds( 0,  0);
-                case 'd':       controller.setWheelSpeeds( 1, -1);
-                case 'x':       controller.setWheelSpeeds(-1, -1);
+                case 'w':       controller.setWheelSpeeds( 1,  1); break;
+                case 'a':       controller.setWheelSpeeds(-1,  1); break;
+                case 's':       controller.setWheelSpeeds( 0,  0); break;
+                case 'd':       controller.setWheelSpeeds( 1, -1); break;
+                case 'x':       controller.setWheelSpeeds(-1, -1); break;
                 }
                 
         }

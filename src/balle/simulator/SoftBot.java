@@ -55,6 +55,7 @@ public class SoftBot implements Controller {
 	public void setWheelSpeeds(int leftWheelSpeed, int rightWheelSpeed) {
 		this.leftWheelSpeed = leftWheelSpeed;
 		this.rightWheelSpeed = rightWheelSpeed;
+		System.out.println(leftWheelSpeed + " " + rightWheelSpeed);
 		
 	}
 
