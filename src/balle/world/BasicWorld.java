@@ -24,7 +24,7 @@ public class BasicWorld extends AbstractWorld {
         if (prevCoordinate == null)
             return null;
         else
-            return prevCoordinate.add(prevVelocity);
+            return new Coord(prevCoordinate.add(prevVelocity), true);
     }
 
     /**
