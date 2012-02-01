@@ -82,11 +82,13 @@ public class BasicWorld extends AbstractWorld {
         if (prev == null) {
             if ((theirsPosition != null)
                     && (theirsOrientation != UNKNOWN_VALUE))
-                them = new Robot(theirsPosition, 0, 0, theirsOrientation);
+                them = new Robot(theirsPosition, new Velocity(0, 0, 1),
+                        theirsOrientation);
             if ((ourPosition != null) && (ourOrientation != UNKNOWN_VALUE))
-                ours = new Robot(ourPosition, 0, 0, ourOrientation);
+                ours = new Robot(ourPosition, new Velocity(0, 0, 1),
+                        ourOrientation);
             if (ballPosition != null)
-                ball = new FieldObject(ballPosition, 0, 0);
+                ball = new FieldObject(ballPosition, new Velocity(0, 0, 1));
         } else {
             // change in time
             long deltaT = timestamp - prev.getTimestamp();
