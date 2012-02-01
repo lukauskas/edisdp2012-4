@@ -32,6 +32,11 @@ public class BluetoothController implements Controller {
         connection.send(Roboto.MESSAGE_KICK);
     }
 
+    /**
+     * Calls controller.setWheelSpeeds(-speed, -speed);
+     * 
+     * @see balle.controller.Controller#forward(int)
+     */
     @Override
     public void backward(int speed) {
         connection.send(Roboto.MESSAGE_MOVE);
@@ -40,6 +45,11 @@ public class BluetoothController implements Controller {
 
     }
 
+    /**
+     * Calls controller.setWheelSpeeds(speed, speed);
+     * 
+     * @see balle.controller.Controller#forward(int)
+     */
     @Override
     public void forward(int speed) {
         connection.send(Roboto.MESSAGE_MOVE);
@@ -67,11 +77,10 @@ public class BluetoothController implements Controller {
         return 720;
     }
 
-	@Override
-	public void penaltyKick() {
-		connection.send(Roboto.MESSAGE_PENALTY);		
-	}
-	
+    @Override
+    public void penaltyKick() {
+        connection.send(Roboto.MESSAGE_PENALTY);
+    }
 
     @Override
     public boolean isReady() {

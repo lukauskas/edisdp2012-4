@@ -34,11 +34,14 @@ public class DummyStrategy extends AbstractStrategy {
         timesMoveCalledOnThisStep++;
 
         if (stepNumber == 0) {
+            controller.stop();
             controller.forward(controller.getMaximumWheelSpeed());
         }
 
-        else if (stepNumber == 50)
+        else if (stepNumber == 50) {
+            controller.stop();
             controller.backward(controller.getMaximumWheelSpeed());
+        }
 
     }
 }
