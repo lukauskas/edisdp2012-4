@@ -11,7 +11,7 @@ import javax.swing.JTextField;
 import lejos.nxt.Button;
 import lejos.nxt.ButtonListener;
  
-import balle.brick.Controller;
+import balle.controller.Controller;
 import balle.world.AbstractWorld;
  
 public class UserInputStrategy extends AbstractStrategy {
@@ -44,11 +44,11 @@ public class UserInputStrategy extends AbstractStrategy {
         	System.out.println(cmd);
                 
                 switch (cmd) {
-                case 'w':       controller.setWheelSpeeds( 1,  1); break;
-                case 'a':       controller.setWheelSpeeds(-1,  1); break;
-                case 's':       controller.setWheelSpeeds( 0,  0); break;
-                case 'd':       controller.setWheelSpeeds( 1, -1); break;
-                case 'x':       controller.setWheelSpeeds(-1, -1); break;
+                case 'w':       controller.setWheelSpeeds( 99,  99); break;
+                case 'a':       controller.setWheelSpeeds(-99,  99); break;
+                case 's':       controller.setWheelSpeeds(  0,   0); break;
+                case 'd':       controller.setWheelSpeeds( 99, -99); break;
+                case 'x':       controller.setWheelSpeeds(-99, -99); break;
                 }
                 
         }

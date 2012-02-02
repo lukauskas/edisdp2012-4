@@ -24,8 +24,10 @@ import balle.world.BasicWorld;
 
 public class PhysicsGUIDemo extends TestbedTest {
 
-	// Increases sizes, but keeps real-world scale; jbox2d acts unrealistically at a small scale
+	// Increases sizes, but keeps real-world scale; jbox2d acts unrealistically 
+	//at a small scale
 	private final float scale = 10;
+	
 	private Body ground;
 	private Body ball;
 
@@ -33,7 +35,7 @@ public class PhysicsGUIDemo extends TestbedTest {
 	private Robot yellow;
 	private SoftBot blueSoft;
 	private SoftBot yellowSoft;
-
+	
 	@Override
 	public String getTestName() {
 		return "Super Cool Simulator";
@@ -132,31 +134,11 @@ public class PhysicsGUIDemo extends TestbedTest {
 
 	@Override
 	public void update() {
-		killAllOrtogonal(yellow.wheelL);
-		killAllOrtogonal(yellow.wheelR);
-		killAllOrtogonal(blue.wheelL);		
-		killAllOrtogonal(blue.wheelR);
-		
-		double blueAng = blue.robot.getAngle();
-		double yellowAng = yellow.robot.getAngle();
-		
-		float blueLeftWheelSpeed = blueSoft.getLeftWheelSpeed();
-		float blueRightWheelSpeed = blueSoft.getRightWheelSpeed();
-		float yellowLeftWheelSpeed = yellowSoft.getLeftWheelSpeed();
-		float yellowRightWheelSpeed = yellowSoft.getRightWheelSpeed();
-		
-		blue.wheelL.applyForce(new Vec2((float)(blueLeftWheelSpeed*Math.cos(blueAng)),
-				(float)(blueLeftWheelSpeed*Math.sin(blueAng))), blue.wheelL.getWorldCenter());
-		blue.wheelR.applyForce(new Vec2((float)(blueRightWheelSpeed*Math.cos(blueAng)),
-				(float)(blueRightWheelSpeed*Math.sin(blueAng))), blue.wheelR.getWorldCenter());
-		
-		
-		yellow.wheelL.applyForce(new Vec2((float)(yellowLeftWheelSpeed*Math.cos(yellowAng)),
-				(float)(yellowRightWheelSpeed*Math.sin(yellowAng))), yellow.wheelL.getWorldCenter());
-		yellow.wheelR.applyForce(new Vec2((float)(yellowRightWheelSpeed*Math.cos(yellowAng)),
-				(float)(yellowRightWheelSpeed*Math.sin(yellowAng))), yellow.wheelR.getWorldCenter());
+		blue.updateRobot(blueSoft);
+		yellow.updateRobot(yellowSoft);
 		super.update();
 	}
+	
 
 	private void killAllOrtogonal(Body b) {
 		Vec2 v = b.getLinearVelocity();
@@ -201,10 +183,16 @@ public class PhysicsGUIDemo extends TestbedTest {
 		private final float robotLength = 0.2f * scale / 2;
 		private final float wheelWidth = 0.02f * scale;
 		private final float wheelLength = 0.05f * scale;
+		FrictionJointDef rightWheelFriction;
+		FrictionJointDef leftWheelFriction;
 
+		private static final float engineForce = 2f;
+		private static final float wheelMaxTorque = 0.5f;
+		
 		// wheel power (-1 for lock and 0 for float and (0,100] for power )
 
 		public Robot(Vec2 startingPos, float angle) {
+		
 			World w = getWorld();
 			leftWheelPos = new Vec2(0, (0.05f * scale));
 			rightWheelPos = new Vec2(0, -(0.05f * scale));
@@ -236,11 +224,25 @@ public class PhysicsGUIDemo extends TestbedTest {
 					.add(leftWheelPos));
 			wheelL = w.createBody(wheelBodyDef);
 			wheelL.createFixture(wheelF);
+			
+			//Creates friction between left wheel and ground
+			leftWheelFriction = new FrictionJointDef();
+			leftWheelFriction.initialize(wheelL, ground, wheelL.getWorldCenter());
+//			leftWheelFriction.maxForce = wheelMaxForce;
+			leftWheelFriction.maxTorque = wheelMaxTorque;
+			w.createJoint(leftWheelFriction);
 
 			wheelBodyDef.position.set(robot.getWorldCenter().clone()
 					.add(rightWheelPos));
 			wheelR = w.createBody(wheelBodyDef);
 			wheelR.createFixture(wheelF);
+			
+			//Creates friction right wheel and ground
+			rightWheelFriction = new FrictionJointDef();
+			rightWheelFriction.initialize(wheelR, ground, wheelR.getWorldCenter());
+//			rightWheelFriction.maxForce = wheelMaxForce;
+			rightWheelFriction.maxTorque = wheelMaxTorque;
+			w.createJoint(rightWheelFriction);
 
 			WeldJointDef wjd = new WeldJointDef();
 			wjd.initialize(robot, wheelL, wheelL.getWorldCenter());
@@ -248,6 +250,25 @@ public class PhysicsGUIDemo extends TestbedTest {
 			wjd.initialize(robot, wheelR, wheelR.getWorldCenter());
 			w.createJoint(wjd);
 
+		}
+		
+		public void updateRobot(SoftBot bot) {
+			
+			killAllOrtogonal(wheelL);
+			killAllOrtogonal(wheelR);
+			
+			double blueAng = robot.getAngle();
+			
+			// Normalises wheel force
+			float leftWheelSpeed = (bot.getLeftWheelSpeed()/100) * engineForce;
+			float rightWheelSpeed = (bot.getRightWheelSpeed()/100) * engineForce;
+			
+			wheelL.applyForce(new Vec2((float)(leftWheelSpeed*Math.cos(blueAng)),
+					(float)(leftWheelSpeed*Math.sin(blueAng))), wheelL.getWorldCenter());
+			wheelR.applyForce(new Vec2((float)(rightWheelSpeed*Math.cos(blueAng)),
+					(float)(rightWheelSpeed*Math.sin(blueAng))), wheelR.getWorldCenter());
+			wheelL.setLinearDamping( (engineForce - Math.abs(leftWheelSpeed) + 2)*2 );
+			wheelR.setLinearDamping( (engineForce - Math.abs(rightWheelSpeed) + 2)*2 );
 		}
 	}
 }
