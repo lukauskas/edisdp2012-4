@@ -11,7 +11,7 @@ import javax.swing.JTextField;
 import lejos.nxt.Button;
 import lejos.nxt.ButtonListener;
  
-import balle.brick.Controller;
+import balle.controller.Controller;
 import balle.world.AbstractWorld;
  
 public class UserInputStrategy extends AbstractStrategy {
