@@ -36,6 +36,8 @@ public class PhysicsGUIDemo extends TestbedTest {
 	private SoftBot blueSoft;
 	private SoftBot yellowSoft;
 	
+	private long startTime; 
+
 	@Override
 	public String getTestName() {
 		return "Super Cool Simulator";
@@ -58,6 +60,8 @@ public class PhysicsGUIDemo extends TestbedTest {
 
 	@Override
 	public void initTest(boolean arg0) {
+		
+		startTime = System.currentTimeMillis();
 
 		// centre the camera
 		setCamera(new Vec2(1.22f * scale, 1.22f * scale),
@@ -167,6 +171,34 @@ public class PhysicsGUIDemo extends TestbedTest {
 		testbed.setVisible(true);
 		testbed.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
+	}
+	
+	private long getTimeStamp() {
+		return System.currentTimeMillis() - startTime;
+	}
+	
+	private float convAngle(float a) {
+		return -a;
+	}
+	
+	private Vec2 convPos(Vec2 a) {
+		Vec2 output = new Vec2();
+		output.x = a.x/scale;
+		output.y = (a.y/-scale) + 1.22f;
+		return output;
+	}
+	
+	public String getWorldData() {
+		Vec2 yellowPos, bluePos;
+		yellowPos = convPos(yellow.robot.getPosition());
+		bluePos = convPos(blue.robot.getPosition());
+
+		
+		float yellowAng, blueAng;
+		yellowAng = yellow.robot.getAngle();
+		blueAng = blue.robot.getAngle();
+		return yellowPos.x+" "+yellowPos.y+" "+yellowAng+" "+
+				bluePos.x+" "+bluePos.y+" "+blueAng+" "+ getTimeStamp();
 	}
 
 	private static int robotNo = -20;
