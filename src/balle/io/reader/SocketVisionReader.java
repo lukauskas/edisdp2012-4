@@ -6,42 +6,51 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Scanner;
 
-public class SocketVisionReader extends AbstractVisionReader implements Runnable {
+
+/** 
+ * 
+ * NOTE: Reader implements AbstractVisionReader  
+ */
+public class SocketVisionReader extends Reader {
     
     public static final int PORT = 28546;
 
-    @Override
-    public void start() {
-        new Thread(this).start();
+    public SocketVisionReader() {
+        new SocketThread().start();
     }
 
-    @Override
-    public void run() {
-                
-        try {
-            ServerSocket server = new ServerSocket(PORT);
-            
-            while (true) {
-                Socket socket = server.accept();
-
-                System.out.println("Client connected");
-
-                Scanner scanner = new Scanner(new BufferedInputStream(socket.getInputStream()));
+    class SocketThread extends Thread {
     
-                while (scanner.hasNextLine()) {
-                    try {
-                        parse(scanner.nextLine());
-                    } catch (java.util.NoSuchElementException e) {
-                        System.out.println("No input from camera!");
-                    }
-                }
+    	@Override
+    	public void run() {
 
-                System.out.println("Client disconnected");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        
+			try {
+				ServerSocket server = new ServerSocket(PORT);
+
+				while (true) {
+					Socket socket = server.accept();
+
+					System.out.println("Client connected");
+
+					Scanner scanner = new Scanner(new BufferedInputStream(
+							socket.getInputStream()));
+
+					while (scanner.hasNextLine()) {
+						try {
+							parse(scanner.nextLine());
+						} catch (java.util.NoSuchElementException e) {
+							System.out.println("No input from camera!");
+						}
+					}
+
+					System.out.println("Client disconnected");
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+		}
+    
     }
     
     private void parse(String line) {
