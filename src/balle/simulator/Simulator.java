@@ -138,8 +138,8 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 		// create robots at either end of pitch
 		blue = new Robot(new Vec2((float) (0.1f * scale), (float) (0.61 * scale)), 0f);
 		yellow = new Robot(new Vec2((float) (2.34 * scale), (float) (0.61 * scale)), 0f);
-		blueSoft = new SoftBot();
-		yellowSoft = new SoftBot();
+		
+		System.out.println("ARGGGGGGGGGGGGGGGGGGGGGGG");
 	}
 
 	@Override
@@ -169,7 +169,13 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 	/** Empty constructor, to make private.
 	 * 		For constructor use createSimulator()
 	 */
-	private Simulator() { /* James: Do not use. Use initTest() instead. */	}
+	private Simulator() {
+		
+		// Sorry, these need to be created straight away.
+		blueSoft = new SoftBot(); yellowSoft = new SoftBot();
+		
+		/* James: Do not use. Use initTest() instead. */
+		}
 	
 	/** Equivalent to a constructor.
 	 * 

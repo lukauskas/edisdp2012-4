@@ -29,7 +29,12 @@ public class UserInputStrategy extends AbstractStrategy {
         
         @Override
         protected void aiStep(){
-                
+        		try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
         }
  
         private char cmd = 's';
