@@ -4,6 +4,8 @@ import balle.controller.Controller;
 
 public class SoftBot implements Controller {
 	
+	private float kick = 0;
+
 	private float leftWheelSpeed = 0;
 	private float rightWheelSpeed = 0;
 	
@@ -17,26 +19,26 @@ public class SoftBot implements Controller {
 
 	@Override
 	public void backward(int speed) {
-		// TODO Auto-generated method stub
-		
+		leftWheelSpeed = -speed;
+		rightWheelSpeed = -speed;
 	}
 
 	@Override
 	public void forward(int speed) {
-		// TODO Auto-generated method stub
-		
+		leftWheelSpeed = speed;
+		rightWheelSpeed = speed;
 	}
 
 	@Override
 	public void floatWheels() {
-		// TODO Auto-generated method stub
-		
+		// TODO Changes behaviour of the robot.
+		// Not exactly sure how will behave?
 	}
 
 	@Override
 	public void stop() {
-		// TODO Auto-generated method stub
-		
+		leftWheelSpeed = 0;
+		rightWheelSpeed = 0;
 	}
 
 	@Override
@@ -55,7 +57,7 @@ public class SoftBot implements Controller {
 	public void setWheelSpeeds(int leftWheelSpeed, int rightWheelSpeed) {
 		this.leftWheelSpeed = leftWheelSpeed;
 		this.rightWheelSpeed = rightWheelSpeed;
-		System.out.println(leftWheelSpeed + " " + rightWheelSpeed);
+		// System.out.println("setWheelSpeeds(): "+leftWheelSpeed+" "+rightWheelSpeed);
 		
 	}
 
@@ -67,8 +69,12 @@ public class SoftBot implements Controller {
 
 	@Override
 	public void kick() {
-		// TODO Auto-generated method stub
-		
+		if (kick == 0) {
+			kick = 1;
+			// System.out.println("kick(): kicking.");
+		} else {
+			// System.out.println("kick(): failed to kick.");
+		}
 	}
 
     @Override

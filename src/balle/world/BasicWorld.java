@@ -1,11 +1,13 @@
 package balle.world;
 
 public class BasicWorld extends AbstractWorld {
-
+	
     private Snapshot prev = null;
 
     public BasicWorld(boolean balleIsBlue) {
         super(balleIsBlue);
+        
+        
     }
 
     @Override

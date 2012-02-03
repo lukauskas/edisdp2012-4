@@ -79,9 +79,15 @@ function install_bluetooth {
     wget "http://dl.dropbox.com/u/46248986/libbluetooth.tar.gz" -O $lTMP_BLUETOOTH_LIB \
     && cd $LIB && tar xvf $lTMP_BLUETOOTH_LIB && cd $SDP_HOME && rm $lTMP_BLUETOOTH_LIB
 }
+
+function install_mockito {
+    wget "http://mockito.googlecode.com/files/mockito-all-1.9.0.jar" -O "$LIB/mockito-all-1.9.0.jar"
+}
+
 cleanup
 install_lejos
 install_bluetooth
 install_slf4j # Seems to be required for the physics demo
-#install_jbullet
+##install_jbullet
 install_jbox2d
+install_mockito   # Mocking framework -- used in some JUnit tests

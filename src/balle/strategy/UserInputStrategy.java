@@ -3,13 +3,9 @@ package balle.strategy;
 import java.awt.BorderLayout;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.Scanner;
 
 import javax.swing.JFrame;
 import javax.swing.JTextField;
- 
-import lejos.nxt.Button;
-import lejos.nxt.ButtonListener;
  
 import balle.controller.Controller;
 import balle.world.AbstractWorld;
@@ -33,7 +29,12 @@ public class UserInputStrategy extends AbstractStrategy {
         
         @Override
         protected void aiStep(){
-                
+        		try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
         }
  
         private char cmd = 's';
