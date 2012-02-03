@@ -30,13 +30,13 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 
 	// Increases sizes, but keeps real-world scale; jbox2d acts unrealistically 
 	//at a small scale
-	private final float scale = 10;
+	protected final float scale = 10;
 	
 	private Body ground;
-	private Body ball;
+	protected Body ball;
 
-	private Robot blue;
-	private Robot yellow;
+	protected Robot blue;
+	protected Robot yellow;
 	
 	private SoftBot blueSoft = new SoftBot();
 	private SoftBot yellowSoft = new SoftBot();
@@ -169,7 +169,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 	/** Empty constructor, to make private.
 	 * 		For constructor use createSimulator()
 	 */
-	private Simulator() { /* James: Do not use. Use initTest() instead. */ }
+	protected Simulator() { /* James: Do not use. Use initTest() instead. */ }
 	
 	/** Equivalent to a constructor.
 	 * 
@@ -190,6 +190,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 		Simulator pgui = new Simulator();
 		model.addTest(pgui);
 		JFrame testbed = new TestbedFrame(model, panel);
+		testbed.setTitle("Simulator");
 		testbed.setVisible(true);
 		testbed.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		return pgui;
@@ -197,11 +198,12 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 	
 
 	private static int robotNo = -20;
-	class Robot {
+	protected class Robot {
 		
 		private Body robot;
 		private Body wheelL;
 		private Body wheelR;
+		private boolean isPuppet;
 
 		private final Vec2 leftWheelPos;
 		private final Vec2 rightWheelPos;
@@ -214,7 +216,6 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 
 		private static final float engineForce = 2f;
 		private static final float wheelMaxTorque = 0.5f;
-		
 		// wheel power (-1 for lock and 0 for float and (0,100] for power )
 
 		public Robot(Vec2 startingPos, float angle) {
@@ -222,6 +223,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 			World w = getWorld();
 			leftWheelPos = new Vec2(0, (0.05f * scale));
 			rightWheelPos = new Vec2(0, -(0.05f * scale));
+			isPuppet = false;
 			
 			// Create Robot body, set position from Constructor
 			PolygonShape robotShape = new PolygonShape();
@@ -279,22 +281,33 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 		}
 		
 		public void updateRobot(SoftBot bot) {
-			
-			killAllOrtogonal(wheelL);
-			killAllOrtogonal(wheelR);
-			
-			double blueAng = robot.getAngle();
-			
-			// Normalises wheel force
-			float leftWheelSpeed = (bot.getLeftWheelSpeed()/100) * engineForce;
-			float rightWheelSpeed = (bot.getRightWheelSpeed()/100) * engineForce;
-			
-			wheelL.applyForce(new Vec2((float)(leftWheelSpeed*Math.cos(blueAng)),
-					(float)(leftWheelSpeed*Math.sin(blueAng))), wheelL.getWorldCenter());
-			wheelR.applyForce(new Vec2((float)(rightWheelSpeed*Math.cos(blueAng)),
-					(float)(rightWheelSpeed*Math.sin(blueAng))), wheelR.getWorldCenter());
-			wheelL.setLinearDamping( (engineForce - Math.abs(leftWheelSpeed) + 2)*2 );
-			wheelR.setLinearDamping( (engineForce - Math.abs(rightWheelSpeed) + 2)*2 );
+			if(!isPuppet) {
+				killAllOrtogonal(wheelL);
+				killAllOrtogonal(wheelR);
+				
+				double blueAng = robot.getAngle();
+				
+				// Normalises wheel force
+				float leftWheelSpeed = (bot.getLeftWheelSpeed()/100) * engineForce;
+				float rightWheelSpeed = (bot.getRightWheelSpeed()/100) * engineForce;
+				
+				wheelL.applyForce(new Vec2((float)(leftWheelSpeed*Math.cos(blueAng)),
+						(float)(leftWheelSpeed*Math.sin(blueAng))), wheelL.getWorldCenter());
+				wheelR.applyForce(new Vec2((float)(rightWheelSpeed*Math.cos(blueAng)),
+						(float)(rightWheelSpeed*Math.sin(blueAng))), wheelR.getWorldCenter());
+				wheelL.setLinearDamping( (engineForce - Math.abs(leftWheelSpeed) + 2)*2 );
+				wheelR.setLinearDamping( (engineForce - Math.abs(rightWheelSpeed) + 2)*2 );
+			}
+		}
+		
+		public void makePuppet() {
+			isPuppet = true;
+			getWorld().destroyBody(wheelL);
+			getWorld().destroyBody(wheelR);
+		}
+		
+		public Body getBody() {
+			return robot;
 		}
 	}
 	

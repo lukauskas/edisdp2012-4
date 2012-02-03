@@ -1,6 +1,10 @@
 package balle.world;
 
 import balle.io.listener.Listener;
+import balle.simulator.Simulator;
+import balle.simulator.SoftBot;
+import balle.strategy.AbstractStrategy;
+import balle.strategy.UserInputStrategy;
 
 /***
  * 
@@ -22,6 +26,7 @@ public abstract class AbstractWorld implements Listener {
 
     public AbstractWorld(boolean isBalleBlue) {
         this.balleIsBlue = isBalleBlue;
+        displayGUI();
     }
 
     /**
@@ -64,5 +69,9 @@ public abstract class AbstractWorld implements Listener {
      * @return coordinates of the robot.
      */
     public abstract Snapshot getSnapshot();
+    
+    public void displayGUI() {
+    	WorldGUI.createWorldGUI(this);
+    }
 
 }
