@@ -38,8 +38,8 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 	private Robot blue;
 	private Robot yellow;
 	
-	private SoftBot blueSoft;
-	private SoftBot yellowSoft;
+	private SoftBot blueSoft = new SoftBot();
+	private SoftBot yellowSoft = new SoftBot();
 	
 	private long startTime;
 	
@@ -153,7 +153,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 		super.update();
 		
 		// Update world with new information.
-		this.propergate();
+		this.reader.update();
 	}
 	
 
@@ -169,13 +169,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 	/** Empty constructor, to make private.
 	 * 		For constructor use createSimulator()
 	 */
-	private Simulator() {
-		
-		// Sorry, these need to be created straight away.
-		blueSoft = new SoftBot(); yellowSoft = new SoftBot();
-		
-		/* James: Do not use. Use initTest() instead. */
-		}
+	private Simulator() { /* James: Do not use. Use initTest() instead. */ }
 	
 	/** Equivalent to a constructor.
 	 * 
@@ -304,11 +298,63 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 		}
 	}
 	
+	SimulatorReader reader = new SimulatorReader();
+	
 	/* Output to World:
 	 * All code refering to the output from the simulator goes here.
 	 */
-	
-	private Reader reader = new Reader();
+	class SimulatorReader extends Reader {
+		
+		private long getTimeStamp() {
+			return System.currentTimeMillis() - startTime;
+		}
+		
+		private float convAngle(float a) {
+			return -a;
+		}
+		
+		private Vec2 convPos(Vec2 a) {
+			Vec2 output = new Vec2();
+			output.x = a.x/scale;
+			output.y = (a.y/-scale) + 1.22f;
+			return output;
+		}
+		
+		public synchronized String getWorldData() {
+			Vec2 yellowPos, bluePos;
+			yellowPos = convPos(yellow.robot.getPosition());
+			bluePos = convPos(blue.robot.getPosition());
+			
+			float yellowAng, blueAng;
+			yellowAng = convAngle(yellow.robot.getAngle());
+			blueAng = convAngle(blue.robot.getAngle());
+			return yellowPos.x+" "+yellowPos.y+" "+yellowAng+" "+
+					bluePos.x+" "+bluePos.y+" "+blueAng+" "+ getTimeStamp();
+		}
+		
+		
+		public void update() {
+			float yPosX, yPosY, yRad, bPosX, bPosY, bRad, ballPosX, ballPosY;
+			
+			Vec2 yPos = convPos(yellow.robot.getPosition());
+			yPosX = yPos.x;
+			yPosY = yPos.y;
+			yRad  = convAngle(yellow.robot.getAngle()); 
+			
+			Vec2 bPos = convPos(blue.robot.getPosition());
+			bPosX = bPos.x;
+			bPosY = bPos.y;
+			bRad  = convAngle(blue.robot.getAngle());
+			
+			Vec2 ballPos = convPos(ball.getPosition());
+			ballPosX = ballPos.x;
+			ballPosY = ballPos.y;
+			
+			long timestamp = getTimeStamp();
+			
+			super.propagate(yPosX, yPosY, yRad, bPosX, bPosY, bRad, ballPosX, ballPosY, timestamp);
+		}
+	}
 	
 	/** Marks a world to be updated of any changes
 	 * 
@@ -318,35 +364,4 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 		reader.addListener(listener);
 	}
 	
-	private long getTimeStamp() {
-		return System.currentTimeMillis() - startTime;
-	}
-	
-	private float convAngle(float a) {
-		return -a;
-	}
-	
-	private Vec2 convPos(Vec2 a) {
-		Vec2 output = new Vec2();
-		output.x = a.x/scale;
-		output.y = (a.y/-scale) + 1.22f;
-		return output;
-	}
-	
-	private void propergate() {
-		
-		
-	}
-	
-	public synchronized String getWorldData() {
-		Vec2 yellowPos, bluePos;
-		yellowPos = convPos(yellow.robot.getPosition());
-		bluePos = convPos(blue.robot.getPosition());
-		
-		float yellowAng, blueAng;
-		yellowAng = convAngle(yellow.robot.getAngle());
-		blueAng = convAngle(blue.robot.getAngle());
-		return yellowPos.x+" "+yellowPos.y+" "+yellowAng+" "+
-				bluePos.x+" "+bluePos.y+" "+blueAng+" "+ getTimeStamp();
-	}
 }
