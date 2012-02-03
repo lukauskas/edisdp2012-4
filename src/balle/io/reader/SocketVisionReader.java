@@ -7,7 +7,15 @@ import java.net.Socket;
 import java.util.Scanner;
 
 
-/** 
+/** SocketVisionReader:
+ * 	Captures input from vision system.
+ * 
+ * Usage:
+ * 		- Create an instance.
+ * 		- Add the listener.
+ * 
+ * 	Contains an inner class SocketThread that will update
+ *  listeners with world information.
  * 
  * NOTE: Reader implements AbstractVisionReader  
  */
