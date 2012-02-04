@@ -38,17 +38,14 @@ public class AbstractMessageTest {
     @Test
     public void testExtactOpcodeFromEncodedMessage() {
 
-        // 111 00000000000000000000000000000
-        assertEquals(7,
-                AbstractMessage.extactOpcodeFromEncodedMessage(0xE0000000));
+        // 11 000000000000000000000000000000
+        assertEquals(3, AbstractMessage.extactOpcodeFromEncodedMessage(0xC0000000));
 
-        // 011 00000001100100100010101010000
-        assertEquals(3,
-                AbstractMessage.extactOpcodeFromEncodedMessage(0x60324550));
+        // 01 000000000011010001010000010101
+        assertEquals(1, AbstractMessage.extactOpcodeFromEncodedMessage(0x400D1415));
 
-        // 000 11111111111111111111111111111
-        assertEquals(0,
-                AbstractMessage.extactOpcodeFromEncodedMessage(0x1FFFFFFF));
+        // 00 111111111111111111111111111111
+        assertEquals(0, AbstractMessage.extactOpcodeFromEncodedMessage(0x3FFFFFFF));
 
     }
 
@@ -60,10 +57,9 @@ public class AbstractMessageTest {
      * @throws InvalidOpcodeException
      */
     @Test
-    public void test_abstract_message_hashes_opcode_correctly()
-            throws InvalidOpcodeException {
+    public void test_abstract_message_hashes_opcode_correctly() throws InvalidOpcodeException {
         AbstractMessage message1 = spy(new AbstractMessageConcrete());
-        when(message1.getOpcode()).thenReturn(6);
+        when(message1.getOpcode()).thenReturn(3);
 
         assertEquals(0xC0000000, message1.hashOpcode());
 
@@ -73,9 +69,9 @@ public class AbstractMessageTest {
         assertEquals(0x00000000, message2.hashOpcode());
 
         AbstractMessage message3 = spy(new AbstractMessageConcrete());
-        when(message3.getOpcode()).thenReturn(7);
+        when(message3.getOpcode()).thenReturn(1);
 
-        assertEquals(0xE0000000, message3.hashOpcode());
+        assertEquals(0x40000000, message3.hashOpcode());
     }
 
     /**

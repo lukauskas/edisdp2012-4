@@ -10,15 +10,12 @@ public abstract class AbstractSingleArgMessage extends AbstractMessage {
         this.arg1 = arg1;
 
         if (arg1 < 0) {
-            throw new InvalidArgumentException(
-                    "Provided argument "
-                            + arg1
-                            + " is < 0. Arguments should be unsigned. "
-                            + " If you need a negative valued one, consider offsetting it "
-                            + " so it is always positive.");
+            throw new InvalidArgumentException("Provided argument " + arg1
+                    + " is < 0. Arguments should be unsigned. "
+                    + " If you need a negative valued one, consider offsetting it "
+                    + " so it is always positive.");
 
-        } else if (arg1 > (int) Math.pow(2,
-                AbstractSingleArgMessage.BITS_PER_ARGUMENT) - 1) {
+        } else if (arg1 > (int) Math.pow(2, AbstractSingleArgMessage.BITS_PER_ARGUMENT) - 1) {
             throw new InvalidArgumentException("Provided argument " + arg1
                     + " exceeds number of bits per argument");
         }
@@ -37,6 +34,10 @@ public abstract class AbstractSingleArgMessage extends AbstractMessage {
 
     public static int decodeArgumentsFromHash(int hash) {
         return hash & 0x1FFFFFFF;
+    }
+
+    public int getArgument() {
+        return this.arg1;
     }
 
 }

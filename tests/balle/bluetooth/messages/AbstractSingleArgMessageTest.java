@@ -8,8 +8,7 @@ import org.junit.Test;
 
 class AbstractSingleArgMessageConcrete extends AbstractSingleArgMessage {
 
-    public AbstractSingleArgMessageConcrete(int arg1)
-            throws InvalidArgumentException {
+    public AbstractSingleArgMessageConcrete(int arg1) throws InvalidArgumentException {
         super(arg1);
         // TODO Auto-generated constructor stub
     }
@@ -32,13 +31,11 @@ public class AbstractSingleArgMessageTest {
      * @throws InvalidOpcodeException
      */
     @Test
-    public void testHash() throws InvalidArgumentException,
-            InvalidOpcodeException {
-        AbstractSingleArgMessage message1 = spy(new AbstractSingleArgMessageConcrete(
-                12));
-        when(message1.getOpcode()).thenReturn(7);
+    public void testHash() throws InvalidArgumentException, InvalidOpcodeException {
+        AbstractSingleArgMessage message1 = spy(new AbstractSingleArgMessageConcrete(12));
+        when(message1.getOpcode()).thenReturn(3);
 
-        assertEquals(0xE000000C, message1.hash());
+        assertEquals(0xC000000C, message1.hash());
     }
 
     /**
@@ -49,8 +46,7 @@ public class AbstractSingleArgMessageTest {
     @Test(expected = InvalidArgumentException.class)
     public void test_constructor_fails_when_negative_argument_is_passed()
             throws InvalidArgumentException {
-        AbstractSingleArgMessage message = new AbstractSingleArgMessageConcrete(
-                -1);
+        AbstractSingleArgMessage message = new AbstractSingleArgMessageConcrete(-1);
     }
 
     /**
@@ -61,9 +57,9 @@ public class AbstractSingleArgMessageTest {
     public void test_constructor_fails_when_high_valued_argument_is_passed()
             throws InvalidArgumentException {
         // Currently it should have 29 bits allowing to store integers as big as
-        // 2^29-1
-        AbstractSingleArgMessage message = new AbstractSingleArgMessageConcrete(
-                (int) Math.pow(2, 29));
+        // 2^30-1
+        AbstractSingleArgMessage message = new AbstractSingleArgMessageConcrete((int) Math.pow(2,
+                30));
     }
 
     /**
@@ -74,12 +70,10 @@ public class AbstractSingleArgMessageTest {
      */
     @Test
     public void testHashArguments() throws InvalidArgumentException {
-        AbstractSingleArgMessage message1 = new AbstractSingleArgMessageConcrete(
-                1234);
+        AbstractSingleArgMessage message1 = new AbstractSingleArgMessageConcrete(1234);
         assertEquals(1234, message1.hashArguments());
 
-        AbstractSingleArgMessage message2 = new AbstractSingleArgMessageConcrete(
-                7);
+        AbstractSingleArgMessage message2 = new AbstractSingleArgMessageConcrete(7);
         assertEquals(7, message2.hashArguments());
     }
 
@@ -89,10 +83,8 @@ public class AbstractSingleArgMessageTest {
      */
     @Test
     public void testDecodeArgumentsFromHash() {
-        assertEquals(0,
-                AbstractSingleArgMessage.decodeArgumentsFromHash(0xE0000000));
-        assertEquals(224,
-                AbstractSingleArgMessage.decodeArgumentsFromHash(0xA00000E0));
+        assertEquals(0, AbstractSingleArgMessage.decodeArgumentsFromHash(0xE0000000));
+        assertEquals(224, AbstractSingleArgMessage.decodeArgumentsFromHash(0xA00000E0));
 
     }
 
