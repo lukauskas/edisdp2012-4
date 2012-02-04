@@ -2,7 +2,7 @@ package balle.bluetooth.messages;
 
 public class MessageStop extends AbstractSingleArgMessage {
 
-    protected static int OPCODE = 1;
+    public static final int OPCODE = 1;
 
     /**
      * Instantiates a new message stop.

@@ -1,7 +1,7 @@
 package balle.bluetooth.messages;
 
 public class MessageRotate extends AbstractTwoArgMessage {
-    protected static int       OPCODE       = 3;
+    public static final int    OPCODE       = 3;
     protected static final int ANGLE_OFFSET = 360;
 
     public MessageRotate(int angle, int speed) throws InvalidArgumentException {

@@ -2,7 +2,7 @@ package balle.bluetooth.messages;
 
 public class MessageMove extends AbstractTwoArgMessage {
 
-    protected static int       OPCODE = 2;
+    public static final int    OPCODE = 2;
     protected final static int OFFSET = 720; // offset to add to speeds so we
                                              // never see negative values
 

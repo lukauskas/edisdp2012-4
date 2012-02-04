@@ -1,7 +1,7 @@
 package balle.bluetooth.messages;
 
 public class MessageKick extends AbstractSingleArgMessage {
-    protected static int OPCODE = 0;
+    public static final int OPCODE = 0;
 
     public MessageKick(int isPenalty) throws InvalidArgumentException {
         super(isPenalty);

@@ -7,14 +7,10 @@ public abstract class AbstractMessage {
     public final static int BITS_PER_INT     = 32;
     public final static int MAX_OPCODE_VALUE = (int) Math.pow(2, BITS_FOR_OPCODE) - 1;
 
-    protected static int    OPCODE           = -1;
-
-    public final static int opcode() {
-        return OPCODE;
-    }
+    public final static int OPCODE           = -1;
 
     public int getOpcode() {
-        return AbstractMessage.opcode();
+        return OPCODE;
     }
 
     public abstract int hash() throws InvalidOpcodeException;
@@ -41,4 +37,5 @@ public abstract class AbstractMessage {
     public static final int extactOpcodeFromEncodedMessage(int message) {
         return message >>> (BITS_PER_INT - BITS_FOR_OPCODE);
     }
+
 }
