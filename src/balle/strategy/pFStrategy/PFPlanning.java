@@ -1,4 +1,4 @@
-package main.strategy.pFStrategy;
+package balle.strategy.pFStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
