@@ -83,8 +83,8 @@ public class AbstractSingleArgMessageTest {
      */
     @Test
     public void testDecodeArgumentsFromHash() {
-        assertEquals(0, AbstractSingleArgMessage.decodeArgumentsFromHash(0xE0000000));
-        assertEquals(224, AbstractSingleArgMessage.decodeArgumentsFromHash(0xA00000E0));
+        assertEquals(0, AbstractSingleArgMessage.decodeArgumentsFromHash(0xC0000000));
+        assertEquals(536871136, AbstractSingleArgMessage.decodeArgumentsFromHash(0xA00000E0));
 
     }
 
