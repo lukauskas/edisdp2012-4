@@ -2,6 +2,8 @@ package balle.bluetooth.messages;
 
 public class MessageStop extends AbstractSingleArgMessage {
 
+    protected static int OPCODE = 1;
+
     /**
      * Instantiates a new message stop.
      * 
@@ -15,11 +17,6 @@ public class MessageStop extends AbstractSingleArgMessage {
         super(floatWheels);
         if ((floatWheels != 0) && (floatWheels != 1))
             throw new InvalidArgumentException("floatWheels should either be 0 or 1");
-    }
-
-    @Override
-    public int getOpcode() {
-        return 1;
     }
 
     /**
