@@ -15,4 +15,14 @@ public class MessageKick extends AbstractSingleArgMessage {
         return (getArgument() == 1);
     }
 
+    @Override
+    public String getName() {
+        return NAME;
+    }
+
+    @Override
+    public int getOpcode() {
+        return OPCODE;
+    }
+
 }

@@ -10,13 +10,9 @@ public abstract class AbstractMessage {
     public final static int    OPCODE           = -1;
     public final static String NAME             = "";
 
-    public int getOpcode() {
-        return OPCODE;
-    }
+    public abstract int getOpcode();
 
-    public String getName() {
-        return NAME;
-    }
+    public abstract String getName();
 
     public abstract int hash() throws InvalidOpcodeException;
 

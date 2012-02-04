@@ -40,4 +40,14 @@ public class MessageMove extends AbstractTwoArgMessage {
         }
     }
 
+    @Override
+    public String getName() {
+        return NAME;
+    }
+
+    @Override
+    public int getOpcode() {
+        return OPCODE;
+    }
+
 }

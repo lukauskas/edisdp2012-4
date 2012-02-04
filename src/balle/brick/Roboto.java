@@ -33,6 +33,43 @@ public class Roboto {
     public static final int MESSAGE_PENALTY = 7;
 
     /**
+     * Processes the decoded message and issues correct commands to controller
+     * 
+     * @param decodedMessage
+     *            the decoded message
+     * @param controller
+     * @return true, if successful
+     */
+    public static boolean processMessage(AbstractMessage decodedMessage, Controller controller) {
+        String name = decodedMessage.getName();
+
+        if (name.equals(MessageKick.NAME)) {
+            MessageKick messageKick = (MessageKick) decodedMessage;
+            if (messageKick.isPenalty()) {
+                controller.penaltyKick();
+            } else {
+                controller.kick();
+            }
+        } else if (name.equals(MessageMove.NAME)) {
+            MessageMove messageMove = (MessageMove) decodedMessage;
+            controller.setWheelSpeeds(messageMove.getLeftWheelSpeed(),
+                    messageMove.getRightWheelSpeed());
+        } else if (name.equals(MessageStop.NAME)) {
+            MessageStop messageStop = (MessageStop) decodedMessage;
+            if (messageStop.floatWheels())
+                controller.floatWheels();
+            else
+                controller.stop();
+        } else if (name.equals(MessageRotate.NAME)) {
+            MessageRotate messageRotate = (MessageRotate) decodedMessage;
+            controller.rotate(messageRotate.getAngle(), messageRotate.getSpeed());
+        } else {
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Main program
      * 
      * @param args
@@ -84,30 +121,15 @@ public class Roboto {
 
                     int hashedMessage = input.readInt();
                     AbstractMessage message = decoder.decodeMessage(hashedMessage);
+                    if (message == null) {
+                        drawMessage("Could not decode: " + hashedMessage);
+                        break;
+                    }
                     String name = message.getName();
                     drawMessage(name);
 
-                    if (name.equals(MessageKick.NAME)) {
-                        MessageKick messageKick = (MessageKick) message;
-                        if (messageKick.isPenalty()) {
-                            controller.penaltyKick();
-                        } else {
-                            controller.kick();
-                        }
-                    } else if (name.equals(MessageMove.NAME)) {
-                        MessageMove messageMove = (MessageMove) message;
-                        controller.setWheelSpeeds(messageMove.getLeftWheelSpeed(),
-                                messageMove.getRightWheelSpeed());
-                    } else if (name.equals(MessageStop.NAME)) {
-                        MessageStop messageStop = (MessageStop) message;
-                        if (messageStop.floatWheels())
-                            controller.floatWheels();
-                        else
-                            controller.stop();
-                    } else if (name.equals(MessageRotate.NAME)) {
-                        MessageRotate messageRotate = (MessageRotate) message;
-                        controller.rotate(messageRotate.getAngle(), messageRotate.getSpeed());
-                    } else {
+                    boolean successful = processMessage(message, controller);
+                    if (!successful) {
                         drawMessage("Unknown message received: " + hashedMessage);
                         break;
                     }
