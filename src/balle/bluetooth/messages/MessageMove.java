@@ -3,8 +3,9 @@ package balle.bluetooth.messages;
 public class MessageMove extends AbstractTwoArgMessage {
 
     public static final int    OPCODE = 2;
-    protected final static int OFFSET = 720; // offset to add to speeds so we
-                                             // never see negative values
+    protected final static int OFFSET = 720;   // offset to add to speeds so we
+                                                // never see negative values
+    public static final String NAME   = "MOVE";
 
     /**
      * Message for the robot to move.

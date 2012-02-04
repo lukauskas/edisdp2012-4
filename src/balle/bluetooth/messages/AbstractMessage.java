@@ -3,14 +3,19 @@ package balle.bluetooth.messages;
 public abstract class AbstractMessage {
 
     // Can have 4 opcodes only
-    public final static int BITS_FOR_OPCODE  = 2;
-    public final static int BITS_PER_INT     = 32;
-    public final static int MAX_OPCODE_VALUE = (int) Math.pow(2, BITS_FOR_OPCODE) - 1;
+    public final static int    BITS_FOR_OPCODE  = 2;
+    public final static int    BITS_PER_INT     = 32;
+    public final static int    MAX_OPCODE_VALUE = (int) Math.pow(2, BITS_FOR_OPCODE) - 1;
 
-    public final static int OPCODE           = -1;
+    public final static int    OPCODE           = -1;
+    public final static String NAME             = "";
 
     public int getOpcode() {
         return OPCODE;
+    }
+
+    public String getName() {
+        return NAME;
     }
 
     public abstract int hash() throws InvalidOpcodeException;
