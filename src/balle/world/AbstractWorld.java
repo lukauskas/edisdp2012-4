@@ -1,10 +1,6 @@
 package balle.world;
 
 import balle.io.listener.Listener;
-import balle.simulator.Simulator;
-import balle.simulator.SoftBot;
-import balle.strategy.AbstractStrategy;
-import balle.strategy.UserInputStrategy;
 
 /***
  * 

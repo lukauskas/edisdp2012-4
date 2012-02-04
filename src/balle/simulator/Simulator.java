@@ -22,9 +22,6 @@ import balle.io.listener.Listener;
 import balle.io.reader.AbstractVisionReader;
 import balle.io.reader.Reader;
 import balle.simulator.SoftBot;
-import balle.strategy.AbstractStrategy;
-import balle.strategy.UserInputStrategy;
-import balle.world.BasicWorld;
 
 public class Simulator extends TestbedTest implements AbstractVisionReader {
 
