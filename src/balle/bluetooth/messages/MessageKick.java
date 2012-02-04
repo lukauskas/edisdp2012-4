@@ -11,7 +11,7 @@ public class MessageKick extends AbstractSingleArgMessage {
 
     @Override
     public int getOpcode() {
-        return 1;
+        return 0;
     }
 
     public boolean isPenalty() {
