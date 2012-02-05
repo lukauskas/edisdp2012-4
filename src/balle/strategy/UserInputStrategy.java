@@ -50,6 +50,7 @@ public class UserInputStrategy extends AbstractStrategy {
                 case 's':       controller.setWheelSpeeds(  0,   0); break;
                 case 'd':       controller.setWheelSpeeds( 99, -99); break;
                 case 'x':       controller.setWheelSpeeds(-99, -99); break;
+                case ' ':		controller.kick();
                 }
                 
         }

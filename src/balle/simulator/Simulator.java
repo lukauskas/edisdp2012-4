@@ -2,8 +2,11 @@ package balle.simulator;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 
+import org.jbox2d.callbacks.RayCastCallback;
+import org.jbox2d.collision.Collision;
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
+import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
@@ -12,11 +15,13 @@ import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
 import org.jbox2d.dynamics.joints.FrictionJointDef;
 import org.jbox2d.dynamics.joints.WeldJointDef;
+import org.jbox2d.pooling.normal.DefaultWorldPool;
 import org.jbox2d.testbed.framework.TestbedFrame;
 import org.jbox2d.testbed.framework.TestbedModel;
 import org.jbox2d.testbed.framework.TestbedPanel;
 import org.jbox2d.testbed.framework.TestbedTest;
 import org.jbox2d.testbed.framework.j2d.TestPanelJ2D;
+import org.jbox2d.pooling.*;
 
 import balle.io.listener.Listener;
 import balle.io.reader.AbstractVisionReader;
@@ -39,6 +44,8 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 	private SoftBot yellowSoft = new SoftBot();
 	
 	private long startTime;
+	
+	private CircleShape ballShape;
 	
 	public SoftBot getBlueSoft() {
 		return blueSoft;
@@ -111,7 +118,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 		addEdge(2.54f * scale, 0.31f * scale, 2.54f * scale, 0.91f * scale);
 
 		// Create ball
-		CircleShape ballShape = new CircleShape();
+		ballShape = new CircleShape();
 		ballShape.m_radius = 0.02135f * scale;
 		FixtureDef f = new FixtureDef();
 		f.shape = ballShape;
@@ -135,8 +142,6 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 		// create robots at either end of pitch
 		blue = new Robot(new Vec2((float) (0.1f * scale), (float) (0.61 * scale)), 0f);
 		yellow = new Robot(new Vec2((float) (2.34 * scale), (float) (0.61 * scale)), 0f);
-		
-		System.out.println("ARGGGGGGGGGGGGGGGGGGGGGGG");
 	}
 
 	@Override
@@ -194,33 +199,42 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 	}
 	
 
-	private static int robotNo = -20;
+	private static int robotNo = 0;
 	protected class Robot {
+		
+		private Body kicker;
 		
 		private Body robot;
 		private Body wheelL;
 		private Body wheelR;
-		private boolean isPuppet;
+		private boolean isPuppet = false;
 
-		private final Vec2 leftWheelPos;
-		private final Vec2 rightWheelPos;
+		private final Vec2 leftWheelPos = new Vec2(0, (0.05f * scale));
+		private final Vec2 rightWheelPos = new Vec2(0, -(0.05f * scale));
+		private final Vec2 kickPos = new Vec2(0.12f*scale, 0);
+		
 		private final float robotWidth = 0.15f * scale / 2;
 		private final float robotLength = 0.2f * scale / 2;
+		
 		private final float wheelWidth = 0.02f * scale;
 		private final float wheelLength = 0.05f * scale;
+		
+		private final float kickerWidth = 0.15f * scale / 2;
+		private final float kickerLength = 0.04f * scale / 2;
+		
+		private PolygonShape kickerShape;
+		
 		FrictionJointDef rightWheelFriction;
 		FrictionJointDef leftWheelFriction;
 
 		private static final float engineForce = 2f;
+		private static final float kickForce = 20000f;
 		private static final float wheelMaxTorque = 0.5f;
 		// wheel power (-1 for lock and 0 for float and (0,100] for power )
 
 		public Robot(Vec2 startingPos, float angle) {
-		
 			World w = getWorld();
-			leftWheelPos = new Vec2(0, (0.05f * scale));
-			rightWheelPos = new Vec2(0, -(0.05f * scale));
-			isPuppet = false;
+			int robotIndex = robotNo++;
 			
 			// Create Robot body, set position from Constructor
 			PolygonShape robotShape = new PolygonShape();
@@ -233,7 +247,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 			robotF.shape = robotShape;
 			robotF.density = (1f / 0.36f) / scale;
 			// Stops wheels and body colliding
-			robotF.filter.groupIndex = robotNo--;
+			robotF.filter.groupIndex = -robotIndex-20;
 			robot.createFixture(robotF);
 
 			PolygonShape wheelShape = new PolygonShape();
@@ -241,7 +255,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 			BodyDef wheelBodyDef = new BodyDef();
 			wheelBodyDef.type = BodyType.DYNAMIC;
 			FixtureDef wheelF = new FixtureDef();
-			wheelF.filter.groupIndex = -1;
+			wheelF.filter.groupIndex = -robotIndex-20;
 			wheelF.density = (1f / 0.36f) / scale;
 			wheelF.shape = wheelShape;
 
@@ -262,6 +276,20 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 			wheelR = w.createBody(wheelBodyDef);
 			wheelR.createFixture(wheelF);
 			
+			kickerShape = new PolygonShape();
+			kickerShape.setAsBox(kickerLength, kickerWidth);
+			BodyDef kickerBodyDef = new BodyDef();
+			kickerBodyDef.type = BodyType.DYNAMIC;
+			FixtureDef kickF = new FixtureDef();
+			kickF.filter.maskBits = 0x0;
+			kickF.filter.groupIndex = -robotIndex-20;
+			kickF.density = (1f / 0.36f) / scale;
+			kickF.shape = kickerShape;
+			
+			kickerBodyDef.position.set(robot.getWorldCenter().clone().add(kickPos));
+			kicker = w.createBody(kickerBodyDef);
+			kicker.createFixture(kickF);
+			
 			//Creates friction right wheel and ground
 			rightWheelFriction = new FrictionJointDef();
 			rightWheelFriction.initialize(wheelR, ground, wheelR.getWorldCenter());
@@ -274,7 +302,14 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 			w.createJoint(wjd);
 			wjd.initialize(robot, wheelR, wheelR.getWorldCenter());
 			w.createJoint(wjd);
+			wjd.initialize(robot, kicker, kicker.getWorldCenter());
+			w.createJoint(wjd);
 
+		}
+		
+		public boolean ballInRange() {
+			Collision c = getWorld().getPool().getCollision();
+			return c.testOverlap(ballShape, kickerShape, ball.getTransform(), kicker.getTransform());
 		}
 		
 		public void updateRobot(SoftBot bot) {
@@ -294,6 +329,16 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 						(float)(rightWheelSpeed*Math.sin(blueAng))), wheelR.getWorldCenter());
 				wheelL.setLinearDamping( (engineForce - Math.abs(leftWheelSpeed) + 2)*2 );
 				wheelR.setLinearDamping( (engineForce - Math.abs(rightWheelSpeed) + 2)*2 );
+				
+				if (bot.getKick() && ballInRange()) {
+					
+					// Kick
+					float xF, yF;
+					xF = (float)(kickForce*Math.cos(blueAng)); 
+					yF = (float)(kickForce*Math.sin(blueAng));
+					ball.applyForce( new Vec2(xF,yF), ball.getWorldCenter() );
+					
+				}
 			}
 		}
 		
