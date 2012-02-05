@@ -67,7 +67,7 @@ public abstract class AbstractWorld implements Listener {
     public abstract Snapshot getSnapshot();
     
     public void displayGUI() {
-    	WorldGUI.createWorldGUI(this);
+    	new SimpleWorldGUI(null, this).start();;
     }
 
 }

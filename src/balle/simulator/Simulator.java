@@ -21,6 +21,7 @@ import org.jbox2d.testbed.framework.j2d.TestPanelJ2D;
 import balle.io.listener.Listener;
 import balle.io.reader.AbstractVisionReader;
 import balle.io.reader.Reader;
+import balle.misc.Globals;
 import balle.simulator.SoftBot;
 
 public class Simulator extends TestbedTest implements AbstractVisionReader {
@@ -112,7 +113,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 
 		// Create ball
 		CircleShape ballShape = new CircleShape();
-		ballShape.m_radius = 0.02135f * scale;
+		ballShape.m_radius = Globals.BALL_RADIUS * scale;
 		FixtureDef f = new FixtureDef();
 		f.shape = ballShape;
 		f.density = (1f / 0.36f) / scale;
@@ -204,8 +205,8 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 
 		private final Vec2 leftWheelPos;
 		private final Vec2 rightWheelPos;
-		private final float robotWidth = 0.15f * scale / 2;
-		private final float robotLength = 0.2f * scale / 2;
+		private final float robotWidth = Globals.ROBOT_WIDTH * scale / 2;
+		private final float robotLength = Globals.ROBOT_LENGTH * scale / 2;
 		private final float wheelWidth = 0.02f * scale;
 		private final float wheelLength = 0.05f * scale;
 		FrictionJointDef rightWheelFriction;
