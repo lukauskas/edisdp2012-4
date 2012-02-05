@@ -21,15 +21,16 @@ class Vision:
         self.running = True
         
         self.stdout = False
-        
+
         self.cap = Camera()
         self.gui = Gui()
         self.threshold = Threshold(pitchnum)
         self.thresholdGui = ThresholdGui(self.threshold, self.gui)
         self.preprocessor = Preprocessor()
         self.features = Features(self.gui, self.threshold)
-
-        self.gui.getKeyHandler().addListener('q', self.quit)
+        
+        eventHandler =  self.gui.getEventHandler()
+        eventHandler.addListener('q', self.quit)
         
         if not self.stdout:
             self.connect()
@@ -52,10 +53,9 @@ class Vision:
             self.gui.updateLayer('raw', frame)
 
             ents = self.features.extractFeatures(frame)
-            
-            self.gui.loop()
-
             self.outputEnts(ents)
+
+            self.gui.loop()
         
         self.socket.close()
 
