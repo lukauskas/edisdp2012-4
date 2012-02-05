@@ -2,7 +2,6 @@ import cv
 import os
 import cPickle
 from SimpleCV import Image
-from display import Gui, ThresholdGui
 
 class Threshold:
     
@@ -12,9 +11,6 @@ class Threshold:
     def __init__(self, pitch):
         
         self.__getDefaults(pitch)
-
-        self._gui = ThresholdGui(self)
-        self._gui.changeEntity('ball')
         
     def __getDefaults(self, pitch):
         self._values = {}

@@ -1,9 +1,6 @@
 import cv
 from SimpleCV import Image, Features
 from threshold import Threshold
-from display import Gui
-
-display = Gui.getGui()
 
 class Features:
     # Sizes of various features
@@ -14,8 +11,9 @@ class Features:
           'dirmarker' : (3,  12, 3,  12),
         }
 
-    def __init__(self, pitch):
-        self.threshold = Threshold(pitch);
+    def __init__(self, display, threshold):
+        self.threshold = threshold
+        self._display = display
 
     def extractFeatures(self, frame):
         
@@ -24,17 +22,17 @@ class Features:
         blue = self.threshold.blueT(frame)
         ball = self.threshold.ball(frame)
 
-        display.updateLayer('threshY', yellow)
-        display.updateLayer('threshB', blue)
-        display.updateLayer('threshR', ball)
+        self._display.updateLayer('threshY', yellow)
+        self._display.updateLayer('threshB', blue)
+        self._display.updateLayer('threshR', ball)
 
         ents['yellow'] = self.findEntity(yellow, 'T')
         ents['blue'] = self.findEntity(blue, 'T')
         ents['ball'] = self.findEntity(ball, 'ball')
         
-        display.updateLayer('yellow', ents['yellow'])
-        display.updateLayer('blue', ents['blue'])
-        display.updateLayer('ball', ents['ball'])
+        self._display.updateLayer('yellow', ents['yellow'])
+        self._display.updateLayer('blue', ents['blue'])
+        self._display.updateLayer('ball', ents['ball'])
 
         return ents
 
