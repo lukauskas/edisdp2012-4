@@ -2,227 +2,151 @@ package balle.brick;
 
 import java.io.DataInputStream;
 
-import balle.controller.Controller;
-import lejos.robotics.navigation.Pilot;
-import lejos.robotics.navigation.TachoPilot;
-
+import lejos.nxt.Battery;
 import lejos.nxt.Button;
 import lejos.nxt.LCD;
-import lejos.nxt.Motor;
 import lejos.nxt.SensorPort;
 import lejos.nxt.TouchSensor;
 import lejos.nxt.comm.BTConnection;
 import lejos.nxt.comm.Bluetooth;
+import balle.bluetooth.messages.AbstractMessage;
+import balle.bluetooth.messages.MessageDecoder;
+import balle.bluetooth.messages.MessageKick;
+import balle.bluetooth.messages.MessageMove;
+import balle.bluetooth.messages.MessageRotate;
+import balle.bluetooth.messages.MessageStop;
+import balle.controller.Controller;
 
 /**
- * Create a connection to Roboto from the computer.
- * execute commands send from the computer
- * test out movements of Roboto.
+ * Create a connection to Roboto from the computer. execute commands send from
+ * the computer test out movements of Roboto.
  * 
  * @author s0815695
  */
 public class Roboto {
 
-	public static final int MESSAGE_EXIT = -1;
-	public static final int MESSAGE_ROTATE = 3;
-	public static final int MESSAGE_STOP = 4;
-	public static final int MESSAGE_KICK = 5;
-	public static final int MESSAGE_MOVE = 6;	
-	public static final int MESSAGE_PENALTY = 7;
+    public static final int MESSAGE_EXIT    = -1;
+    public static final int MESSAGE_ROTATE  = 3;
+    public static final int MESSAGE_STOP    = 4;
+    public static final int MESSAGE_KICK    = 5;
+    public static final int MESSAGE_MOVE    = 6;
+    public static final int MESSAGE_PENALTY = 7;
 
-	/**
-	 * Main program
-	 * @param args
-	 */
-	public static void main(String[] args) {
+    /**
+     * Processes the decoded message and issues correct commands to controller
+     * 
+     * @param decodedMessage
+     *            the decoded message
+     * @param controller
+     * @return true, if successful
+     */
+    public static boolean processMessage(AbstractMessage decodedMessage, Controller controller) {
+        String name = decodedMessage.getName();
 
-		TouchSensor touchRight = new TouchSensor(SensorPort.S1);
-		TouchSensor touchLeft = new TouchSensor(SensorPort.S2);
+        if (name.equals(MessageKick.NAME)) {
+            MessageKick messageKick = (MessageKick) decodedMessage;
+            if (messageKick.isPenalty()) {
+                controller.penaltyKick();
+            } else {
+                controller.kick();
+            }
+        } else if (name.equals(MessageMove.NAME)) {
+            MessageMove messageMove = (MessageMove) decodedMessage;
+            controller.setWheelSpeeds(messageMove.getLeftWheelSpeed(),
+                    messageMove.getRightWheelSpeed());
+        } else if (name.equals(MessageStop.NAME)) {
+            MessageStop messageStop = (MessageStop) decodedMessage;
+            if (messageStop.floatWheels())
+                controller.floatWheels();
+            else
+                controller.stop();
+        } else if (name.equals(MessageRotate.NAME)) {
+            MessageRotate messageRotate = (MessageRotate) decodedMessage;
+            controller.rotate(messageRotate.getAngle(), messageRotate.getSpeed());
+        } else {
+            return false;
+        }
+        return true;
+    }
 
-		while (true) {
-			// Enter button click will halt the program
-			if (Button.ENTER.isPressed())
-				break;
+    /**
+     * Main program
+     * 
+     * @param args
+     */
+    public static void main(String[] args) {
 
-			drawMessage("Connecting...");
+        TouchSensor touchRight = new TouchSensor(SensorPort.S1);
+        TouchSensor touchLeft = new TouchSensor(SensorPort.S2);
 
-			BTConnection connection = Bluetooth.waitForConnection();
+        while (true) {
+            // Enter button click will halt the program
+            if (Button.ENTER.isPressed())
+                break;
 
-			drawMessage("Connected");
+            drawMessage("Connecting...");
 
-			DataInputStream input = connection.openDataInputStream();
-            
-			Controller controller = new BrickController();
-		
-			mainLoop:
-			while (true) {
-				// Enter button click will halt the program
-				if (Button.ENTER.isPressed()){
-					controller.stop();
-					break;
-				}
-				try {
-					// no input available
-					while(input.available() == 0) {
-						// Enter button click will halt the program
-						if (Button.ENTER.isPressed()){
-							controller.stop();
-							break mainLoop;
-						}
-					}
+            BTConnection connection = Bluetooth.waitForConnection();
 
-					int command = input.readInt();
+            drawMessage("Connected");
 
-					drawMessage(Integer.toString(command));
+            DataInputStream input = connection.openDataInputStream();
 
-					if (touchLeft.isPressed() || touchRight.isPressed()){
-						controller.backward(controller.getMaximumWheelSpeed());
-						Thread.sleep(400);
-					} 
+            Controller controller = new BrickController();
+            MessageDecoder decoder = new MessageDecoder();
 
-					switch (command) {
-					case MESSAGE_EXIT:
-						controller.stop();
-						// stop
-						break mainLoop;
-					case MESSAGE_MOVE:
-						int leftWheelSpeed = input.readInt();
-						int rightWheelSpeed = input.readInt();
-						drawMessage("Speeds: " + leftWheelSpeed + " " + rightWheelSpeed);
-						controller.setWheelSpeeds(leftWheelSpeed, rightWheelSpeed);
-						break;
-					case MESSAGE_KICK:
-						controller.kick();
-						break;
-					case MESSAGE_STOP:
-						controller.stop();
-						break;
-					case MESSAGE_ROTATE:
-						int theta = input.readInt();
-						int speed = input.readInt();
-						controller.rotate(theta, speed);
-						break;
-					case MESSAGE_PENALTY:
-						controller.penaltyKick();
-						break;
-					default:
-						break;
-					}
-//					case MOVE:
-//						try {
-//							//read further two values for the parameters of MOVE
-//							int leftVel = input.readInt();
-//							int rightVel = input.readInt();
-//							drawMessage(leftVel + " " + rightVel);
-//							if (leftVel < 0) {
-//								leftVel = leftVel*-1;
-//								Motor.C.forward();
-//							}
-//							else {
-//								Motor.C.backward();
-//							}
-//							Motor.C.setSpeed(leftVel);
-//							if (rightVel < 0) {
-//								rightVel = rightVel*-1;
-//								Motor.A.forward();
-//							}
-//							else {
-//								Motor.A.backward();
-//							}
-//							Motor.A.setSpeed(rightVel);
-//						break;
-//						} catch (Exception e) {
-//							drawMessage("Error in MOVE: " + e);
-//						}
+            mainLoop: while (true) {
+                // Enter button click will halt the program
+                if (Button.ENTER.isPressed()) {
+                    controller.stop();
+                    break;
+                }
+                try {
+                    // no input available
+                    while (input.available() == 0) {
+                        // Enter button click will halt the program
+                        if (Button.ENTER.isPressed()) {
+                            controller.stop();
+                            break mainLoop;
+                        }
 
-//					case KICK:
-//						try {
-//							Motor.B.setSpeed(1020);
-//							Motor.B.forward();
-//							Thread.sleep(120);
-//							Motor.B.stop();
-//							Motor.B.backward();
-//							Thread.sleep(150);
-//							Motor.B.stop();
-//						} catch (InterruptedException e) {
-//							drawMessage("Error in KICK: " + e);
-//						}
-//						break;
-//					case CELEBRATE:
-//						Tune.Tune();
-//						break;
-//					case PENALTY:
-//						Motor.A.setSpeed(500);
-//						Motor.C.setSpeed(500);
-//						int rotateAmount = 100;
-//
-//						if (Math.random() < 0.5) {
-//							try {  
-//								//rotate right
-//								Motor.A.backward();
-//								Motor.C.forward();
-//								Thread.sleep(rotateAmount);
-//								Motor.A.stop();
-//								Motor.C.stop();
-//
-//								//kick
-//								Motor.B.setSpeed(1020);
-//								Motor.B.forward();
-//								Thread.sleep(120);
-//								Motor.B.stop();
-//								Motor.B.backward();
-//								Thread.sleep(150);
-//								Motor.B.stop();
-//
-//							} catch (InterruptedException e) {
-//								drawMessage("Error in PENALTY: " + e);
-//							}
-//						} else {
-//							try {  
-//								//rotate left
-//								Motor.A.forward();
-//								Motor.C.backward();
-//								Thread.sleep(rotateAmount);
-//								Motor.A.stop();
-//								Motor.C.stop();
-//
-//								//kick
-//								Motor.B.setSpeed(1020);
-//								Motor.B.forward();
-//								Thread.sleep(120);
-//								Motor.B.stop();
-//								Motor.B.backward();
-//								Thread.sleep(150);
-//								Motor.B.stop();
-//
-//							} catch (InterruptedException e) {
-//								drawMessage("Error in PENALTY: " + e);
-//							}
-//
-//						}
-//					case STOP:
-//						Motor.A.stop();
-//						Motor.B.stop();
-//						Motor.C.stop();
-//						break;
-//					default:
-//						// No command input
-//						break;
-//					}
+                        // Check for sensors when idle
+                        if (touchLeft.isPressed() || touchRight.isPressed()) {
+                            controller.backward(controller.getMaximumWheelSpeed());
+                            Thread.sleep(400);
+                        }
 
-				} catch (Exception e1) {
-					drawMessage("Error in MainLoop: " + e1.getMessage());
-				}
-			}
+                        drawMessage("Battery: " + Battery.getVoltage());
+                    }
 
-			connection.close();
-		}
-	}
+                    int hashedMessage = input.readInt();
+                    AbstractMessage message = decoder.decodeMessage(hashedMessage);
+                    if (message == null) {
+                        drawMessage("Could not decode: " + hashedMessage);
+                        break;
+                    }
+                    String name = message.getName();
+                    drawMessage(name);
 
-	private static void drawMessage(String message) {
-		LCD.clear();
-		LCD.drawString(message, 0, 0);
-		LCD.refresh();
-	}
+                    boolean successful = processMessage(message, controller);
+                    if (!successful) {
+                        drawMessage("Unknown message received: " + hashedMessage);
+                        break;
+                    }
+
+                } catch (Exception e1) {
+                    drawMessage("Error in MainLoop: " + e1.getMessage());
+                }
+            }
+
+            connection.close();
+        }
+    }
+
+    private static void drawMessage(String message) {
+        LCD.clear();
+        LCD.drawString(message, 0, 0);
+        LCD.refresh();
+    }
 
 }
