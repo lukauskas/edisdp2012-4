@@ -1,4 +1,4 @@
-package main.strategy.pFStrategy;
+package balle.strategy.pFStrategy;
 
 //basic Point class includes x,y 
 public class Point {

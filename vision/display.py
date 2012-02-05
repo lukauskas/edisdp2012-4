@@ -16,15 +16,6 @@ class Gui:
             'ball': ['threshR', 'ball']
             }
 
-    _instance = None
-
-    @classmethod
-    def getGui(cls):
-        if cls._instance is None:
-            cls._instance = Gui()
-
-        return cls._instance
-
     def __init__(self):
         self._layers = {
                 # Base layers
@@ -117,7 +108,7 @@ class Gui:
 
 class ThresholdGui:
 
-    def __init__(self, thresholdinstance, window=None):
+    def __init__(self, thresholdinstance, gui, window=None):
 
         if window is None:
             self.window = 'thresh_adjust'
@@ -125,6 +116,7 @@ class ThresholdGui:
         else:
             self.window = window
 
+        self._gui = gui
         self.threshold = thresholdinstance
         self.currentEntity = 'yellow'
 
@@ -142,7 +134,7 @@ class ThresholdGui:
         def blue(): self.changeEntity('blue')
         def ball(): self.changeEntity('ball')
         
-        keyHandler = Gui.getGui().getKeyHandler()
+        keyHandler = self._gui.getKeyHandler()
         keyHandler.addListener('y', yellow)
         keyHandler.addListener('b', blue)
         keyHandler.addListener('r', ball)
@@ -177,11 +169,10 @@ class ThresholdGui:
     def toggleShowOnGui(self):
         self._showOnGui = not self._showOnGui
         
-        gui = Gui.getGui()
         if self._showOnGui:
-            gui.switchLayerset(self.currentEntity)
+            self._gui.switchLayerset(self.currentEntity)
         else:
-            gui.switchLayerset('default')
+            self._gui.switchLayerset('default')
 
     def changeEntity(self, name):
         """

@@ -1,4 +1,4 @@
-package main.strategy.pFStrategy;
+package balle.strategy.pFStrategy;
 
 //Naive forward kinematic implementation for simulating robot movement.
 public class Simulate {
