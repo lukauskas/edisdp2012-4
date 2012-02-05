@@ -31,6 +31,7 @@ class Vision:
         
         eventHandler =  self.gui.getEventHandler()
         eventHandler.addListener('q', self.quit)
+        eventHandler.setClickListener(self.preprocessor.setNextPitchCorner)
         
         if not self.stdout:
             self.connect()
@@ -60,6 +61,11 @@ class Vision:
         self.socket.close()
 
     def outputEnts(self, ents):
+
+        # Messyyy
+        if not self.preprocessor.hasPitchSize:
+            return
+
         for name in ['yellow', 'blue', 'ball']:
             x = y = angle = -1
             entity = ents[name]
