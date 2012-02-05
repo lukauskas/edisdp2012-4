@@ -19,6 +19,12 @@ class AbstractTwoArgMessageConcrete extends AbstractTwoArgMessage {
         return 0;
     }
 
+    @Override
+    public String getName() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }
 
 public class AbstractTwoArgMessageTest {
