@@ -118,12 +118,14 @@ class ThresholdGui:
 
         self._gui = gui
         self.threshold = thresholdinstance
-        self.currentEntity = 'yellow'
 
         self._showOnGui = False
 
         self.__createTrackbars()
         self.__setupKeyEvents()
+
+        self.changeEntity('yellow')
+
         
     def __setupKeyEvents(self):
         """
@@ -184,7 +186,7 @@ class ThresholdGui:
         self.setTrackbarValues(self.threshold._values[name])
 
         if self._showOnGui:
-            Gui.getGui().switchLayerset(name)
+            self._gui.switchLayerset(name)
 
     def setTrackbarValues(self, values):
         for i, which in enumerate(['min', 'max']):
