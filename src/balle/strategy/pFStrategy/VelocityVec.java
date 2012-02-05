@@ -1,4 +1,4 @@
-package main.strategy.pFStrategy;
+package balle.strategy.pFStrategy;
 
 //a Velocity vector that includes left and right wheels.
 public class VelocityVec extends Vector {

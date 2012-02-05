@@ -3,8 +3,6 @@ package balle.strategy.pFStrategy;
 import java.util.ArrayList;
 import java.util.List;
 
-import main.Runner;
-
 public class PFPlanning {
 	Pos robot;
 	PointObject opponent;
@@ -77,9 +75,9 @@ public class PFPlanning {
 		complList.add((Object) this.opponent);
 		complList.add(obj);
 		Vector res = GoTo(complList, this.ball, robot.getLocation());
-		if (Runner.DEBUG) {
-			//System.out.println("Result Vector: " + res.toString());
-		}
+//		if (Runner.DEBUG) {
+//			//System.out.println("Result Vector: " + res.toString());
+//		}
 		if (orig)
 			return new VelocityVec(res.getX(),res.getY());
 		else
@@ -112,9 +110,9 @@ public class PFPlanning {
 		{
 			res=new Vector(0,0);
 		}
-		if (Runner.DEBUG) {
-			//System.out.println("Result Vector: " + res.toString());
-		}
+//		if (Runner.DEBUG) {
+//			//System.out.println("Result Vector: " + res.toString());
+//		}
 		if (orig)
 			return (VelocityVec) res;
 		else
@@ -174,9 +172,9 @@ public class PFPlanning {
 			rep = rep.add(obstacles.get(i).getVector(start_point, true));
 		}
 		// Compute attractive vector.
-		if (Runner.DEBUG){
-			//System.out.println("PFPlanning::PointObject::attractive Force, Clac. attractive forc");
-		}
+//		if (Runner.DEBUG){
+//			//System.out.println("PFPlanning::PointObject::attractive Force, Clac. attractive forc");
+//		}
 		Vector att = dest_obj.getVector(start_point, false);
 		
 		return att.add(rep);
@@ -205,16 +203,16 @@ public class PFPlanning {
 			return new VelocityVec(0, 0);
 		double alpha = inputVel.normalAngle();
 		double dist_alpha = alpha - current.getAngle();
-		if(Runner.DEBUG) {
-			//System.out.println("Current T: "+current.getAngle()+", dist_alpha="+dist_alpha);
-		}
+//		if(Runner.DEBUG) {
+//			//System.out.println("Current T: "+current.getAngle()+", dist_alpha="+dist_alpha);
+//		}
 		if(dist_alpha>Math.PI)
 			dist_alpha=-1*(2*Math.PI-dist_alpha);
 		else if(dist_alpha<-1*Math.PI)
 			dist_alpha=2*Math.PI+dist_alpha;
-		if(Runner.DEBUG) {
-			//System.out.println("Final dist_alpha="+dist_alpha);
-		}
+//		if(Runner.DEBUG) {
+//			//System.out.println("Final dist_alpha="+dist_alpha);
+//		}
 		double Vlin = Math.cos(dist_alpha) * size;
 		double angSize=1/size;
 		//if(*angSizeangSize>10)
@@ -226,9 +224,9 @@ public class PFPlanning {
 		//if(Vang<-1*threshold)
 		//	Vang=-1*threshold;
 		
-		if(Runner.DEBUG) {
-			//System.out.println(Vlin + " " + Vang);
-		}
+//		if(Runner.DEBUG) {
+//			//System.out.println(Vlin + " " + Vang);
+//		}
 		return CvtVelocity(Vlin, Vang, config.getr());
 	}
 
