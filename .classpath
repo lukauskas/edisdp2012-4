@@ -2,14 +2,14 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="tests"/>
-	<classpathentry kind="lib" path="lib/lejos_nxj/lib/classes.jar"/>
 	<classpathentry kind="lib" path="lib/lejos_nxj/lib/jtools.jar"/>
-	<classpathentry kind="lib" path="lib/lejos_nxj/lib/pccomm.jar"/>
 	<classpathentry kind="lib" path="lib/lejos_nxj/lib/pctools.jar"/>
 	<classpathentry kind="lib" path="lib/jbox2d-library-2.1.2.1-SNAPSHOT-jar-with-dependencies.jar"/>
 	<classpathentry kind="lib" path="lib/mockito-all-1.9.0.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/jbox2d-testbed-2.1.2.1-SNAPSHOT-jar-with-dependencies.jar"/>
+	<classpathentry kind="lib" path="lib/lejos_nxj/lib/classes.jar"/>
+	<classpathentry kind="lib" path="lib/lejos_nxj/lib/pccomm.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
