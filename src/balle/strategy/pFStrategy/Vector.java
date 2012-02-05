@@ -1,4 +1,4 @@
-package main.strategy.pFStrategy;
+package balle.strategy.pFStrategy;
 
 //basic support for basic vector operations.
 public class Vector extends Point {

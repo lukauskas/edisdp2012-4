@@ -6,10 +6,13 @@ import socket
 from SimpleCV import Image, Camera
 from preprocess import Preprocessor
 from features import Features
-from display import Gui
+from threshold import Threshold
+from display import Gui, ThresholdGui
 
 HOST = 'localhost' 
 PORT = 28546 
+
+PITCH_SIZE = (243.8, 121.9)
 
 class Vision:
     
@@ -20,10 +23,12 @@ class Vision:
         self.stdout = False
         
         self.cap = Camera()
+        self.gui = Gui()
+        self.threshold = Threshold(pitchnum)
+        self.thresholdGui = ThresholdGui(self.threshold, self.gui)
         self.preprocessor = Preprocessor()
-        self.features = Features(pitchnum)
-        self.gui = Gui.getGui()
-        
+        self.features = Features(self.gui, self.threshold)
+
         self.gui.getKeyHandler().addListener('q', self.quit)
         
         if not self.stdout:
