@@ -40,7 +40,8 @@ public class Roboto {
      * @param controller
      * @return true, if successful
      */
-    public static boolean processMessage(AbstractMessage decodedMessage, Controller controller) {
+    public static boolean processMessage(AbstractMessage decodedMessage,
+            Controller controller) {
         String name = decodedMessage.getName();
 
         if (name.equals(MessageKick.NAME)) {
@@ -62,7 +63,8 @@ public class Roboto {
                 controller.stop();
         } else if (name.equals(MessageRotate.NAME)) {
             MessageRotate messageRotate = (MessageRotate) decodedMessage;
-            controller.rotate(messageRotate.getAngle(), messageRotate.getSpeed());
+            controller.rotate(messageRotate.getAngle(),
+                    messageRotate.getSpeed());
         } else {
             return false;
         }
@@ -112,15 +114,19 @@ public class Roboto {
 
                         // Check for sensors when idle
                         if (touchLeft.isPressed() || touchRight.isPressed()) {
-                            controller.backward(controller.getMaximumWheelSpeed());
+                            controller.backward(controller
+                                    .getMaximumWheelSpeed());
+                            drawMessage("Obstacle detected. Backing up");
                             Thread.sleep(400);
+                            controller.stop();
                         }
 
                         drawMessage("Battery: " + Battery.getVoltage());
                     }
 
                     int hashedMessage = input.readInt();
-                    AbstractMessage message = decoder.decodeMessage(hashedMessage);
+                    AbstractMessage message = decoder
+                            .decodeMessage(hashedMessage);
                     if (message == null) {
                         drawMessage("Could not decode: " + hashedMessage);
                         break;
@@ -130,7 +136,8 @@ public class Roboto {
 
                     boolean successful = processMessage(message, controller);
                     if (!successful) {
-                        drawMessage("Unknown message received: " + hashedMessage);
+                        drawMessage("Unknown message received: "
+                                + hashedMessage);
                         break;
                     }
 
