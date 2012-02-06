@@ -39,6 +39,15 @@ public abstract class AbstractWorldProcessor extends Thread {
     }
 
     /**
+     * Return the latest snapshot
+     * 
+     * @return snapshot
+     */
+    protected final Snapshot getSnapshot() {
+        return snapshot;
+    }
+
+    /**
      * This function is a step counter for the vision input. It is increased
      * every time a new snapshot of the world is received.
      */

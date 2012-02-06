@@ -7,34 +7,22 @@ import java.awt.Graphics;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import balle.controller.Controller;
 import balle.misc.Globals;
-import balle.strategy.AbstractStrategy;
+import balle.world.processing.AbstractWorldProcessor;
 
-public class SimpleWorldGUI extends AbstractStrategy {
+public class SimpleWorldGUI extends AbstractWorldProcessor {
 
     private JFrame frame;
     private JPanel panel;
 
-    public SimpleWorldGUI(Controller controller, AbstractWorld world) {
-        super(controller, world);
+    public SimpleWorldGUI(AbstractWorld world) {
+        super(world);
         frame = new JFrame("WorldGUI");
         // frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         panel = new Screen();
         frame.getContentPane().add(BorderLayout.CENTER, panel);
         frame.setSize(770, 500);
         frame.setVisible(true);
-    }
-
-    @Override
-    protected void aiStep() {
-        panel.repaint();
-    }
-
-    @Override
-    protected void aiMove(Controller controller) {
-        // TODO Auto-generated method stub
-
     }
 
     private class Screen extends JPanel {
@@ -172,6 +160,17 @@ public class SimpleWorldGUI extends AbstractStrategy {
             return (int) ((y + YSHIFTM) * scale);
         }
 
+    }
+
+    @Override
+    protected void actionOnStep() {
+        panel.repaint();
+
+    }
+
+    @Override
+    protected void actionOnChange() {
+        // Do nothing
     }
 
 }
