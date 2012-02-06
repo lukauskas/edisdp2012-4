@@ -1,8 +1,10 @@
 package balle.world;
 
 public class BasicWorld extends AbstractWorld {
-	
-    private Snapshot prev = null;
+
+    private Snapshot prev        = null;
+    private double   fieldWidth  = -1;
+    private double   fieldHeight = -1;
 
     public BasicWorld(boolean balleIsBlue) {
         super(balleIsBlue);
@@ -29,6 +31,13 @@ public class BasicWorld extends AbstractWorld {
     public void update(double yPosX, double yPosY, double yRad, double bPosX,
             double bPosY, double bRad, double ballPosX, double ballPosY,
             long timestamp) {
+
+        if ((fieldWidth < 0) || (fieldHeight < 0)) {
+            System.err
+                    .println("Cannot update locations as field size is not set properly. Restart vision");
+            return;
+        }
+
         Robot ours = null;
         Robot them = null;
         FieldObject ball = null;
@@ -132,5 +141,13 @@ public class BasicWorld extends AbstractWorld {
             // pack into a snapshot
             this.prev = new Snapshot(them, ours, ball, timestamp);
         }
+    }
+
+    @Override
+    public void updateFieldSize(double width, double height) {
+        prev = null;
+        fieldWidth = width;
+        fieldHeight = height;
+
     }
 }

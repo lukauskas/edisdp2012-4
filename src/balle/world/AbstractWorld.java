@@ -34,7 +34,9 @@ public abstract class AbstractWorld implements Listener {
     }
 
     /**
-     * // TODO James: this sounds like more of a job for within strategy.
+     * // TODO James: this sounds like more of a job for within strategy. NOPE!
+     * 1) We do not want to reimplement this for all strategies 2) We DO want
+     * the world class to use this to estimate coordinates in case vision fails!
      * 
      * Estimated position of the object after timestep (in miliseconds)
      * 
