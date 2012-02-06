@@ -1,4 +1,4 @@
-package main.strategy.pFStrategy;
+package balle.strategy.pFStrategy;
 
 //some utility functions.
 public class Util {

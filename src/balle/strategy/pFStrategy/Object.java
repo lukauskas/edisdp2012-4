@@ -1,4 +1,4 @@
-package main.strategy.pFStrategy;
+package balle.strategy.pFStrategy;
 
 //basic object for any object in the arena.
 public interface Object {

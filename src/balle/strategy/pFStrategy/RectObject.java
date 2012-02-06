@@ -1,4 +1,4 @@
-package main.strategy.pFStrategy;
+package balle.strategy.pFStrategy;
 
 //A rectangle based object which calculates repulsive vector given that a surface is 
 //considered.
