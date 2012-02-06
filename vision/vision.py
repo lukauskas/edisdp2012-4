@@ -14,6 +14,10 @@ PORT = 28546
 
 PITCH_SIZE = (243.8, 121.9)
 
+# Distinct between field size line or entity line
+ENTITY_BIT = 'E';
+PITCH_SIZE_BIT  = 'P';
+
 class Vision:
     
     def __init__(self, pitchnum):
@@ -31,7 +35,7 @@ class Vision:
         
         eventHandler =  self.gui.getEventHandler()
         eventHandler.addListener('q', self.quit)
-        eventHandler.setClickListener(self.preprocessor.setNextPitchCorner)
+        eventHandler.setClickListener(self.setNextPitchCorner)
         
         if not self.stdout:
             self.connect()
@@ -60,11 +64,24 @@ class Vision:
         
         self.socket.close()
 
+    def setNextPitchCorner(self, where):
+        self.preprocessor.setNextPitchCorner(where)
+        
+        if self.preprocessor.hasPitchSize:
+            print("Pitch size: {0!r}".format(self.preprocessor.pitch_size))
+            self.outputPitchSize()
+    
+    def outputPitchSize(self):
+        self.send('{0} {1} {2} \n'.format(
+                PITCH_SIZE_BIT, self.preprocessor.pitch_size[0], self.preprocessor.pitch_size[1]))
+
     def outputEnts(self, ents):
 
         # Messyyy
         if not self.preprocessor.hasPitchSize:
             return
+
+        self.send("{0} ".format(ENTITY_BIT))
 
         for name in ['yellow', 'blue', 'ball']:
             x = y = angle = -1

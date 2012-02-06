@@ -34,7 +34,9 @@ public abstract class AbstractWorld implements Listener {
     }
 
     /**
-     * // TODO James: this sounds like more of a job for within strategy.
+     * // TODO James: this sounds like more of a job for within strategy. NOPE!
+     * 1) We do not want to reimplement this for all strategies 2) We DO want
+     * the world class to use this to estimate coordinates in case vision fails!
      * 
      * Estimated position of the object after timestep (in miliseconds)
      * 
@@ -46,7 +48,8 @@ public abstract class AbstractWorld implements Listener {
      * @return new coordinate for the position of the object after timestep
      */
     public Coord estimatedPosition(FieldObject object, double timestep) {
-        if ((object == null) || (object.getPosition() == null))
+        if ((object == null) || (object.getPosition() == null)
+                || (object.getVelocity() == null))
             return null;
         else if (timestep == 0) {
             return object.getPosition();
