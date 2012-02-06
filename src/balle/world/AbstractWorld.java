@@ -22,7 +22,6 @@ public abstract class AbstractWorld implements Listener {
 
     public AbstractWorld(boolean isBalleBlue) {
         this.balleIsBlue = isBalleBlue;
-        displayGUI();
     }
 
     /**
@@ -65,9 +64,5 @@ public abstract class AbstractWorld implements Listener {
      * @return coordinates of the robot.
      */
     public abstract Snapshot getSnapshot();
-
-    public void displayGUI() {
-        new SimpleWorldGUI(this).start();
-    }
 
 }
