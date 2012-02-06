@@ -8,3 +8,4 @@ bin/
 # Only for saving threshold values between runs
 vision/threshdefaults
 JBox2d.log
+*.orig
