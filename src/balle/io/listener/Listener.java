@@ -6,5 +6,5 @@ public interface Listener {
             double bPosY, double bRad, double ballPosX, double ballPosY,
             long timestamp);
 
-    public void updateFieldSize(double width, double height);
+    public void updatePitchSize(double width, double height);
 }

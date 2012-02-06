@@ -1,10 +1,12 @@
 package balle.world;
 
+import balle.misc.Globals;
+
 public class BasicWorld extends AbstractWorld {
 
     private Snapshot prev        = null;
-    private double   fieldWidth  = -1;
-    private double   fieldHeight = -1;
+    private double   pitchWidth  = -1;
+    private double   pitchHeight = -1;
 
     public BasicWorld(boolean balleIsBlue) {
         super(balleIsBlue);
@@ -22,6 +24,20 @@ public class BasicWorld extends AbstractWorld {
             return a.sub(b);
     }
 
+    protected double scaleXToMeters(double x) {
+        if (x < 0)
+            return x;
+
+        return (x / pitchWidth) * Globals.PITCH_WIDTH;
+    }
+
+    protected double scaleYToMeters(double y) {
+        if (y < 0)
+            return y;
+
+        return (y / pitchHeight) * Globals.PITCH_HEIGHT;
+    }
+
     /**
      * NOTE: DO ROBOTS ALWAYS MOVE FORWARD !? NO, treat angle of velocity
      * different from angle the robot is facing.
@@ -32,11 +48,20 @@ public class BasicWorld extends AbstractWorld {
             double bPosY, double bRad, double ballPosX, double ballPosY,
             long timestamp) {
 
-        if ((fieldWidth < 0) || (fieldHeight < 0)) {
+        if ((pitchWidth < 0) || (pitchHeight < 0)) {
             System.err
-                    .println("Cannot update locations as field size is not set properly. Restart vision");
+                    .println("Cannot update locations as pitch size is not set properly. Restart vision");
             return;
         }
+        // Scale the coordinates from vision to meters:
+        yPosX = scaleXToMeters(yPosX);
+        yPosY = scaleXToMeters(yPosY);
+
+        bPosX = scaleXToMeters(bPosX);
+        bPosY = scaleXToMeters(bPosY);
+
+        ballPosX = scaleXToMeters(ballPosX);
+        ballPosY = scaleXToMeters(ballPosY);
 
         Robot ours = null;
         Robot them = null;
@@ -144,10 +169,9 @@ public class BasicWorld extends AbstractWorld {
     }
 
     @Override
-    public void updateFieldSize(double width, double height) {
+    public void updatePitchSize(double width, double height) {
         prev = null;
-        fieldWidth = width;
-        fieldHeight = height;
-
+        pitchWidth = width;
+        pitchHeight = height;
     }
 }

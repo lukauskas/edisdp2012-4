@@ -45,20 +45,36 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 
         private void drawField(Graphics g) {
             g.setColor(Color.BLACK);
-            drawLineTransformMeters(g, 0f, 0f, 2.44f, 0f);
-            drawLineTransformMeters(g, 0f, 1.22f, 2.44f, 1.22f);
-            drawLineTransformMeters(g, 0f, 0f, 0f, 0.31f);
-            drawLineTransformMeters(g, 2.44f, 0f, 2.44f, 0.31f);
-            drawLineTransformMeters(g, 0f, 1.22f, 0f, 0.91f);
-            drawLineTransformMeters(g, 2.44f, 1.22f, 2.44f, 0.91f);
+            drawLineTransformMeters(g, 0f, 0f, Globals.PITCH_WIDTH, 0f);
+            drawLineTransformMeters(g, 0f, Globals.PITCH_HEIGHT,
+                    Globals.PITCH_WIDTH, Globals.PITCH_HEIGHT);
+            drawLineTransformMeters(g, 0f, 0f, 0f, Globals.GOAL_POSITION);
+            drawLineTransformMeters(g, Globals.PITCH_WIDTH, 0f,
+                    Globals.PITCH_WIDTH, Globals.GOAL_POSITION);
+            drawLineTransformMeters(g, 0f, Globals.PITCH_HEIGHT, 0f,
+                    Globals.PITCH_HEIGHT - Globals.GOAL_POSITION);
+            drawLineTransformMeters(g, Globals.PITCH_WIDTH,
+                    Globals.PITCH_HEIGHT, Globals.PITCH_WIDTH,
+                    Globals.PITCH_HEIGHT - Globals.GOAL_POSITION);
             // Left-hand goal area
-            drawLineTransformMeters(g, 0f, 0.31f, -0.1f, 0.31f);
-            drawLineTransformMeters(g, -0.1f, 0.31f, -0.1f, 0.91f);
-            drawLineTransformMeters(g, 2.44f, 0.31f, 2.54f, 0.31f);
+            drawLineTransformMeters(g, 0f, Globals.GOAL_POSITION, -0.1f,
+                    Globals.GOAL_POSITION);
+            drawLineTransformMeters(g, -0.1f, Globals.GOAL_POSITION, -0.1f,
+                    Globals.PITCH_HEIGHT - Globals.GOAL_POSITION);
+            drawLineTransformMeters(g, Globals.PITCH_WIDTH,
+                    Globals.GOAL_POSITION, Globals.PITCH_WIDTH + 0.1f,
+                    Globals.GOAL_POSITION);
             // Right-hand goal area
-            drawLineTransformMeters(g, 2.44f, 0.91f, 2.54f, 0.91f);
-            drawLineTransformMeters(g, 0f, 0.91f, -0.1f, 0.91f);
-            drawLineTransformMeters(g, 2.54f, 0.31f, 2.54f, 0.91f);
+            drawLineTransformMeters(g, Globals.PITCH_WIDTH,
+                    Globals.PITCH_HEIGHT - Globals.GOAL_POSITION,
+                    Globals.PITCH_WIDTH + 0.1f, Globals.PITCH_HEIGHT
+                            - Globals.GOAL_POSITION);
+            drawLineTransformMeters(g, 0f, Globals.PITCH_HEIGHT
+                    - Globals.GOAL_POSITION, -0.1f, Globals.PITCH_HEIGHT
+                    - Globals.GOAL_POSITION);
+            drawLineTransformMeters(g, Globals.PITCH_WIDTH + 0.1f,
+                    Globals.GOAL_POSITION, Globals.PITCH_WIDTH + 0.1f,
+                    Globals.PITCH_HEIGHT - Globals.GOAL_POSITION);
         }
 
         private void drawFieldObjects(Graphics g) {

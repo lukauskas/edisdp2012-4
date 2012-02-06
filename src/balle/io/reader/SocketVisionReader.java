@@ -85,7 +85,10 @@ public class SocketVisionReader extends Reader {
 
                         Long.parseLong(tokens[9]));
             } else if (tokens[0].equals(PITCH_SIZE_BIT)) {
-                System.out.println("Updating (field size): " + line);
+                System.out.println("Updating (pitch size): " + line);
+                propagatePitchSize(Double.parseDouble(tokens[1]),
+                        Double.parseDouble(tokens[2]));
+
             } else {
                 System.err.println("Could not decode: " + line);
             }
