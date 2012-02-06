@@ -92,34 +92,23 @@ public class PFPlanning {
     // orig: return original vector, if unset return vector is left,right wheels
     // velocity, if
     // if set it will return the basic velocity vector created by PFPlanner.
-    public VelocityVec update(Pos robot, Pos opponent, Point ball,
-			boolean orig) {
+    public VelocityVec update(Pos robot, Pos opponent, Point ball, boolean orig) {
 
-		init(robot,opponent,ball,orig);
-		List<Object> complList =  new ArrayList<Object>(objects);
-		complList.add(this.opponent);
-		Vector res = GoTo(complList, this.ball, robot.getLocation());
-		Vector vball=new Vector(ball);
-		Vector vrobot=new Vector(robot.getLocation());
-		if(vball.subtract(vrobot).size()<Stopdistance)
-		{
-			res=new Vector(0,0);
-		}
-<<<<<<< HEAD
-	/*	if (Runner.DEBUG) {
-			//System.out.println("Result Vector: " + res.toString());
-		}*/
-=======
-//		if (Runner.DEBUG) {
-//			//System.out.println("Result Vector: " + res.toString());
-//		}
->>>>>>> 61e4de4b673159bdc8b0d093e4b2e3a9d1c9677e
-		if (orig)
-			return (VelocityVec) res;
-		else
-			return getVelocity(res, robot);
+        init(robot, opponent, ball, orig);
+        List<Object> complList = new ArrayList<Object>(objects);
+        complList.add(this.opponent);
+        Vector res = GoTo(complList, this.ball, robot.getLocation());
+        Vector vball = new Vector(ball);
+        Vector vrobot = new Vector(robot.getLocation());
+        if (vball.subtract(vrobot).size() < Stopdistance) {
+            res = new Vector(0, 0);
+        }
+        if (orig)
+            return (VelocityVec) res;
+        else
+            return getVelocity(res, robot);
 
-	}
+    }
 
     // Adds static object in the arena to list of static obstacles.
     public void AddObjects(Object r) {
@@ -155,38 +144,29 @@ public class PFPlanning {
     // Extended Potential Field.This function takes into account the orientation
     // of Robot.
     public Vector GoTo(List<Object> obstacles, PointObject dest_obj,
-			Pos start_point) {
-		// calculate distance so if we reached the target position we stop.
-		double dist = Math.sqrt((start_point.getLocation().getX() - dest_obj
-				.getX())
-				* (start_point.getLocation().getX() - dest_obj.getX())
-				+ (start_point.getLocation().getY() - dest_obj.getY())
-				* (start_point.getLocation().getY() - dest_obj.getY()));
-		if (dist < Stopdistance) {
-			return new Vector(0, 0);
-		}
+            Pos start_point) {
+        // calculate distance so if we reached the target position we stop.
+        double dist = Math.sqrt((start_point.getLocation().getX() - dest_obj
+                .getX())
+                * (start_point.getLocation().getX() - dest_obj.getX())
+                + (start_point.getLocation().getY() - dest_obj.getY())
+                * (start_point.getLocation().getY() - dest_obj.getY()));
+        if (dist < Stopdistance) {
+            return new Vector(0, 0);
+        }
 
-		Vector rep = new Vector(0, 0);
-		// iterate through all obstacles and compute sum of all repulsive
-		// vectors
-		for (int i = 0; i < obstacles.size(); i++) {
-			rep = rep.add(obstacles.get(i).getVector(start_point, true));
-		}
-		// Compute attractive vector.
-<<<<<<< HEAD
-	/*	if (Runner.DEBUG){
-			//System.out.println("PFPlanning::PointObject::attractive Force, Clac. attractive forc");
-		}*/
-=======
-//		if (Runner.DEBUG){
-//			//System.out.println("PFPlanning::PointObject::attractive Force, Clac. attractive forc");
-//		}
->>>>>>> 61e4de4b673159bdc8b0d093e4b2e3a9d1c9677e
-		Vector att = dest_obj.getVector(start_point, false);
-		
-		return att.add(rep);
+        Vector rep = new Vector(0, 0);
+        // iterate through all obstacles and compute sum of all repulsive
+        // vectors
+        for (int i = 0; i < obstacles.size(); i++) {
+            rep = rep.add(obstacles.get(i).getVector(start_point, true));
+        }
+        // Compute attractive vector.
+        Vector att = dest_obj.getVector(start_point, false);
 
-	}
+        return att.add(rep);
+
+    }
 
     // This function translates linear and angular velocities to left and right
     // velocities.
@@ -204,54 +184,26 @@ public class PFPlanning {
     // robot.
     private VelocityVec getVelocity(Vector inputVel, Pos current) {
 
-		
-		double size = inputVel.size();
-		if(size==0)
-			return new VelocityVec(0, 0);
-		double alpha = inputVel.normalAngle();
-		double dist_alpha = alpha - current.getAngle();
-<<<<<<< HEAD
-	/*	if(Runner.DEBUG) {
-			//System.out.println("Current T: "+current.getAngle()+", dist_alpha="+dist_alpha);
-		}*/
-=======
-//		if(Runner.DEBUG) {
-//			//System.out.println("Current T: "+current.getAngle()+", dist_alpha="+dist_alpha);
-//		}
->>>>>>> 61e4de4b673159bdc8b0d093e4b2e3a9d1c9677e
-		if(dist_alpha>Math.PI)
-			dist_alpha=-1*(2*Math.PI-dist_alpha);
-		else if(dist_alpha<-1*Math.PI)
-			dist_alpha=2*Math.PI+dist_alpha;
-<<<<<<< HEAD
-	/*	if(Runner.DEBUG) {
-			//System.out.println("Final dist_alpha="+dist_alpha);
-		}*/
-=======
-//		if(Runner.DEBUG) {
-//			//System.out.println("Final dist_alpha="+dist_alpha);
-//		}
->>>>>>> 61e4de4b673159bdc8b0d093e4b2e3a9d1c9677e
-		double Vlin = Math.cos(dist_alpha) * size;
-		double angSize=1/size;
-		//if(*angSizeangSize>10)
-		//	angSize=10;
-		double Vang = 0.4*dist_alpha/Math.PI;
-		//double threshold=0.1;
-		//if(Vang>threshold)
-		//	Vang=threshold;
-		//if(Vang<-1*threshold)
-		//	Vang=-1*threshold;
-		
-<<<<<<< HEAD
-	/*	if(Runner.DEBUG) {
-			//System.out.println(Vlin + " " + Vang);
-		}*/
-=======
-//		if(Runner.DEBUG) {
-//			//System.out.println(Vlin + " " + Vang);
-//		}
->>>>>>> 61e4de4b673159bdc8b0d093e4b2e3a9d1c9677e
-		return CvtVelocity(Vlin, Vang, config.getr());
-	}
+        double size = inputVel.size();
+        if (size == 0)
+            return new VelocityVec(0, 0);
+        double alpha = inputVel.normalAngle();
+        double dist_alpha = alpha - current.getAngle();
+        if (dist_alpha > Math.PI)
+            dist_alpha = -1 * (2 * Math.PI - dist_alpha);
+        else if (dist_alpha < -1 * Math.PI)
+            dist_alpha = 2 * Math.PI + dist_alpha;
+        double Vlin = Math.cos(dist_alpha) * size;
+        double angSize = 1 / size;
+        // if(*angSizeangSize>10)
+        // angSize=10;
+        double Vang = 0.4 * dist_alpha / Math.PI;
+        // double threshold=0.1;
+        // if(Vang>threshold)
+        // Vang=threshold;
+        // if(Vang<-1*threshold)
+        // Vang=-1*threshold;
+
+        return CvtVelocity(Vlin, Vang, config.getr());
+    }
 }
