@@ -11,6 +11,14 @@ class Preprocessor:
         self.hasPitchSize = False
         self._cropRect = []
 
+    @property
+    def pitch_size(self):
+        if not self.hasPitchSize:
+            return None
+
+        return ((self._cropRect[2] - self._cropRect[0]),
+                (self._cropRect[3] - self._cropRect[1]))
+
     def setNextPitchCorner(self, where):
 
         assert len(where) == 2, "setNextPitchCorner takes a tuple (x, y)"
@@ -26,7 +34,7 @@ class Preprocessor:
             return
 
         self._cropRect.extend(next)
-        print self._cropRect
+        print "Cropped rectangle {0}".format(self._cropRect)
         
     def preprocess(self, frame):
         frame = self.undistort(frame)

@@ -31,7 +31,7 @@ class Vision:
         
         eventHandler =  self.gui.getEventHandler()
         eventHandler.addListener('q', self.quit)
-        eventHandler.setClickListener(self.preprocessor.setNextPitchCorner)
+        eventHandler.setClickListener(self.setNextPitchCorner)
         
         if not self.stdout:
             self.connect()
@@ -59,6 +59,12 @@ class Vision:
             self.gui.loop()
         
         self.socket.close()
+
+    def setNextPitchCorner(self, where):
+        self.preprocessor.setNextPitchCorner(where)
+        
+        if self.preprocessor.hasPitchSize:
+            print("Pitch size: {0!r}".format(self.preprocessor.pitch_size))
 
     def outputEnts(self, ents):
 
