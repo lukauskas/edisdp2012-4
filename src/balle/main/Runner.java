@@ -7,12 +7,11 @@ import balle.simulator.Simulator;
 import balle.simulator.SoftBot;
 import balle.strategy.AbstractStrategy;
 import balle.strategy.DummyStrategy;
-import balle.strategy.UserInputStrategy;
 import balle.world.AbstractWorld;
 import balle.world.BasicWorld;
 
 /**
- * This is where the main executable code for BALL-E lies. It is responsible of
+ * This is where the main executable code for 4s lies. It is responsible of
  * initialising various subsystems of the code and make sure they interact.
  * 
  * 
@@ -22,7 +21,8 @@ import balle.world.BasicWorld;
 public class Runner {
 
     private static void print_usage() {
-        System.out.println("Usage: java balle.main.Runner <balle_colour>");
+        System.out
+                .println("Usage: java balle.main.Runner <balle_colour> [<run_in_simulator>]");
         System.out
                 .println("Where <balle_colour> is either \"blue\" or \"yellow\"");
     }
@@ -31,8 +31,8 @@ public class Runner {
      * @param args
      */
     public static void main(String[] args) {
-    	// Check the usage
-        if (args.length != 1) {
+        // Check the usage
+        if ((args.length != 1) && (args.length != 2)) {
             print_usage();
             System.exit(-1);
         }
@@ -50,20 +50,21 @@ public class Runner {
             balleIsBlue = false; // This is just to fool Eclipse about
                                  // balleIsBlue initialisation
         }
-        
-        // runRobot(balleIsBlue);
-        runSimulator(balleIsBlue);
+
+        if (args[1].equals("1"))
+            runSimulator(balleIsBlue);
+        else
+            runRobot(balleIsBlue);
     }
-    
+
     public static void runRobot(boolean balleIsBlue) {
-    	
-    	AbstractWorld world;
+
+        AbstractWorld world;
         SocketVisionReader visionInput;
         Controller controller;
         AbstractStrategy strategy;
 
-        
-     // Initialise world
+        // Initialise world
         world = new BasicWorld(balleIsBlue);
 
         // Create visionInput buffer
@@ -81,22 +82,22 @@ public class Runner {
         // Once the controller is ready, start the strategy
         strategy.start();
     }
-    
+
     public static void runSimulator(boolean balleIsBlue) {
-    	Simulator simulator = Simulator.createSimulator();
-    	BasicWorld world = new BasicWorld(balleIsBlue);
-    	simulator.addListener(world);
-    	
-    	SoftBot bot;
-    	if (balleIsBlue)
-    		bot = simulator.getYellowSoft();
-    	else 
-    		bot = simulator.getBlueSoft();
-    	
-    	System.out.println(bot);
-    	
-    	//AbstractStrategy s = new UserInputStrategy(bot, world);
-		//s.start();
-    	
+        Simulator simulator = Simulator.createSimulator();
+        BasicWorld world = new BasicWorld(balleIsBlue);
+        simulator.addListener(world);
+
+        SoftBot bot;
+        if (balleIsBlue)
+            bot = simulator.getYellowSoft();
+        else
+            bot = simulator.getBlueSoft();
+
+        System.out.println(bot);
+
+        // AbstractStrategy s = new UserInputStrategy(bot, world);
+        // s.start();
+
     }
 }
