@@ -12,13 +12,13 @@ import balle.world.Snapshot;
  * @author s0909773
  * 
  */
-public abstract class AbstractProcessor extends Thread {
+public abstract class AbstractWorldProcessor extends Thread {
 
     private Snapshot            snapshot;
     private Snapshot            prevSnapshot;
     private final AbstractWorld world;
 
-    public AbstractProcessor(AbstractWorld world) {
+    public AbstractWorldProcessor(AbstractWorld world) {
         super();
         this.world = world;
     }
