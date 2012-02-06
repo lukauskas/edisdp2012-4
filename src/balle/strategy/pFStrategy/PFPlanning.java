@@ -75,15 +75,9 @@ public class PFPlanning {
 		complList.add((Object) this.opponent);
 		complList.add(obj);
 		Vector res = GoTo(complList, this.ball, robot.getLocation());
-<<<<<<< HEAD
 /*		if (Runner.DEBUG) {
 			//System.out.println("Result Vector: " + res.toString());
 		}*/
-=======
-//		if (Runner.DEBUG) {
-//			//System.out.println("Result Vector: " + res.toString());
-//		}
->>>>>>> 61e4de4b673159bdc8b0d093e4b2e3a9d1c9677e
 		if (orig)
 			return new VelocityVec(res.getX(),res.getY());
 		else
@@ -116,15 +110,9 @@ public class PFPlanning {
 		{
 			res=new Vector(0,0);
 		}
-<<<<<<< HEAD
 	/*	if (Runner.DEBUG) {
 			//System.out.println("Result Vector: " + res.toString());
 		}*/
-=======
-//		if (Runner.DEBUG) {
-//			//System.out.println("Result Vector: " + res.toString());
-//		}
->>>>>>> 61e4de4b673159bdc8b0d093e4b2e3a9d1c9677e
 		if (orig)
 			return (VelocityVec) res;
 		else
