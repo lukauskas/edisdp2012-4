@@ -48,7 +48,8 @@ public abstract class AbstractWorld implements Listener {
      * @return new coordinate for the position of the object after timestep
      */
     public Coord estimatedPosition(FieldObject object, double timestep) {
-        if ((object == null) || (object.getPosition() == null))
+        if ((object == null) || (object.getPosition() == null)
+                || (object.getVelocity() == null))
             return null;
         else if (timestep == 0) {
             return object.getPosition();

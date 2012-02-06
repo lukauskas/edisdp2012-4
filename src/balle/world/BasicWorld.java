@@ -18,7 +18,7 @@ public class BasicWorld extends AbstractWorld {
     }
 
     private Coord subtractOrNull(Coord a, Coord b) {
-        if ((a == null) && (b == null))
+        if ((a == null) || (b == null))
             return null;
         else
             return a.sub(b);
