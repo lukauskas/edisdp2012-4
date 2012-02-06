@@ -414,3 +414,5 @@
 2012-02-05 17:15:06,803 [Testbed] DEBUG org.jbox2d.testbed.framework.j2d.TestPanelJ2D.render(TestPanelJ2D.java:170) - dbImage is null, creating a new one
 2012-02-05 17:15:06,841 [Testbed] DEBUG org.jbox2d.testbed.framework.j2d.TestPanelJ2D.render(TestPanelJ2D.java:170) - dbImage is null, creating a new one
 >>>>>>> branch 'master' of https://jvaughan68@github.com/sauliusl/edisdp2012-4.git
+2012-02-06 15:43:22,058 [Testbed] DEBUG org.jbox2d.testbed.framework.j2d.TestPanelJ2D.render(TestPanelJ2D.java:170) - dbImage is null, creating a new one
+2012-02-06 17:34:37,926 [Testbed] DEBUG org.jbox2d.testbed.framework.j2d.TestPanelJ2D.render(TestPanelJ2D.java:170) - dbImage is null, creating a new one
