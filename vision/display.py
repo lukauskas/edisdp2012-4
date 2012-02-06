@@ -16,15 +16,6 @@ class Gui:
             'ball': ['threshR', 'ball']
             }
 
-    _instance = None
-
-    @classmethod
-    def getGui(cls):
-        if cls._instance is None:
-            cls._instance = Gui()
-
-        return cls._instance
-
     def __init__(self):
         self._layers = {
                 # Base layers
@@ -43,14 +34,20 @@ class Gui:
 
         self._display = Display()
         
-        self._keyListener = Gui.KeyListener()
+        self._eventHandler = Gui.EventHandler()
+
+        self._lastMouseState = 0
 
     def __draw(self):
 
         iterator = iter(self._currentLayerset)
         
         # First element is the base layer
-        baseLayer = self._layers[iterator.next()] 
+        baseLayer = self._layers[iterator.next()]
+
+        if baseLayer is None:
+            return
+
         size = baseLayer.size()
 
         for key in iterator:
@@ -71,19 +68,24 @@ class Gui:
         
         self.__draw()
 
-        # Process any keyboard events
-        #self._display.checkEvents()
+        for event in pygame.event.get(pygame.KEYDOWN):
+            self._eventHandler.processKey(chr(event.key % 0x100))
+
+        self._display.checkEvents()
+
+        mouseLeft = self._display.mouseLeft
+        # Only fire click event once for each click
+        if mouseLeft == 1 and self._lastMouseState == 0:
+            self._eventHandler.processClick((self._display.mouseX, self._display.mouseY))
         
-        for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN:
-                self._keyListener.processKey(chr(event.key % 0x100))
+        self._lastMouseState = mouseLeft
             
         # Process OpenCV events (for if the focus is on the thresholding window)
         c = cv.WaitKey(16)
-        self._keyListener.processKey(chr(c % 0x100))
+        self._eventHandler.processKey(chr(c % 0x100))
 
-    def getKeyHandler(self):
-        return self._keyListener   
+    def getEventHandler(self):
+        return self._eventHandler   
 
     def updateLayer(self, name, layer):
         """
@@ -100,24 +102,44 @@ class Gui:
 
         self._currentLayerset = self.layersets[name]
         
-    class KeyListener:
+    class EventHandler:
         
         def __init__(self):
             self._listeners = {}
+            self._clickListener = None
         
         def processKey(self, key):
             if key in self._listeners.keys():
                 self._listeners[key]()
+
+        def processClick(self, where):
+            if self._clickListener is not None:
+                self._clickListener(where)
             
         def addListener(self, key, callback):
+            """
+            Adds a function callback for a key.
+            """
             
             assert callable(callback), '"callback" must be callable'
             
             self._listeners[key] = callback
 
+        def setClickListener(self, callback):
+            """
+            Sets a function to be called on clicking on the image.
+            The function will be passed a tuple with the (x,y) of the click.
+
+            Setting a new callback will override the last one (or pass None to clear)
+            """
+            assert callback is None or callable(callback), '"callback" must be callable'
+            
+            self._clickListener = callback
+
+
 class ThresholdGui:
 
-    def __init__(self, thresholdinstance, window=None):
+    def __init__(self, thresholdinstance, gui, window=None):
 
         if window is None:
             self.window = 'thresh_adjust'
@@ -125,13 +147,16 @@ class ThresholdGui:
         else:
             self.window = window
 
+        self._gui = gui
         self.threshold = thresholdinstance
-        self.currentEntity = 'yellow'
 
         self._showOnGui = False
 
         self.__createTrackbars()
         self.__setupKeyEvents()
+
+        self.changeEntity('yellow')
+
         
     def __setupKeyEvents(self):
         """
@@ -142,7 +167,7 @@ class ThresholdGui:
         def blue(): self.changeEntity('blue')
         def ball(): self.changeEntity('ball')
         
-        keyHandler = Gui.getGui().getKeyHandler()
+        keyHandler = self._gui.getEventHandler()
         keyHandler.addListener('y', yellow)
         keyHandler.addListener('b', blue)
         keyHandler.addListener('r', ball)
@@ -177,11 +202,10 @@ class ThresholdGui:
     def toggleShowOnGui(self):
         self._showOnGui = not self._showOnGui
         
-        gui = Gui.getGui()
         if self._showOnGui:
-            gui.switchLayerset(self.currentEntity)
+            self._gui.switchLayerset(self.currentEntity)
         else:
-            gui.switchLayerset('default')
+            self._gui.switchLayerset('default')
 
     def changeEntity(self, name):
         """
@@ -193,7 +217,7 @@ class ThresholdGui:
         self.setTrackbarValues(self.threshold._values[name])
 
         if self._showOnGui:
-            Gui.getGui().switchLayerset(name)
+            self._gui.switchLayerset(name)
 
     def setTrackbarValues(self, values):
         for i, which in enumerate(['min', 'max']):

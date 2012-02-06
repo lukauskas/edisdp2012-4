@@ -93,8 +93,10 @@ public class Runner {
     	else 
     		bot = simulator.getBlueSoft();
     	
-    	AbstractStrategy s = new UserInputStrategy(bot, new BasicWorld(true));
-		s.start();
+    	System.out.println(bot);
+    	
+    	//AbstractStrategy s = new UserInputStrategy(bot, world);
+		//s.start();
     	
     }
 }

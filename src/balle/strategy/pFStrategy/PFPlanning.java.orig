@@ -3,6 +3,11 @@ package balle.strategy.pFStrategy;
 import java.util.ArrayList;
 import java.util.List;
 
+<<<<<<< HEAD
+//import main.Runner;
+
+=======
+>>>>>>> 61e4de4b673159bdc8b0d093e4b2e3a9d1c9677e
 public class PFPlanning {
 	Pos robot;
 	PointObject opponent;

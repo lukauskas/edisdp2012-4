@@ -2,8 +2,11 @@ package balle.simulator;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 
+import org.jbox2d.callbacks.RayCastCallback;
+import org.jbox2d.collision.Collision;
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
+import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
@@ -12,36 +15,38 @@ import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
 import org.jbox2d.dynamics.joints.FrictionJointDef;
 import org.jbox2d.dynamics.joints.WeldJointDef;
+import org.jbox2d.pooling.normal.DefaultWorldPool;
 import org.jbox2d.testbed.framework.TestbedFrame;
 import org.jbox2d.testbed.framework.TestbedModel;
 import org.jbox2d.testbed.framework.TestbedPanel;
 import org.jbox2d.testbed.framework.TestbedTest;
 import org.jbox2d.testbed.framework.j2d.TestPanelJ2D;
+import org.jbox2d.pooling.*;
 
 import balle.io.listener.Listener;
 import balle.io.reader.AbstractVisionReader;
 import balle.io.reader.Reader;
+import balle.misc.Globals;
 import balle.simulator.SoftBot;
-import balle.strategy.AbstractStrategy;
-import balle.strategy.UserInputStrategy;
-import balle.world.BasicWorld;
 
 public class Simulator extends TestbedTest implements AbstractVisionReader {
 
 	// Increases sizes, but keeps real-world scale; jbox2d acts unrealistically 
 	//at a small scale
-	private final float scale = 10;
+	protected final float scale = 10;
 	
 	private Body ground;
-	private Body ball;
+	protected Body ball;
 
-	private Robot blue;
-	private Robot yellow;
+	protected Robot blue;
+	protected Robot yellow;
 	
-	private SoftBot blueSoft;
-	private SoftBot yellowSoft;
+	private SoftBot blueSoft = new SoftBot();
+	private SoftBot yellowSoft = new SoftBot();
 	
 	private long startTime;
+	
+	private CircleShape ballShape;
 	
 	public SoftBot getBlueSoft() {
 		return blueSoft;
@@ -114,8 +119,8 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 		addEdge(2.54f * scale, 0.31f * scale, 2.54f * scale, 0.91f * scale);
 
 		// Create ball
-		CircleShape ballShape = new CircleShape();
-		ballShape.m_radius = 0.02135f * scale;
+		ballShape = new CircleShape();
+		ballShape.m_radius = Globals.BALL_RADIUS * scale;
 		FixtureDef f = new FixtureDef();
 		f.shape = ballShape;
 		f.density = (1f / 0.36f) / scale;
@@ -138,8 +143,6 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 		// create robots at either end of pitch
 		blue = new Robot(new Vec2((float) (0.1f * scale), (float) (0.61 * scale)), 0f);
 		yellow = new Robot(new Vec2((float) (2.34 * scale), (float) (0.61 * scale)), 0f);
-		blueSoft = new SoftBot();
-		yellowSoft = new SoftBot();
 	}
 
 	@Override
@@ -153,7 +156,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 		super.update();
 		
 		// Update world with new information.
-		this.propergate();
+		this.reader.update();
 	}
 	
 
@@ -169,7 +172,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 	/** Empty constructor, to make private.
 	 * 		For constructor use createSimulator()
 	 */
-	private Simulator() { /* James: Do not use. Use initTest() instead. */	}
+	protected Simulator() { /* James: Do not use. Use initTest() instead. */ }
 	
 	/** Equivalent to a constructor.
 	 * 
@@ -190,38 +193,49 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 		Simulator pgui = new Simulator();
 		model.addTest(pgui);
 		JFrame testbed = new TestbedFrame(model, panel);
+		testbed.setTitle("Simulator");
 		testbed.setVisible(true);
 		testbed.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		return pgui;
 	}
 	
 
-	private static int robotNo = -20;
-	class Robot {
+	private static int robotNo = 0;
+	protected class Robot {
+		
+		private Body kicker;
 		
 		private Body robot;
 		private Body wheelL;
 		private Body wheelR;
+		private boolean isPuppet = false;
 
-		private final Vec2 leftWheelPos;
-		private final Vec2 rightWheelPos;
-		private final float robotWidth = 0.15f * scale / 2;
-		private final float robotLength = 0.2f * scale / 2;
+		private final Vec2 leftWheelPos = new Vec2(0, (0.05f * scale));
+		private final Vec2 rightWheelPos = new Vec2(0, -(0.05f * scale));
+		private final Vec2 kickPos = new Vec2(0.12f*scale, 0);
+
+		private final float robotWidth = Globals.ROBOT_WIDTH * scale / 2;
+		private final float robotLength = Globals.ROBOT_LENGTH * scale / 2;
+
 		private final float wheelWidth = 0.02f * scale;
 		private final float wheelLength = 0.05f * scale;
+		
+		private final float kickerWidth = 0.15f * scale / 2;
+		private final float kickerLength = 0.04f * scale / 2;
+		
+		private PolygonShape kickerShape;
+		
 		FrictionJointDef rightWheelFriction;
 		FrictionJointDef leftWheelFriction;
 
 		private static final float engineForce = 2f;
+		private static final float kickForce = 20000f;
 		private static final float wheelMaxTorque = 0.5f;
-		
 		// wheel power (-1 for lock and 0 for float and (0,100] for power )
 
 		public Robot(Vec2 startingPos, float angle) {
-		
 			World w = getWorld();
-			leftWheelPos = new Vec2(0, (0.05f * scale));
-			rightWheelPos = new Vec2(0, -(0.05f * scale));
+			int robotIndex = robotNo++;
 			
 			// Create Robot body, set position from Constructor
 			PolygonShape robotShape = new PolygonShape();
@@ -234,7 +248,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 			robotF.shape = robotShape;
 			robotF.density = (1f / 0.36f) / scale;
 			// Stops wheels and body colliding
-			robotF.filter.groupIndex = robotNo--;
+			robotF.filter.groupIndex = -robotIndex-20;
 			robot.createFixture(robotF);
 
 			PolygonShape wheelShape = new PolygonShape();
@@ -242,7 +256,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 			BodyDef wheelBodyDef = new BodyDef();
 			wheelBodyDef.type = BodyType.DYNAMIC;
 			FixtureDef wheelF = new FixtureDef();
-			wheelF.filter.groupIndex = -1;
+			wheelF.filter.groupIndex = -robotIndex-20;
 			wheelF.density = (1f / 0.36f) / scale;
 			wheelF.shape = wheelShape;
 
@@ -263,6 +277,20 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 			wheelR = w.createBody(wheelBodyDef);
 			wheelR.createFixture(wheelF);
 			
+			kickerShape = new PolygonShape();
+			kickerShape.setAsBox(kickerLength, kickerWidth);
+			BodyDef kickerBodyDef = new BodyDef();
+			kickerBodyDef.type = BodyType.DYNAMIC;
+			FixtureDef kickF = new FixtureDef();
+			kickF.filter.maskBits = 0x0;
+			kickF.filter.groupIndex = -robotIndex-20;
+			kickF.density = (1f / 0.36f) / scale;
+			kickF.shape = kickerShape;
+			
+			kickerBodyDef.position.set(robot.getWorldCenter().clone().add(kickPos));
+			kicker = w.createBody(kickerBodyDef);
+			kicker.createFixture(kickF);
+			
 			//Creates friction right wheel and ground
 			rightWheelFriction = new FrictionJointDef();
 			rightWheelFriction.initialize(wheelR, ground, wheelR.getWorldCenter());
@@ -275,34 +303,114 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 			w.createJoint(wjd);
 			wjd.initialize(robot, wheelR, wheelR.getWorldCenter());
 			w.createJoint(wjd);
+			wjd.initialize(robot, kicker, kicker.getWorldCenter());
+			w.createJoint(wjd);
 
 		}
 		
+		public boolean ballInRange() {
+			Collision c = getWorld().getPool().getCollision();
+			return c.testOverlap(ballShape, kickerShape, ball.getTransform(), kicker.getTransform());
+		}
+		
 		public void updateRobot(SoftBot bot) {
-			
-			killAllOrtogonal(wheelL);
-			killAllOrtogonal(wheelR);
-			
-			double blueAng = robot.getAngle();
-			
-			// Normalises wheel force
-			float leftWheelSpeed = (bot.getLeftWheelSpeed()/100) * engineForce;
-			float rightWheelSpeed = (bot.getRightWheelSpeed()/100) * engineForce;
-			
-			wheelL.applyForce(new Vec2((float)(leftWheelSpeed*Math.cos(blueAng)),
-					(float)(leftWheelSpeed*Math.sin(blueAng))), wheelL.getWorldCenter());
-			wheelR.applyForce(new Vec2((float)(rightWheelSpeed*Math.cos(blueAng)),
-					(float)(rightWheelSpeed*Math.sin(blueAng))), wheelR.getWorldCenter());
-			wheelL.setLinearDamping( (engineForce - Math.abs(leftWheelSpeed) + 2)*2 );
-			wheelR.setLinearDamping( (engineForce - Math.abs(rightWheelSpeed) + 2)*2 );
+			if(!isPuppet) {
+				killAllOrtogonal(wheelL);
+				killAllOrtogonal(wheelR);
+				
+				double blueAng = robot.getAngle();
+				
+				// Normalises wheel force
+				float leftWheelSpeed = (bot.getLeftWheelSpeed()/100) * engineForce;
+				float rightWheelSpeed = (bot.getRightWheelSpeed()/100) * engineForce;
+				
+				wheelL.applyForce(new Vec2((float)(leftWheelSpeed*Math.cos(blueAng)),
+						(float)(leftWheelSpeed*Math.sin(blueAng))), wheelL.getWorldCenter());
+				wheelR.applyForce(new Vec2((float)(rightWheelSpeed*Math.cos(blueAng)),
+						(float)(rightWheelSpeed*Math.sin(blueAng))), wheelR.getWorldCenter());
+				wheelL.setLinearDamping( (engineForce - Math.abs(leftWheelSpeed) + 2)*2 );
+				wheelR.setLinearDamping( (engineForce - Math.abs(rightWheelSpeed) + 2)*2 );
+				
+				if (bot.getKick() && ballInRange()) {
+					
+					// Kick
+					float xF, yF;
+					xF = (float)(kickForce*Math.cos(blueAng)); 
+					yF = (float)(kickForce*Math.sin(blueAng));
+					ball.applyForce( new Vec2(xF,yF), ball.getWorldCenter() );
+					
+				}
+			}
+		}
+		
+		public void makePuppet() {
+			isPuppet = true;
+			getWorld().destroyBody(wheelL);
+			getWorld().destroyBody(wheelR);
+		}
+		
+		public Body getBody() {
+			return robot;
 		}
 	}
+	
+	SimulatorReader reader = new SimulatorReader();
 	
 	/* Output to World:
 	 * All code refering to the output from the simulator goes here.
 	 */
-	
-	private Reader reader = new Reader();
+	class SimulatorReader extends Reader {
+		
+		private long getTimeStamp() {
+			return System.currentTimeMillis() - startTime;
+		}
+		
+		private float convAngle(float a) {
+			return -a;
+		}
+		
+		private Vec2 convPos(Vec2 a) {
+			Vec2 output = new Vec2();
+			output.x = a.x/scale;
+			output.y = (a.y/-scale) + 1.22f;
+			return output;
+		}
+		
+		public synchronized String getWorldData() {
+			Vec2 yellowPos, bluePos;
+			yellowPos = convPos(yellow.robot.getPosition());
+			bluePos = convPos(blue.robot.getPosition());
+			
+			float yellowAng, blueAng;
+			yellowAng = convAngle(yellow.robot.getAngle());
+			blueAng = convAngle(blue.robot.getAngle());
+			return yellowPos.x+" "+yellowPos.y+" "+yellowAng+" "+
+					bluePos.x+" "+bluePos.y+" "+blueAng+" "+ getTimeStamp();
+		}
+		
+		
+		public void update() {
+			float yPosX, yPosY, yRad, bPosX, bPosY, bRad, ballPosX, ballPosY;
+			
+			Vec2 yPos = convPos(yellow.robot.getPosition());
+			yPosX = yPos.x;
+			yPosY = yPos.y;
+			yRad  = convAngle(yellow.robot.getAngle()); 
+			
+			Vec2 bPos = convPos(blue.robot.getPosition());
+			bPosX = bPos.x;
+			bPosY = bPos.y;
+			bRad  = convAngle(blue.robot.getAngle());
+			
+			Vec2 ballPos = convPos(ball.getPosition());
+			ballPosX = ballPos.x;
+			ballPosY = ballPos.y;
+			
+			long timestamp = getTimeStamp();
+			
+			super.propagate(yPosX, yPosY, yRad, bPosX, bPosY, bRad, ballPosX, ballPosY, timestamp);
+		}
+	}
 	
 	/** Marks a world to be updated of any changes
 	 * 
@@ -312,35 +420,4 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 		reader.addListener(listener);
 	}
 	
-	private long getTimeStamp() {
-		return System.currentTimeMillis() - startTime;
-	}
-	
-	private float convAngle(float a) {
-		return -a;
-	}
-	
-	private Vec2 convPos(Vec2 a) {
-		Vec2 output = new Vec2();
-		output.x = a.x/scale;
-		output.y = (a.y/-scale) + 1.22f;
-		return output;
-	}
-	
-	private void propergate() {
-		
-		
-	}
-	
-	public synchronized String getWorldData() {
-		Vec2 yellowPos, bluePos;
-		yellowPos = convPos(yellow.robot.getPosition());
-		bluePos = convPos(blue.robot.getPosition());
-		
-		float yellowAng, blueAng;
-		yellowAng = convAngle(yellow.robot.getAngle());
-		blueAng = convAngle(blue.robot.getAngle());
-		return yellowPos.x+" "+yellowPos.y+" "+yellowAng+" "+
-				bluePos.x+" "+bluePos.y+" "+blueAng+" "+ getTimeStamp();
-	}
 }

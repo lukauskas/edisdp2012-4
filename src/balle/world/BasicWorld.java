@@ -6,8 +6,6 @@ public class BasicWorld extends AbstractWorld {
 
     public BasicWorld(boolean balleIsBlue) {
         super(balleIsBlue);
-        
-        
     }
 
     @Override

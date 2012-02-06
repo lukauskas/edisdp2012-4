@@ -1,6 +1,10 @@
 package balle.strategy.pFStrategy;
 
+<<<<<<< HEAD
+//import main.Runner;
+=======
 import balle.main.Runner;
+>>>>>>> 61e4de4b673159bdc8b0d093e4b2e3a9d1c9677e
 
 //basic Point class includes x,y
 public class PointObject extends Vector implements Object {
@@ -73,10 +77,17 @@ public class PointObject extends Vector implements Object {
 					* (this.getX() - point.getLocation().getX())
 					+ (this.getY() - point.getLocation().getY())
 					* (this.getY() - point.getLocation().getY()));
+<<<<<<< HEAD
 /*			if (Runner.DEBUG) {
 				System.out.println("obstacle Distance:" + distance);
 				System.out.println("PFPlanning::PointObject::inf_distance:"+infl_distance);
 			}*/		
+=======
+//			if (Runner.DEBUG) {
+//				System.out.println("obstacle Distance:" + distance);
+//				System.out.println("PFPlanning::PointObject::inf_distance:"+infl_distance);
+//			}
+>>>>>>> 61e4de4b673159bdc8b0d093e4b2e3a9d1c9677e
 			if (distance < infl_distance & power!=0) {
 				try
 				{
@@ -105,11 +116,19 @@ public class PointObject extends Vector implements Object {
 			Vector res=out_point.subtract(this);
 				System.out.println("goal Distance:" + res.size());
 			Vector final_res=res.mult(power * -1);
+<<<<<<< HEAD
 		/*	if (Runner.DEBUG){
 				System.out.println("PFPlanning::PointObject::attractive Force:"+final_res);
 				System.out.println("PFPlanning::PointObject::current:"+out_point);
 				System.out.println("PFPlanning::PointObject::destination:"+this);
 			}*/
+=======
+//			if (Runner.DEBUG){
+//				System.out.println("PFPlanning::PointObject::attractive Force:"+final_res);
+//				System.out.println("PFPlanning::PointObject::current:"+out_point);
+//				System.out.println("PFPlanning::PointObject::destination:"+this);
+//			}
+>>>>>>> 61e4de4b673159bdc8b0d093e4b2e3a9d1c9677e
 			return final_res;
 		}
 	}
