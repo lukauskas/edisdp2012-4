@@ -24,7 +24,7 @@ public abstract class AbstractWorldProcessor extends Thread {
     }
 
     @Override
-    public void run() {
+    public final void run() {
         snapshot = null;
         while (true) {
             Snapshot newSnapshot = world.getSnapshot();
