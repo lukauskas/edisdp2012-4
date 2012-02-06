@@ -9,3 +9,4 @@ bin/
 vision/threshdefaults
 JBox2d.log
 *.orig
+*.log
