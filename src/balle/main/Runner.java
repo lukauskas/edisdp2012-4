@@ -106,8 +106,8 @@ public class Runner {
 
         System.out.println(bot);
 
-        // AbstractStrategy s = new UserInputStrategy(bot, world);
-        // s.start();
+        AbstractStrategy s = new DummyStrategy(bot, world);
+        s.start();
 
     }
 }

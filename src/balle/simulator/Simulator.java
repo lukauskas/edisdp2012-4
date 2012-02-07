@@ -331,22 +331,19 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
                 double blueAng = robot.getAngle();
 
                 // Normalises wheel force
-                float leftWheelSpeed = (bot.getLeftWheelSpeed() / 100)
-                        * engineForce;
-                float rightWheelSpeed = (bot.getRightWheelSpeed() / 100)
-                        * engineForce;
-
-                wheelL.applyForce(
+                System.out.println(bot.getLeftWheelSpeed() +" --> "+powerToVelocity(bot.getLeftWheelSpeed()));
+                float leftWheelSpeed = scale * powerToVelocity(bot.getLeftWheelSpeed());
+                float rightWheelSpeed = scale * powerToVelocity(bot.getRightWheelSpeed());
+                
+                wheelL.setLinearVelocity(
                         new Vec2((float) (leftWheelSpeed * Math.cos(blueAng)),
-                                (float) (leftWheelSpeed * Math.sin(blueAng))),
-                        wheelL.getWorldCenter());
-                wheelR.applyForce(
+                                (float) (leftWheelSpeed * Math.sin(blueAng))));
+                wheelR.setLinearVelocity(
                         new Vec2((float) (rightWheelSpeed * Math.cos(blueAng)),
-                                (float) (rightWheelSpeed * Math.sin(blueAng))),
-                        wheelR.getWorldCenter());
-                wheelL.setLinearDamping((engineForce - Math.abs(leftWheelSpeed) + 2) * 2);
-                wheelR.setLinearDamping((engineForce
-                        - Math.abs(rightWheelSpeed) + 2) * 2);
+                                (float) (rightWheelSpeed * Math.sin(blueAng))));
+                //wheelL.setLinearDamping((engineForce - Math.abs(leftWheelSpeed) + 2) * 2);
+                //wheelR.setLinearDamping((engineForce
+                //        - Math.abs(rightWheelSpeed) + 2) * 2);
 
                 if (bot.getKick() && ballInRange()) {
 
@@ -368,6 +365,13 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 
         public Body getBody() {
             return robot;
+        }
+        
+        private float powerToVelocity(float p) {
+        	boolean isNeg = p < 0;
+        	if(isNeg) p = -p;
+        	float absVelocity = (float) (1f/(Math.exp(-0.0025 * p + 3.1187))) / ((1f/(p/50f))+1f);
+        	return isNeg?-absVelocity:absVelocity;
         }
     }
 
