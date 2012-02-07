@@ -7,6 +7,7 @@ import balle.simulator.Simulator;
 import balle.simulator.SoftBot;
 import balle.strategy.AbstractStrategy;
 import balle.strategy.DummyStrategy;
+import balle.strategy.PFNavigation;
 import balle.world.AbstractWorld;
 import balle.world.BasicWorld;
 
@@ -98,6 +99,10 @@ public class Runner {
 
         // AbstractStrategy s = new UserInputStrategy(bot, world);
         // s.start();
+        
+        AbstractStrategy s = new PFNavigation(bot, world);
+        s.start();
+        
 
     }
 }
