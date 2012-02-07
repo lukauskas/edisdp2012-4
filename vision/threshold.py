@@ -42,10 +42,13 @@ class Threshold:
         if threshmin[0] > threshmax[0]:
             # Handle hue threshold crossing over
             # angle boundry e.g. when thresholding on red
-            
+
+            hMax = threshmin[0]
+            hMin = threshmax[0]
+
             crossover = True
-            threshmax2 = [threshmin[0], threshmax[1], threshmax[2]]
-            threshmin = [threshmax[0], threshmin[1], threshmin[2]] 
+            threshmax2 = [hMin, threshmax[1], threshmax[2]]
+            threshmin = [hMax, threshmin[1], threshmin[2]] 
             threshmax = [255, threshmax[1], threshmax[2]]
             threshmin2 = [0, threshmin[1], threshmin[2]]
 
@@ -59,7 +62,6 @@ class Threshold:
             cv.InRangeS(iplhsv, threshmin2, threshmax2, iplresult2)
             
             result = result + Image(iplresult2)
-
 
         return result
 
