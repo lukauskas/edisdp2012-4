@@ -2,15 +2,15 @@ package balle.world;
 
 public class Robot extends FieldObject {
 
-    private final double orientation;
+    private final Orientation orientation;
 
-    public double getOrientation() {
-        return orientation;
-    }
-
-    public Robot(Coord position, Velocity velocity, double orientation) {
+    public Robot(Coord position, Velocity velocity, Orientation orientation) {
         super(position, velocity);
         this.orientation = orientation;
+    }
+
+    public Orientation getOrientation() {
+        return orientation;
     }
 
 }

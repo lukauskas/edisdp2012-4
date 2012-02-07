@@ -127,7 +127,7 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
                     { -hl, -hw }, { -hl, hw } };
 
             // for each point
-            double a = robot.getOrientation();
+            double a = robot.getOrientation().radians();
             for (int i = 0; i < poly.length; i++) {
                 float px = poly[i][0];
                 float py = poly[i][1];
