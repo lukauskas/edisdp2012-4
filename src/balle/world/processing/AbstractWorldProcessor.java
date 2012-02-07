@@ -30,11 +30,11 @@ public abstract class AbstractWorldProcessor extends Thread {
             Snapshot newSnapshot = world.getSnapshot();
 
             if ((newSnapshot != null) && (!newSnapshot.equals(prevSnapshot))) {
-                actionOnStep();
+                actionOnChange();
                 prevSnapshot = snapshot;
                 snapshot = newSnapshot;
             }
-            actionOnChange();
+            actionOnStep();
         }
     }
 
