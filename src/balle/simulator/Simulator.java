@@ -12,6 +12,7 @@ import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
+import org.jbox2d.dynamics.joints.FrictionJoint;
 import org.jbox2d.dynamics.joints.FrictionJointDef;
 import org.jbox2d.dynamics.joints.WeldJointDef;
 import org.jbox2d.testbed.framework.TestbedFrame;
@@ -230,8 +231,8 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 
         private PolygonShape       kickerShape;
 
-        FrictionJointDef           rightWheelFriction;
-        FrictionJointDef           leftWheelFriction;
+        FrictionJoint			   rightWheelFriction;
+        FrictionJoint	           leftWheelFriction;
 
         private static final float engineForce    = 2f;
         private static final float kickForce      = 20000f;
@@ -261,6 +262,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
             wheelShape.setAsBox(wheelLength, wheelWidth);
             BodyDef wheelBodyDef = new BodyDef();
             wheelBodyDef.type = BodyType.DYNAMIC;
+            wheelBodyDef.linearDamping = 0;
             FixtureDef wheelF = new FixtureDef();
             wheelF.filter.groupIndex = -robotIndex - 20;
             wheelF.density = (1f / 0.36f) / scale;
@@ -271,13 +273,6 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
             wheelL = w.createBody(wheelBodyDef);
             wheelL.createFixture(wheelF);
 
-            // Creates friction between left wheel and ground
-            leftWheelFriction = new FrictionJointDef();
-            leftWheelFriction.initialize(wheelL, ground,
-                    wheelL.getWorldCenter());
-            // leftWheelFriction.maxForce = wheelMaxForce;
-            leftWheelFriction.maxTorque = wheelMaxTorque;
-            w.createJoint(leftWheelFriction);
 
             wheelBodyDef.position.set(robot.getWorldCenter().clone()
                     .add(rightWheelPos));
@@ -298,14 +293,6 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
                     .add(kickPos));
             kicker = w.createBody(kickerBodyDef);
             kicker.createFixture(kickF);
-
-            // Creates friction right wheel and ground
-            rightWheelFriction = new FrictionJointDef();
-            rightWheelFriction.initialize(wheelR, ground,
-                    wheelR.getWorldCenter());
-            // rightWheelFriction.maxForce = wheelMaxForce;
-            rightWheelFriction.maxTorque = wheelMaxTorque;
-            w.createJoint(rightWheelFriction);
 
             WeldJointDef wjd = new WeldJointDef();
             wjd.initialize(robot, wheelL, wheelL.getWorldCenter());
@@ -331,7 +318,6 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
                 double blueAng = robot.getAngle();
 
                 // Normalises wheel force
-                System.out.println(bot.getLeftWheelSpeed() +" --> "+powerToVelocity(bot.getLeftWheelSpeed()));
                 float leftWheelSpeed = scale * powerToVelocity(bot.getLeftWheelSpeed());
                 float rightWheelSpeed = scale * powerToVelocity(bot.getRightWheelSpeed());
                 
@@ -342,8 +328,10 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
                         new Vec2((float) (rightWheelSpeed * Math.cos(blueAng)),
                                 (float) (rightWheelSpeed * Math.sin(blueAng))));
                 //wheelL.setLinearDamping((engineForce - Math.abs(leftWheelSpeed) + 2) * 2);
-                //wheelR.setLinearDamping((engineForce
-                //        - Math.abs(rightWheelSpeed) + 2) * 2);
+                //wheelR.setLinearDamping(Float.POSITIVE_INFINITY);
+                		//(engineForce - Math.abs(rightWheelSpeed) + 2) * 2);
+//                rightWheelFriction.setMaxForce(powerToMaxFF(rightWheelSpeed));
+//                leftWheelFriction.setMaxForce(powerToMaxFF(leftWheelSpeed));
 
                 if (bot.getKick() && ballInRange()) {
 
@@ -367,11 +355,16 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
             return robot;
         }
         
+        private float powerToMaxFF(float p) {
+        	return 0;//(float)((15/p)+0.0001);
+        }
+        
         private float powerToVelocity(float p) {
-        	boolean isNeg = p < 0;
-        	if(isNeg) p = -p;
-        	float absVelocity = (float) (1f/(Math.exp(-0.0025 * p + 3.1187))) / ((1f/(p/50f))+1f);
-        	return isNeg?-absVelocity:absVelocity;
+        	return (float) (p * (0.4/720));
+//        	boolean isNeg = p < 0;
+//        	if(isNeg) p = -p;
+//        	float absVelocity = (float) (1f/(Math.exp(-0.0025 * p + 3.1187))) / ((1f/(p/50f))+1f);
+//        	return isNeg?-absVelocity:absVelocity;
         }
     }
 
