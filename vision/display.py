@@ -1,4 +1,5 @@
 import pygame
+import time
 import cv
 from SimpleCV import Display, DrawingLayer, Image, Blob
 
@@ -27,54 +28,101 @@ class Gui:
                 # Overlay layers
                 'yellow': None,
                 'blue': None,
-                'ball' : None
+                'ball' : None,
+
+                # fps is always drawn
+                'fps': None
                 }
 
         self._currentLayerset = self.layersets['default']
-
         self._display = Display()
-        
-        self._keyListener = Gui.KeyListener()
+        self._eventHandler = Gui.EventHandler()
+        self._lastMouseState = 0
+        self._lastFrame = None
+        self._lastFrameTime = time.time()
 
     def __draw(self):
 
         iterator = iter(self._currentLayerset)
         
         # First element is the base layer
-        baseLayer = self._layers[iterator.next()] 
+        baseLayer = self._layers[iterator.next()]
+
+        if baseLayer is None:
+            return
+
         size = baseLayer.size()
 
         for key in iterator:
-            if self._layers[key] is None:
+            toDraw = self._layers[key]
+            if toDraw is None:
                 continue
             
-            layer = DrawingLayer(size)
-            baseLayer.addDrawingLayer(layer)
+            elif isinstance(toDraw, DrawingLayer):
+                baseLayer.addDrawingLayer(toDraw)
 
-            self._layers[key].draw(layer=layer)
+            else:
+                layer = DrawingLayer(size)
+                baseLayer.addDrawingLayer(layer)
+
+                toDraw.draw(layer)
+
+        # draw fps
+        baseLayer.addDrawingLayer(self._layers['fps'])
 
         baseLayer.save(self._display)
 
+    def __updateFps(self):
+        smoothConst = 0.1
+        thisFrameTime = time.time()
+
+        thisFrame = thisFrameTime - self._lastFrameTime
+        if self._lastFrame is not None:
+            # Smooth values
+            thisFrame = thisFrame * (1 - smoothConst) + smoothConst * self._lastFrame
+        
+        fps = 1.0 / thisFrame
+
+        self._lastFrame = thisFrame
+        self._lastFrameTime = thisFrameTime
+
+        # Draw the text
+        size = self._layers['raw'].size() # This could break
+
+        layer = DrawingLayer(size)
+        layer.ezViewText('{0:.2f} fps'.format(fps), (10, 10))
+        self._layers['fps'] = layer
+ 
     def loop(self):
         """
         Draw the image to the display, and process any events
         """
+
+        self.__updateFps()
         
         self.__draw()
 
-        # Process any keyboard events
-        #self._display.checkEvents()
+        for event in pygame.event.get(pygame.KEYDOWN):
+            self._eventHandler.processKey(chr(event.key % 0x100))
+
+        self._display.checkEvents()
+
+        mouseLeft = self._display.mouseLeft
+        # Only fire click event once for each click
+        if mouseLeft == 1 and self._lastMouseState == 0:
+            self._eventHandler.processClick((self._display.mouseX, self._display.mouseY))
         
-        for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN:
-                self._keyListener.processKey(chr(event.key % 0x100))
+        self._lastMouseState = mouseLeft
             
         # Process OpenCV events (for if the focus is on the thresholding window)
         c = cv.WaitKey(16)
-        self._keyListener.processKey(chr(c % 0x100))
+        self._eventHandler.processKey(chr(c % 0x100))
 
-    def getKeyHandler(self):
-        return self._keyListener   
+    def getEventHandler(self):
+        return self._eventHandler   
+
+    def getDrawingLayer(self):
+        return DrawingLayer(self._layers['raw'].size())
 
     def updateLayer(self, name, layer):
         """
@@ -91,20 +139,40 @@ class Gui:
 
         self._currentLayerset = self.layersets[name]
         
-    class KeyListener:
+    class EventHandler:
         
         def __init__(self):
             self._listeners = {}
+            self._clickListener = None
         
         def processKey(self, key):
             if key in self._listeners.keys():
                 self._listeners[key]()
+
+        def processClick(self, where):
+            if self._clickListener is not None:
+                self._clickListener(where)
             
         def addListener(self, key, callback):
+            """
+            Adds a function callback for a key.
+            """
             
             assert callable(callback), '"callback" must be callable'
             
             self._listeners[key] = callback
+
+        def setClickListener(self, callback):
+            """
+            Sets a function to be called on clicking on the image.
+            The function will be passed a tuple with the (x,y) of the click.
+
+            Setting a new callback will override the last one (or pass None to clear)
+            """
+            assert callback is None or callable(callback), '"callback" must be callable'
+            
+            self._clickListener = callback
+
 
 class ThresholdGui:
 
@@ -118,12 +186,14 @@ class ThresholdGui:
 
         self._gui = gui
         self.threshold = thresholdinstance
-        self.currentEntity = 'yellow'
 
         self._showOnGui = False
 
         self.__createTrackbars()
         self.__setupKeyEvents()
+
+        self.changeEntity('yellow')
+
         
     def __setupKeyEvents(self):
         """
@@ -134,7 +204,7 @@ class ThresholdGui:
         def blue(): self.changeEntity('blue')
         def ball(): self.changeEntity('ball')
         
-        keyHandler = self._gui.getKeyHandler()
+        keyHandler = self._gui.getEventHandler()
         keyHandler.addListener('y', yellow)
         keyHandler.addListener('b', blue)
         keyHandler.addListener('r', ball)
@@ -184,7 +254,7 @@ class ThresholdGui:
         self.setTrackbarValues(self.threshold._values[name])
 
         if self._showOnGui:
-            Gui.getGui().switchLayerset(name)
+            self._gui.switchLayerset(name)
 
     def setTrackbarValues(self, values):
         for i, which in enumerate(['min', 'max']):

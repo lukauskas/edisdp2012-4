@@ -3,7 +3,7 @@ import sys
 import time
 import cv
 import socket
-from SimpleCV import Image, Camera
+from SimpleCV import Image, Camera, VirtualCamera
 from preprocess import Preprocessor
 from features import Features
 from threshold import Threshold
@@ -14,6 +14,10 @@ PORT = 28546
 
 PITCH_SIZE = (243.8, 121.9)
 
+# Distinct between field size line or entity line
+ENTITY_BIT = 'E';
+PITCH_SIZE_BIT  = 'P';
+
 class Vision:
     
     def __init__(self, pitchnum):
@@ -21,15 +25,18 @@ class Vision:
         self.running = True
         
         self.stdout = False
-        
+
         self.cap = Camera()
+        #self.cap = VirtualCamera('global05.jpg', 'image')
         self.gui = Gui()
         self.threshold = Threshold(pitchnum)
         self.thresholdGui = ThresholdGui(self.threshold, self.gui)
         self.preprocessor = Preprocessor()
         self.features = Features(self.gui, self.threshold)
-
-        self.gui.getKeyHandler().addListener('q', self.quit)
+        
+        eventHandler = self.gui.getEventHandler()
+        eventHandler.addListener('q', self.quit)
+        eventHandler.setClickListener(self.setNextPitchCorner)
         
         if not self.stdout:
             self.connect()
@@ -46,26 +53,40 @@ class Vision:
     def doStuff(self):
         while self.running:
             frame = self.cap.getImage()
-            #frame = Image('global05.jpg')
             frame = self.preprocessor.preprocess(frame)
             
             self.gui.updateLayer('raw', frame)
 
             ents = self.features.extractFeatures(frame)
-            
-            self.gui.loop()
-
             self.outputEnts(ents)
+
+            self.gui.loop()
         
         self.socket.close()
 
+    def setNextPitchCorner(self, where):
+        self.preprocessor.setNextPitchCorner(where)
+        
+        if self.preprocessor.hasPitchSize:
+            print("Pitch size: {0!r}".format(self.preprocessor.pitch_size))
+            self.outputPitchSize()
+    
+    def outputPitchSize(self):
+        self.send('{0} {1} {2} \n'.format(
+                PITCH_SIZE_BIT, self.preprocessor.pitch_size[0], self.preprocessor.pitch_size[1]))
+
     def outputEnts(self, ents):
+
+        # Messyyy
+        if not self.preprocessor.hasPitchSize:
+            return
+
+        self.send("{0} ".format(ENTITY_BIT))
+
         for name in ['yellow', 'blue', 'ball']:
-            x = y = angle = -1
             entity = ents[name]
-            if entity is not None:
-                x, y = entity.coordinates()
-                angle = entity.angle()
+            x, y = entity.coordinates()
+            angle = entity.angle()
 
             if name == 'ball':
                 self.send('{0} {1} '.format(x, y))

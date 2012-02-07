@@ -4,8 +4,8 @@ import balle.controller.Controller;
 
 public class SoftBot implements Controller {
 	
-	private float kick = 0;
-
+	private boolean kick = false;
+	
 	private float leftWheelSpeed = 0;
 	private float rightWheelSpeed = 0;
 	
@@ -15,6 +15,12 @@ public class SoftBot implements Controller {
 	
 	public float getRightWheelSpeed() {
 		return rightWheelSpeed;
+	}
+	
+	public boolean getKick() {
+		boolean out = kick;
+		kick = false;
+		return out;
 	}
 
 	@Override
@@ -69,12 +75,7 @@ public class SoftBot implements Controller {
 
 	@Override
 	public void kick() {
-		if (kick == 0) {
-			kick = 1;
-			// System.out.println("kick(): kicking.");
-		} else {
-			// System.out.println("kick(): failed to kick.");
-		}
+		kick = true;
 	}
 
     @Override
