@@ -107,8 +107,6 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 
             // Fail early, fail often
             if ((robot == null) || (robot.getPosition() == null)) {
-                System.out.println("Cannot draw robot");
-                // 451, 157s
                 return;
             }
 
@@ -193,13 +191,12 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 
     @Override
     protected void actionOnStep() {
-        panel.repaint();
 
     }
 
     @Override
     protected void actionOnChange() {
-        // Do nothing
+        panel.repaint();
     }
 
 }
