@@ -75,7 +75,8 @@ public class BasicWorld extends AbstractWorld {
 
         // Adjust based on our color.
         if (isBlue()) {
-            if ((bPosX == UNKNOWN_VALUE) || (bPosY == UNKNOWN_VALUE))
+            if ((bPosX - UNKNOWN_VALUE < 0.00001)
+                    || (bPosY - UNKNOWN_VALUE < 0.00001))
                 ourPosition = null;
             else
                 ourPosition = new Coord(bPosX, bPosY);
@@ -83,7 +84,8 @@ public class BasicWorld extends AbstractWorld {
             ourOrientation = (bRad != UNKNOWN_VALUE) ? new Orientation(bRad,
                     false) : null;
 
-            if ((yPosX == UNKNOWN_VALUE) || (yPosY == UNKNOWN_VALUE))
+            if ((yPosX - UNKNOWN_VALUE < 0.00001)
+                    || (yPosY - UNKNOWN_VALUE < 0.00001))
                 theirsPosition = null;
             else
                 theirsPosition = new Coord(yPosX, yPosY);
@@ -91,7 +93,8 @@ public class BasicWorld extends AbstractWorld {
             theirsOrientation = (yRad != UNKNOWN_VALUE) ? new Orientation(yRad,
                     false) : null;
         } else {
-            if ((yPosX == UNKNOWN_VALUE) || (yPosY == UNKNOWN_VALUE))
+            if ((yPosX - UNKNOWN_VALUE < 0.00001)
+                    || (yPosY - UNKNOWN_VALUE < 0.00001))
                 ourPosition = null;
             else
                 ourPosition = new Coord(yPosX, yPosY);
@@ -99,7 +102,8 @@ public class BasicWorld extends AbstractWorld {
             ourOrientation = (yRad != UNKNOWN_VALUE) ? new Orientation(yRad,
                     false) : null;
 
-            if ((bPosX == UNKNOWN_VALUE) || (bPosY == UNKNOWN_VALUE))
+            if ((bPosX - UNKNOWN_VALUE < 0.00001)
+                    || (bPosY - UNKNOWN_VALUE < 0.00001))
                 theirsPosition = null;
             else
                 theirsPosition = new Coord(bPosX, bPosY);
@@ -110,7 +114,8 @@ public class BasicWorld extends AbstractWorld {
 
         Coord ballPosition;
         // Ball position
-        if ((bPosX == UNKNOWN_VALUE) || (bPosY == UNKNOWN_VALUE))
+        if ((bPosX - UNKNOWN_VALUE < 0.00001)
+                || (bPosY - UNKNOWN_VALUE < 0.00001))
             ballPosition = null;
         else
             ballPosition = new Coord(ballPosX, ballPosY);
