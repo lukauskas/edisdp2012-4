@@ -114,8 +114,8 @@ public class BasicWorld extends AbstractWorld {
 
         Coord ballPosition;
         // Ball position
-        if ((bPosX - UNKNOWN_VALUE < 0.00001)
-                || (bPosY - UNKNOWN_VALUE < 0.00001))
+        if ((ballPosX - UNKNOWN_VALUE < 0.00001)
+                || (ballPosY - UNKNOWN_VALUE < 0.00001))
             ballPosition = null;
         else
             ballPosition = new Coord(ballPosX, ballPosY);
