@@ -73,37 +73,52 @@ public class BasicWorld extends AbstractWorld {
         // Orientations
         Orientation theirsOrientation;
 
+        Snapshot prev = getSnapshot();
+        double e = 0.3;
+        
         // Adjust based on our color.
         if (isBlue()) {
             if ((bPosX == UNKNOWN_VALUE) || (bPosY == UNKNOWN_VALUE))
                 ourPosition = null;
-            else
+            else {
                 ourPosition = new Coord(bPosX, bPosY);
+            	if (prev.getBalle().getPosition().dist(ourPosition) > e)
+            		ourPosition = null;
+            }
 
             ourOrientation = (bRad != UNKNOWN_VALUE) ? new Orientation(bRad,
                     false) : null;
 
             if ((yPosX == UNKNOWN_VALUE) || (yPosY == UNKNOWN_VALUE))
                 theirsPosition = null;
-            else
+            else {
                 theirsPosition = new Coord(yPosX, yPosY);
-
+            	if (prev.getOpponent().getPosition().dist(theirsPosition) > e)
+            		theirsPosition = null;
+            }
+            		
             theirsOrientation = (yRad != UNKNOWN_VALUE) ? new Orientation(yRad,
                     false) : null;
         } else {
             if ((yPosX == UNKNOWN_VALUE) || (yPosY == UNKNOWN_VALUE))
                 ourPosition = null;
-            else
+            else {
                 ourPosition = new Coord(yPosX, yPosY);
+	            if (prev.getBalle().getPosition().dist(ourPosition) > e)
+	        		ourPosition = null;
+	        }
 
             ourOrientation = (yRad != UNKNOWN_VALUE) ? new Orientation(yRad,
                     false) : null;
 
             if ((bPosX == UNKNOWN_VALUE) || (bPosY == UNKNOWN_VALUE))
                 theirsPosition = null;
-            else
+            else {
                 theirsPosition = new Coord(bPosX, bPosY);
-
+	            if (prev.getOpponent().getPosition().dist(theirsPosition) > e)
+	        		theirsPosition = null;
+	        }
+            
             theirsOrientation = (bRad != UNKNOWN_VALUE) ? new Orientation(bRad,
                     false) : null;
         }
@@ -114,8 +129,6 @@ public class BasicWorld extends AbstractWorld {
             ballPosition = null;
         else
             ballPosition = new Coord(ballPosX, ballPosY);
-
-        Snapshot prev = getSnapshot();
 
         // First case when there is no past snapshot (assume velocities are 0)
         if (prev == null) {
