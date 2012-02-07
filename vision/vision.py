@@ -1,8 +1,10 @@
 from __future__ import print_function
 import sys
 import time
-import cv
+import math
 import socket
+import cv
+
 from SimpleCV import Image, Camera, VirtualCamera
 from preprocess import Preprocessor
 from features import Features
@@ -86,11 +88,10 @@ class Vision:
         for name in ['yellow', 'blue', 'ball']:
             entity = ents[name]
             x, y = entity.coordinates()
-            angle = entity.angle()
-
             if name == 'ball':
                 self.send('{0} {1} '.format(x, y))
             else:
+                angle = 360 - (((entity.angle() * (180/math.pi)) - 360) % 360)
                 self.send('{0} {1} {2} '.format(x, y, angle))
 
         self.send(str(int(time.time() * 1000)) + " \n")

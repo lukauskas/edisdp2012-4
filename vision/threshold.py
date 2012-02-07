@@ -60,7 +60,6 @@ class Threshold:
             
             result = result + Image(iplresult2)
 
-
         return result
 
     def updateValues(self, entity, newValues):
