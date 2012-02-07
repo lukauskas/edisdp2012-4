@@ -1,8 +1,12 @@
 package balle.world;
 
+import balle.misc.Globals;
+
 public class BasicWorld extends AbstractWorld {
-	
-    private Snapshot prev = null;
+
+    private Snapshot prev        = null;
+    private double   pitchWidth  = -1;
+    private double   pitchHeight = -1;
 
     public BasicWorld(boolean balleIsBlue) {
         super(balleIsBlue);
@@ -14,10 +18,24 @@ public class BasicWorld extends AbstractWorld {
     }
 
     private Coord subtractOrNull(Coord a, Coord b) {
-        if ((a == null) && (b == null))
+        if ((a == null) || (b == null))
             return null;
         else
             return a.sub(b);
+    }
+
+    protected double scaleXToMeters(double x) {
+        if (x < 0)
+            return x;
+
+        return (x / pitchWidth) * Globals.PITCH_WIDTH;
+    }
+
+    protected double scaleYToMeters(double y) {
+        if (y < 0)
+            return y;
+
+        return (y / pitchHeight) * Globals.PITCH_HEIGHT;
     }
 
     /**
@@ -29,6 +47,22 @@ public class BasicWorld extends AbstractWorld {
     public void update(double yPosX, double yPosY, double yRad, double bPosX,
             double bPosY, double bRad, double ballPosX, double ballPosY,
             long timestamp) {
+
+        if ((pitchWidth < 0) || (pitchHeight < 0)) {
+            System.err
+                    .println("Cannot update locations as pitch size is not set properly. Restart vision");
+            return;
+        }
+        // Scale the coordinates from vision to meters:
+        yPosX = scaleXToMeters(yPosX);
+        yPosY = scaleXToMeters(yPosY);
+
+        bPosX = scaleXToMeters(bPosX);
+        bPosY = scaleXToMeters(bPosY);
+
+        ballPosX = scaleXToMeters(ballPosX);
+        ballPosY = scaleXToMeters(ballPosY);
+
         Robot ours = null;
         Robot them = null;
         FieldObject ball = null;
@@ -132,5 +166,12 @@ public class BasicWorld extends AbstractWorld {
             // pack into a snapshot
             this.prev = new Snapshot(them, ours, ball, timestamp);
         }
+    }
+
+    @Override
+    public void updatePitchSize(double width, double height) {
+        prev = null;
+        pitchWidth = width;
+        pitchHeight = height;
     }
 }
