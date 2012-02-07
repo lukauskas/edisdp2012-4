@@ -69,8 +69,7 @@ public class SoftBot implements Controller {
 
 	@Override
 	public int getMaximumWheelSpeed() {
-		// TODO Auto-generated method stub
-		return 0;
+		return 720;
 	}
 
 	@Override

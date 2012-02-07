@@ -1,4 +1,5 @@
 import pygame
+import time
 import cv
 from SimpleCV import Display, DrawingLayer, Image, Blob
 
@@ -27,16 +28,18 @@ class Gui:
                 # Overlay layers
                 'yellow': None,
                 'blue': None,
-                'ball' : None
+                'ball' : None,
+
+                # fps is always drawn
+                'fps': None
                 }
 
         self._currentLayerset = self.layersets['default']
-
         self._display = Display()
-        
         self._eventHandler = Gui.EventHandler()
-
         self._lastMouseState = 0
+        self._lastFrame = None
+        self._lastFrameTime = time.time()
 
     def __draw(self):
 
@@ -51,20 +54,51 @@ class Gui:
         size = baseLayer.size()
 
         for key in iterator:
-            if self._layers[key] is None:
+            toDraw = self._layers[key]
+            if toDraw is None:
                 continue
             
-            layer = DrawingLayer(size)
-            baseLayer.addDrawingLayer(layer)
+            elif isinstance(toDraw, DrawingLayer):
+                baseLayer.addDrawingLayer(toDraw)
 
-            self._layers[key].draw(layer=layer)
+            else:
+                layer = DrawingLayer(size)
+                baseLayer.addDrawingLayer(layer)
+
+                toDraw.draw(layer)
+
+        # draw fps
+        baseLayer.addDrawingLayer(self._layers['fps'])
 
         baseLayer.save(self._display)
 
+    def __updateFps(self):
+        smoothConst = 0.1
+        thisFrameTime = time.time()
+
+        thisFrame = thisFrameTime - self._lastFrameTime
+        if self._lastFrame is not None:
+            # Smooth values
+            thisFrame = thisFrame * (1 - smoothConst) + smoothConst * self._lastFrame
+        
+        fps = 1.0 / thisFrame
+
+        self._lastFrame = thisFrame
+        self._lastFrameTime = thisFrameTime
+
+        # Draw the text
+        size = self._layers['raw'].size() # This could break
+
+        layer = DrawingLayer(size)
+        layer.ezViewText('{0:.2f} fps'.format(fps), (10, 10))
+        self._layers['fps'] = layer
+ 
     def loop(self):
         """
         Draw the image to the display, and process any events
         """
+
+        self.__updateFps()
         
         self.__draw()
 
@@ -86,6 +120,9 @@ class Gui:
 
     def getEventHandler(self):
         return self._eventHandler   
+
+    def getDrawingLayer(self):
+        return DrawingLayer(self._layers['raw'].size())
 
     def updateLayer(self, name, layer):
         """

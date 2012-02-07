@@ -10,6 +10,7 @@ import balle.strategy.DummyStrategy;
 import balle.strategy.PFNavigation;
 import balle.world.AbstractWorld;
 import balle.world.BasicWorld;
+import balle.world.SimpleWorldGUI;
 
 /**
  * This is where the main executable code for 4s lies. It is responsible of
@@ -52,7 +53,7 @@ public class Runner {
                                  // balleIsBlue initialisation
         }
 
-        if (args[1].equals("1"))
+        if ((args.length == 2) && (args[1].equals("1")))
             runSimulator(balleIsBlue);
         else
             runRobot(balleIsBlue);
@@ -64,9 +65,13 @@ public class Runner {
         SocketVisionReader visionInput;
         Controller controller;
         AbstractStrategy strategy;
+        SimpleWorldGUI gui;
 
         // Initialise world
         world = new BasicWorld(balleIsBlue);
+
+        gui = new SimpleWorldGUI(world);
+        gui.start();
 
         // Create visionInput buffer
         visionInput = new SocketVisionReader();
@@ -76,6 +81,7 @@ public class Runner {
         // controller = new BluetoothController(new Communicator());
         controller = new DummyController();
         strategy = new DummyStrategy(controller, world);
+
         // Wait for controller to initialise
         while (!controller.isReady()) {
             continue;
@@ -87,7 +93,11 @@ public class Runner {
     public static void runSimulator(boolean balleIsBlue) {
         Simulator simulator = Simulator.createSimulator();
         BasicWorld world = new BasicWorld(balleIsBlue);
+        SimpleWorldGUI gui;
         simulator.addListener(world);
+
+        gui = new SimpleWorldGUI(world);
+        gui.start();
 
         SoftBot bot;
         if (balleIsBlue)
@@ -97,12 +107,8 @@ public class Runner {
 
         System.out.println(bot);
 
-        // AbstractStrategy s = new UserInputStrategy(bot, world);
-        // s.start();
-        
-        AbstractStrategy s = new PFNavigation(bot, world);
+        AbstractStrategy s = new DummyStrategy(bot, world);
         s.start();
-        
 
     }
 }

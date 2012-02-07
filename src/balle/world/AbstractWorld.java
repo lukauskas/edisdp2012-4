@@ -22,7 +22,6 @@ public abstract class AbstractWorld implements Listener {
 
     public AbstractWorld(boolean isBalleBlue) {
         this.balleIsBlue = isBalleBlue;
-        displayGUI();
     }
 
     /**
@@ -35,7 +34,9 @@ public abstract class AbstractWorld implements Listener {
     }
 
     /**
-     *  // TODO James: this sounds like more of a job for within strategy.
+     * // TODO James: this sounds like more of a job for within strategy. NOPE!
+     * 1) We do not want to reimplement this for all strategies 2) We DO want
+     * the world class to use this to estimate coordinates in case vision fails!
      * 
      * Estimated position of the object after timestep (in miliseconds)
      * 
@@ -47,14 +48,15 @@ public abstract class AbstractWorld implements Listener {
      * @return new coordinate for the position of the object after timestep
      */
     public Coord estimatedPosition(FieldObject object, double timestep) {
-        if ((object == null) || (object.getPosition() == null))
+        if ((object == null) || (object.getPosition() == null)
+                || (object.getVelocity() == null))
             return null;
         else if (timestep == 0) {
             return object.getPosition();
         } else
             // TODO: Make sure the robot does not go through the wall
             // make sure the ball bounces from the wall, etc.
-        	
+
             return new Coord(object.getPosition().add(
                     object.getVelocity().adjustLength(timestep)), true);
     }
@@ -65,9 +67,5 @@ public abstract class AbstractWorld implements Listener {
      * @return coordinates of the robot.
      */
     public abstract Snapshot getSnapshot();
-    
-    public void displayGUI() {
-    	new SimpleWorldGUI(null, this).start();;
-    }
 
 }

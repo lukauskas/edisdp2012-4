@@ -7,34 +7,22 @@ import java.awt.Graphics;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import balle.controller.Controller;
 import balle.misc.Globals;
-import balle.strategy.AbstractStrategy;
+import balle.world.processing.AbstractWorldProcessor;
 
-public class SimpleWorldGUI extends AbstractStrategy {
+public class SimpleWorldGUI extends AbstractWorldProcessor {
 
     private JFrame frame;
     private JPanel panel;
 
-    public SimpleWorldGUI(Controller controller, AbstractWorld world) {
-        super(controller, world);
+    public SimpleWorldGUI(AbstractWorld world) {
+        super(world);
         frame = new JFrame("WorldGUI");
         // frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         panel = new Screen();
         frame.getContentPane().add(BorderLayout.CENTER, panel);
         frame.setSize(770, 500);
         frame.setVisible(true);
-    }
-
-    @Override
-    protected void aiStep() {
-        panel.repaint();
-    }
-
-    @Override
-    protected void aiMove(Controller controller) {
-        // TODO Auto-generated method stub
-
     }
 
     private class Screen extends JPanel {
@@ -47,7 +35,7 @@ public class SimpleWorldGUI extends AbstractStrategy {
         @Override
         public void paintComponent(Graphics g) {
             scale = getHeight() / VIEWHEIGHTM;
-            g.setColor(Color.YELLOW);
+            g.setColor(new Color(72, 104, 22));
             g.fillRect(0, 0, getWidth(), getHeight());
             drawField(g);
             drawFieldObjects(g);
@@ -57,27 +45,43 @@ public class SimpleWorldGUI extends AbstractStrategy {
 
         private void drawField(Graphics g) {
             g.setColor(Color.BLACK);
-            drawLineTransformMeters(g, 0f, 0f, 2.44f, 0f);
-            drawLineTransformMeters(g, 0f, 1.22f, 2.44f, 1.22f);
-            drawLineTransformMeters(g, 0f, 0f, 0f, 0.31f);
-            drawLineTransformMeters(g, 2.44f, 0f, 2.44f, 0.31f);
-            drawLineTransformMeters(g, 0f, 1.22f, 0f, 0.91f);
-            drawLineTransformMeters(g, 2.44f, 1.22f, 2.44f, 0.91f);
+            drawLineTransformMeters(g, 0f, 0f, Globals.PITCH_WIDTH, 0f);
+            drawLineTransformMeters(g, 0f, Globals.PITCH_HEIGHT,
+                    Globals.PITCH_WIDTH, Globals.PITCH_HEIGHT);
+            drawLineTransformMeters(g, 0f, 0f, 0f, Globals.GOAL_POSITION);
+            drawLineTransformMeters(g, Globals.PITCH_WIDTH, 0f,
+                    Globals.PITCH_WIDTH, Globals.GOAL_POSITION);
+            drawLineTransformMeters(g, 0f, Globals.PITCH_HEIGHT, 0f,
+                    Globals.PITCH_HEIGHT - Globals.GOAL_POSITION);
+            drawLineTransformMeters(g, Globals.PITCH_WIDTH,
+                    Globals.PITCH_HEIGHT, Globals.PITCH_WIDTH,
+                    Globals.PITCH_HEIGHT - Globals.GOAL_POSITION);
             // Left-hand goal area
-            drawLineTransformMeters(g, 0f, 0.31f, -0.1f, 0.31f);
-            drawLineTransformMeters(g, -0.1f, 0.31f, -0.1f, 0.91f);
-            drawLineTransformMeters(g, 2.44f, 0.31f, 2.54f, 0.31f);
+            drawLineTransformMeters(g, 0f, Globals.GOAL_POSITION, -0.1f,
+                    Globals.GOAL_POSITION);
+            drawLineTransformMeters(g, -0.1f, Globals.GOAL_POSITION, -0.1f,
+                    Globals.PITCH_HEIGHT - Globals.GOAL_POSITION);
+            drawLineTransformMeters(g, Globals.PITCH_WIDTH,
+                    Globals.GOAL_POSITION, Globals.PITCH_WIDTH + 0.1f,
+                    Globals.GOAL_POSITION);
             // Right-hand goal area
-            drawLineTransformMeters(g, 2.44f, 0.91f, 2.54f, 0.91f);
-            drawLineTransformMeters(g, 0f, 0.91f, -0.1f, 0.91f);
-            drawLineTransformMeters(g, 2.54f, 0.31f, 2.54f, 0.91f);
+            drawLineTransformMeters(g, Globals.PITCH_WIDTH,
+                    Globals.PITCH_HEIGHT - Globals.GOAL_POSITION,
+                    Globals.PITCH_WIDTH + 0.1f, Globals.PITCH_HEIGHT
+                            - Globals.GOAL_POSITION);
+            drawLineTransformMeters(g, 0f, Globals.PITCH_HEIGHT
+                    - Globals.GOAL_POSITION, -0.1f, Globals.PITCH_HEIGHT
+                    - Globals.GOAL_POSITION);
+            drawLineTransformMeters(g, Globals.PITCH_WIDTH + 0.1f,
+                    Globals.GOAL_POSITION, Globals.PITCH_WIDTH + 0.1f,
+                    Globals.PITCH_HEIGHT - Globals.GOAL_POSITION);
         }
 
         private void drawFieldObjects(Graphics g) {
             Snapshot s = getSnapshot();
             if (s != null) {
-                drawRobot(g, Color.GREEN, s.getBalle());
-                drawRobot(g, Color.PINK, s.getOpponent());
+                drawRobot(g, Color.YELLOW, s.getBalle());
+                drawRobot(g, Color.BLUE, s.getOpponent());
                 drawBall(g, Color.RED, s.getBall());
             }
         }
@@ -89,7 +93,12 @@ public class SimpleWorldGUI extends AbstractStrategy {
             }
             float radius = Globals.BALL_RADIUS;
             Coord pos = ball.getPosition();
-            g.setColor(c);
+
+            if (!pos.isEstimated())
+                g.setColor(c);
+            else
+                g.setColor(Color.LIGHT_GRAY);
+
             g.fillOval(m2PX(pos.getX() - radius), m2PY(pos.getY() - radius),
                     (int) (radius * 2 * scale), (int) (radius * 2 * scale));
         }
@@ -106,7 +115,8 @@ public class SimpleWorldGUI extends AbstractStrategy {
             // position of center of the robot
             float x = (float) robot.getPosition().getX();
             float y = (float) robot.getPosition().getY();
-            System.out.println("Drawing robot x:" + x + ", y:" + y);
+            boolean isEstimated = robot.getPosition().isEstimated();
+
             // half length and width of robot
             float hl = Globals.ROBOT_LENGTH / 2;
             float hw = Globals.ROBOT_WIDTH / 2;
@@ -117,14 +127,17 @@ public class SimpleWorldGUI extends AbstractStrategy {
                     { -hl, -hw }, { -hl, hw } };
 
             // for each point
-            double a = robot.getOrientation();
+            double a = robot.getOrientation().radians();
             for (int i = 0; i < poly.length; i++) {
                 float px = poly[i][0];
                 float py = poly[i][1];
 
+                // a = (90 * Math.PI) / 180;
+
+                // System.out.println(robot.getOrientation().degrees());
                 // rotate by angle of orientation
-                poly[i][0] = (float) ((px * Math.cos(a)) + (-py * Math.sin(a)));
-                poly[i][1] = (float) ((px * Math.sin(a)) + (py * Math.cos(a)));
+                poly[i][0] = (float) ((px * Math.cos(a)) + (py * Math.sin(a)));
+                poly[i][1] = (float) ((-px * Math.sin(a)) + (py * Math.cos(a)));
 
                 // transform to robot's position
                 poly[i][0] += x;
@@ -141,7 +154,11 @@ public class SimpleWorldGUI extends AbstractStrategy {
             }
 
             // draw
-            g.setColor(Color.DARK_GRAY);
+            if (!isEstimated)
+                g.setColor(Color.LIGHT_GRAY);
+            else
+                g.setColor(Color.DARK_GRAY);
+
             g.fillPolygon(xs, ys, n);
             g.setColor(c);
             g.fillPolygon(new int[] { xs[2], xs[3], m2PX(x) }, new int[] {
@@ -172,6 +189,17 @@ public class SimpleWorldGUI extends AbstractStrategy {
             return (int) ((y + YSHIFTM) * scale);
         }
 
+    }
+
+    @Override
+    protected void actionOnStep() {
+        panel.repaint();
+
+    }
+
+    @Override
+    protected void actionOnChange() {
+        // Do nothing
     }
 
 }
