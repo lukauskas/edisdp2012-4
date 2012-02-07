@@ -74,7 +74,7 @@ public class BasicWorld extends AbstractWorld {
         Orientation theirsOrientation;
 
         Snapshot prev = getSnapshot();
-        double e = 0.3;
+        double e = 1;
         
         // Adjust based on our color.
         if (isBlue()) {
@@ -82,8 +82,9 @@ public class BasicWorld extends AbstractWorld {
                 ourPosition = null;
             else {
                 ourPosition = new Coord(bPosX, bPosY);
-            	if (prev.getBalle().getPosition().dist(ourPosition) > e)
-            		ourPosition = null;
+            	if (prev != null && prev.getBalle() != null && prev.getBalle().getPosition() != null)
+            		if (prev.getBalle().getPosition().dist(ourPosition) > e && prev.getBalle().getPosition().isEstimated() == false)
+            			ourPosition = null;
             }
 
             ourOrientation = (bRad != UNKNOWN_VALUE) ? new Orientation(bRad,
@@ -93,8 +94,9 @@ public class BasicWorld extends AbstractWorld {
                 theirsPosition = null;
             else {
                 theirsPosition = new Coord(yPosX, yPosY);
-            	if (prev.getOpponent().getPosition().dist(theirsPosition) > e)
-            		theirsPosition = null;
+            	if (prev != null && prev.getOpponent() != null && prev.getOpponent().getPosition() != null && theirsPosition != null)
+            		if (prev.getOpponent().getPosition().dist(theirsPosition) > e && prev.getOpponent().getPosition().isEstimated() == false)
+            			theirsPosition = null;
             }
             		
             theirsOrientation = (yRad != UNKNOWN_VALUE) ? new Orientation(yRad,
@@ -104,8 +106,9 @@ public class BasicWorld extends AbstractWorld {
                 ourPosition = null;
             else {
                 ourPosition = new Coord(yPosX, yPosY);
-	            if (prev.getBalle().getPosition().dist(ourPosition) > e)
-	        		ourPosition = null;
+                if (prev != null && prev.getBalle() != null && prev.getBalle().getPosition() != null && prev.getBalle().getPosition().isEstimated() == false)
+            		if (prev.getBalle().getPosition().dist(ourPosition) > e)
+            			ourPosition = null;
 	        }
 
             ourOrientation = (yRad != UNKNOWN_VALUE) ? new Orientation(yRad,
@@ -115,8 +118,9 @@ public class BasicWorld extends AbstractWorld {
                 theirsPosition = null;
             else {
                 theirsPosition = new Coord(bPosX, bPosY);
-	            if (prev.getOpponent().getPosition().dist(theirsPosition) > e)
-	        		theirsPosition = null;
+                if (prev != null && prev.getOpponent() != null && prev.getOpponent().getPosition() != null && prev.getOpponent().getPosition().isEstimated() == false)
+            		if (prev.getOpponent().getPosition().dist(theirsPosition) > e)
+            			theirsPosition = null;
 	        }
             
             theirsOrientation = (bRad != UNKNOWN_VALUE) ? new Orientation(bRad,
