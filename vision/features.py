@@ -140,6 +140,8 @@ class Entity:
             centroid2 = (round(m10/m00), round(m01/m00))
 
             self._angle = math.atan2(centroid1[1] - centroid2[1], centroid1[0] - centroid2[0])
+            # Flip the angle so it points to front of the robot, not back
+            self._angle += math.pi
 
         return self._angle
 

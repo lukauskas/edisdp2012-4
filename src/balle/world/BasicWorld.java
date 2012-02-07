@@ -69,8 +69,9 @@ public class BasicWorld extends AbstractWorld {
 
         // Coordinates
         Coord ourPosition, theirsPosition;
+        Orientation ourOrientation;
         // Orientations
-        double ourOrientation, theirsOrientation;
+        Orientation theirsOrientation;
 
         // Adjust based on our color.
         if (isBlue()) {
@@ -79,28 +80,32 @@ public class BasicWorld extends AbstractWorld {
             else
                 ourPosition = new Coord(bPosX, bPosY);
 
-            ourOrientation = bRad;
+            ourOrientation = (bRad != UNKNOWN_VALUE) ? new Orientation(bRad,
+                    false) : null;
 
             if ((yPosX == UNKNOWN_VALUE) || (yPosY == UNKNOWN_VALUE))
                 theirsPosition = null;
             else
                 theirsPosition = new Coord(yPosX, yPosY);
 
-            theirsOrientation = yRad;
+            theirsOrientation = (yRad != UNKNOWN_VALUE) ? new Orientation(yRad,
+                    false) : null;
         } else {
             if ((yPosX == UNKNOWN_VALUE) || (yPosY == UNKNOWN_VALUE))
                 ourPosition = null;
             else
                 ourPosition = new Coord(yPosX, yPosY);
 
-            ourOrientation = yRad;
+            ourOrientation = (yRad != UNKNOWN_VALUE) ? new Orientation(yRad,
+                    false) : null;
 
             if ((bPosX == UNKNOWN_VALUE) || (bPosY == UNKNOWN_VALUE))
                 theirsPosition = null;
             else
                 theirsPosition = new Coord(bPosX, bPosY);
 
-            theirsOrientation = bRad;
+            theirsOrientation = (bRad != UNKNOWN_VALUE) ? new Orientation(bRad,
+                    false) : null;
         }
 
         Coord ballPosition;
@@ -114,11 +119,10 @@ public class BasicWorld extends AbstractWorld {
 
         // First case when there is no past snapshot (assume velocities are 0)
         if (prev == null) {
-            if ((theirsPosition != null)
-                    && (theirsOrientation != UNKNOWN_VALUE))
+            if ((theirsPosition != null) && (theirsOrientation != null))
                 them = new Robot(theirsPosition, new Velocity(0, 0, 1),
                         theirsOrientation);
-            if ((ourPosition != null) && (ourOrientation != UNKNOWN_VALUE))
+            if ((ourPosition != null) && (ourOrientation != null))
                 ours = new Robot(ourPosition, new Velocity(0, 0, 1),
                         ourOrientation);
             if (ballPosition != null)
