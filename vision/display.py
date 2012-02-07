@@ -57,15 +57,18 @@ class Gui:
             toDraw = self._layers[key]
             if toDraw is None:
                 continue
+            
+            elif isinstance(toDraw, DrawingLayer):
+                baseLayer.addDrawingLayer(toDraw)
 
-            layer = DrawingLayer(size)
-            baseLayer.addDrawingLayer(layer)
+            else:
+                layer = DrawingLayer(size)
+                baseLayer.addDrawingLayer(layer)
 
-            toDraw.draw(layer=layer)
+                toDraw.draw(layer)
 
         # draw fps
         baseLayer.addDrawingLayer(self._layers['fps'])
-
 
         baseLayer.save(self._display)
 
@@ -117,6 +120,9 @@ class Gui:
 
     def getEventHandler(self):
         return self._eventHandler   
+
+    def getDrawingLayer(self):
+        return DrawingLayer(self._layers['raw'].size())
 
     def updateLayer(self, name, layer):
         """

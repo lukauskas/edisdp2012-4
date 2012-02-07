@@ -3,7 +3,7 @@ import sys
 import time
 import cv
 import socket
-from SimpleCV import Image, Camera
+from SimpleCV import Image, Camera, VirtualCamera
 from preprocess import Preprocessor
 from features import Features
 from threshold import Threshold
@@ -27,13 +27,14 @@ class Vision:
         self.stdout = False
 
         self.cap = Camera()
+        #self.cap = VirtualCamera('global05.jpg', 'image')
         self.gui = Gui()
         self.threshold = Threshold(pitchnum)
         self.thresholdGui = ThresholdGui(self.threshold, self.gui)
         self.preprocessor = Preprocessor()
         self.features = Features(self.gui, self.threshold)
         
-        eventHandler =  self.gui.getEventHandler()
+        eventHandler = self.gui.getEventHandler()
         eventHandler.addListener('q', self.quit)
         eventHandler.setClickListener(self.setNextPitchCorner)
         
@@ -52,7 +53,6 @@ class Vision:
     def doStuff(self):
         while self.running:
             frame = self.cap.getImage()
-            #frame = Image('global05.jpg')
             frame = self.preprocessor.preprocess(frame)
             
             self.gui.updateLayer('raw', frame)
@@ -84,11 +84,9 @@ class Vision:
         self.send("{0} ".format(ENTITY_BIT))
 
         for name in ['yellow', 'blue', 'ball']:
-            x = y = angle = -1
             entity = ents[name]
-            if entity is not None:
-                x, y = entity.coordinates()
-                angle = entity.angle()
+            x, y = entity.coordinates()
+            angle = entity.angle()
 
             if name == 'ball':
                 self.send('{0} {1} '.format(x, y))
