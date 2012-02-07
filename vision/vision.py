@@ -26,7 +26,7 @@ class Vision:
                
         self.running = True
         
-        self.stdout = False
+        self.stdout = True 
 
         self.cap = Camera()
         #self.cap = VirtualCamera('global05.jpg', 'image')
