@@ -6,24 +6,29 @@ from SimpleCV import Image
 class Threshold:
     
     # File for storing temporary threshold defaults
-    filepath = "threshdefaults"
+    filepath = "threshdefaults_{0}"
 
     def __init__(self, pitch):
         
-        self.__getDefaults(pitch)
+        self._pitch = pitch
+        self.__getDefaults()
         
-    def __getDefaults(self, pitch):
+    def __getDefaults(self):
         self._values = {}
         
-        if os.path.exists(self.filepath):
-            f = open(self.filepath, 'r')
+        path = self.__getFilePath()
+        if os.path.exists(path):
+            f = open(path, 'r')
             self._values = cPickle.load(f)
         else:
-            self._values = defaults[pitch]
+            self._values = defaults[self._pitch]
             
     def __saveDefaults(self):
-        f = open(self.filepath, 'w')
+        f = open(self.__getFilePath(), 'w')
         cPickle.dump(self._values, f)
+
+    def __getFilePath(self):
+        return self.filepath.format(self._pitch)
 
     def yellowT(self, frame):
         return self.threshold(frame, self._values['yellow'][0], self._values['yellow'][1])
