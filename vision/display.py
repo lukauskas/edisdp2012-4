@@ -98,8 +98,8 @@ class Gui:
     def __drawMouse(self, mousePos):
         size = self._layers['raw'].size()
         layer = self.getDrawingLayer()
-        layer.line((0, mousePos[1]), (size[0], mousePos[1]))
-        layer.line((mousePos[0], 0), (mousePos[0], size[1]))
+        layer.line((0, mousePos[1]), (size[0], mousePos[1]), color=(0, 0, 255))
+        layer.line((mousePos[0], 0), (mousePos[0], size[1]), color=(0, 0, 255))
 
         self._layers['mouse'] = layer
 
