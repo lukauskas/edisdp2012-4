@@ -127,6 +127,8 @@ class Entity:
             
             centroid1 = (round(m10/m00), round(m01/m00))
 
+            # cv.Circle is really fussy with what it takes
+            centroid1 = tuple(map(int, centroid1))
             cv.Circle(mask, centroid1, 14, cv.RGB(0, 0, 0), -1)
 
             moments = cv.Moments(mask, 1)
