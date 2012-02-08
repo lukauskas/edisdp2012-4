@@ -15,7 +15,6 @@ public class Orientation {
 
         if (useRadians) {
             angle = angle % (2*Math.PI);
-            angle += 2 * Math.PI;
             angleInRadians = angle;
         } else {
         	angle = angle % 360;
