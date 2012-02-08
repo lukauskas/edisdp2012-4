@@ -9,7 +9,6 @@ import balle.simulator.SoftBot;
 import balle.strategy.AbstractStrategy;
 import balle.strategy.DummyStrategy;
 import balle.strategy.GoToBall;
-import balle.strategy.PFNavigation;
 import balle.world.AbstractWorld;
 import balle.world.BasicWorld;
 import balle.world.SimpleWorldGUI;
