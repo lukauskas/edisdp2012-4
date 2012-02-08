@@ -14,19 +14,11 @@ public class Orientation {
     public Orientation(double angle, boolean useRadians) {
 
         if (useRadians) {
-            while (angle >= 2 * Math.PI) {
-                angle -= 2 * Math.PI;
-            }
-            while (angle < 0) {
-                angle += 2 * Math.PI;
-            }
+            angle = angle % (2*Math.PI);
+            angle += 2 * Math.PI;
             angleInRadians = angle;
         } else {
-            while (angle >= 360) {
-                angle -= 360;
-            }
-            while (angle < 0)
-                angle += 360;
+        	angle = angle % 360;
             angleInRadians = (angle * Math.PI) / 180;
         }
 
