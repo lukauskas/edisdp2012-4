@@ -5,6 +5,8 @@ import math
 import socket
 import cv
 
+from optparse import OptionParser
+
 from SimpleCV import Image, Camera, VirtualCamera
 from preprocess import Preprocessor
 from features import Features
@@ -22,14 +24,21 @@ PITCH_SIZE_BIT  = 'P';
 
 class Vision:
     
-    def __init__(self, pitchnum):
+    def __init__(self, pitchnum, stdout, sourcefile):
                
         self.running = True
         
-        self.stdout = False
+        self.stdout = stdout 
 
-        self.cap = Camera()
-        #self.cap = VirtualCamera('global05.jpg', 'image')
+        if sourcefile is None:  
+            self.cap = Camera()
+        else:
+            filetype = 'video'
+            if sourcefile.endswith(('jpg', 'png')):
+                filetype = 'image'
+
+            self.cap = VirtualCamera(sourcefile, filetype)
+
         self.gui = Gui()
         self.threshold = Threshold(pitchnum)
         self.thresholdGui = ThresholdGui(self.threshold, self.gui)
@@ -103,9 +112,23 @@ class Vision:
             self.socket.send(string)
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        Vision(int(sys.argv[1]))
-    else:
-        # Default to the main pitch
-        Vision(0)
+
+    parser = OptionParser()
+    parser.add_option('-p', '--pitch', dest='pitch', type='int', metavar='PITCH',
+                      help='PITCH should be 0 for main pitch, 1 for the other pitch')
+
+    parser.add_option('-f', '--file', dest='file', metavar='FILE',
+                      help='Use FILE as input instead of capturing from Camera')
+
+    parser.add_option('-s', '--stdout', action='store_true', dest='stdout', default=False,
+                      help='Send output to stdout instead of using a socket')
+
+    (options, args) = parser.parse_args()
+
+    if options.pitch not in [0,1]:
+        parser.error('Pitch must be 0 or 1')
+
+    Vision(options.pitch, options.stdout, options.file)
+
+
 
