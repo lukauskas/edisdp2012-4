@@ -1,12 +1,14 @@
 package balle.main;
 
+import balle.bluetooth.Communicator;
+import balle.controller.BluetoothController;
 import balle.controller.Controller;
-import balle.controller.DummyController;
 import balle.io.reader.SocketVisionReader;
 import balle.simulator.Simulator;
 import balle.simulator.SoftBot;
 import balle.strategy.AbstractStrategy;
 import balle.strategy.DummyStrategy;
+import balle.strategy.GoToBall;
 import balle.world.AbstractWorld;
 import balle.world.BasicWorld;
 import balle.world.SimpleWorldGUI;
@@ -77,9 +79,9 @@ public class Runner {
         visionInput.addListener(world);
 
         // Initialise controller
-        // controller = new BluetoothController(new Communicator());
-        controller = new DummyController();
-        strategy = new DummyStrategy(controller, world);
+        controller = new BluetoothController(new Communicator());
+        // controller = new DummyController();
+        strategy = new GoToBall(controller, world);
 
         // Wait for controller to initialise
         while (!controller.isReady()) {
