@@ -89,7 +89,7 @@ public class GoToBall extends AbstractStrategy {
             } else {
                 if (!isMoving) {
                     startedTurning = 0;
-                    controller.forward(300);
+                    controller.forward(500);
                     isMoving = true;
                 }
             }
