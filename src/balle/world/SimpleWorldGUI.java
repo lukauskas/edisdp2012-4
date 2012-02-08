@@ -160,7 +160,7 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
             g.fillPolygon(xs, ys, n);
             g.setColor(c);
             g.fillPolygon(new int[] { xs[2], xs[3], m2PX(x) }, new int[] {
-                    ys[2], ys[3], m2PX(y) }, 3);
+                    ys[2], ys[3], m2PY(y) }, 3);
         }
 
         // Convert meters into pixels and draws line
@@ -184,6 +184,7 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
         }
 
         private int m2PY(float y) {
+        	y = Globals.PITCH_HEIGHT-y;
             return (int) ((y + YSHIFTM) * scale);
         }
 
