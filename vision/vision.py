@@ -97,6 +97,7 @@ class Vision:
         for name in ['yellow', 'blue', 'ball']:
             entity = ents[name]
             x, y = entity.coordinates()
+            y = self.preprocessor.pitch_size[0] - y
             if name == 'ball':
                 self.send('{0} {1} '.format(x, y))
             else:

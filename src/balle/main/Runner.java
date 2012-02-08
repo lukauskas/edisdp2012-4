@@ -3,6 +3,7 @@ package balle.main;
 import balle.bluetooth.Communicator;
 import balle.controller.BluetoothController;
 import balle.controller.Controller;
+import balle.controller.DummyController;
 import balle.io.reader.SocketVisionReader;
 import balle.simulator.Simulator;
 import balle.simulator.SoftBot;
@@ -79,8 +80,8 @@ public class Runner {
         visionInput.addListener(world);
 
         // Initialise controller
-        controller = new BluetoothController(new Communicator());
-        // controller = new DummyController();
+        //controller = new BluetoothController(new Communicator());
+        controller = new DummyController();
         strategy = new GoToBall(controller, world);
 
         // Wait for controller to initialise
