@@ -30,8 +30,9 @@ class Gui:
                 'blue': None,
                 'ball' : None,
 
-                # fps is always drawn
-                'fps': None
+                # always drawn
+                'fps': None,
+                'mouse': None
                 }
 
         self._currentLayerset = self.layersets['default']
@@ -69,6 +70,7 @@ class Gui:
 
         # draw fps
         baseLayer.addDrawingLayer(self._layers['fps'])
+        baseLayer.addDrawingLayer(self._layers['mouse'])
 
         baseLayer.save(self._display)
 
@@ -92,31 +94,44 @@ class Gui:
         layer = DrawingLayer(size)
         layer.ezViewText('{0:.2f} fps'.format(fps), (10, 10))
         self._layers['fps'] = layer
+
+    def __drawMouse(self, mousePos):
+        size = self._layers['raw'].size()
+        layer = self.getDrawingLayer()
+        layer.line((0, mousePos[1]), (size[0], mousePos[1]))
+        layer.line((mousePos[0], 0), (mousePos[0], size[1]))
+
+        self._layers['mouse'] = layer
+
  
     def loop(self):
         """
         Draw the image to the display, and process any events
         """
 
-        self.__updateFps()
-        
-        self.__draw()
-
         for event in pygame.event.get(pygame.KEYDOWN):
             self._eventHandler.processKey(chr(event.key % 0x100))
 
         self._display.checkEvents()
 
+        mouseX = self._display.mouseX
+        mouseY = self._display.mouseY
+
+        self.__drawMouse((mouseX, mouseY))
+
         mouseLeft = self._display.mouseLeft
         # Only fire click event once for each click
         if mouseLeft == 1 and self._lastMouseState == 0:
-            self._eventHandler.processClick((self._display.mouseX, self._display.mouseY))
+            self._eventHandler.processClick((mouseX, mouseY))
         
         self._lastMouseState = mouseLeft
             
         # Process OpenCV events (for if the focus is on the thresholding window)
         c = cv.WaitKey(16)
         self._eventHandler.processKey(chr(c % 0x100))
+
+        self.__updateFps()
+        self.__draw()
 
     def getEventHandler(self):
         return self._eventHandler   
