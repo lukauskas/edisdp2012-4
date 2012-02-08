@@ -53,8 +53,8 @@ public class Coord {
         return c.sub(this).abs();
     }
 
-    public Orientation orientation() {
-        return new Orientation(Math.atan2(this.getY(), this.getX()), true);
+    public double orientation() {
+        return Math.atan2(this.getY(), this.getX());
     }
 
     /**

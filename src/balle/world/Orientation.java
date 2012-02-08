@@ -14,7 +14,7 @@ public class Orientation {
     public Orientation(double angle, boolean useRadians) {
 
         if (useRadians) {
-            while (angle > 2 * Math.PI) {
+            while (angle >= 2 * Math.PI) {
                 angle -= 2 * Math.PI;
             }
             while (angle < 0) {
@@ -22,7 +22,7 @@ public class Orientation {
             }
             angleInRadians = angle;
         } else {
-            while (angle > 360) {
+            while (angle >= 360) {
                 angle -= 360;
             }
             while (angle < 0)
@@ -49,6 +49,22 @@ public class Orientation {
      */
     public double radians() {
         return angleInRadians;
+    }
+
+    public double atan2styleradians() {
+        if (radians() <= Math.PI)
+            return radians();
+        else
+            return -1 * (2 * Math.PI - radians());
+
+    }
+
+    public double atan2styledegrees() {
+        if (radians() <= Math.PI)
+            return degrees();
+        else
+            return -1 * (360 - degrees());
+
     }
 
     /**

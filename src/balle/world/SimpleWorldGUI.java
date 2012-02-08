@@ -80,8 +80,8 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
         private void drawFieldObjects(Graphics g) {
             Snapshot s = getSnapshot();
             if (s != null) {
-                drawRobot(g, Color.YELLOW, s.getBalle());
-                drawRobot(g, Color.BLUE, s.getOpponent());
+                drawRobot(g, Color.GREEN, s.getBalle());
+                drawRobot(g, Color.RED, s.getOpponent());
                 drawBall(g, Color.RED, s.getBall());
             }
         }
