@@ -107,8 +107,8 @@ class Entity:
             return -1
 
         if self._angle is None:
-            # Use moments to do magic things
-
+            # Use moments to do magic things.
+            # (finds precise line through blob)
             mask = feature.crop().getGrayscaleMatrix()
 
             m = cv.Moments(mask, 1)
@@ -125,9 +125,31 @@ class Entity:
 
             self._angle = math.atan2(2 * b, a - c + e)
                         
-            # Flip the angle so it points to front of the robot, not back.
-            # Or points to the back. We can't really tell at the moment
-            self._angle += math.pi
+            # Crudely find direction.          
+            m00 = cv.GetSpatialMoment(m, 0, 0)
+            m10 = cv.GetSpatialMoment(m, 1, 0)
+            m01 = cv.GetSpatialMoment(m, 0, 1)
+            if m00 == 0.0:
+                 m00 = 0.1
+
+            centroid1 = (round(m10/m00), round(m01/m00))
+            cv.Circle(mask, centroid1, 14, cv.RGB(0,0,0), -1)
+            
+            m = cv.Moments(mask, 1)
+            m00 = cv.GetSpatialMoment(m, 0, 0)
+            m10 = cv.GetSpatialMoment(m, 1, 0)
+            m01 = cv.GetSpatialMoment(m, 0, 1)
+            if m00 == 0:
+                 m00 = 0.1
+
+            centroid2 = (round(m10/m00), round(m01/m00))
+            roughAngle = math.atan2(centroid1[1] - centroid2[1], centroid1[0] - centroid2[0])
+            
+            pi2 = math.pi*2
+            roughAngle = min( (roughAngle-self._angle)%pi2, (self._angle-roughAngle)%pi2 )
+
+            if roughAngle>(math.pi/2):
+                self._angle += math.pi
 
         return self._angle
 
