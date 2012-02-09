@@ -8,8 +8,11 @@ import balle.world.Robot;
 
 public class GoToBall extends AbstractStrategy {
 
-    private boolean             isMoving           = false;
+    private static final int TURN_SPEED_DEGREES = 180;
+    private static final double TURN_SPEED_RADIANS = (TURN_SPEED_DEGREES * Math.PI) / 180;
+	private boolean             isMoving           = false;
     private long                startedTurning     = 0;
+    private long 				timeToTurn		   = 0;
     private final static double DISTANCE_THRESHOLD = 0.2;
     private final static double EPSILON            = 0.00001;
     private final static double TURN_THRESHOLD     = Math.PI / 8;
@@ -76,16 +79,16 @@ public class GoToBall extends AbstractStrategy {
                                              // controlelr!!
 
             double dist = target.dist(robot.getPosition());
-            double x = Math.sin(turnAngle) * dist;
-            System.out.println("dist" + x);
+            double x = Math.sin(Math.abs(turnAngle)) * dist;
             
-            if (Math.abs(x) > 0.3) {
+            if (Math.abs(x) > 0.1) {
                 if (isMoving) {
                     controller.stop();
                     isMoving = false;
                 }
-                if (System.currentTimeMillis() - startedTurning > 2000) {
-                    System.out.println("Turning " + turnAngle);
+                if (System.currentTimeMillis() - startedTurning > timeToTurn) {
+                    timeToTurn = Math.round(Math.abs(turnAngle) / (TURN_SPEED_RADIANS*0.001)) + 500;
+                    System.out.println("Turning " + turnAngle + " should take " + timeToTurn +" ms");
                     controller.rotate((int) (turnAngle * 180 / Math.PI), 180);
                     startedTurning = System.currentTimeMillis();
                 }
