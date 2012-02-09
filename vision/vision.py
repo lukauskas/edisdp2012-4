@@ -83,6 +83,9 @@ class Vision:
             print("Pitch size: {0!r}".format(self.preprocessor.pitch_size))
             self.outputPitchSize()
             self.gui.setShowMouse(False)
+            self.gui.updateLayer('corner', None)
+        else:
+            self.gui.drawCrosshair(where, 'corner')
     
     def outputPitchSize(self):
         self.send('{0} {1} {2} \n'.format(
