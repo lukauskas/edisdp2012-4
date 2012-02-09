@@ -75,7 +75,11 @@ public class GoToBall extends AbstractStrategy {
                 turnAngle = -turnRightAngle; // TODO these should be flipped in
                                              // controlelr!!
 
-            if (Math.abs(turnAngle) > TURN_THRESHOLD) {
+            double dist = target.dist(robot.getPosition());
+            double x = Math.sin(turnAngle) * dist;
+            System.out.println("dist" + x);
+            
+            if (Math.abs(x) > 0.3) {
                 if (isMoving) {
                     controller.stop();
                     isMoving = false;
