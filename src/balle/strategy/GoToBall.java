@@ -50,9 +50,8 @@ public class GoToBall extends AbstractStrategy {
             return;
         } else {
 
-            // Minus one the atan2 as our coordinate axes are upside down.. no?
-            double angleToTarget = -1
-                    * target.sub(currentPosition).orientation();
+            // Minus one the atan2 as our coordinate axes are upside down.. no? Yes! Fixed.
+            double angleToTarget = target.sub(currentPosition).orientation();
             ;
             double currentOrientation = robot.getOrientation()
                     .atan2styleradians();
