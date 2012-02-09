@@ -22,6 +22,8 @@ import balle.world.SimpleWorldGUI;
  * 
  */
 public class Runner {
+	
+	public static AbstractStrategy s, g;
 
     private static void print_usage() {
         System.out
@@ -108,7 +110,8 @@ public class Runner {
 
         System.out.println(bot);
 
-        AbstractStrategy s = new DummyStrategy(bot, world);
+        s = new DummyStrategy(bot, world);
+        g = new GoToBall(bot, world);
         s.start();
 
     }
