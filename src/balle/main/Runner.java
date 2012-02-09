@@ -9,10 +9,10 @@ import balle.simulator.SoftBot;
 import balle.strategy.AbstractStrategy;
 import balle.strategy.DummyStrategy;
 import balle.strategy.GoToBall;
-import balle.strategy.PFNavigation;
 import balle.world.AbstractWorld;
 import balle.world.BasicWorld;
 import balle.world.SimpleWorldGUI;
+import balle.world.Strategy_M2;
 
 /**
  * This is where the main executable code for 4s lies. It is responsible of
@@ -82,7 +82,8 @@ public class Runner {
         // Initialise controller
         controller = new BluetoothController(new Communicator());
         // controller = new DummyController();
-        strategy = new GoToBall(controller, world);
+        //strategy = new GoToBall(controller, world);
+        strategy = new Strategy_M2(controller,world);
 
         // Wait for controller to initialise
         while (!controller.isReady()) {
@@ -111,6 +112,7 @@ public class Runner {
 
         AbstractStrategy s = new DummyStrategy(bot, world);
         s.start();
+        
 
     }
 }
