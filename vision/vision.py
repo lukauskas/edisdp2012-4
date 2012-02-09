@@ -82,6 +82,7 @@ class Vision:
         if self.preprocessor.hasPitchSize:
             print("Pitch size: {0!r}".format(self.preprocessor.pitch_size))
             self.outputPitchSize()
+            self.gui.setShowMouse(False)
     
     def outputPitchSize(self):
         self.send('{0} {1} {2} \n'.format(

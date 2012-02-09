@@ -39,6 +39,7 @@ class Gui:
         self._display = Display()
         self._eventHandler = Gui.EventHandler()
         self._lastMouseState = 0
+        self._showMouse = True
         self._lastFrame = None
         self._lastFrameTime = time.time()
 
@@ -70,7 +71,9 @@ class Gui:
 
         # draw fps
         baseLayer.addDrawingLayer(self._layers['fps'])
-        baseLayer.addDrawingLayer(self._layers['mouse'])
+
+        if self._showMouse:
+            baseLayer.addDrawingLayer(self._layers['mouse'])
 
         baseLayer.save(self._display)
 
@@ -113,11 +116,11 @@ class Gui:
             self._eventHandler.processKey(chr(event.key % 0x100))
 
         self._display.checkEvents()
-
         mouseX = self._display.mouseX
         mouseY = self._display.mouseY
 
-        self.__drawMouse((mouseX, mouseY))
+        if self._showMouse:
+            self.__drawMouse((mouseX, mouseY))
 
         mouseLeft = self._display.mouseLeft
         # Only fire click event once for each click
@@ -153,6 +156,9 @@ class Gui:
         assert name in self.layersets.keys(), 'Unknown layerset ' + name + '!'
 
         self._currentLayerset = self.layersets[name]
+
+    def setShowMouse(self, showMouse):
+        self._showMouse = showMouse
         
     class EventHandler:
         
