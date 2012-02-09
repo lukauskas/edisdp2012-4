@@ -73,7 +73,8 @@ class Vision:
 
             self.gui.loop()
         
-        self.socket.close()
+        if not self.stdout:
+            self.socket.close()
 
     def setNextPitchCorner(self, where):
         self.preprocessor.setNextPitchCorner(where)
