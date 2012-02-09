@@ -148,7 +148,7 @@ class Entity:
             pi2 = math.pi*2
             roughAngle = min( (roughAngle-self._angle)%pi2, (self._angle-roughAngle)%pi2 )
 
-            if roughAngle>(math.pi/2):
+            if roughAngle < (math.pi/2):
                 self._angle += math.pi
 
         return self._angle
