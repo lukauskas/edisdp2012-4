@@ -22,8 +22,6 @@ import balle.world.SimpleWorldGUI;
  * 
  */
 public class Runner {
-	
-	public static AbstractStrategy s, g;
 
     private static void print_usage() {
         System.out
@@ -96,6 +94,7 @@ public class Runner {
     public static void runSimulator(boolean balleIsBlue) {
         Simulator simulator = Simulator.createSimulator();
         BasicWorld world = new BasicWorld(balleIsBlue);
+        AbstractStrategy s;
         SimpleWorldGUI gui;
         simulator.addListener(world);
 
@@ -111,8 +110,8 @@ public class Runner {
         System.out.println(bot);
 
         s = new DummyStrategy(bot, world);
-        g = new GoToBall(bot, world);
         s.start();
+       
 
     }
 }

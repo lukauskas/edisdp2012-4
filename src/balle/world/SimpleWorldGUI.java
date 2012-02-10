@@ -1,101 +1,44 @@
 package balle.world;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.*;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.*;
 
-import balle.main.Runner;
+import balle.main.*;
 import balle.misc.Globals;
 import balle.world.processing.AbstractWorldProcessor;
 
 public class SimpleWorldGUI extends AbstractWorldProcessor {
 
-    private JFrame frame;
     private JPanel panel;
-
-    private int frame_counter = 0;
 
     public SimpleWorldGUI(AbstractWorld world) {
         super(world);
-        frame = new JFrame("WorldGUI");
-        // frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        
         panel = new Screen();
-        frame.getContentPane().add(BorderLayout.CENTER, panel);
-        frame.setSize(770, 500);
-        frame.setVisible(true);
+        ((GUITab) panel).addToFrame("World");
     }
 
-    private class Screen extends JPanel implements ActionListener {
+    @SuppressWarnings("serial")
+	private class Screen extends GUITab {
     	
-    	private JButton button;
-
         private float       scale;
         private final float XSHIFTM     = 0.4f;
         private final float YSHIFTM     = 0.39f;
         private final float VIEWHEIGHTM = 2;
-        private final int FRAMES = 24;
-        private long averagetime;
-        private long totaltime;
-        
-        boolean flag = false;
 
         @Override
         public void paintComponent(Graphics g) {
-        	long start = System.nanoTime();
             scale = getHeight() / VIEWHEIGHTM;
             g.setColor(new Color(72, 104, 22));
             g.fillRect(0, 0, getWidth(), getHeight());
             drawField(g);
             drawFieldObjects(g);
-            // Only prints button once, rather than each frame
-            if (flag == false) {
-            	drawButton();
-            }
-            // Display frame rate
-            if (frame_counter == FRAMES) {
-        		averagetime = totaltime / FRAMES;
-        		totaltime = 0;
-        		frame_counter = 0;
-        	} else {
-        		totaltime += System.nanoTime() - start;
-        		frame_counter++;
-        	}
-        	String s = String.format("%1$5.3f", averagetime / 100000d);
+            
+        	String s = String.format("%1$5.3f", getFPS());
         	g.drawString(s, 5, 16);
         }
-        
-        // Size and location aren't set properly
-        private void drawButton() {
-        	button = new JButton("Stop");
-        	button.setSize(100, 100);
-        	button.setLocation(500, 200);
-        	button.addActionListener(this);
-        	
-        	add(button);
-        	
-        	flag = true;    	
-        }
-        
-        // Define actions for Start/Stop button
-        // When Stop is pressed, Robot continues to move at constant speed in current direction
-        @SuppressWarnings("deprecation")
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			if (button.getText().equals("Stop")) {
-				button.setText("Start");
-				Runner.s.suspend();
-			} else {
-				button.setText("Stop");
-				Runner.s.resume();
-			}
-			
-		}
 
         private void drawField(Graphics g) {
             g.setColor(Color.BLACK);
