@@ -52,8 +52,7 @@ public abstract class AbstractWorld implements Listener {
      * @return new coordinate for the position of the object after timestep
      */
     public Coord estimatedPosition(FieldObject object, double timestep) {
-        if ((object == null) || (object.getPosition() == null)
-                || (object.getVelocity() == null))
+        if ((object.getPosition() == null) || (object.getVelocity() == null))
             return null;
         else if (timestep == 0) {
             return object.getPosition();
@@ -85,9 +84,9 @@ public abstract class AbstractWorld implements Listener {
      * @param ballPosY
      * @param timestamp
      */
-    abstract protected void updateScaled(Coord yellowPos,
-            Orientation yellowOrientation, Coord bluePos,
-            Orientation blueOrientation, Coord ballPos, long timestamp);
+    abstract protected void updateScaled(Coord ourPos,
+            Orientation ourOrientation, Coord theirsPos,
+            Orientation theirsOrientation, Coord ballPos, long timestamp);
 
     protected double scaleXToMeters(double x) {
         if (x < 0)
@@ -135,7 +134,12 @@ public abstract class AbstractWorld implements Listener {
                     scaleYToMeters(ballPosY));
         }
 
-        updateScaled(yPos, yOrientation, bPos, bOrientation, ballPos, timestamp);
+        if (isBlue())
+            updateScaled(bPos, bOrientation, yPos, yOrientation, ballPos,
+                    timestamp);
+        else
+            updateScaled(yPos, yOrientation, bPos, bOrientation, ballPos,
+                    timestamp);
     }
 
     @Override

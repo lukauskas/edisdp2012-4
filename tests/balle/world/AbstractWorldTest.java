@@ -71,13 +71,24 @@ public class AbstractWorldTest {
      */
     @Test
     public void updateCallsUpdateScaledWithCorrectParameters() {
-        AbstractWorld world = spy(new AbstractWorldConcrete(true));
+        AbstractWorld world = spy(new AbstractWorldConcrete(false));
         // Both coordinates twice as big so it's easy to scale
         world.updatePitchSize(Globals.PITCH_WIDTH * 2, Globals.PITCH_HEIGHT * 2);
         world.update(0.2, 0.4, 0, 0.6, 0.8, 0, 1, 1.2, 0);
         // Verify that update scaled is called correctly
         verify(world).updateScaled(new Coord(0.1, 0.2),
                 new Orientation(0, false), new Coord(0.3, 0.4),
+                new Orientation(0, false), new Coord(0.5, 0.6), 0);
+
+        // Flip robot colour here
+        AbstractWorld world2 = spy(new AbstractWorldConcrete(true));
+        // Both coordinates twice as big so it's easy to scale
+        world2.updatePitchSize(Globals.PITCH_WIDTH * 2,
+                Globals.PITCH_HEIGHT * 2);
+        world2.update(0.2, 0.4, 0, 0.6, 0.8, 0, 1, 1.2, 0);
+        // Verify that update scaled is called correctly
+        verify(world2).updateScaled(new Coord(0.3, 0.4),
+                new Orientation(0, false), new Coord(0.1, 0.2),
                 new Orientation(0, false), new Coord(0.5, 0.6), 0);
     }
 
@@ -89,11 +100,20 @@ public class AbstractWorldTest {
      */
     @Test
     public void updateCallsUpdateScaledWithNullParameters() {
-        AbstractWorld world = spy(new AbstractWorldConcrete(true));
+        AbstractWorld world = spy(new AbstractWorldConcrete(false));
         // Both coordinates twice as big so it's easy to scale
         world.updatePitchSize(Globals.PITCH_WIDTH * 2, Globals.PITCH_HEIGHT * 2);
         world.update(-1, -1, 15, -1, -1, 0, -1, -1, 0);
         // Verify that update scaled is called correctly
         verify(world).updateScaled(null, null, null, null, null, 0);
+
+        // Flip robot colour here!
+        AbstractWorld world2 = spy(new AbstractWorldConcrete(true));
+        // Both coordinates twice as big so it's easy to scale
+        world2.updatePitchSize(Globals.PITCH_WIDTH * 2,
+                Globals.PITCH_HEIGHT * 2);
+        world2.update(-1, -1, 15, -1, -1, 0, -1, -1, 0);
+        // Verify that update scaled is called correctly
+        verify(world2).updateScaled(null, null, null, null, null, 0);
     }
 }
