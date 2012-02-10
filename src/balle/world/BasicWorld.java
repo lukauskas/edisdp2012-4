@@ -1,12 +1,8 @@
 package balle.world;
 
-import balle.misc.Globals;
-
 public class BasicWorld extends AbstractWorld {
 
     private Snapshot prev;
-    private double   pitchWidth  = -1;
-    private double   pitchHeight = -1;
 
     public BasicWorld(boolean balleIsBlue) {
         super(balleIsBlue);
@@ -25,44 +21,15 @@ public class BasicWorld extends AbstractWorld {
             return a.sub(b);
     }
 
-    protected double scaleXToMeters(double x) {
-        if (x < 0)
-            return x;
-
-        return (x / pitchWidth) * Globals.PITCH_WIDTH;
-    }
-
-    protected double scaleYToMeters(double y) {
-        if (y < 0)
-            return y;
-
-        return (y / pitchHeight) * Globals.PITCH_HEIGHT;
-    }
-
     /**
      * NOTE: DO ROBOTS ALWAYS MOVE FORWARD !? NO, treat angle of velocity
      * different from angle the robot is facing.
      * 
      */
     @Override
-    public void update(double yPosX, double yPosY, double yRad, double bPosX,
-            double bPosY, double bRad, double ballPosX, double ballPosY,
-            long timestamp) {
-
-        if ((pitchWidth < 0) || (pitchHeight < 0)) {
-            System.err
-                    .println("Cannot update locations as pitch size is not set properly. Restart vision");
-            return;
-        }
-        // Scale the coordinates from vision to meters:
-        yPosX = scaleXToMeters(yPosX);
-        yPosY = scaleXToMeters(yPosY);
-
-        bPosX = scaleXToMeters(bPosX);
-        bPosY = scaleXToMeters(bPosY);
-
-        ballPosX = scaleXToMeters(ballPosX);
-        ballPosY = scaleXToMeters(ballPosY);
+    public void updateScaled(double yPosX, double yPosY, double yRad,
+            double bPosX, double bPosY, double bRad, double ballPosX,
+            double ballPosY, long timestamp) {
 
         Robot ours = null;
         Robot them = null;
@@ -207,8 +174,7 @@ public class BasicWorld extends AbstractWorld {
 
     @Override
     public void updatePitchSize(double width, double height) {
+        super.updatePitchSize(width, height);
         prev = new EmptySnapshot();
-        pitchWidth = width;
-        pitchHeight = height;
     }
 }
