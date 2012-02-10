@@ -1,6 +1,7 @@
 package balle.world;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -21,6 +22,28 @@ public class BasicWorldTest {
         worldB.updatePitchSize(Globals.PITCH_WIDTH, Globals.PITCH_HEIGHT);
         worldY = new BasicWorld(false);
         worldY.updatePitchSize(Globals.PITCH_WIDTH, Globals.PITCH_HEIGHT);
+    }
+
+    /**
+     * Given a world object that was just initialised the snapshot should be an
+     * empty one initially
+     */
+    @Test
+    public void testSnapshotIsEmptySnapshotInitially() {
+        BasicWorld world = new BasicWorld(true);
+        assertTrue(EmptySnapshot.class.isInstance(world.getSnapshot()));
+    }
+
+    /**
+     * Given a world object that had its pitch size just updated the Snapshot
+     * should be null initially
+     */
+    @Test
+    public void testSnapshotIsEmptyAfterPitchSizeUpdate() {
+        worldB.update(0.3, 0.3, 30, 0.5, 0.3, 13, 0.5, 0.5,
+                System.currentTimeMillis()); // generate a new
+        worldB.updatePitchSize(10, 10); // update pitch size
+        assertTrue(EmptySnapshot.class.isInstance(worldB.getSnapshot()));
     }
 
     /**
@@ -89,7 +112,7 @@ public class BasicWorldTest {
         worldY.update(0, 0, 0, 0, 0, 0, 0, 0, 0);
         worldY.update(dX, 0, 0, 0, 0, 0, 0, 0, dT);
 
-        assertEquals(1.5, worldY.getSnapshot().getBalle().getVelocity().abs(),
+        assertEquals(dX, worldY.getSnapshot().getBalle().getVelocity().abs(),
                 0.0000001);
     }
 
@@ -98,14 +121,14 @@ public class BasicWorldTest {
      */
     @Test
     public void testVelocityProperlyEstimatedAtAnAngle() {
-        double dX = 3;
-        double dY = 4;
+        double dX = 1;
+        double dY = 1;
         long dT = 1;
 
         worldY.update(0, 0, 0, 0, 0, 0, 0, 0, 0);
         worldY.update(dX, dY, 0, 0, 0, 0, 0, 0, dT);
 
-        assertEquals(5, worldY.getSnapshot().getBalle().getVelocity().abs(),
-                0.0000001);
+        assertEquals(Math.sqrt(2), worldY.getSnapshot().getBalle()
+                .getVelocity().abs(), 0.0000001);
     }
 }
