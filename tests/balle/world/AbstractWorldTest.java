@@ -21,10 +21,10 @@ class AbstractWorldConcrete extends AbstractWorld {
     }
 
     @Override
-    protected void updateScaled(double yPosX, double yPosY, double yRad,
-            double bPosX, double bPosY, double bRad, double ballPosX,
-            double ballPosY, long timestamp) {
-        // TODO mock this
+    protected void updateScaled(Coord yellowPos, Orientation yellowOrientation,
+            Coord bluePos, Orientation blueOrientation, Coord ballPos,
+            long timestamp) {
+        // TODO Auto-generated method stub
 
     }
 
@@ -76,6 +76,24 @@ public class AbstractWorldTest {
         world.updatePitchSize(Globals.PITCH_WIDTH * 2, Globals.PITCH_HEIGHT * 2);
         world.update(0.2, 0.4, 0, 0.6, 0.8, 0, 1, 1.2, 0);
         // Verify that update scaled is called correctly
-        verify(world).updateScaled(0.1, 0.2, 0, 0.3, 0.4, 0, 0.5, 0.6, 0);
+        verify(world).updateScaled(new Coord(0.1, 0.2),
+                new Orientation(0, false), new Coord(0.3, 0.4),
+                new Orientation(0, false), new Coord(0.5, 0.6), 0);
+    }
+
+    /**
+     * Given an AbstractWorld class that has the pitch size initialised
+     * correctly, and null for coordinates to update the state of the world to
+     * the AbstractWorld class should send nulls for *both* the coordinate and
+     * orientation objects.s
+     */
+    @Test
+    public void updateCallsUpdateScaledWithNullParameters() {
+        AbstractWorld world = spy(new AbstractWorldConcrete(true));
+        // Both coordinates twice as big so it's easy to scale
+        world.updatePitchSize(Globals.PITCH_WIDTH * 2, Globals.PITCH_HEIGHT * 2);
+        world.update(-1, -1, 15, -1, -1, 0, -1, -1, 0);
+        // Verify that update scaled is called correctly
+        verify(world).updateScaled(null, null, null, null, null, 0);
     }
 }
