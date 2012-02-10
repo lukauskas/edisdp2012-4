@@ -4,12 +4,13 @@ import balle.misc.Globals;
 
 public class BasicWorld extends AbstractWorld {
 
-    private Snapshot prev        = null;
+    private Snapshot prev;
     private double   pitchWidth  = -1;
     private double   pitchHeight = -1;
 
     public BasicWorld(boolean balleIsBlue) {
         super(balleIsBlue);
+        prev = new EmptySnapshot();
     }
 
     @Override
@@ -75,7 +76,7 @@ public class BasicWorld extends AbstractWorld {
 
         Snapshot prev = getSnapshot();
         double e = 1;
-        
+
         // Adjust based on our color.
         if (isBlue()) {
             if ((bPosX - UNKNOWN_VALUE < 0.00001)
@@ -83,9 +84,11 @@ public class BasicWorld extends AbstractWorld {
                 ourPosition = null;
             else {
                 ourPosition = new Coord(bPosX, bPosY);
-            	if (prev != null && prev.getBalle() != null && prev.getBalle().getPosition() != null)
-            		if (prev.getBalle().getPosition().dist(ourPosition) > e && prev.getBalle().getPosition().isEstimated() == false)
-            			ourPosition = null;
+                if (prev != null && prev.getBalle() != null
+                        && prev.getBalle().getPosition() != null)
+                    if (prev.getBalle().getPosition().dist(ourPosition) > e
+                            && prev.getBalle().getPosition().isEstimated() == false)
+                        ourPosition = null;
             }
 
             ourOrientation = (bRad != UNKNOWN_VALUE) ? new Orientation(bRad,
@@ -96,11 +99,14 @@ public class BasicWorld extends AbstractWorld {
                 theirsPosition = null;
             else {
                 theirsPosition = new Coord(yPosX, yPosY);
-            	if (prev != null && prev.getOpponent() != null && prev.getOpponent().getPosition() != null && theirsPosition != null)
-            		if (prev.getOpponent().getPosition().dist(theirsPosition) > e && prev.getOpponent().getPosition().isEstimated() == false)
-            			theirsPosition = null;
+                if (prev != null && prev.getOpponent() != null
+                        && prev.getOpponent().getPosition() != null
+                        && theirsPosition != null)
+                    if (prev.getOpponent().getPosition().dist(theirsPosition) > e
+                            && prev.getOpponent().getPosition().isEstimated() == false)
+                        theirsPosition = null;
             }
-            		
+
             theirsOrientation = (yRad != UNKNOWN_VALUE) ? new Orientation(yRad,
                     false) : null;
         } else {
@@ -109,10 +115,12 @@ public class BasicWorld extends AbstractWorld {
                 ourPosition = null;
             else {
                 ourPosition = new Coord(yPosX, yPosY);
-                if (prev != null && prev.getBalle() != null && prev.getBalle().getPosition() != null && prev.getBalle().getPosition().isEstimated() == false)
-            		if (prev.getBalle().getPosition().dist(ourPosition) > e)
-            			ourPosition = null;
-	        }
+                if (prev != null && prev.getBalle() != null
+                        && prev.getBalle().getPosition() != null
+                        && prev.getBalle().getPosition().isEstimated() == false)
+                    if (prev.getBalle().getPosition().dist(ourPosition) > e)
+                        ourPosition = null;
+            }
 
             ourOrientation = (yRad != UNKNOWN_VALUE) ? new Orientation(yRad,
                     false) : null;
@@ -122,11 +130,14 @@ public class BasicWorld extends AbstractWorld {
                 theirsPosition = null;
             else {
                 theirsPosition = new Coord(bPosX, bPosY);
-                if (prev != null && prev.getOpponent() != null && prev.getOpponent().getPosition() != null && prev.getOpponent().getPosition().isEstimated() == false)
-            		if (prev.getOpponent().getPosition().dist(theirsPosition) > e)
-            			theirsPosition = null;
-	        }
-            
+                if (prev != null
+                        && prev.getOpponent() != null
+                        && prev.getOpponent().getPosition() != null
+                        && prev.getOpponent().getPosition().isEstimated() == false)
+                    if (prev.getOpponent().getPosition().dist(theirsPosition) > e)
+                        theirsPosition = null;
+            }
+
             theirsOrientation = (bRad != UNKNOWN_VALUE) ? new Orientation(bRad,
                     false) : null;
         }
@@ -196,7 +207,7 @@ public class BasicWorld extends AbstractWorld {
 
     @Override
     public void updatePitchSize(double width, double height) {
-        prev = null;
+        prev = new EmptySnapshot();
         pitchWidth = width;
         pitchHeight = height;
     }
