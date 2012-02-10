@@ -9,7 +9,7 @@ import balle.world.Robot;
 public class Strategy_M2 extends AbstractStrategy {
 
 	private double EPSILON = 0.000001;
-	private double DISTANCE_THRESHOLD = 0.2;
+	private double DISTANCE_THRESHOLD = 0.1;
 	private int INIT_SPEED = 220;
 	private int speed = INIT_SPEED;
 	private double timer_start;
@@ -46,10 +46,6 @@ public class Strategy_M2 extends AbstractStrategy {
 			System.out.println("Vision Error, Cannot see Ball or Self");
 			return;
 		}
-		
-		if (distance > 30) {
-			controller.stop();
-		}
 
 		// Ball in front of robot
 		if ((currentPosition.dist(target) - DISTANCE_THRESHOLD <= EPSILON) && (distance <= 30)) {
@@ -85,6 +81,7 @@ public class Strategy_M2 extends AbstractStrategy {
 				
 
 			} else {
+				
 
 				double turnLeftAngle, turnRightAngle;
 
@@ -98,14 +95,14 @@ public class Strategy_M2 extends AbstractStrategy {
 					turnRightAngle = currentOrientation - angleToTarget;
 				}
 
-				if (turnLeftAngle < turnRightAngle)
+				if (turnLeftAngle <= turnRightAngle)
 					controller.setWheelSpeeds(speed - 120, speed);
 					System.out.println("Turning Left");
 					//controller.setWheelSpeeds(speed, speed - 120);
 					//System.out.println("Blocking Right");
 					if (reachedBall == true) {
 						timer_travel = (System.currentTimeMillis() - timer_start) / 1000;
-						distance = distance + (float) (timer_travel * (speed)/360);
+						distance = distance + (float) (timer_travel * (speed - 120)/360);
 					}
 				if (turnLeftAngle > turnRightAngle)
 					controller.setWheelSpeeds(speed, speed - 120);
@@ -114,12 +111,15 @@ public class Strategy_M2 extends AbstractStrategy {
 					//System.out.println("Blocking Left");
 					if (reachedBall == true) {
 						timer_travel = (System.currentTimeMillis() - timer_start) / 1000;
-						distance = distance + (float) (timer_travel * (speed)/360);
+						distance = distance + (float) (timer_travel * (speed - 120)/360);
 					}
 
 			}
 			
-
+			if (distance > 30) {
+				controller.stop();
+			}
+			
 		}
 
 	}
