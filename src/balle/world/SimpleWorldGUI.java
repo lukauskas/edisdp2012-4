@@ -106,7 +106,8 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
         private void drawRobot(Graphics g, Color c, Robot robot) {
 
             // Fail early, fail often
-            if ((robot == null) || (robot.getPosition() == null)) {
+            if ((robot.getPosition() == null)
+                    || (robot.getOrientation() == null)) {
                 return;
             }
 
@@ -185,7 +186,7 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
         }
 
         private int m2PY(float y) {
-        	y = Globals.PITCH_HEIGHT-y;
+            y = Globals.PITCH_HEIGHT - y;
             return (int) ((y + YSHIFTM) * scale);
         }
 
