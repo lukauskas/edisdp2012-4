@@ -73,7 +73,8 @@ class Vision:
 
             self.gui.loop()
         
-        self.socket.close()
+        if not self.stdout:
+            self.socket.close()
 
     def setNextPitchCorner(self, where):
         self.preprocessor.setNextPitchCorner(where)
@@ -81,6 +82,10 @@ class Vision:
         if self.preprocessor.hasPitchSize:
             print("Pitch size: {0!r}".format(self.preprocessor.pitch_size))
             self.outputPitchSize()
+            self.gui.setShowMouse(False)
+            self.gui.updateLayer('corner', None)
+        else:
+            self.gui.drawCrosshair(where, 'corner')
     
     def outputPitchSize(self):
         self.send('{0} {1} {2} \n'.format(

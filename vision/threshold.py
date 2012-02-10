@@ -1,5 +1,6 @@
 import cv
 import os
+import sys
 import cPickle
 from SimpleCV import Image
 
@@ -28,7 +29,7 @@ class Threshold:
         cPickle.dump(self._values, f)
 
     def __getFilePath(self):
-        return self.filepath.format(self._pitch)
+        return os.path.join(sys.path[0], self.filepath.format(self._pitch))
 
     def yellowT(self, frame):
         return self.threshold(frame, self._values['yellow'][0], self._values['yellow'][1])
