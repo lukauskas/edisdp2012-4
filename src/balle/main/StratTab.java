@@ -9,63 +9,80 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 
+import balle.controller.Controller;
 import balle.strategy.AbstractStrategy;
+import balle.strategy.StrategyFactory;
+import balle.world.AbstractWorld;
 
 @SuppressWarnings("serial")
 public class StratTab extends GUITab implements ActionListener {
 
-	// GUI
-	private JPanel top;
-	private JButton button;
-	private JComboBox menu;
+    // GUI
+    private JPanel            top;
+    private JButton           button;
+    private JComboBox         menu;
 
-	private ArrayList<AbstractStrategy> stratTabs;
-	private String[] strings = new String[0];
+    private ArrayList<String> stratTabs;
+    private String[]          strings                = new String[0];
 
-	public StratTab() {
-		// Class Variables
-		top = new JPanel();
-		stratTabs = new ArrayList<AbstractStrategy>();
+    private AbstractStrategy  currentRunningStrategy = null;
+    public Controller         controller;
+    public AbstractWorld      world;
 
-		top.setLayout(new BorderLayout());
+    public StratTab() {
 
-		button = new JButton("Stop");
-		button.addActionListener(this);
-		
-		menu = new JComboBox(strings);
+        // Class Variables
+        top = new JPanel();
+        stratTabs = new ArrayList<String>();
 
-		top.add(BorderLayout.WEST, menu);
-		top.add(BorderLayout.EAST, button);
+        top.setLayout(new BorderLayout());
 
-		this.add(top);
-	}
+        button = new JButton("Start");
+        button.addActionListener(this);
 
-	@Override
-	public final void actionPerformed(ActionEvent e) {
-		if (button.getText().equals("Stop")) {
-			button.setText("Start");
-			stratTabs.get(menu.getSelectedIndex()).pause(true);
-		} else {
-			button.setText("Stop");
-			stratTabs.get(menu.getSelectedIndex()).pause(false);
-		}
-	}
-	
-	public String[] getStrings() {
-		int size = stratTabs.size();
-		String[] out = new String[size];
-		for (int i = 0; i < size; i++) {
-			out[i] = (i + 1) + ": " + stratTabs.get(i).toString();
-		}
-		return out;
-	}
+        menu = new JComboBox(strings);
 
-	public final void add(AbstractStrategy x) {
-		stratTabs.add(x);
-		strings = getStrings();
-		this.remove(menu);
-		menu = new JComboBox(strings);
-		top.add(BorderLayout.WEST, menu);
-	}
+        top.add(BorderLayout.WEST, menu);
+        top.add(BorderLayout.EAST, button);
+
+        this.add(top);
+    }
+
+    public void setCurrentWorld(AbstractWorld world) {
+        this.world = world;
+    }
+
+    public void setCurrentController(Controller controller) {
+        this.controller = controller;
+    }
+
+    @Override
+    public final void actionPerformed(ActionEvent e) {
+        if (button.getText().equals("Start")) {
+            button.setText("Stop");
+            currentRunningStrategy = StrategyFactory.createClass(
+                    stratTabs.get(menu.getSelectedIndex()), controller, world);
+        } else {
+            button.setText("Start");
+            currentRunningStrategy.cancel();
+        }
+    }
+
+    public String[] getStrings() {
+        int size = stratTabs.size();
+        String[] out = new String[size];
+        for (int i = 0; i < size; i++) {
+            out[i] = (i + 1) + ": " + stratTabs.get(i);
+        }
+        return out;
+    }
+
+    public final void add(String designator) {
+        stratTabs.add(designator);
+        strings = getStrings();
+        this.remove(menu);
+        menu = new JComboBox(strings);
+        top.add(BorderLayout.WEST, menu);
+    }
 
 }

@@ -8,7 +8,6 @@ import balle.simulator.Simulator;
 import balle.simulator.SoftBot;
 import balle.strategy.AbstractStrategy;
 import balle.strategy.DummyStrategy;
-import balle.strategy.GoToBall;
 import balle.world.AbstractWorld;
 import balle.world.BasicWorld;
 import balle.world.SimpleWorldGUI;
@@ -65,30 +64,34 @@ public class Runner {
         AbstractWorld world;
         SocketVisionReader visionInput;
         Controller controller;
-        AbstractStrategy strategy;
         SimpleWorldGUI gui;
 
         // Initialise world
         world = new BasicWorld(balleIsBlue);
 
+        // Moving this forward so we do not start a GUI until controller is
+        // initialised
+        // If you're getting a merge conflict here leave this before
+        // SimpleWorldGUI start!
+
+        controller = new BluetoothController(new Communicator());
+        // controller = new DummyController();
+        // Wait for controller to initialise
+        while (!controller.isReady()) {
+            continue;
+        }
+        GUITab.setWorld(world);
+        GUITab.setController(controller);
+        GUITab.addStrategy("DummyStrategy");
+        GUITab.addStrategy("GoToBall");
+
         gui = new SimpleWorldGUI(world);
+
         gui.start();
 
         // Create visionInput buffer
         visionInput = new SocketVisionReader();
         visionInput.addListener(world);
-
-        // Initialise controller
-        controller = new BluetoothController(new Communicator());
-        // controller = new DummyController();
-        strategy = new GoToBall(controller, world);
-
-        // Wait for controller to initialise
-        while (!controller.isReady()) {
-            continue;
-        }
-        // Once the controller is ready, start the strategy
-        strategy.start();
     }
 
     public static void runSimulator(boolean balleIsBlue) {
@@ -111,7 +114,6 @@ public class Runner {
 
         s = new DummyStrategy(bot, world);
         s.start();
-       
 
     }
 }

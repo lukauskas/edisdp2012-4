@@ -17,22 +17,29 @@ public abstract class AbstractWorldProcessor extends Thread {
     private Snapshot            snapshot;
     private Snapshot            prevSnapshot;
     private final AbstractWorld world;
-    
-    private double fps = 0;
-    
+    private boolean             shouldStop = false;
+
+    private double              fps        = 0;
+
     public double getFPS() {
-    	return fps;
+        return fps;
     }
-    
+
     public AbstractWorldProcessor(AbstractWorld world) {
         super();
         this.world = world;
     }
 
     @Override
+    public final void start() {
+        shouldStop = false;
+        super.start();
+    }
+
+    @Override
     public final void run() {
         snapshot = null;
-        while (true) {
+        while (!shouldStop) {
             Snapshot newSnapshot = world.getSnapshot();
 
             // James, Daniel:
@@ -41,16 +48,19 @@ public abstract class AbstractWorldProcessor extends Thread {
                 actionOnChange();
                 prevSnapshot = snapshot;
                 snapshot = newSnapshot;
-                
-                if (prevSnapshot != null && snapshot.getTimestamp() != prevSnapshot.getTimestamp()) {
-                	long dTime = snapshot.getTimestamp() - prevSnapshot.getTimestamp();
-                	fps = ((double)1000)/((double)dTime);
+
+                if (prevSnapshot != null
+                        && snapshot.getTimestamp() != prevSnapshot
+                                .getTimestamp()) {
+                    long dTime = snapshot.getTimestamp()
+                            - prevSnapshot.getTimestamp();
+                    fps = ((double) 1000) / ((double) dTime);
                 }
             }
             actionOnStep();
         }
     }
-    
+
     /**
      * Return the latest snapshot
      * 
@@ -71,4 +81,8 @@ public abstract class AbstractWorldProcessor extends Thread {
      * previous one was received.
      */
     protected abstract void actionOnChange();
+
+    public void cancel() {
+        shouldStop = true;
+    }
 }
