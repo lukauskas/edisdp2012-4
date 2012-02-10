@@ -94,6 +94,7 @@ public class Runner {
     public static void runSimulator(boolean balleIsBlue) {
         Simulator simulator = Simulator.createSimulator();
         BasicWorld world = new BasicWorld(balleIsBlue);
+        AbstractStrategy s;
         SimpleWorldGUI gui;
         simulator.addListener(world);
 
@@ -108,8 +109,9 @@ public class Runner {
 
         System.out.println(bot);
 
-        AbstractStrategy s = new DummyStrategy(bot, world);
+        s = new DummyStrategy(bot, world);
         s.start();
+       
 
     }
 }

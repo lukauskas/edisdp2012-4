@@ -17,7 +17,13 @@ public abstract class AbstractWorldProcessor extends Thread {
     private Snapshot            snapshot;
     private Snapshot            prevSnapshot;
     private final AbstractWorld world;
-
+    
+    private double fps = 0;
+    
+    public double getFPS() {
+    	return fps;
+    }
+    
     public AbstractWorldProcessor(AbstractWorld world) {
         super();
         this.world = world;
@@ -29,15 +35,22 @@ public abstract class AbstractWorldProcessor extends Thread {
         while (true) {
             Snapshot newSnapshot = world.getSnapshot();
 
+            // James, Daniel:
+            // Timestamps of the 2 snapshots is frequently the same.
             if ((newSnapshot != null) && (!newSnapshot.equals(prevSnapshot))) {
                 actionOnChange();
                 prevSnapshot = snapshot;
                 snapshot = newSnapshot;
+                
+                if (prevSnapshot != null && snapshot.getTimestamp() != prevSnapshot.getTimestamp()) {
+                	long dTime = snapshot.getTimestamp() - prevSnapshot.getTimestamp();
+                	fps = ((double)1000)/((double)dTime);
+                }
             }
             actionOnStep();
         }
     }
-
+    
     /**
      * Return the latest snapshot
      * 

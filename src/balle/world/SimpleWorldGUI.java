@@ -1,32 +1,28 @@
 package balle.world;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.*;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.*;
 
+import balle.main.*;
 import balle.misc.Globals;
 import balle.world.processing.AbstractWorldProcessor;
 
 public class SimpleWorldGUI extends AbstractWorldProcessor {
 
-    private JFrame frame;
     private JPanel panel;
 
     public SimpleWorldGUI(AbstractWorld world) {
         super(world);
-        frame = new JFrame("WorldGUI");
-        // frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        
         panel = new Screen();
-        frame.getContentPane().add(BorderLayout.CENTER, panel);
-        frame.setSize(770, 500);
-        frame.setVisible(true);
+        ((GUITab) panel).addToFrame("World");
     }
 
-    private class Screen extends JPanel {
-
+    @SuppressWarnings("serial")
+	private class Screen extends GUITab {
+    	
         private float       scale;
         private final float XSHIFTM     = 0.4f;
         private final float YSHIFTM     = 0.39f;
@@ -39,9 +35,10 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
             g.fillRect(0, 0, getWidth(), getHeight());
             drawField(g);
             drawFieldObjects(g);
+            
+        	String s = String.format("%1$5.3f", getFPS());
+        	g.drawString(s, 5, 16);
         }
-
-        // public void
 
         private void drawField(Graphics g) {
             g.setColor(Color.BLACK);
@@ -199,7 +196,9 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 
     @Override
     protected void actionOnChange() {
+    	//frame_counter++;  	
         panel.repaint();
     }
-
+    
+    
 }
