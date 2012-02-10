@@ -110,8 +110,8 @@ public class Runner {
 
         System.out.println(bot);
 
-        //AbstractStrategy s = new DummyStrategy(bot, world);
-        //s.start();
+        AbstractStrategy s = new GoToBall(bot, world);
+        s.start();
         
 
     }
