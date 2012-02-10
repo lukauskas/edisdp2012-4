@@ -38,12 +38,6 @@ public class BluetoothController implements Controller {
     }
 
     @Override
-    public void travel(int dist) {
-        System.out.println("IMPLEMENT");
-
-    }
-
-    @Override
     public void kick() {
         try {
             connection.send(new MessageKick(0).hash());

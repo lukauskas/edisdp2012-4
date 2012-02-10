@@ -67,16 +67,6 @@ public class BrickController implements Controller {
     /*
      * (non-Javadoc)
      * 
-     * @see balle.brick.Controller#travel(int)
-     */
-    @Override
-    public void travel(int dist) {
-        pilot.travel(dist);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
      * @see balle.brick.Controller#kick()
      */
     @Override

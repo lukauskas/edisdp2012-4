@@ -381,13 +381,13 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
         }
 
         private float convAngle(float a) {
-            return -a;
+            return (180f/(float)Math.PI)*a;
         }
 
         private Vec2 convPos(Vec2 a) {
             Vec2 output = new Vec2();
             output.x = a.x / scale;
-            output.y = (a.y / -scale) + 1.22f;
+            output.y = a.y / scale;
             return output;
         }
 

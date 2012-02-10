@@ -18,7 +18,7 @@ class Features:
         self._display = display
 
     def extractFeatures(self, frame):
-        
+
         ents = {'yellow': None, 'blue': None, 'ball': None}
         yellow = self.threshold.yellowT(frame)
         blue = self.threshold.blueT(frame)
@@ -107,43 +107,49 @@ class Entity:
             return -1
 
         if self._angle is None:
-            # This method is stolen from sdp2011 group 4
-            # It first calculates the center of mass of the T shape (TODO: might be faster to)
-            # take feature.centroid() and scale it to the T region), then blacks out a circle
-            # over the center. This covers most of the top of the T shape, but leaves lots of
-            # the bottom, so when we calculate the center of mass again, it is nearer the bottom
-            # (i.e. the opposite end to the original center of mass) and we can calculate the angle
-            # of the line between them.
-
+            # Use moments to do magic things.
+            # (finds precise line through blob)
             mask = feature.crop().getGrayscaleMatrix()
 
-            moments = cv.Moments(mask, 1)
-            m00 = cv.GetSpatialMoment(moments, 0, 0)
-            m10 = cv.GetSpatialMoment(moments, 1, 0)
-            m01 = cv.GetSpatialMoment(moments, 0, 1)
+            m = cv.Moments(mask, 1)
 
-            if m00 == 0:
-                m00 = 0.01
+            if m.m00 == 0:
+                m.m00 = 0.01
             
+            # Intermediate values
+            a = m.mu20 / m.m00;
+            b = m.mu11 / m.m00;
+            c = m.mu02 / m.m00;
+            d = a + c;
+            e = math.sqrt((4 * b * b) + ((a - c) * (a - c)));
+
+            self._angle = math.atan2(2 * b, a - c + e)
+                        
+            # Crudely find direction.          
+            m00 = cv.GetSpatialMoment(m, 0, 0)
+            m10 = cv.GetSpatialMoment(m, 1, 0)
+            m01 = cv.GetSpatialMoment(m, 0, 1)
+            if m00 == 0.0:
+                 m00 = 0.1
+
             centroid1 = (round(m10/m00), round(m01/m00))
-
-            # cv.Circle is really fussy with what it takes
-            centroid1 = tuple(map(int, centroid1))
-            cv.Circle(mask, centroid1, 14, cv.RGB(0, 0, 0), -1)
-
-            moments = cv.Moments(mask, 1)
-            m00 = cv.GetSpatialMoment(moments, 0, 0)
-            m10 = cv.GetSpatialMoment(moments, 1, 0)
-            m01 = cv.GetSpatialMoment(moments, 0, 1)
-
-            if m00 == 0:
-                m00 = 0.01
+            cv.Circle(mask, centroid1, 14, cv.RGB(0,0,0), -1)
             
-            centroid2 = (round(m10/m00), round(m01/m00))
+            m = cv.Moments(mask, 1)
+            m00 = cv.GetSpatialMoment(m, 0, 0)
+            m10 = cv.GetSpatialMoment(m, 1, 0)
+            m01 = cv.GetSpatialMoment(m, 0, 1)
+            if m00 == 0:
+                 m00 = 0.1
 
-            self._angle = math.atan2(centroid1[1] - centroid2[1], centroid1[0] - centroid2[0])
-            # Flip the angle so it points to front of the robot, not back
-            self._angle += math.pi
+            centroid2 = (round(m10/m00), round(m01/m00))
+            roughAngle = math.atan2(centroid1[1] - centroid2[1], centroid1[0] - centroid2[0])
+            
+            pi2 = math.pi*2
+            roughAngle = min( (roughAngle-self._angle)%pi2, (self._angle-roughAngle)%pi2 )
+
+            if roughAngle < (math.pi/2):
+                self._angle += math.pi
 
         return self._angle
 
@@ -158,7 +164,8 @@ class Entity:
             feature.draw(layer=layer)
 
             if angle and self._hasAngle:
-                center = (feature.minRectX(), feature.minRectY())
+                #center = (feature.minRectX(), feature.minRectY())
+                center = self._coordinates
                 angle = self.angle()
                 endx = center[0] + 30 * math.cos(angle)
                 endy = center[1] + 30 * math.sin(angle)

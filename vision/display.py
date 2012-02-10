@@ -29,16 +29,19 @@ class Gui:
                 'yellow': None,
                 'blue': None,
                 'ball' : None,
+                }
 
-                # always drawn
+        # These layers are drawn regardless of the current layerset
+        self._persistentLayers = {
                 'fps': None,
                 'mouse': None
-                }
+        }
 
         self._currentLayerset = self.layersets['default']
         self._display = Display()
         self._eventHandler = Gui.EventHandler()
         self._lastMouseState = 0
+        self._showMouse = True
         self._lastFrame = None
         self._lastFrameTime = time.time()
 
@@ -69,8 +72,9 @@ class Gui:
                 toDraw.draw(layer)
 
         # draw fps
-        baseLayer.addDrawingLayer(self._layers['fps'])
-        baseLayer.addDrawingLayer(self._layers['mouse'])
+        for layer in self._persistentLayers.itervalues():
+            if layer is not None:
+                baseLayer.addDrawingLayer(layer)
 
         baseLayer.save(self._display)
 
@@ -93,15 +97,15 @@ class Gui:
 
         layer = DrawingLayer(size)
         layer.ezViewText('{0:.2f} fps'.format(fps), (10, 10))
-        self._layers['fps'] = layer
+        self.updateLayer('fps', layer)
 
-    def __drawMouse(self, mousePos):
+    def drawCrosshair(self, pos, layerName):
         size = self._layers['raw'].size()
         layer = self.getDrawingLayer()
-        layer.line((0, mousePos[1]), (size[0], mousePos[1]), color=(0, 0, 255))
-        layer.line((mousePos[0], 0), (mousePos[0], size[1]), color=(0, 0, 255))
+        layer.line((0, pos[1]), (size[0], pos[1]), color=(0, 0, 255))
+        layer.line((pos[0], 0), (pos[0], size[1]), color=(0, 0, 255))
 
-        self._layers['mouse'] = layer
+        self.updateLayer(layerName, layer)
 
  
     def loop(self):
@@ -113,11 +117,11 @@ class Gui:
             self._eventHandler.processKey(chr(event.key % 0x100))
 
         self._display.checkEvents()
-
         mouseX = self._display.mouseX
         mouseY = self._display.mouseY
 
-        self.__drawMouse((mouseX, mouseY))
+        if self._showMouse:
+            self.drawCrosshair((mouseX, mouseY), 'mouse')
 
         mouseLeft = self._display.mouseLeft
         # Only fire click event once for each click
@@ -142,17 +146,25 @@ class Gui:
     def updateLayer(self, name, layer):
         """
         Update the layer specified by 'name'
+        If the layer name is not in the know list of layers, 
+        then it will be drawn regardless of the current view setting
         """
-
-        assert name in self._layers.keys(), \
-                name + ' is not in the known list of layers'
         
-        self._layers[name] = layer
+        if name in self._layers.keys():
+            self._layers[name] = layer
+        else:
+            self._persistentLayers[name] = layer
 
     def switchLayerset(self, name):
         assert name in self.layersets.keys(), 'Unknown layerset ' + name + '!'
 
         self._currentLayerset = self.layersets[name]
+
+    def setShowMouse(self, showMouse):
+        if not showMouse:
+            self.updateLayer('mouse', None)
+
+        self._showMouse = showMouse
         
     class EventHandler:
         
@@ -208,7 +220,6 @@ class ThresholdGui:
         self.__setupKeyEvents()
 
         self.changeEntity('yellow')
-
         
     def __setupKeyEvents(self):
         """
