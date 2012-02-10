@@ -16,8 +16,7 @@ class Preprocessor:
         if not self.hasPitchSize:
             return None
 
-        return ((self._cropRect[2] - self._cropRect[0]),
-                (self._cropRect[3] - self._cropRect[1]))
+        return (self._cropRect[2], self._cropRect[3])
 
     def setNextPitchCorner(self, where):
 
