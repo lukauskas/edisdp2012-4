@@ -8,11 +8,15 @@ import balle.world.Robot;
 
 public class GoToBall extends AbstractStrategy {
 
-    private boolean             isMoving           = false;
+    private static final int TURN_SPEED_DEGREES = 180;
+    private static final double TURN_SPEED_RADIANS = (TURN_SPEED_DEGREES * Math.PI) / 180;
+	private boolean             isMoving           = false;
     private long                startedTurning     = 0;
+    private long 				timeToTurn		   = 0;
     private final static double DISTANCE_THRESHOLD = 0.2;
     private final static double EPSILON            = 0.00001;
-    private final static double TURN_THRESHOLD     = Math.PI / 8;
+    private final static double DISTANCE_DIFF	   = 0.1;
+    private final static int SPEED_CONSTANT	   = 500;
 
     public GoToBall(Controller controller, AbstractWorld world) {
         super(controller, world);
@@ -50,9 +54,8 @@ public class GoToBall extends AbstractStrategy {
             return;
         } else {
 
-            // Minus one the atan2 as our coordinate axes are upside down.. no?
-            double angleToTarget = -1
-                    * target.sub(currentPosition).orientation();
+            // Minus one the atan2 as our coordinate axes are upside down.. no? Yes! Fixed. Don't need it.
+            double angleToTarget = target.sub(currentPosition).orientation();
             ;
             double currentOrientation = robot.getOrientation()
                     .atan2styleradians();
@@ -76,13 +79,17 @@ public class GoToBall extends AbstractStrategy {
                 turnAngle = -turnRightAngle; // TODO these should be flipped in
                                              // controlelr!!
 
-            if (Math.abs(turnAngle) > TURN_THRESHOLD) {
+            double dist = target.dist(robot.getPosition());
+            double distDiffFromTarget = Math.sin(Math.abs(turnAngle)) * dist;
+            
+            if (Math.abs(distDiffFromTarget) > DISTANCE_DIFF) {
                 if (isMoving) {
                     controller.stop();
                     isMoving = false;
                 }
-                if (System.currentTimeMillis() - startedTurning > 2000) {
-                    System.out.println("Turning " + turnAngle);
+                if (System.currentTimeMillis() - startedTurning > timeToTurn) {
+                    timeToTurn = Math.round(Math.abs(turnAngle) / (TURN_SPEED_RADIANS*0.001)) + SPEED_CONSTANT;
+                    System.out.println("Turning " + turnAngle + " should take " + timeToTurn +" ms");
                     controller.rotate((int) (turnAngle * 180 / Math.PI), 180);
                     startedTurning = System.currentTimeMillis();
                 }

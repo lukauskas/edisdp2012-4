@@ -44,14 +44,6 @@ public interface Controller {
     public abstract void rotate(int deg, int speed);
 
     /**
-     * Moves the robot dist distance. Only used by the Sensors class
-     * 
-     * @param dist
-     *            the distance to move.
-     */
-    public abstract void travel(int dist);
-
-    /**
      * Sets the speeds of individual wheels in the robot
      * 
      * @param leftWheelSpeed
