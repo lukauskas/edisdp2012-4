@@ -131,7 +131,7 @@ public class Runner {
         simulator.addListener(world);
 
         SoftBot bot;
-        if (balleIsBlue)
+        if (!balleIsBlue)
             bot = simulator.getYellowSoft();
         else
             bot = simulator.getBlueSoft();
