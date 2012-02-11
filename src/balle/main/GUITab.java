@@ -12,7 +12,6 @@ public class GUITab extends JPanel {
 
     private JFrame      frame;
     private JTabbedPane tab_pane;
-    private StratTab    strategies;
 
     public GUITab() {
         super();
