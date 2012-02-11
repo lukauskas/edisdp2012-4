@@ -12,9 +12,13 @@ import balle.world.processing.AbstractWorldProcessor;
 
 public class SimpleWorldGUI extends AbstractWorldProcessor {
 
-    private JPanel panel;
-    private Screen screen;
-    private JLabel fps;
+    private JPanel           panel;
+    private Screen           screen;
+    private JLabel           fps;
+
+    private static final int UPDATE_FPS_EVERY_MS = 100; // How many ms to wait
+                                                        // before updating fps
+    private long             lastFpsUpdate       = 0;
 
     public SimpleWorldGUI(AbstractWorld world) {
         super(world);
@@ -197,10 +201,18 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 
     }
 
-    @Override
-    protected void actionOnStep() {
+    private void redrawFPS() {
+        if (System.currentTimeMillis() - lastFpsUpdate < SimpleWorldGUI.UPDATE_FPS_EVERY_MS)
+            return;
+
         String s = String.format("FPS: %1$5.3f", getFPS());
         fps.setText(s);
+        lastFpsUpdate = System.currentTimeMillis();
+    }
+
+    @Override
+    protected void actionOnStep() {
+        redrawFPS();
     }
 
     @Override
