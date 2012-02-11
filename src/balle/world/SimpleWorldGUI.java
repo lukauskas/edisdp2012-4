@@ -1,10 +1,10 @@
 package balle.world;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics;
 
-import javax.swing.*;
+import javax.swing.JPanel;
 
-import balle.main.*;
 import balle.misc.Globals;
 import balle.world.processing.AbstractWorldProcessor;
 
@@ -15,14 +15,16 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
     public SimpleWorldGUI(AbstractWorld world) {
         super(world);
 
-        
         panel = new Screen();
-        ((GUITab) panel).addToFrame("World");
+    }
+
+    public JPanel getPanel() {
+        return panel;
     }
 
     @SuppressWarnings("serial")
-	private class Screen extends GUITab {
-    	
+    private class Screen extends JPanel {
+
         private float       scale;
         private final float XSHIFTM     = 0.4f;
         private final float YSHIFTM     = 0.39f;
@@ -35,9 +37,9 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
             g.fillRect(0, 0, getWidth(), getHeight());
             drawField(g);
             drawFieldObjects(g);
-            
-        	String s = String.format("%1$5.3f", getFPS());
-        	g.drawString(s, 5, 16);
+
+            String s = String.format("%1$5.3f", getFPS());
+            g.drawString(s, 5, 16);
         }
 
         private void drawField(Graphics g) {
@@ -196,9 +198,8 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 
     @Override
     protected void actionOnChange() {
-    	//frame_counter++;  	
+        // frame_counter++;
         panel.repaint();
     }
-    
-    
+
 }
