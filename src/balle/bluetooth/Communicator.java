@@ -56,7 +56,7 @@ public class Communicator {
      */
     public boolean send(Integer message) {
         try {
-            System.err.println("Sending: " + Integer.toHexString(message));
+            // System.err.println("Sending: " + Integer.toHexString(message));
             dos.writeInt(message);
             dos.flush();
             return true;
