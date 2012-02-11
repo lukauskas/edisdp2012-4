@@ -12,10 +12,11 @@ import javax.swing.JPanel;
 import balle.controller.Controller;
 import balle.strategy.AbstractStrategy;
 import balle.strategy.StrategyFactory;
+import balle.strategy.UnknownDesignatorException;
 import balle.world.AbstractWorld;
 
 @SuppressWarnings("serial")
-public class StratTab extends GUITab implements ActionListener {
+public class StratTab extends JPanel implements ActionListener {
 
     // GUI
     private JPanel            top;
@@ -26,10 +27,13 @@ public class StratTab extends GUITab implements ActionListener {
     private String[]          strings                = new String[0];
 
     private AbstractStrategy  currentRunningStrategy = null;
-    public Controller         controller;
-    public AbstractWorld      world;
+    private Controller        controller;
+    private AbstractWorld     world;
 
-    public StratTab() {
+    public StratTab(Controller controller, AbstractWorld world) {
+        super();
+        this.controller = controller;
+        this.world = world;
 
         // Class Variables
         top = new JPanel();
@@ -48,20 +52,21 @@ public class StratTab extends GUITab implements ActionListener {
         this.add(top);
     }
 
-    public void setCurrentWorld(AbstractWorld world) {
-        this.world = world;
-    }
-
-    public void setCurrentController(Controller controller) {
-        this.controller = controller;
-    }
-
     @Override
-    public final void actionPerformed(ActionEvent e) {
+    public final void actionPerformed(ActionEvent event) {
         if (button.getText().equals("Start")) {
+            String selectedStrategy = stratTabs.get(menu.getSelectedIndex());
+            try {
+                currentRunningStrategy = StrategyFactory.createClass(
+                        selectedStrategy, controller, world);
+            } catch (UnknownDesignatorException e) {
+                System.err.println("Could not start strategy \""
+                        + currentRunningStrategy + "\": " + e);
+                return;
+            }
             button.setText("Stop");
-            currentRunningStrategy = StrategyFactory.createClass(
-                    stratTabs.get(menu.getSelectedIndex()), controller, world);
+            currentRunningStrategy.start();
+
         } else {
             button.setText("Start");
             currentRunningStrategy.cancel();
@@ -77,7 +82,7 @@ public class StratTab extends GUITab implements ActionListener {
         return out;
     }
 
-    public final void add(String designator) {
+    public final void addStrategy(String designator) {
         stratTabs.add(designator);
         strings = getStrings();
         this.remove(menu);

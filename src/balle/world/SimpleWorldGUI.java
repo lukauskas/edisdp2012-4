@@ -5,7 +5,6 @@ import java.awt.Graphics;
 
 import javax.swing.JPanel;
 
-import balle.main.GUITab;
 import balle.misc.Globals;
 import balle.world.processing.AbstractWorldProcessor;
 
@@ -17,11 +16,14 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
         super(world);
 
         panel = new Screen();
-        ((GUITab) panel).addToFrame("World");
+    }
+
+    public JPanel getPanel() {
+        return panel;
     }
 
     @SuppressWarnings("serial")
-    private class Screen extends GUITab {
+    private class Screen extends JPanel {
 
         private float       scale;
         private final float XSHIFTM     = 0.4f;

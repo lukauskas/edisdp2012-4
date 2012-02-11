@@ -1,13 +1,12 @@
 package balle.main;
 
-import balle.bluetooth.Communicator;
-import balle.controller.BluetoothController;
 import balle.controller.Controller;
+import balle.controller.DummyController;
 import balle.io.reader.SocketVisionReader;
 import balle.simulator.Simulator;
 import balle.simulator.SoftBot;
 import balle.strategy.AbstractStrategy;
-import balle.strategy.DummyStrategy;
+import balle.strategy.StrategyFactory;
 import balle.world.AbstractWorld;
 import balle.world.BasicWorld;
 import balle.world.SimpleWorldGUI;
@@ -59,12 +58,27 @@ public class Runner {
             runRobot(balleIsBlue);
     }
 
+    public static void initialiseGUI(Controller controller, AbstractWorld world) {
+        SimpleWorldGUI gui;
+        GUITab mainWindow = new GUITab();
+
+        StratTab strategyTab = new StratTab(controller, world);
+        for (String strategy : StrategyFactory.availableDesignators())
+            strategyTab.addStrategy(strategy);
+
+        mainWindow.addToFrame(strategyTab, "Strategy");
+
+        gui = new SimpleWorldGUI(world);
+        mainWindow.addToFrame(gui.getPanel(), "World");
+        gui.start();
+
+    }
+
     public static void runRobot(boolean balleIsBlue) {
 
         AbstractWorld world;
         SocketVisionReader visionInput;
         Controller controller;
-        SimpleWorldGUI gui;
 
         // Initialise world
         world = new BasicWorld(balleIsBlue);
@@ -74,20 +88,14 @@ public class Runner {
         // If you're getting a merge conflict here leave this before
         // SimpleWorldGUI start!
 
-        controller = new BluetoothController(new Communicator());
-        // controller = new DummyController();
+        // controller = new BluetoothController(new Communicator());
+        controller = new DummyController();
         // Wait for controller to initialise
         while (!controller.isReady()) {
             continue;
         }
-        GUITab.setWorld(world);
-        GUITab.setController(controller);
-        GUITab.addStrategy("DummyStrategy");
-        GUITab.addStrategy("GoToBall");
 
-        gui = new SimpleWorldGUI(world);
-
-        gui.start();
+        initialiseGUI(controller, world);
 
         // Create visionInput buffer
         visionInput = new SocketVisionReader();
@@ -98,11 +106,7 @@ public class Runner {
         Simulator simulator = Simulator.createSimulator();
         BasicWorld world = new BasicWorld(balleIsBlue);
         AbstractStrategy s;
-        SimpleWorldGUI gui;
         simulator.addListener(world);
-
-        gui = new SimpleWorldGUI(world);
-        gui.start();
 
         SoftBot bot;
         if (balleIsBlue)
@@ -112,8 +116,6 @@ public class Runner {
 
         System.out.println(bot);
 
-        s = new DummyStrategy(bot, world);
-        s.start();
-
+        initialiseGUI(bot, world);
     }
 }
