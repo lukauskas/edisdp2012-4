@@ -1,8 +1,10 @@
 package balle.world;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
 
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import balle.misc.Globals;
@@ -11,11 +13,19 @@ import balle.world.processing.AbstractWorldProcessor;
 public class SimpleWorldGUI extends AbstractWorldProcessor {
 
     private JPanel panel;
+    private Screen screen;
+    private JLabel fps;
 
     public SimpleWorldGUI(AbstractWorld world) {
         super(world);
+        panel = new JPanel();
+        panel.setLayout(new BorderLayout());
 
-        panel = new Screen();
+        fps = new JLabel();
+
+        screen = new Screen();
+        panel.add(BorderLayout.NORTH, fps);
+        panel.add(BorderLayout.CENTER, screen);
     }
 
     public JPanel getPanel() {
@@ -37,9 +47,6 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
             g.fillRect(0, 0, getWidth(), getHeight());
             drawField(g);
             drawFieldObjects(g);
-
-            String s = String.format("%1$5.3f", getFPS());
-            g.drawString(s, 5, 16);
         }
 
         private void drawField(Graphics g) {
@@ -192,13 +199,14 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 
     @Override
     protected void actionOnStep() {
-
+        String s = String.format("FPS: %1$5.3f", getFPS());
+        fps.setText(s);
     }
 
     @Override
     protected void actionOnChange() {
         // frame_counter++;
-        panel.repaint();
+        screen.repaint();
     }
 
 }

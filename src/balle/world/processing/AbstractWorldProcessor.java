@@ -17,11 +17,13 @@ public abstract class AbstractWorldProcessor extends Thread {
     private Snapshot            snapshot;
     private Snapshot            prevSnapshot;
     private final AbstractWorld world;
-    private boolean             shouldStop = false;
+    private boolean             shouldStop           = false;
 
-    private double              fps        = 0;
+    private long                lastSnapshotReceived = 0;
+    private double              fps                  = 0;
 
     public double getFPS() {
+        long timedelta = System.currentTimeMillis() - lastSnapshotReceived;
         return fps;
     }
 
@@ -41,7 +43,7 @@ public abstract class AbstractWorldProcessor extends Thread {
         snapshot = null;
         while (!shouldStop) {
             Snapshot newSnapshot = world.getSnapshot();
-
+            countFPS();
             // James, Daniel:
             // Timestamps of the 2 snapshots is frequently the same.
             if ((newSnapshot != null) && (!newSnapshot.equals(prevSnapshot))) {
@@ -52,13 +54,21 @@ public abstract class AbstractWorldProcessor extends Thread {
                 if (prevSnapshot != null
                         && snapshot.getTimestamp() != prevSnapshot
                                 .getTimestamp()) {
-                    long dTime = snapshot.getTimestamp()
-                            - prevSnapshot.getTimestamp();
-                    fps = ((double) 1000) / ((double) dTime);
+                    registerSnapshotReceived();
+
                 }
             }
             actionOnStep();
         }
+    }
+
+    private final void registerSnapshotReceived() {
+        lastSnapshotReceived = System.currentTimeMillis();
+    }
+
+    private final void countFPS() {
+        long timedelta = System.currentTimeMillis() - lastSnapshotReceived;
+        this.fps = (1000f / (double) timedelta);
     }
 
     /**

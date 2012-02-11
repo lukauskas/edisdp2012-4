@@ -42,7 +42,7 @@ public class Snapshot {
             return false;
         if (other == this)
             return true;
-        if (this.getClass() != other.getClass())
+        if (!(other instanceof Snapshot))
             return false;
         Snapshot otherSnapshot = (Snapshot) other;
 
