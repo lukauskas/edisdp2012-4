@@ -134,7 +134,6 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 
                 // System.out.println(robot.getOrientation().degrees());
                 // rotate by angle of orientation
-                System.out.println(a);
                 poly[i][0] = (float) ((px * Math.cos(a)) + (py * -Math.sin(a)));
                 poly[i][1] = (float) ((px * Math.sin(a)) + (py * Math.cos(a)));
 
