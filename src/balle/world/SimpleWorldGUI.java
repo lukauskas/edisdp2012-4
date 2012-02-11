@@ -2,6 +2,7 @@ package balle.world;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.Graphics;
 
 import javax.swing.JLabel;
@@ -12,23 +13,31 @@ import balle.world.processing.AbstractWorldProcessor;
 
 public class SimpleWorldGUI extends AbstractWorldProcessor {
 
-    private JPanel           panel;
-    private Screen           screen;
-    private JLabel           fps;
-
-    private static final int UPDATE_FPS_EVERY_MS = 100; // How many ms to wait
-                                                        // before updating fps
-    private long             lastFpsUpdate       = 0;
+    private JPanel panel;
+    private Screen screen;
+    private JPanel fpsPanel;
+    private JLabel fpsText;
+    private JLabel fpsWarning;
+    private JLabel fps;
 
     public SimpleWorldGUI(AbstractWorld world) {
         super(world);
         panel = new JPanel();
         panel.setLayout(new BorderLayout());
 
+        fpsPanel = new JPanel();
+        fpsPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        fpsText = new JLabel("Input FPS:");
+        fpsWarning = new JLabel("Vision down?");
+        fpsWarning.setForeground(Color.RED);
+
         fps = new JLabel();
+        fpsPanel.add(fpsText);
+        fpsPanel.add(fps);
+        fpsPanel.add(fpsWarning);
 
         screen = new Screen();
-        panel.add(BorderLayout.NORTH, fps);
+        panel.add(BorderLayout.NORTH, fpsPanel);
         panel.add(BorderLayout.CENTER, screen);
     }
 
@@ -202,12 +211,24 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
     }
 
     private void redrawFPS() {
-        if (System.currentTimeMillis() - lastFpsUpdate < SimpleWorldGUI.UPDATE_FPS_EVERY_MS)
-            return;
+        long age = getFPSAge();
+        double fpsCount = getFPS();
 
-        String s = String.format("FPS: %1$5.3f", getFPS());
+        String s = String.format("%1$5.3f", fpsCount);
+
+        double timePerFrame = 1000.0 / fpsCount;
+        if ((fpsCount > 0) && (age < timePerFrame * 1.5)) {
+            fps.setForeground(Color.GREEN);
+            fpsWarning.setVisible(false);
+        } else if ((fpsCount > 0) && (age < timePerFrame * 3)) {
+            fps.setForeground(Color.ORANGE);
+            fpsWarning.setVisible(false);
+        } else {
+            fps.setForeground(Color.RED);
+            fpsWarning.setVisible(true);
+        }
+
         fps.setText(s);
-        lastFpsUpdate = System.currentTimeMillis();
     }
 
     @Override
