@@ -85,10 +85,10 @@ public class Runner {
         for (String strategy : StrategyFactory.availableDesignators())
             strategyTab.addStrategy(strategy);
 
-        mainWindow.addToFrame(strategyTab, "Strategy");
+        mainWindow.addToSidebar(strategyTab);
 
         gui = new SimpleWorldGUI(world);
-        mainWindow.addToFrame(gui.getPanel(), "World");
+        mainWindow.addToMainPanel(gui.getPanel());
         gui.start();
 
     }

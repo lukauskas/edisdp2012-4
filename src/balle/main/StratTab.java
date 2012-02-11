@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import balle.controller.Controller;
@@ -19,16 +20,19 @@ import balle.world.AbstractWorld;
 public class StratTab extends JPanel implements ActionListener {
 
     // GUI
-    private JPanel            top;
-    private JButton           button;
-    private JComboBox         menu;
+    private JPanel              top;
+    private JButton             button;
+    private JComboBox           menu;
+    private JLabel              label;
 
-    private ArrayList<String> stratTabs;
-    private String[]          strings                = new String[0];
+    private ArrayList<String>   stratTabs;
+    private String[]            strings                = new String[0];
 
-    private AbstractStrategy  currentRunningStrategy = null;
-    private Controller        controller;
-    private AbstractWorld     world;
+    private AbstractStrategy    currentRunningStrategy = null;
+    private Controller          controller;
+    private AbstractWorld       world;
+
+    private final static String LABEL_TEXT             = "Select strategy";
 
     public StratTab(Controller controller, AbstractWorld world) {
         super();
@@ -46,8 +50,11 @@ public class StratTab extends JPanel implements ActionListener {
 
         menu = new JComboBox(strings);
 
+        label = new JLabel(LABEL_TEXT);
+
         top.add(BorderLayout.WEST, menu);
         top.add(BorderLayout.EAST, button);
+        top.add(BorderLayout.NORTH, label);
 
         this.add(top);
     }
