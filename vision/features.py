@@ -19,10 +19,11 @@ class Features:
 
     def extractFeatures(self, frame):
 
+        hsv = frame.toHSV()
         ents = {'yellow': None, 'blue': None, 'ball': None}
-        yellow = self.threshold.yellowT(frame)
-        blue = self.threshold.blueT(frame)
-        ball = self.threshold.ball(frame)
+        yellow = self.threshold.yellowT(hsv)
+        blue = self.threshold.blueT(hsv)
+        ball = self.threshold.ball(hsv)
 
         self._display.updateLayer('threshY', yellow)
         self._display.updateLayer('threshB', blue)

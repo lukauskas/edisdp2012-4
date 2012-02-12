@@ -57,6 +57,8 @@ class Gui:
 
         size = baseLayer.size()
 
+        # Draw all entities to one layer (for speed)
+        entityLayer = baseLayer.dl()
         for key in iterator:
             toDraw = self._layers[key]
             if toDraw is None:
@@ -66,10 +68,10 @@ class Gui:
                 baseLayer.addDrawingLayer(toDraw)
 
             else:
-                layer = DrawingLayer(size)
-                baseLayer.addDrawingLayer(layer)
+                #layer = DrawingLayer(size)
+                #baseLayer.addDrawingLayer(layer)
 
-                toDraw.draw(layer)
+                toDraw.draw(entityLayer)
 
         # draw fps
         for layer in self._persistentLayers.itervalues():

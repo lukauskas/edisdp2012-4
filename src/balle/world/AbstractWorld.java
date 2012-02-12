@@ -52,8 +52,7 @@ public abstract class AbstractWorld implements Listener {
      * @return new coordinate for the position of the object after timestep
      */
     public Coord estimatedPosition(FieldObject object, double timestep) {
-        if ((object == null) || (object.getPosition() == null)
-                || (object.getVelocity() == null))
+        if ((object.getPosition() == null) || (object.getVelocity() == null))
             return null;
         else if (timestep == 0) {
             return object.getPosition();
@@ -85,9 +84,9 @@ public abstract class AbstractWorld implements Listener {
      * @param ballPosY
      * @param timestamp
      */
-    abstract protected void updateScaled(double yPosX, double yPosY,
-            double yRad, double bPosX, double bPosY, double bRad,
-            double ballPosX, double ballPosY, long timestamp);
+    abstract protected void updateScaled(Coord ourPos,
+            Orientation ourOrientation, Coord theirsPos,
+            Orientation theirsOrientation, Coord ballPos, long timestamp);
 
     protected double scaleXToMeters(double x) {
         if (x < 0)
@@ -104,8 +103,8 @@ public abstract class AbstractWorld implements Listener {
     }
 
     @Override
-    public void update(double yPosX, double yPosY, double yRad, double bPosX,
-            double bPosY, double bRad, double ballPosX, double ballPosY,
+    public void update(double yPosX, double yPosY, double yDeg, double bPosX,
+            double bPosY, double bDeg, double ballPosX, double ballPosY,
             long timestamp) {
 
         if ((pitchWidth < 0) || (pitchHeight < 0)) {
@@ -113,18 +112,34 @@ public abstract class AbstractWorld implements Listener {
                     .println("Cannot update locations as pitch size is not set properly. Restart vision");
             return;
         }
-        // Scale the coordinates from vision to meters:
-        yPosX = scaleXToMeters(yPosX);
-        yPosY = scaleYToMeters(yPosY);
 
-        bPosX = scaleXToMeters(bPosX);
-        bPosY = scaleYToMeters(bPosY);
+        Coord yPos = null;
+        Orientation yOrientation = null;
+        Coord bPos = null;
+        Orientation bOrientation = null;
+        Coord ballPos = null;
 
-        ballPosX = scaleXToMeters(ballPosX);
-        ballPosY = scaleYToMeters(ballPosY);
+        if ((yPosX != UNKNOWN_VALUE) && (yPosY != UNKNOWN_VALUE)) {
+            yPos = new Coord(scaleXToMeters(yPosX), scaleYToMeters(yPosY));
+            yOrientation = new Orientation(yDeg, false);
+        }
 
-        updateScaled(yPosX, yPosY, yRad, bPosX, bPosY, bRad, ballPosX,
-                ballPosY, timestamp);
+        if ((bPosX != UNKNOWN_VALUE) && (bPosY != UNKNOWN_VALUE)) {
+            bPos = new Coord(scaleXToMeters(bPosX), scaleYToMeters(bPosY));
+            bOrientation = new Orientation(bDeg, false);
+        }
+
+        if ((ballPosX != UNKNOWN_VALUE) && (ballPosY != UNKNOWN_VALUE)) {
+            ballPos = new Coord(scaleXToMeters(ballPosX),
+                    scaleYToMeters(ballPosY));
+        }
+
+        if (isBlue())
+            updateScaled(bPos, bOrientation, yPos, yOrientation, ballPos,
+                    timestamp);
+        else
+            updateScaled(yPos, yOrientation, bPos, bOrientation, ballPos,
+                    timestamp);
     }
 
     @Override

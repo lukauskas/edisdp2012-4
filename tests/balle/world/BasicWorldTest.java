@@ -106,7 +106,7 @@ public class BasicWorldTest {
      */
     @Test
     public void testVelocityProperlyEstimated() {
-        double dX = 1.5;
+        double dX = 0.3; // Should be low enough not to get discarded
         long dT = 1;
 
         worldY.update(0, 0, 0, 0, 0, 0, 0, 0, 0);
@@ -121,14 +121,14 @@ public class BasicWorldTest {
      */
     @Test
     public void testVelocityProperlyEstimatedAtAnAngle() {
-        double dX = 1;
-        double dY = 1;
+        double dX = 0.3; // Should be low enough not to get discarded
+        double dY = 0.4; // Should be low enough not to get discarded
         long dT = 1;
 
         worldY.update(0, 0, 0, 0, 0, 0, 0, 0, 0);
         worldY.update(dX, dY, 0, 0, 0, 0, 0, 0, dT);
 
-        assertEquals(Math.sqrt(2), worldY.getSnapshot().getBalle()
-                .getVelocity().abs(), 0.0000001);
+        assertEquals(0.5, worldY.getSnapshot().getBalle().getVelocity().abs(),
+                0.0000001);
     }
 }

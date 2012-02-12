@@ -7,7 +7,6 @@ package balle.world;
 public class EmptySnapshot extends Snapshot {
 
     public EmptySnapshot() {
-
         super(new Robot(null, null, null), new Robot(null, null, null),
                 new FieldObject(null, null), System.currentTimeMillis());
     }
