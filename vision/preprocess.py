@@ -36,7 +36,7 @@ class Preprocessor:
         print "Cropped rectangle {0}".format(self._cropRect)
         
     def preprocess(self, frame):
-        frame = self.undistort(frame)
+        #frame = self.undistort(frame)
         
         if self.hasPitchSize:
             frame = frame.crop(*self._cropRect)

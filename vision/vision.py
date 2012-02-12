@@ -32,6 +32,7 @@ class Vision:
 
         if sourcefile is None:  
             self.cap = Camera()
+            self.cap.loadCalibration('pitch1')
         else:
             filetype = 'video'
             if sourcefile.endswith(('jpg', 'png')):
@@ -63,7 +64,7 @@ class Vision:
         
     def doStuff(self):
         while self.running:
-            frame = self.cap.getImage()
+            frame = self.cap.getImageUndistort()
             frame = self.preprocessor.preprocess(frame)
             
             self.gui.updateLayer('raw', frame)
