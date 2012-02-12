@@ -4,6 +4,7 @@ import balle.controller.Controller;
 import balle.world.AbstractWorld;
 import balle.world.Coord;
 import balle.world.FieldObject;
+import balle.world.Orientation;
 import balle.world.Robot;
 
 public class GoToBall extends AbstractStrategy {
@@ -15,8 +16,8 @@ public class GoToBall extends AbstractStrategy {
     private long                timeToTurn         = 0;
     private final static double DISTANCE_THRESHOLD = 0.2;
     private final static double EPSILON            = 0.00001;
-    private final static double DISTANCE_DIFF      = 0.1;
-    private final static int    SPEED_CONSTANT     = 500;
+    private final static double DISTANCE_DIFF      = 0.3;
+    private final static int    SPEED_CONSTANT     = 700;
 
     public GoToBall(Controller controller, AbstractWorld world) {
         super(controller, world);
@@ -59,12 +60,18 @@ public class GoToBall extends AbstractStrategy {
             return;
         } else {
 
-            // Minus one the atan2 as our coordinate axes are upside down.. no?
-            // Yes! Fixed. Don't need it.
             double angleToTarget = target.sub(currentPosition).orientation();
-            ;
-            double currentOrientation = robot.getOrientation()
-                    .atan2styleradians();
+
+            Orientation currentOr = robot.getOrientation();
+            if (currentOr == null) {
+                System.out.println("getOrientation is null");
+                if (isMoving) {
+                    controller.stop();
+                    isMoving = false;
+                }
+                return;
+            }
+            double currentOrientation = currentOr.atan2styleradians();
 
             double turnLeftAngle, turnRightAngle;
             if (angleToTarget > currentOrientation) {
@@ -82,13 +89,14 @@ public class GoToBall extends AbstractStrategy {
             if (turnLeftAngle < turnRightAngle)
                 turnAngle = turnLeftAngle;
             else
-                turnAngle = -turnRightAngle; // TODO these should be flipped in
-                                             // controlelr!!
+                turnAngle = -turnRightAngle;
 
             double dist = target.dist(robot.getPosition());
-            double distDiffFromTarget = Math.sin(Math.abs(turnAngle)) * dist;
+            double distDiffFromTarget = Math.abs(Math.sin(turnAngle) * dist);
 
-            if (Math.abs(distDiffFromTarget) > DISTANCE_DIFF) {
+            if ((Math.abs(turnAngle) > Math.PI / 2) // sin(180) = sin(0) thus
+                                                    // the check
+                    || (Math.abs(distDiffFromTarget) > DISTANCE_DIFF * dist)) {
                 if (isMoving) {
                     controller.stop();
                     isMoving = false;
@@ -97,6 +105,7 @@ public class GoToBall extends AbstractStrategy {
                     timeToTurn = Math.round(Math.abs(turnAngle)
                             / (TURN_SPEED_RADIANS * 0.001))
                             + SPEED_CONSTANT;
+
                     System.out.println("Turning " + turnAngle + " should take "
                             + timeToTurn + " ms");
                     controller.rotate((int) (turnAngle * 180 / Math.PI), 180);
@@ -110,11 +119,12 @@ public class GoToBall extends AbstractStrategy {
                 }
             }
 
-            System.out.println("Angle to target unadjusted: "
-                    + (((angleToTarget * 180) / Math.PI)));
-            System.out.println("Current orientation: "
-                    + (robot.getOrientation().atan2styledegrees()));
-            System.out.println("Turn angle " + ((turnAngle * 180)) / Math.PI);
+            // System.out.println("Angle to target unadjusted: "
+            // + (((angleToTarget * 180) / Math.PI)));
+            // System.out.println("Current orientation: "
+            // + (robot.getOrientation().atan2styledegrees()));
+            // System.out.println("Turn angle " + ((turnAngle * 180)) /
+            // Math.PI);
 
         }
 

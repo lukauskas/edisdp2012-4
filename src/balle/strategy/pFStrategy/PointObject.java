@@ -1,7 +1,5 @@
 package balle.strategy.pFStrategy;
 
-import balle.main.Runner;
-
 //basic Point class includes x,y
 public class PointObject extends Vector implements Object {
 

@@ -116,7 +116,7 @@ public class PFPlanning {
     }
 
     // Actual function which computes the the next velocity vector to be applied
-    // to the robor.
+    // to the robot.
     public Vector GoTo(List<Object> obstacles, PointObject dest_obj,
             Point start_point) {
         // calculate distance so if we reached the target position we stop.
