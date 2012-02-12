@@ -8,7 +8,7 @@ import balle.world.Robot;
 
 public class Strategy_M2 extends AbstractStrategy {
 
-    private static final double DISTANCE_TO_TRAVEL    = 1;
+    private static final double DISTANCE_TO_TRAVEL    = 0.6;
     private double              EPSILON               = 0.000001;
     private double              DISTANCE_THRESHOLD    = 0.13;
     private int                 INIT_SPEED            = 220;
@@ -46,6 +46,34 @@ public class Strategy_M2 extends AbstractStrategy {
         return result;
     }
 
+    protected void blockBall(Controller controller, Coord target, Robot robot) {
+        double angleToTarget = target.sub(robot.getPosition()).orientation();
+        double currentOrientation = robot.getOrientation().atan2styleradians();
+
+        double turnLeftAngle, turnRightAngle;
+
+        if (angleToTarget > currentOrientation) {
+            turnLeftAngle = angleToTarget - currentOrientation;
+            turnRightAngle = currentOrientation + (2 * Math.PI - angleToTarget);
+        } else {
+            turnLeftAngle = (2 * Math.PI) - currentOrientation + angleToTarget;
+            turnRightAngle = currentOrientation - angleToTarget;
+        }
+
+        if (turnLeftAngle <= turnRightAngle) {
+            // controller.setWheelSpeeds(speed - 120, speed);
+            // System.out.println("Turning Left");
+            controller.setWheelSpeeds(speed, speed - 20);
+            System.out.println("Blocking Right");
+        }
+        if (turnLeftAngle > turnRightAngle) {
+            // controller.setWheelSpeeds(speed, speed - 120);
+            // System.out.println("Turning Right");
+            controller.setWheelSpeeds(speed - 20, speed);
+            System.out.println("Blocking Left");
+        }
+    }
+
     @Override
     protected void aiMove(Controller controller) {
         if (getSnapshot() == null) {
@@ -77,9 +105,9 @@ public class Strategy_M2 extends AbstractStrategy {
                 System.out.println("Setting start coordinate");
                 startCoord = getSnapshot().getBalle().getPosition();
             }
-            speed = INIT_SPEED;
-            controller.forward(speed);
             reachedBall = true;
+            blockBall(controller, target, robot);
+
         } else {
             // Ball away from robot
             double angleToTarget = target.sub(currentPosition).orientation();
@@ -106,18 +134,14 @@ public class Strategy_M2 extends AbstractStrategy {
                 }
 
                 if (turnLeftAngle <= turnRightAngle) {
-                    // controller.setWheelSpeeds(speed - 120, speed);
-                    // System.out.println("Turning Left");
-                    controller.setWheelSpeeds(speed, speed - 120);
-                    System.out.println("Blocking Right");
+                    controller.setWheelSpeeds(speed - 120, speed);
+                    System.out.println("Turning Left");
+
                 }
                 if (turnLeftAngle > turnRightAngle) {
-                    // controller.setWheelSpeeds(speed, speed - 120);
-                    // System.out.println("Turning Right");
-                    controller.setWheelSpeeds(speed - 120, speed);
-                    System.out.println("Blocking Left");
+                    controller.setWheelSpeeds(speed, speed - 120);
+                    System.out.println("Turning Right");
                 }
-
             }
         }
     }
