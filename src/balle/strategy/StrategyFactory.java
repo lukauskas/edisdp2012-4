@@ -6,7 +6,7 @@ import balle.world.AbstractWorld;
 public class StrategyFactory {
     public static String[] availableDesignators() {
 
-        String[] designators = { "DummyStrategy", "GoToBall", "Strategy_M2" };
+        String[] designators = { "DummyStrategy", "GoToBall", "Dribble" };
         return designators;
     }
 
@@ -18,8 +18,8 @@ public class StrategyFactory {
             return new DummyStrategy(controller, world);
         } else if (designator == "GoToBall") {
             return new GoToBall(controller, world);
-        } else if (designator == "Strategy_M2") {
-            return new Strategy_M2(controller, world);
+        } else if (designator == "Dribble") {
+            return new Dribble(controller, world);
         } else
             throw new UnknownDesignatorException("Don't know strategy \""
                     + designator + "\"");
