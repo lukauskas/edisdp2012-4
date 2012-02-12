@@ -13,7 +13,6 @@ import balle.controller.DummyController;
 import balle.io.reader.SocketVisionReader;
 import balle.simulator.Simulator;
 import balle.simulator.SoftBot;
-import balle.strategy.AbstractStrategy;
 import balle.strategy.StrategyFactory;
 import balle.world.AbstractWorld;
 import balle.world.BasicWorld;
@@ -127,7 +126,6 @@ public class Runner {
     public static void runSimulator(boolean balleIsBlue) {
         Simulator simulator = Simulator.createSimulator();
         BasicWorld world = new BasicWorld(balleIsBlue);
-        AbstractStrategy s;
         simulator.addListener(world);
 
         SoftBot bot;
