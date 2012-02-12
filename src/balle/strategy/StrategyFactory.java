@@ -14,10 +14,10 @@ public class StrategyFactory {
             Controller controller, AbstractWorld world)
             throws UnknownDesignatorException {
 
-        if (designator == "DummyStrategy") {
+        if (designator.equals("DummyStrategy")) {
             return new DummyStrategy(controller, world);
         }
-        if (designator == "GoToBall") {
+        if (designator.equals("GoToBall")) {
             return new GoToBall(controller, world);
         } else
             throw new UnknownDesignatorException("Don't know strategy \""
