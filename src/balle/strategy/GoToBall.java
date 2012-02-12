@@ -4,6 +4,7 @@ import balle.controller.Controller;
 import balle.world.AbstractWorld;
 import balle.world.Coord;
 import balle.world.FieldObject;
+import balle.world.Orientation;
 import balle.world.Robot;
 
 public class GoToBall extends AbstractStrategy {
@@ -59,12 +60,18 @@ public class GoToBall extends AbstractStrategy {
             return;
         } else {
 
-            // Minus one the atan2 as our coordinate axes are upside down.. no?
-            // Yes! Fixed. Don't need it.
             double angleToTarget = target.sub(currentPosition).orientation();
-            ;
-            double currentOrientation = robot.getOrientation()
-                    .atan2styleradians();
+
+            Orientation currentOr = robot.getOrientation();
+            if (currentOr == null) {
+                System.out.println("getOrientation is null");
+                if (isMoving) {
+                    controller.stop();
+                    isMoving = false;
+                }
+                return;
+            }
+            double currentOrientation = currentOr.atan2styleradians();
 
             double turnLeftAngle, turnRightAngle;
             if (angleToTarget > currentOrientation) {
@@ -88,7 +95,8 @@ public class GoToBall extends AbstractStrategy {
             double dist = target.dist(robot.getPosition());
             double distDiffFromTarget = Math.sin(Math.abs(turnAngle)) * dist;
 
-            if (Math.abs(distDiffFromTarget) > DISTANCE_DIFF) {
+            // if (Math.abs(distDiffFromTarget) > DISTANCE_DIFF) {
+            if (Math.abs(turnAngle) > Math.PI / 8) {
                 if (isMoving) {
                     controller.stop();
                     isMoving = false;
@@ -97,6 +105,7 @@ public class GoToBall extends AbstractStrategy {
                     timeToTurn = Math.round(Math.abs(turnAngle)
                             / (TURN_SPEED_RADIANS * 0.001))
                             + SPEED_CONSTANT;
+
                     System.out.println("Turning " + turnAngle + " should take "
                             + timeToTurn + " ms");
                     controller.rotate((int) (turnAngle * 180 / Math.PI), 180);
