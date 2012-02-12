@@ -16,10 +16,9 @@ public class StrategyFactory {
 
         if (designator.equals("DummyStrategy")) {
             return new DummyStrategy(controller, world);
-        }
-        else if (designator.equals("GoToBall")) {
+        } else if (designator.equals("GoToBall")) {
             return new GoToBall(controller, world);
-        } else if (designator == "Dribble") {
+        } else if (designator.equals("Dribble")) {
             return new Dribble(controller, world);
         } else
             throw new UnknownDesignatorException("Don't know strategy \""
