@@ -4,12 +4,6 @@ import static java.util.Arrays.asList;
 
 import java.io.IOException;
 
-package balle.main;
-
-import static java.util.Arrays.asList;
-
-import java.io.IOException;
-
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import balle.bluetooth.Communicator;
