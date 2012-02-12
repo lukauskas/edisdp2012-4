@@ -16,7 +16,7 @@ public class GoToBall extends AbstractStrategy {
     private long                timeToTurn         = 0;
     private final static double DISTANCE_THRESHOLD = 0.2;
     private final static double EPSILON            = 0.00001;
-    private final static double DISTANCE_DIFF      = 0.1;
+    private final static double DISTANCE_DIFF      = 0.3;
     private final static int    SPEED_CONSTANT     = 500;
 
     public GoToBall(Controller controller, AbstractWorld world) {
@@ -93,10 +93,10 @@ public class GoToBall extends AbstractStrategy {
                                              // controlelr!!
 
             double dist = target.dist(robot.getPosition());
-            double distDiffFromTarget = Math.sin(Math.abs(turnAngle)) * dist;
+            double distDiffFromTarget = Math.abs(Math.sin(turnAngle) * dist);
 
-            // if (Math.abs(distDiffFromTarget) > DISTANCE_DIFF) {
-            if (Math.abs(turnAngle) > Math.PI / 8) {
+            if (Math.abs(distDiffFromTarget) > DISTANCE_DIFF) {
+                // if (Math.abs(turnAngle) > Math.PI / 8) {
                 if (isMoving) {
                     controller.stop();
                     isMoving = false;

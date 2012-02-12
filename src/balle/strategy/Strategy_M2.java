@@ -11,7 +11,7 @@ public class Strategy_M2 extends AbstractStrategy {
     private static final double DISTANCE_TO_TRAVEL    = 1;
     private double              EPSILON               = 0.000001;
     private double              DISTANCE_THRESHOLD    = 0.13;
-    private int                 INIT_SPEED            = 400;
+    private int                 INIT_SPEED            = 220;
     private int                 speed                 = INIT_SPEED;
     boolean                     reachedBall           = false;
     float                       distance              = 0;
