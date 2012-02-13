@@ -43,15 +43,12 @@ public class UserInputStrategy extends AbstractStrategy {
 		}
 	}
 
-
 	@Override
 	// TODO Change to rely on and react to JPanel thing
 	protected void aiMove(Controller controller) {
 		System.out.println(leftWheelPower + " " + rightWheelPower);
-		controller.setWheelSpeeds((int)Math.round(leftWheelPower),
-				(int)Math.round(rightWheelPower));
-		
-
+		controller.setWheelSpeeds((int) Math.round(leftWheelPower),
+				(int) Math.round(rightWheelPower));
 
 	}
 
@@ -80,11 +77,12 @@ public class UserInputStrategy extends AbstractStrategy {
 			mouseXPos = e.getX();
 			mouseYPos = e.getY();
 			screen.repaint();
-			int dX = (mouseXPos - screen.getWidth()/2);
-			int dY = (screen.getHeight()-mouseYPos)-(screen.getHeight()/2);
+			int dX = (mouseXPos - screen.getWidth() / 2);
+			int dY = (screen.getHeight() - mouseYPos)
+					- (screen.getHeight() / 2);
 			leftWheelPower = leftWheelTurn(dX, dY) * 100;
 			rightWheelPower = rightWheelTurn(dX, dY) * 100;
-			
+
 		}
 
 		@Override
@@ -104,14 +102,14 @@ public class UserInputStrategy extends AbstractStrategy {
 		public void mouseMoved(MouseEvent e) {
 		}
 
-		// Calculates the amount 
+		// Calculates the amount
 		public float leftWheelTurn(int dX, int dY) {
 			if (dX > 0 && dY > 0) {
 				return 1;
 			} else if (dX > 0 && dY < 0) {
 				return -1;
 			} else {
-				float angleToClick = turningAngle(dX,dY);
+				float angleToClick = turningAngle(dX, dY);
 				if (dY < 0) {
 					return -angleToClick;
 				} else {
@@ -119,14 +117,14 @@ public class UserInputStrategy extends AbstractStrategy {
 				}
 			}
 		}
-		
+
 		public float rightWheelTurn(int dX, int dY) {
 			if (dX < 0 && dY > 0) {
 				return 1;
 			} else if (dX < 0 && dY < 0) {
 				return -1;
 			} else {
-				float angleToClick = turningAngle(dX,dY);
+				float angleToClick = turningAngle(dX, dY);
 				if (dY < 0) {
 					return -angleToClick;
 				} else {
@@ -134,12 +132,13 @@ public class UserInputStrategy extends AbstractStrategy {
 				}
 			}
 		}
-		
+
 		public float turningAngle(int dX, int dY) {
-			double angle = Math.atan2((double)Math.abs(dY),(double)Math.abs(dX));
-			return (float) (((angle/(Math.PI/2)) -0.5)*2);
+			double angle = Math.atan2((double) Math.abs(dY),
+					(double) Math.abs(dX));
+			return (float) (((angle / (Math.PI / 2)) - 0.5) * 2);
 		}
-		
+
 	}
 
 	// Where the user clicks to control robot. Robot drawn in blue.
@@ -151,8 +150,10 @@ public class UserInputStrategy extends AbstractStrategy {
 			g.setColor(Color.DARK_GRAY);
 			g.fillRect(0, 0, screen.getWidth(), screen.getHeight());
 			g.setColor(Color.WHITE);
-			g.drawLine(0, screen.getHeight()/ 2, screen.getWidth(), screen.getHeight()/2);
-			g.drawLine(screen.getWidth()/2, 0, screen.getWidth()/2, screen.getHeight());
+			g.drawLine(0, screen.getHeight() / 2, screen.getWidth(),
+					screen.getHeight() / 2);
+			g.drawLine(screen.getWidth() / 2, 0, screen.getWidth() / 2,
+					screen.getHeight());
 			g.setColor(Color.BLUE);
 			g.fillRect((screen.getWidth() / 2) - 45,
 					(screen.getHeight() / 2) - 50, 90, 100);
