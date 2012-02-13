@@ -1,4 +1,5 @@
 import pygame
+import time
 import cv
 from SimpleCV import Display, DrawingLayer, Image, Blob
 
@@ -27,16 +28,22 @@ class Gui:
                 # Overlay layers
                 'yellow': None,
                 'blue': None,
-                'ball' : None
+                'ball' : None,
                 }
 
+        # These layers are drawn regardless of the current layerset
+        self._persistentLayers = {
+                'fps': None,
+                'mouse': None
+        }
+
         self._currentLayerset = self.layersets['default']
-
         self._display = Display()
-        
         self._eventHandler = Gui.EventHandler()
-
         self._lastMouseState = 0
+        self._showMouse = True
+        self._lastFrame = None
+        self._lastFrameTime = time.time()
 
     def __draw(self):
 
@@ -50,33 +57,78 @@ class Gui:
 
         size = baseLayer.size()
 
+        # Draw all entities to one layer (for speed)
+        entityLayer = baseLayer.dl()
         for key in iterator:
-            if self._layers[key] is None:
+            toDraw = self._layers[key]
+            if toDraw is None:
                 continue
             
-            layer = DrawingLayer(size)
-            baseLayer.addDrawingLayer(layer)
+            elif isinstance(toDraw, DrawingLayer):
+                baseLayer.addDrawingLayer(toDraw)
 
-            self._layers[key].draw(layer=layer)
+            else:
+                #layer = DrawingLayer(size)
+                #baseLayer.addDrawingLayer(layer)
+
+                toDraw.draw(entityLayer)
+
+        # draw fps
+        for layer in self._persistentLayers.itervalues():
+            if layer is not None:
+                baseLayer.addDrawingLayer(layer)
 
         baseLayer.save(self._display)
 
+    def __updateFps(self):
+        smoothConst = 0.1
+        thisFrameTime = time.time()
+
+        thisFrame = thisFrameTime - self._lastFrameTime
+        if self._lastFrame is not None:
+            # Smooth values
+            thisFrame = thisFrame * (1 - smoothConst) + smoothConst * self._lastFrame
+        
+        fps = 1.0 / thisFrame
+
+        self._lastFrame = thisFrame
+        self._lastFrameTime = thisFrameTime
+
+        # Draw the text
+        size = self._layers['raw'].size() # This could break
+
+        layer = DrawingLayer(size)
+        layer.ezViewText('{0:.2f} fps'.format(fps), (10, 10))
+        self.updateLayer('fps', layer)
+
+    def drawCrosshair(self, pos, layerName):
+        size = self._layers['raw'].size()
+        layer = self.getDrawingLayer()
+        layer.line((0, pos[1]), (size[0], pos[1]), color=(0, 0, 255))
+        layer.line((pos[0], 0), (pos[0], size[1]), color=(0, 0, 255))
+
+        self.updateLayer(layerName, layer)
+
+ 
     def loop(self):
         """
         Draw the image to the display, and process any events
         """
-        
-        self.__draw()
 
         for event in pygame.event.get(pygame.KEYDOWN):
             self._eventHandler.processKey(chr(event.key % 0x100))
 
         self._display.checkEvents()
+        mouseX = self._display.mouseX
+        mouseY = self._display.mouseY
+
+        if self._showMouse:
+            self.drawCrosshair((mouseX, mouseY), 'mouse')
 
         mouseLeft = self._display.mouseLeft
         # Only fire click event once for each click
         if mouseLeft == 1 and self._lastMouseState == 0:
-            self._eventHandler.processClick((self._display.mouseX, self._display.mouseY))
+            self._eventHandler.processClick((mouseX, mouseY))
         
         self._lastMouseState = mouseLeft
             
@@ -84,23 +136,37 @@ class Gui:
         c = cv.WaitKey(16)
         self._eventHandler.processKey(chr(c % 0x100))
 
+        self.__updateFps()
+        self.__draw()
+
     def getEventHandler(self):
         return self._eventHandler   
+
+    def getDrawingLayer(self):
+        return DrawingLayer(self._layers['raw'].size())
 
     def updateLayer(self, name, layer):
         """
         Update the layer specified by 'name'
+        If the layer name is not in the know list of layers, 
+        then it will be drawn regardless of the current view setting
         """
-
-        assert name in self._layers.keys(), \
-                name + ' is not in the known list of layers'
         
-        self._layers[name] = layer
+        if name in self._layers.keys():
+            self._layers[name] = layer
+        else:
+            self._persistentLayers[name] = layer
 
     def switchLayerset(self, name):
         assert name in self.layersets.keys(), 'Unknown layerset ' + name + '!'
 
         self._currentLayerset = self.layersets[name]
+
+    def setShowMouse(self, showMouse):
+        if not showMouse:
+            self.updateLayer('mouse', None)
+
+        self._showMouse = showMouse
         
     class EventHandler:
         
@@ -156,7 +222,6 @@ class ThresholdGui:
         self.__setupKeyEvents()
 
         self.changeEntity('yellow')
-
         
     def __setupKeyEvents(self):
         """

@@ -64,17 +64,6 @@ public class DummyController implements Controller {
     /*
      * (non-Javadoc)
      * 
-     * @see balle.brick.Controller#travel(int)
-     */
-    @Override
-    public void travel(int dist) {
-        System.out.println("Travel (dist: " + dist + ")");
-
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
      * @see balle.brick.Controller#setWheelSpeeds(int, int)
      */
     @Override

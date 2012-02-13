@@ -54,12 +54,6 @@ public class SoftBot implements Controller {
 	}
 
 	@Override
-	public void travel(int dist) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public void setWheelSpeeds(int leftWheelSpeed, int rightWheelSpeed) {
 		this.leftWheelSpeed = leftWheelSpeed;
 		this.rightWheelSpeed = rightWheelSpeed;
@@ -69,8 +63,7 @@ public class SoftBot implements Controller {
 
 	@Override
 	public int getMaximumWheelSpeed() {
-		// TODO Auto-generated method stub
-		return 0;
+		return 720;
 	}
 
 	@Override

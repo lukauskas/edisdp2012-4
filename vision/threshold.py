@@ -1,29 +1,35 @@
 import cv
 import os
+import sys
 import cPickle
-from SimpleCV import Image
+from SimpleCV import Image, ColorSpace
 
 class Threshold:
     
     # File for storing temporary threshold defaults
-    filepath = "threshdefaults"
+    filepath = "threshdefaults_{0}"
 
     def __init__(self, pitch):
         
-        self.__getDefaults(pitch)
+        self._pitch = pitch
+        self.__getDefaults()
         
-    def __getDefaults(self, pitch):
+    def __getDefaults(self):
         self._values = {}
         
-        if os.path.exists(self.filepath):
-            f = open(self.filepath, 'r')
+        path = self.__getFilePath()
+        if os.path.exists(path):
+            f = open(path, 'r')
             self._values = cPickle.load(f)
         else:
-            self._values = defaults[pitch]
+            self._values = defaults[self._pitch]
             
     def __saveDefaults(self):
-        f = open(self.filepath, 'w')
+        f = open(self.__getFilePath(), 'w')
         cPickle.dump(self._values, f)
+
+    def __getFilePath(self):
+        return os.path.join(sys.path[0], self.filepath.format(self._pitch))
 
     def yellowT(self, frame):
         return self.threshold(frame, self._values['yellow'][0], self._values['yellow'][1])
@@ -35,31 +41,39 @@ class Threshold:
         return self.threshold(frame, self._values['ball'][0], self._values['ball'][1])
     
     def threshold(self, frame, threshmin, threshmax):
-        
-        iplhsv = frame.toHSV().getBitmap()
+        """
+        Performs thresholding on a frame.
+        The image must be in the HSV colorspace!
+        """
+
+        assert frame.getColorSpace() == ColorSpace.HSV, "Image must be HSV!"
+
+        iplframe = frame.getBitmap()
 
         crossover = False
         if threshmin[0] > threshmax[0]:
             # Handle hue threshold crossing over
             # angle boundry e.g. when thresholding on red
-            
+
+            hMax = threshmin[0]
+            hMin = threshmax[0]
+
             crossover = True
-            threshmax2 = [threshmin[0], threshmax[1], threshmax[2]]
-            threshmin = [threshmax[0], threshmin[1], threshmin[2]] 
+            threshmax2 = [hMin, threshmax[1], threshmax[2]]
+            threshmin = [hMax, threshmin[1], threshmin[2]] 
             threshmax = [255, threshmax[1], threshmax[2]]
             threshmin2 = [0, threshmin[1], threshmin[2]]
 
-        iplresult = cv.CreateImage(cv.GetSize(iplhsv), frame.depth, 1)
-        cv.InRangeS(iplhsv, threshmin, threshmax, iplresult)
+        iplresult = cv.CreateImage(cv.GetSize(iplframe), frame.depth, 1)
+        cv.InRangeS(iplframe, threshmin, threshmax, iplresult)
 
         result = Image(iplresult)
 
         if crossover:
-            iplresult2 = cv.CreateImage(cv.GetSize(iplhsv), frame.depth, 1)
-            cv.InRangeS(iplhsv, threshmin2, threshmax2, iplresult2)
+            iplresult2 = cv.CreateImage(cv.GetSize(iplframe), frame.depth, 1)
+            cv.InRangeS(iplframe, threshmin2, threshmax2, iplresult2)
             
             result = result + Image(iplresult2)
-
 
         return result
 

@@ -1,9 +1,14 @@
 from __future__ import print_function
 import sys
+import os
 import time
-import cv
+import math
 import socket
-from SimpleCV import Image, Camera
+import cv
+
+from optparse import OptionParser
+
+from SimpleCV import Image, Camera, VirtualCamera
 from preprocess import Preprocessor
 from features import Features
 from threshold import Threshold
@@ -20,20 +25,31 @@ PITCH_SIZE_BIT  = 'P';
 
 class Vision:
     
-    def __init__(self, pitchnum):
+    def __init__(self, pitchnum, stdout, sourcefile):
                
         self.running = True
         
-        self.stdout = False
+        self.stdout = stdout 
 
-        self.cap = Camera()
+        if sourcefile is None:  
+            self.cap = Camera()
+        else:
+            filetype = 'video'
+            if sourcefile.endswith(('jpg', 'png')):
+                filetype = 'image'
+
+            self.cap = VirtualCamera(sourcefile, filetype)
+        
+        calibrationPath = os.path.join('calibration', 'pitch{0}'.format(pitchnum))
+        self.cap.loadCalibration(os.path.join(sys.path[0], calibrationPath))
+
         self.gui = Gui()
         self.threshold = Threshold(pitchnum)
         self.thresholdGui = ThresholdGui(self.threshold, self.gui)
         self.preprocessor = Preprocessor()
         self.features = Features(self.gui, self.threshold)
         
-        eventHandler =  self.gui.getEventHandler()
+        eventHandler = self.gui.getEventHandler()
         eventHandler.addListener('q', self.quit)
         eventHandler.setClickListener(self.setNextPitchCorner)
         
@@ -51,8 +67,12 @@ class Vision:
         
     def doStuff(self):
         while self.running:
-            frame = self.cap.getImage()
-            #frame = Image('global05.jpg')
+            if self.cap.getCameraMatrix is None:
+                # No calibration matrices for pitch 0 atm
+                frame = self.cap.getImage()
+            else:
+                frame = self.cap.getImageUndistort()
+
             frame = self.preprocessor.preprocess(frame)
             
             self.gui.updateLayer('raw', frame)
@@ -62,7 +82,8 @@ class Vision:
 
             self.gui.loop()
         
-        self.socket.close()
+        if not self.stdout:
+            self.socket.close()
 
     def setNextPitchCorner(self, where):
         self.preprocessor.setNextPitchCorner(where)
@@ -70,6 +91,10 @@ class Vision:
         if self.preprocessor.hasPitchSize:
             print("Pitch size: {0!r}".format(self.preprocessor.pitch_size))
             self.outputPitchSize()
+            self.gui.setShowMouse(False)
+            self.gui.updateLayer('corner', None)
+        else:
+            self.gui.drawCrosshair(where, 'corner')
     
     def outputPitchSize(self):
         self.send('{0} {1} {2} \n'.format(
@@ -84,15 +109,17 @@ class Vision:
         self.send("{0} ".format(ENTITY_BIT))
 
         for name in ['yellow', 'blue', 'ball']:
-            x = y = angle = -1
             entity = ents[name]
-            if entity is not None:
-                x, y = entity.coordinates()
-                angle = entity.angle()
+            x, y = entity.coordinates()
+
+            # The rest of the system needs (0, 0) at the bottom left
+            if y != -1:
+                y = self.preprocessor.pitch_size[1] - y
 
             if name == 'ball':
                 self.send('{0} {1} '.format(x, y))
             else:
+                angle = 360 - (((entity.angle() * (180/math.pi)) - 360) % 360)
                 self.send('{0} {1} {2} '.format(x, y, angle))
 
         self.send(str(int(time.time() * 1000)) + " \n")
@@ -104,9 +131,23 @@ class Vision:
             self.socket.send(string)
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        Vision(int(sys.argv[1]))
-    else:
-        # Default to the main pitch
-        Vision(0)
+
+    parser = OptionParser()
+    parser.add_option('-p', '--pitch', dest='pitch', type='int', metavar='PITCH',
+                      help='PITCH should be 0 for main pitch, 1 for the other pitch')
+
+    parser.add_option('-f', '--file', dest='file', metavar='FILE',
+                      help='Use FILE as input instead of capturing from Camera')
+
+    parser.add_option('-s', '--stdout', action='store_true', dest='stdout', default=False,
+                      help='Send output to stdout instead of using a socket')
+
+    (options, args) = parser.parse_args()
+
+    if options.pitch not in [0,1]:
+        parser.error('Pitch must be 0 or 1')
+
+    Vision(options.pitch, options.stdout, options.file)
+
+
 

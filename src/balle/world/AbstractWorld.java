@@ -1,6 +1,7 @@
 package balle.world;
 
 import balle.io.listener.Listener;
+import balle.misc.Globals;
 
 /***
  * 
@@ -15,6 +16,9 @@ import balle.io.listener.Listener;
 public abstract class AbstractWorld implements Listener {
 
     public final int      UNKNOWN_VALUE = -1;
+
+    private double        pitchWidth    = -1;
+    private double        pitchHeight   = -1;
 
     // JEV: Scanner is final and can't be extended, makes it difficult for the
     // simulator.
@@ -48,8 +52,7 @@ public abstract class AbstractWorld implements Listener {
      * @return new coordinate for the position of the object after timestep
      */
     public Coord estimatedPosition(FieldObject object, double timestep) {
-        if ((object == null) || (object.getPosition() == null)
-                || (object.getVelocity() == null))
+        if ((object.getPosition() == null) || (object.getVelocity() == null))
             return null;
         else if (timestep == 0) {
             return object.getPosition();
@@ -67,5 +70,83 @@ public abstract class AbstractWorld implements Listener {
      * @return coordinates of the robot.
      */
     public abstract Snapshot getSnapshot();
+
+    /**
+     * Update the current state of the world using scaled coordinates
+     * 
+     * @param yPosX
+     * @param yPosY
+     * @param yRad
+     * @param bPosX
+     * @param bPosY
+     * @param bRad
+     * @param ballPosX
+     * @param ballPosY
+     * @param timestamp
+     */
+    abstract protected void updateScaled(Coord ourPos,
+            Orientation ourOrientation, Coord theirsPos,
+            Orientation theirsOrientation, Coord ballPos, long timestamp);
+
+    protected double scaleXToMeters(double x) {
+        if (x < 0)
+            return x;
+
+        return (x / pitchWidth) * Globals.PITCH_WIDTH;
+    }
+
+    protected double scaleYToMeters(double y) {
+        if (y < 0)
+            return y;
+
+        return (y / pitchHeight) * Globals.PITCH_HEIGHT;
+    }
+
+    @Override
+    public void update(double yPosX, double yPosY, double yDeg, double bPosX,
+            double bPosY, double bDeg, double ballPosX, double ballPosY,
+            long timestamp) {
+
+        if ((pitchWidth < 0) || (pitchHeight < 0)) {
+            System.err
+                    .println("Cannot update locations as pitch size is not set properly. Restart vision");
+            return;
+        }
+
+        Coord yPos = null;
+        Orientation yOrientation = null;
+        Coord bPos = null;
+        Orientation bOrientation = null;
+        Coord ballPos = null;
+
+        if ((yPosX != UNKNOWN_VALUE) && (yPosY != UNKNOWN_VALUE)) {
+            yPos = new Coord(scaleXToMeters(yPosX), scaleYToMeters(yPosY));
+            yOrientation = new Orientation(yDeg, false);
+        }
+
+        if ((bPosX != UNKNOWN_VALUE) && (bPosY != UNKNOWN_VALUE)) {
+            bPos = new Coord(scaleXToMeters(bPosX), scaleYToMeters(bPosY));
+            bOrientation = new Orientation(bDeg, false);
+        }
+
+        if ((ballPosX != UNKNOWN_VALUE) && (ballPosY != UNKNOWN_VALUE)) {
+            ballPos = new Coord(scaleXToMeters(ballPosX),
+                    scaleYToMeters(ballPosY));
+        }
+
+        if (isBlue())
+            updateScaled(bPos, bOrientation, yPos, yOrientation, ballPos,
+                    timestamp);
+        else
+            updateScaled(yPos, yOrientation, bPos, bOrientation, ballPos,
+                    timestamp);
+    }
+
+    @Override
+    public void updatePitchSize(double width, double height) {
+
+        pitchWidth = width;
+        pitchHeight = height;
+    }
 
 }

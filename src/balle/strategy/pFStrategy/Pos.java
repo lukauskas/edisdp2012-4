@@ -1,12 +1,14 @@
 package balle.strategy.pFStrategy;
 
+import balle.world.Coord;
+
 //A robot Pos, includes location and angle.
 public class Pos {
 	private final Point location;
 	private final double angle;
 
-	public Pos(Point loc, double angle) {
-		this.location = loc;
+	public Pos(Point point, double angle) {
+		this.location = point;
 		this.angle = angle;
 	}
 
