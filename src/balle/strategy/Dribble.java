@@ -1,12 +1,13 @@
 package balle.strategy;
 
 import balle.controller.Controller;
+import balle.strategy.planner.AbstractPlanner;
 import balle.world.AbstractWorld;
 import balle.world.Coord;
 import balle.world.FieldObject;
 import balle.world.Robot;
 
-public class Dribble extends AbstractStrategy {
+public class Dribble extends AbstractPlanner {
 
     private static final double DISTANCE_TO_TRAVEL    = 0.6;
     private double              EPSILON               = 0.000001;

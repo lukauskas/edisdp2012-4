@@ -1,6 +1,7 @@
 package balle.strategy;
 
 import balle.controller.Controller;
+import balle.strategy.planner.AbstractPlanner;
 import balle.world.AbstractWorld;
 
 /**
@@ -10,7 +11,7 @@ import balle.world.AbstractWorld;
  * @author s0909773
  * 
  */
-public class DummyStrategy extends AbstractStrategy {
+public class DummyStrategy extends AbstractPlanner {
 
     protected int stepNumber                = -1;
     protected int timesMoveCalledOnThisStep = 0;

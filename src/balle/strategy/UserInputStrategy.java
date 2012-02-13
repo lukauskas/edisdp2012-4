@@ -10,9 +10,10 @@ import javax.swing.JPanel;
 import javax.swing.event.MouseInputListener;
 
 import balle.controller.Controller;
+import balle.strategy.planner.AbstractPlanner;
 import balle.world.AbstractWorld;
 
-public class UserInputStrategy extends AbstractStrategy {
+public class UserInputStrategy extends AbstractPlanner {
 
 	private Screen screen;
 	private int mouseXPos = 10, mouseYPos = 4;
