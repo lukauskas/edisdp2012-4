@@ -78,10 +78,6 @@ public class GoToObject implements MovementExecutor {
             double angleToTarget = targetCoord.sub(currentPosition)
                     .orientation();
 
-            if (isMoving) {
-                controller.stop();
-                isMoving = false;
-            }
             Orientation currentOr = currentState.getBalle().getOrientation();
             double currentOrientation = currentOr.atan2styleradians();
 

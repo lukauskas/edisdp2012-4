@@ -9,8 +9,7 @@ import balle.world.AbstractWorld;
 public class StrategyFactory {
     public static String[] availableDesignators() {
 
-        String[] designators = { "DummyStrategy", "GoToBall", "Dribble",
-                "Old Dribble" };
+        String[] designators = { "DummyStrategy", "GoToBall", "Dribble", };
         return designators;
     }
 

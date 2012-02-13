@@ -46,7 +46,7 @@ public class DribbleStraight implements Executor {
 
     public boolean ballIsCloseToRobot() {
 
-        double DISTANCE_THRESHOLD = 0.2;
+        double DISTANCE_THRESHOLD = 0.15;
         double EPSILON = 0.000001;
         return currentState.getBalle().getPosition()
                 .dist(currentState.getBall().getPosition())
