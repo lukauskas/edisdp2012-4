@@ -7,22 +7,24 @@ import balle.world.FieldObject;
 import balle.world.Robot;
 
 public class Blocking extends AbstractStrategy {
-	
-    private int INIT_SPEED = 520;
-	
+
+    private int     INIT_SPEED    = 450;
+    private boolean goingForward  = false;
+    private boolean goingBackward = false;
+
     public Blocking(Controller controller, AbstractWorld world) {
         super(controller, world);
         // TODO Auto-generated constructor stub
     }
 
-	@Override
-	protected void aiStep() {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    protected void aiStep() {
+        // TODO Auto-generated method stub
 
-	@Override
-	protected void aiMove(Controller controller) {
+    }
+
+    @Override
+    protected void aiMove(Controller controller) {
         if (getSnapshot() == null) {
             System.out.println("No Snapshot");
             return;
@@ -33,7 +35,7 @@ public class Blocking extends AbstractStrategy {
 
         Robot robot = getSnapshot().getBalle();
         Coord currentPosition = robot != null ? robot.getPosition() : null;
-        
+
         double angleToTarget = target.sub(robot.getPosition()).orientation();
         double currentOrientation = robot.getOrientation().atan2styleradians();
 
@@ -46,23 +48,32 @@ public class Blocking extends AbstractStrategy {
             turnLeftAngle = (2 * Math.PI) - currentOrientation + angleToTarget;
             turnRightAngle = currentOrientation - angleToTarget;
         }
-        
+
         double turnAngle;
 
         if (turnLeftAngle < turnRightAngle)
             turnAngle = turnLeftAngle;
         else
             turnAngle = -turnRightAngle;
-        
+
         if (turnAngle < 1.5) {
-        	controller.forward(INIT_SPEED);
+            if (!goingForward) {
+                controller.stop();
+                controller.forward(INIT_SPEED);
+                goingForward = true;
+                goingBackward = false;
+            }
         } else if (turnAngle == 1.5) {
-        	controller.stop();
+            controller.stop();
+            goingBackward = false;
+            goingForward = false;
         } else {
-        	controller.backward(INIT_SPEED);
+            if (!goingBackward) {
+                controller.backward(INIT_SPEED);
+                goingForward = false;
+                goingBackward = true;
+            }
         }
-		
-	}
+
+    }
 }
-
-
