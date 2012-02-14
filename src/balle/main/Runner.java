@@ -106,14 +106,10 @@ public class Runner {
         // If you're getting a merge conflict here leave this before
         // SimpleWorldGUI start!
 
-        // Create visionInput buffer
-        visionInput = new SocketVisionReader();
-        visionInput.addListener(world);
-
-        // Initialise controller
-        //controller = new BluetoothController(new Communicator());
-        controller = new DummyController();
-        strategy = new GoToBall(controller, world);
+        if (useDummyController)
+            controller = new DummyController();
+        else
+            controller = new BluetoothController(new Communicator());
 
         // Wait for controller to initialise
         while (!controller.isReady()) {
