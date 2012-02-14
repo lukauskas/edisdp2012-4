@@ -44,4 +44,9 @@ public class DummyStrategy extends AbstractStrategy {
         }
 
     }
+    
+    @Override
+    public String toString() {
+    	return "Dummy Strategy";
+    }
 }

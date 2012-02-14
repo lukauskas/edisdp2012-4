@@ -27,4 +27,14 @@ public abstract class AbstractStrategy extends AbstractWorldProcessor {
 
     protected abstract void aiMove(Controller controller);
 
+    @Override
+    public void cancel() {
+        super.cancel();
+        controller.stop();
+    }
+
+    @Override
+    public String toString() {
+        return this.getName();
+    }
 }
