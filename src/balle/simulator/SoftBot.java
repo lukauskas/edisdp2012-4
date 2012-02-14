@@ -28,12 +28,6 @@ public class SoftBot implements Controller {
 		return rightWheelSpeed;
 	}
 
-	public boolean getKick() {
-		boolean out = kick;
-		kick = false;
-		return out;
-	}
-
 	@Override
 	public void backward(int speed) {
 		rotating = false;
@@ -153,6 +147,14 @@ public class SoftBot implements Controller {
 
 	public boolean isRotating() {
 		return rotating;
+	}
+
+	public boolean isKicking() {
+		return kick;
+	}
+	
+	public void stopKicking() {
+		kick = false;
 	}
 
 }

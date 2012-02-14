@@ -130,12 +130,11 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
         ball = w.createBody(bd);
         ball.createFixture(f);
         ball.setLinearDamping(0);
-        ball.setLinearVelocity(new Vec2(10f, 10f));
 
         // TODO correct friction
         FrictionJointDef ballFriction = new FrictionJointDef();
         ballFriction.initialize(ball, ground, ball.getWorldCenter());
-        ballFriction.maxForce = 0.2f;
+        ballFriction.maxForce = 0.1f;
         ballFriction.maxTorque = 0.001f;
         w.createJoint(ballFriction);
 
@@ -227,7 +226,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
         private PolygonShape       kickerShape;
 
         private static final float engineForce    = 2f;
-        private static final float kickForce      = 20000f;
+        private static final float kickForce      = 20f;
         private static final float wheelMaxTorque = 0.5f;
 
         // wheel power (-1 for lock and 0 for float and (0,100] for power )
@@ -304,14 +303,13 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
             robot.setAngularVelocity(va);
             //System.out.println(va);
 
-            if (bot.getKick() && ballInRange()) {
-
+            if (bot.isKicking() && ballInRange()) {
                 // Kick
                 float xF, yF;
                 xF = (float) (kickForce * Math.cos(blueAng));
                 yF = (float) (kickForce * Math.sin(blueAng));
                 ball.applyForce(new Vec2(xF, yF), ball.getWorldCenter());
-
+                bot.stopKicking();
             }
         }
 
