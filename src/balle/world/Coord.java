@@ -69,4 +69,18 @@ public class Coord {
     public boolean isEstimated() {
         return estimated;
     }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other == null)
+            return false;
+        if (other == this)
+            return true;
+        if (this.getClass() != other.getClass())
+            return false;
+        Coord otherCoord = (Coord) other;
+        return (otherCoord.getX() == this.getX())
+                && (otherCoord.getY() == this.getY())
+                && (otherCoord.isEstimated() == this.isEstimated());
+    }
 }

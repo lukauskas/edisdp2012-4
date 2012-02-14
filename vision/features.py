@@ -19,10 +19,11 @@ class Features:
 
     def extractFeatures(self, frame):
 
+        hsv = frame.toHSV()
         ents = {'yellow': None, 'blue': None, 'ball': None}
-        yellow = self.threshold.yellowT(frame)
-        blue = self.threshold.blueT(frame)
-        ball = self.threshold.ball(frame)
+        yellow = self.threshold.yellowT(hsv)
+        blue = self.threshold.blueT(hsv)
+        ball = self.threshold.ball(hsv)
 
         self._display.updateLayer('threshY', yellow)
         self._display.updateLayer('threshB', blue)
@@ -133,6 +134,8 @@ class Entity:
                  m00 = 0.1
 
             centroid1 = (round(m10/m00), round(m01/m00))
+            # cv.Circle is really fussy with what it takes
+            centroid1 = tuple(map(int, centroid1))
             cv.Circle(mask, centroid1, 14, cv.RGB(0,0,0), -1)
             
             m = cv.Moments(mask, 1)

@@ -139,8 +139,10 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 
         // create robots at either end of pitch
         blue = new Robot(new Vec2((0.1f * scale), (float) (0.61 * scale)), 0f);
+        blueSoft.setBody(blue.getBody());
         yellow = new Robot(new Vec2((float) (2.34 * scale),
                 (float) (0.61 * scale)), 0f);
+        yellowSoft.setBody(yellow.getBody());
 
         // Send the size of the pitch to the world
         this.reader.propagatePitchSize();
@@ -316,6 +318,19 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
                 killAllOrtogonal(wheelR);
 
                 double blueAng = robot.getAngle();
+                
+                // if we are turning
+                if(bot.isRotating()) {
+                	boolean turningLeft = bot.isTurningLeft();
+                	// get current angle - desired angle
+                	float dDA = bot.deltaDesiredAngle();
+                	System.out.println(dDA);
+                	if(!turningLeft && (0 <= dDA && dDA <= (Math.PI/4)) ||
+            		turningLeft && (0 >= dDA && dDA >= -(Math.PI/4))) {
+                		//stop
+                		bot.stop();
+                	}
+                }
 
                 // Normalises wheel force
                 float leftWheelSpeed = scale * powerToVelocity(bot.getLeftWheelSpeed());
@@ -327,6 +342,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
                 wheelR.setLinearVelocity(
                         new Vec2((float) (rightWheelSpeed * Math.cos(blueAng)),
                                 (float) (rightWheelSpeed * Math.sin(blueAng))));
+                
                 //wheelL.setLinearDamping((engineForce - Math.abs(leftWheelSpeed) + 2) * 2);
                 //wheelR.setLinearDamping(Float.POSITIVE_INFINITY);
                 		//(engineForce - Math.abs(rightWheelSpeed) + 2) * 2);

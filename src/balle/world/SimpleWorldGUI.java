@@ -1,28 +1,53 @@
 package balle.world;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.Graphics;
 
-import javax.swing.*;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
-import balle.main.*;
 import balle.misc.Globals;
 import balle.world.processing.AbstractWorldProcessor;
 
 public class SimpleWorldGUI extends AbstractWorldProcessor {
 
     private JPanel panel;
+    private Screen screen;
+    private JPanel fpsPanel;
+    private JLabel fpsText;
+    private JLabel fpsWarning;
+    private JLabel fps;
 
     public SimpleWorldGUI(AbstractWorld world) {
         super(world);
+        panel = new JPanel();
+        panel.setLayout(new BorderLayout());
 
-        
-        panel = new Screen();
-        ((GUITab) panel).addToFrame("World");
+        fpsPanel = new JPanel();
+        fpsPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        fpsText = new JLabel("Input FPS:");
+        fpsWarning = new JLabel("Vision down?");
+        fpsWarning.setForeground(Color.RED);
+
+        fps = new JLabel();
+        fpsPanel.add(fpsText);
+        fpsPanel.add(fps);
+        fpsPanel.add(fpsWarning);
+
+        screen = new Screen();
+        panel.add(BorderLayout.NORTH, fpsPanel);
+        panel.add(BorderLayout.CENTER, screen);
+    }
+
+    public JPanel getPanel() {
+        return panel;
     }
 
     @SuppressWarnings("serial")
-	private class Screen extends GUITab {
-    	
+    private class Screen extends JPanel {
+
         private float       scale;
         private final float XSHIFTM     = 0.4f;
         private final float YSHIFTM     = 0.39f;
@@ -35,9 +60,6 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
             g.fillRect(0, 0, getWidth(), getHeight());
             drawField(g);
             drawFieldObjects(g);
-            
-        	String s = String.format("%1$5.3f", getFPS());
-        	g.drawString(s, 5, 16);
         }
 
         private void drawField(Graphics g) {
@@ -103,7 +125,8 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
         private void drawRobot(Graphics g, Color c, Robot robot) {
 
             // Fail early, fail often
-            if ((robot == null) || (robot.getPosition() == null)) {
+            if ((robot.getPosition() == null)
+                    || (robot.getOrientation() == null)) {
                 return;
             }
 
@@ -131,7 +154,6 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 
                 // System.out.println(robot.getOrientation().degrees());
                 // rotate by angle of orientation
-                System.out.println(a);
                 poly[i][0] = (float) ((px * Math.cos(a)) + (py * -Math.sin(a)));
                 poly[i][1] = (float) ((px * Math.sin(a)) + (py * Math.cos(a)));
 
@@ -182,22 +204,42 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
         }
 
         private int m2PY(float y) {
-        	y = Globals.PITCH_HEIGHT-y;
+            y = Globals.PITCH_HEIGHT - y;
             return (int) ((y + YSHIFTM) * scale);
         }
 
     }
 
+    private void redrawFPS() {
+        long age = getFPSAge();
+        double fpsCount = getFPS();
+
+        String s = String.format("%1$5.3f", fpsCount);
+
+        double timePerFrame = 1000.0 / fpsCount;
+        if ((fpsCount > 0) && (age < timePerFrame * 1.5)) {
+            fps.setForeground(Color.GREEN);
+            fpsWarning.setVisible(false);
+        } else if ((fpsCount > 0) && (age < timePerFrame * 3)) {
+            fps.setForeground(Color.ORANGE);
+            fpsWarning.setVisible(false);
+        } else {
+            fps.setForeground(Color.RED);
+            fpsWarning.setVisible(true);
+        }
+
+        fps.setText(s);
+    }
+
     @Override
     protected void actionOnStep() {
-
+        redrawFPS();
     }
 
     @Override
     protected void actionOnChange() {
-    	//frame_counter++;  	
-        panel.repaint();
+        // frame_counter++;
+        screen.repaint();
     }
-    
-    
+
 }

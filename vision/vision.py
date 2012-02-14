@@ -1,5 +1,6 @@
 from __future__ import print_function
 import sys
+import os
 import time
 import math
 import socket
@@ -38,6 +39,9 @@ class Vision:
                 filetype = 'image'
 
             self.cap = VirtualCamera(sourcefile, filetype)
+        
+        calibrationPath = os.path.join('calibration', 'pitch{0}'.format(pitchnum))
+        self.cap.loadCalibration(os.path.join(sys.path[0], calibrationPath))
 
         self.gui = Gui()
         self.threshold = Threshold(pitchnum)
@@ -63,7 +67,12 @@ class Vision:
         
     def doStuff(self):
         while self.running:
-            frame = self.cap.getImage()
+            if self.cap.getCameraMatrix is None:
+                # No calibration matrices for pitch 0 atm
+                frame = self.cap.getImage()
+            else:
+                frame = self.cap.getImageUndistort()
+
             frame = self.preprocessor.preprocess(frame)
             
             self.gui.updateLayer('raw', frame)
@@ -103,7 +112,10 @@ class Vision:
             entity = ents[name]
             x, y = entity.coordinates()
 
-            y = self.preprocessor.pitch_size[1] - y
+            # The rest of the system needs (0, 0) at the bottom left
+            if y != -1:
+                y = self.preprocessor.pitch_size[1] - y
+
             if name == 'ball':
                 self.send('{0} {1} '.format(x, y))
             else:
