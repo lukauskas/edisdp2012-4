@@ -3,11 +3,12 @@ package balle.simulator;
 import org.jbox2d.dynamics.Body;
 
 import balle.controller.Controller;
+import balle.misc.Globals;
 
 public class SoftBot implements Controller {
-	
+
 	private boolean kick = false;
-	
+
 	private float leftWheelSpeed = 0;
 	private float rightWheelSpeed = 0;
 
@@ -18,15 +19,15 @@ public class SoftBot implements Controller {
 	private boolean turningLeft;
 
 	private boolean rotating;
-	
+
 	public float getLeftWheelSpeed() {
 		return leftWheelSpeed;
 	}
-	
+
 	public float getRightWheelSpeed() {
 		return rightWheelSpeed;
 	}
-	
+
 	public boolean getKick() {
 		boolean out = kick;
 		kick = false;
@@ -61,24 +62,35 @@ public class SoftBot implements Controller {
 		rightWheelSpeed = 0;
 	}
 
+	/**
+	 * @param deg
+	 *            signed angle relative to the robots current angle, that the
+	 *            robot will rotate to (in place).
+	 * @param speed
+	 *            POSITIVE angular velocity in degrees/seconds. If a negative
+	 *            value is given, the robot will rotate in the opposite
+	 *            direction but end up in the same position as if speed was
+	 *            positive.
+	 */
 	@Override
 	public void rotate(int deg, int speed) {
-		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! remove this later!!!!!!!!!!!!!!1
-		speed = 200;
+		float wheelVelocity = Globals.velocityToPower((speed
+				* Globals.ROBOT_TRACK_WIDTH * (float) Math.PI) / 360f);
 		// turning right
-		if ( deg < 0 ) {
-			leftWheelSpeed = speed; 
-			rightWheelSpeed = - speed;
-		// turning left
+		if (deg < 0) {
+			leftWheelSpeed = wheelVelocity;
+			rightWheelSpeed = -wheelVelocity;
+			// turning left
 		} else {
-			leftWheelSpeed = - speed;  
-			rightWheelSpeed = speed;
-			
+			leftWheelSpeed = -wheelVelocity;
+			rightWheelSpeed = wheelVelocity;
+
 		}
-			
-		desiredAngle = (body.getAngle() + ((float)Math.PI*deg/180))%(2*(float)Math.PI);
+
+		desiredAngle = (body.getAngle() + ((float) Math.PI * deg / 180))
+				% (2 * (float) Math.PI);
 		turningLeft = deg < 0;
-		
+
 		rotating = true;
 	}
 
@@ -88,7 +100,7 @@ public class SoftBot implements Controller {
 		this.leftWheelSpeed = leftWheelSpeed;
 		this.rightWheelSpeed = rightWheelSpeed;
 		// System.out.println("setWheelSpeeds(): "+leftWheelSpeed+" "+rightWheelSpeed);
-		
+
 	}
 
 	@Override
@@ -101,18 +113,18 @@ public class SoftBot implements Controller {
 		kick = true;
 	}
 
-    @Override
-    public void penaltyKick() {
+	@Override
+	public void penaltyKick() {
 		rotating = false;
-        // TODO Auto-generated method stub
+		// TODO Auto-generated method stub
 
-    }
+	}
 
-    @Override
-    public boolean isReady() {
-        // TODO Auto-generated method stub
-        return true;
-    }
+	@Override
+	public boolean isReady() {
+		// TODO Auto-generated method stub
+		return true;
+	}
 
 	public void setBody(Body body) {
 		this.body = body;
@@ -125,17 +137,18 @@ public class SoftBot implements Controller {
 	public boolean isTurningLeft() {
 		return turningLeft;
 	}
-	
+
 	/**
 	 * return the angles to the desired angle. mod 180
+	 * 
 	 * @return
 	 */
 	public float deltaDesiredAngle() {
-		float d = (float)(body.getAngle()%(2*Math.PI)) - getDesiredAngle();
-		if(d == Math.PI) {
+		float d = (float) (body.getAngle() % (2 * Math.PI)) - getDesiredAngle();
+		if (d == Math.PI) {
 			return d;
 		}
-		return  d%(float)Math.PI;
+		return d % (float) Math.PI;
 	}
 
 	public boolean isRotating() {
