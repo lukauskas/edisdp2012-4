@@ -81,7 +81,8 @@ public class DribbleStraight implements Executor {
             Coord target = currentState.getBall().getPosition();
             Robot robot = currentState.getBalle();
             Coord currentPosition = robot.getPosition();
-            double angleToTarget = target.sub(currentPosition).orientation();
+            double angleToTarget = target.sub(currentPosition).orientation()
+                    .atan2styleradians();
 
             double currentOrientation = robot.getOrientation()
                     .atan2styleradians();
@@ -115,7 +116,8 @@ public class DribbleStraight implements Executor {
     }
 
     protected void blockBall(Controller controller, Coord target, Robot robot) {
-        double angleToTarget = target.sub(robot.getPosition()).orientation();
+        double angleToTarget = target.sub(robot.getPosition()).orientation()
+                .atan2styleradians();
         double currentOrientation = robot.getOrientation().atan2styleradians();
 
         double turnLeftAngle, turnRightAngle;

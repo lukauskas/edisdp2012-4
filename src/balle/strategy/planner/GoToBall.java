@@ -4,7 +4,6 @@
 package balle.strategy.planner;
 
 import balle.controller.Controller;
-import balle.strategy.executor.movement.GoToObject;
 import balle.strategy.executor.movement.MovementExecutor;
 import balle.world.AbstractWorld;
 
@@ -20,9 +19,10 @@ public class GoToBall extends AbstractPlanner {
      * @param controller
      * @param world
      */
-    public GoToBall(Controller controller, AbstractWorld world) {
+    public GoToBall(Controller controller, AbstractWorld world,
+            MovementExecutor movementExecutor) {
         super(controller, world);
-        executorStrategy = new GoToObject();
+        executorStrategy = movementExecutor;
 
     }
 

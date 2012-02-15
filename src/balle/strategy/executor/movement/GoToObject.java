@@ -1,6 +1,7 @@
 package balle.strategy.executor.movement;
 
 import balle.controller.Controller;
+import balle.strategy.executor.turning.RotateToOrientationExecutor;
 import balle.world.Coord;
 import balle.world.FieldObject;
 import balle.world.Orientation;
@@ -9,20 +10,21 @@ import balle.world.Snapshot;
 
 public class GoToObject implements MovementExecutor {
 
-    private final static double DISTANCE_THRESHOLD = 0.2;
-    private final static double EPSILON            = 0.00001;
+    private final static double DISTANCE_TO_STOP_AT       = 0.2;
+    private final static double EPSILON                   = 0.00001;
 
-    protected FieldObject       target             = null;
-    protected Snapshot          currentState       = null;
-    private boolean             isMoving           = false;
+    protected FieldObject       target                    = null;
+    protected Snapshot          currentState              = null;
+    private boolean             isMoving                  = false;
 
-    private final static double DISTANCE_DIFF      = 0.3;
-    private final static int    SPEED_CONSTANT     = 700;
+    private final static double DISTANCE_DIFF_TO_TURN_FOR = 0.3;
+    private final static int    MOVEMENT_SPEED            = 500;
 
-    protected long              startedTurning     = 0;
-    private long                timeToTurn         = 0;
-    private static final int    TURN_SPEED_DEGREES = 180;
-    private static final double TURN_SPEED_RADIANS = (TURN_SPEED_DEGREES * Math.PI) / 180;
+    RotateToOrientationExecutor turningExecutor           = null;
+
+    public GoToObject(RotateToOrientationExecutor turningExecutor) {
+        this.turningExecutor = turningExecutor;
+    }
 
     @Override
     public void updateTarget(FieldObject target) {
@@ -36,11 +38,14 @@ public class GoToObject implements MovementExecutor {
         if ((target == null) || (currentPosition == null)) {
             return false;
         }
-        return ((currentPosition.dist(target.getPosition()) - DISTANCE_THRESHOLD) < EPSILON);
+        return ((currentPosition.dist(target.getPosition()) - DISTANCE_TO_STOP_AT) < EPSILON);
     }
 
     @Override
     public boolean isPossible() {
+        if (turningExecutor == null)
+            return false;
+
         Robot robot = currentState.getBalle();
         Coord currentPosition = robot.getPosition();
         Orientation currentOrientation = robot.getOrientation();
@@ -65,88 +70,65 @@ public class GoToObject implements MovementExecutor {
         Coord currentPosition = robot.getPosition();
 
         if (isFinished()) {
-            if (isMoving) {
-                controller.stop();
-                isMoving = false;
-            }
+            stop(controller);
             return;
         } else {
             // Fail quickly if not possible
             if (!isPossible())
                 return;
-
-            double angleToTarget = targetCoord.sub(currentPosition)
-                    .orientation();
-
-            Orientation currentOr = currentState.getBalle().getOrientation();
-            double currentOrientation = currentOr.atan2styleradians();
-
-            double turnLeftAngle, turnRightAngle;
-            if (angleToTarget > currentOrientation) {
-                turnLeftAngle = angleToTarget - currentOrientation;
-                turnRightAngle = currentOrientation
-                        + (2 * Math.PI - angleToTarget);
-            } else {
-                turnLeftAngle = (2 * Math.PI) - currentOrientation
-                        + angleToTarget;
-                turnRightAngle = currentOrientation - angleToTarget;
+            turningExecutor.updateState(currentState);
+            if (turningExecutor.isFinished()) {
+                turningExecutor.stop(controller);
             }
 
-            double turnAngle;
-
-            if (turnLeftAngle < turnRightAngle)
-                turnAngle = turnLeftAngle;
-            else
-                turnAngle = -turnRightAngle;
-
-            double dist = targetCoord.dist(robot.getPosition());
-            double distDiffFromTarget = Math.abs(Math.sin(turnAngle) * dist);
-
-            if ((Math.abs(turnAngle) > Math.PI / 2) // sin(180) = sin(0) thus
-                                                    // the check
-                    || (Math.abs(distDiffFromTarget) > DISTANCE_DIFF * dist)) {
-                if (isMoving) {
-                    controller.stop();
-                    isMoving = false;
-                }
-                // TODO: This should really be handled by an sub-executor
-                // strategy
-                // that would turn the robot by amount X if needed.
-                if (!isTurning()) {
-                    timeToTurn = Math.round(Math.abs(turnAngle)
-                            / (TURN_SPEED_RADIANS * 0.001))
-                            + SPEED_CONSTANT;
-
-                    System.out.println("Turning " + turnAngle + " should take "
-                            + timeToTurn + " ms");
-                    controller.rotate((int) (turnAngle * 180 / Math.PI), 180);
-                    startedTurning = System.currentTimeMillis();
-                }
+            if (turningExecutor.isTurning()) // If we are still turning here
+            {
+                turningExecutor.step(controller);
+                return; // Continue
             } else {
-                if (!isMoving) {
-                    startedTurning = 0;
-                    controller.forward(500);
-                    isMoving = true;
+                Orientation orientationToTarget = targetCoord.sub(
+                        currentPosition).orientation();
+                turningExecutor.setTargetOrientation(orientationToTarget);
+                double turnAngle = turningExecutor.getAngleToTurn();
+                double dist = targetCoord.dist(robot.getPosition());
+                double distDiffFromTarget = Math
+                        .abs(Math.sin(turnAngle) * dist);
+
+                // sin(180) = sin(0) thus the check
+                if ((Math.abs(turnAngle) > Math.PI / 2)
+                        || (Math.abs(distDiffFromTarget) > DISTANCE_DIFF_TO_TURN_FOR
+                                * dist)) {
+
+                    if (isMoving) {
+                        controller.stop();
+                        isMoving = false;
+                    }
+
+                    turningExecutor.step(controller);
+                } else {
+                    if (!isMoving) {
+                        controller.forward(MOVEMENT_SPEED);
+                        isMoving = true;
+                    }
                 }
             }
         }
 
     }
 
-    public boolean isTurning() {
-        return System.currentTimeMillis() - startedTurning < timeToTurn;
-    }
-
     @Override
     public void stop(Controller controller) {
         // If its doing anything, it will stop
-        if (isMoving || isTurning())
+        if (isMoving)
             controller.stop();
 
         // Otherwise it will just make sure to clean up
-        startedTurning = 0;
-        timeToTurn = 0;
         isMoving = false;
+
+        // Also make sure for turningExecutor to do the same
+        if (turningExecutor != null) {
+            turningExecutor.stop(controller);
+        }
 
         // Note that we do not want to just call controller.stop()
         // blindly in case there are some other executors using it. (even though
