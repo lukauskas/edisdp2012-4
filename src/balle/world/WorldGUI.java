@@ -49,8 +49,6 @@ public class WorldGUI extends Simulator {
     @Override
     public void initTest(boolean arg0) {
         super.initTest(arg0);
-        yellow.makePuppet();
-        blue.makePuppet();
     }
 
     @Override

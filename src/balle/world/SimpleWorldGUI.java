@@ -118,8 +118,9 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
             else
                 g.setColor(Color.LIGHT_GRAY);
 
-            g.fillOval(m2PX(pos.getX() - radius), m2PY(pos.getY() - radius),
-                    (int) (radius * 2 * scale), (int) (radius * 2 * scale));
+            float w = radius * 2 * scale;
+            g.fillOval((int)(m2PX(pos.getX()) - (w/2)), (int)(m2PY(pos.getY()) - (w/2)),
+                    (int)w, (int)w);
         }
 
         private void drawRobot(Graphics g, Color c, Robot robot) {

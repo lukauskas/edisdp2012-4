@@ -11,7 +11,7 @@ import balle.world.AbstractWorld;
 public class StrategyFactory {
     public static String[] availableDesignators() {
 
-        String[] designators = { "GoToBall", "Dribble", };
+        String[] designators = { "GoToBall", "Dribble", "Blocking" };
         return designators;
     }
 
@@ -22,6 +22,10 @@ public class StrategyFactory {
         if (designator.equals("GoToBall")) {
             return new GoToBall(controller, world, new GoToObject(
                     new FaceAngle()));
+        } else if (designator.equals("DummyStrategy")) {
+            return new DummyStrategy(controller, world);
+        } else if (designator.equals("Blocking")) {
+            return new Blocking(controller, world);
         } else if (designator.equals("Dribble")) {
             return new DribbleMilestone2(controller, world);
         } else
