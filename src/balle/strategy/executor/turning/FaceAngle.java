@@ -82,7 +82,7 @@ public class FaceAngle implements Executor, RotateToOrientationExecutor {
     }
 
     private int calculateTimeToTurn(double radiansToTurn) {
-        return (int) Math.round(radiansToTurn
+        return (int) Math.round(Math.abs(radiansToTurn)
                 / ((Math.toRadians(TURN_SPEED / 1000.0))))
                 + ADDITIONAL_TIME_TO_TURN;
     }
@@ -98,9 +98,11 @@ public class FaceAngle implements Executor, RotateToOrientationExecutor {
     }
 
     private void initiateTurn(Controller controller, double radians) {
-        System.out.println("Turning");
         timeToTurn = calculateTimeToTurn(radians);
         startedTurning = System.currentTimeMillis();
+
+        // System.out.printf("Rotate %s (%s ms)\n", Math.toDegrees(radians),
+        // timeToTurn);
         controller.rotate((int) Math.toDegrees(radians), TURN_SPEED);
     }
 
