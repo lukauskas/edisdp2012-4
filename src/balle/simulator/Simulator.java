@@ -164,15 +164,6 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
         this.reader.update();
     }
 
-    private void killAllOrtogonal(Body b) {
-        Vec2 v = b.getLinearVelocity();
-        double ang = b.getAngle();
-        Vec2 unitDir = new Vec2((float) (Math.cos(ang)),
-                (float) (Math.sin(ang)));
-        float newMag = Vec2.dot(v, unitDir);
-        b.setLinearVelocity(new Vec2(newMag * unitDir.x, newMag * unitDir.y));
-    }
-
     /**
      * Empty constructor, to make private. For constructor use createSimulator()
      */
@@ -220,14 +211,10 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
         private final float        robotLength    = Globals.ROBOT_LENGTH
                                                           * scale / 2;
 
-        private final float        kickerWidth    = 0.15f * scale / 2;
+        private final float        kickerWidth    = Globals.ROBOT_WIDTH * scale / 2;
         private final float        kickerLength   = 0.04f * scale / 2;
-
         private PolygonShape       kickerShape;
-
-        private static final float engineForce    = 2f;
         private static final float kickForce      = 20f;
-        private static final float wheelMaxTorque = 0.5f;
 
         // wheel power (-1 for lock and 0 for float and (0,100] for power )
 
@@ -277,8 +264,6 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
         }
 
         public void updateRobot(SoftBot bot) {
-//                killAllOrtogonal(wheelL);
-//                killAllOrtogonal(wheelR);
 
             double blueAng = robot.getAngle();
             
@@ -315,10 +300,6 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 
         public Body getBody() {
             return robot;
-        }
-        
-        private float powerToMaxFF(float p) {
-        	return 0;//(float)((15/p)+0.0001);
         }
         
         private float angularVelocityRadians(SoftBot bot) {
