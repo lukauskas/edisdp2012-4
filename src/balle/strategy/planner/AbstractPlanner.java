@@ -1,14 +1,14 @@
-package balle.strategy;
+package balle.strategy.planner;
 
 import balle.controller.Controller;
 import balle.world.AbstractWorld;
 import balle.world.processing.AbstractWorldProcessor;
 
-public abstract class AbstractStrategy extends AbstractWorldProcessor {
+public abstract class AbstractPlanner extends AbstractWorldProcessor {
 
     private Controller controller;
 
-    public AbstractStrategy(Controller controller, AbstractWorld world) {
+    public AbstractPlanner(Controller controller, AbstractWorld world) {
         super(world);
         this.controller = controller;
     }

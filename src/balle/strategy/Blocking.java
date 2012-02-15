@@ -1,12 +1,13 @@
 package balle.strategy;
 
 import balle.controller.Controller;
+import balle.strategy.planner.AbstractPlanner;
 import balle.world.AbstractWorld;
 import balle.world.Coord;
 import balle.world.FieldObject;
 import balle.world.Robot;
 
-public class Blocking extends AbstractStrategy {
+public class Blocking extends AbstractPlanner {
 
     private int     INIT_SPEED    = 450;
     private boolean goingForward  = false;
@@ -36,7 +37,8 @@ public class Blocking extends AbstractStrategy {
         Robot robot = getSnapshot().getBalle();
         Coord currentPosition = robot != null ? robot.getPosition() : null;
 
-        double angleToTarget = target.sub(robot.getPosition()).orientation();
+        double angleToTarget = target.sub(robot.getPosition()).orientation()
+                .atan2styleradians();
         double currentOrientation = robot.getOrientation().atan2styleradians();
 
         double turnLeftAngle, turnRightAngle;

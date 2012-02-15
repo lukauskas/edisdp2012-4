@@ -11,9 +11,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import balle.controller.Controller;
-import balle.strategy.AbstractStrategy;
 import balle.strategy.StrategyFactory;
 import balle.strategy.UnknownDesignatorException;
+import balle.strategy.planner.AbstractPlanner;
 import balle.world.AbstractWorld;
 
 @SuppressWarnings("serial")
@@ -28,7 +28,7 @@ public class StratTab extends JPanel implements ActionListener {
     private ArrayList<String>   stratTabs;
     private String[]            strings                = new String[0];
 
-    private AbstractStrategy    currentRunningStrategy = null;
+    private AbstractPlanner    currentRunningStrategy = null;
     private Controller          controller;
     private AbstractWorld       world;
 
