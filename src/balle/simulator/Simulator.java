@@ -316,7 +316,6 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
         	// NOTE: must convert dt to seconds (td/1000)
         	float dts = dt/1000f;
         	float a = (vf-vi)/dts;
-        	System.out.println("non slip accel: " + a);
         	// Account for slip
         	// if above maximum (Globals.MaxWheelAccel)
         	if(Math.abs(a) > Globals.MaxWheelAccel) {

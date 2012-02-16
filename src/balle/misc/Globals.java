@@ -15,8 +15,8 @@ public class Globals {
     public static final float PITCH_WIDTH   = 2.4384f; // Metres
     public static final float PITCH_HEIGHT  = 1.2192f; // Metres
     public static final float GOAL_POSITION = 0.31f;   // Metres
-	public static final float MaxWheelAccel = 4f;	   // m/s^2
-	public static final float SlipWheelAccel = MaxWheelAccel * 0.3f;
+	public static final float MaxWheelAccel = 10f;	   // m/s^2
+	public static final float SlipWheelAccel = MaxWheelAccel * 0.6f;
     
 
 	

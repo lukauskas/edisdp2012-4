@@ -15,6 +15,8 @@ public class DummyStrategy extends AbstractStrategy {
     protected int stepNumber                = -1;
     protected long timer = System.currentTimeMillis();
     boolean goingForward = false;
+    boolean done = false;
+    long tt = 4000;
 
     public DummyStrategy(Controller controller, AbstractWorld world) {
         super(controller, world);
@@ -26,24 +28,12 @@ public class DummyStrategy extends AbstractStrategy {
 
     @Override
     protected void aiMove(Controller controller) {
-    	long t = System.currentTimeMillis();
-    	long dt = t - timer;
-    	if(dt > 0) {
-    		//controller.backward(100);
-    		controller.setWheelSpeeds(-720, -720);
+    	if(System.currentTimeMillis()%tt < tt/2) {
+    		controller.forward(720);
     	}
     	else {
-    		controller.stop();
+    		controller.backward(720);
     	}
-//
-//    	if (dt > 10000) {
-//            controller.stop();
-//            if(goingForward) 
-//            	controller.backward(controller.getMaximumWheelSpeed());
-//            else
-//            	controller.forward(controller.getMaximumWheelSpeed());
-//            goingForward = !goingForward;
-//        }
     }
     
     @Override
