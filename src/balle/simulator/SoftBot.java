@@ -123,6 +123,10 @@ public class SoftBot implements Controller {
 	public void setBody(Body body) {
 		this.body = body;
 	}
+	
+	public Body getBody() {
+		return body;
+	}
 
 	public float getDesiredAngle() {
 		return desiredAngle;
