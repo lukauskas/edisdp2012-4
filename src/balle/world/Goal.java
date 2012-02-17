@@ -4,6 +4,22 @@ public class Goal {
 	
 	private double minX, maxX, minY, maxY;
 	
+	public double getMinX() {
+		return minX;
+	}
+	
+	public double getMaxX() {
+		return maxX;
+	}
+	
+	public double getMinY() {
+		return minY;
+	}
+	
+	public double getMaxY() {
+		return maxY;
+	}
+	
 	public Goal (double minX, double maxX, double minY, double maxY) {
 		this.minX = minX;
 		this.maxX = maxX;

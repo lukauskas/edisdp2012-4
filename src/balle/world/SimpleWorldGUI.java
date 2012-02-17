@@ -63,6 +63,7 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
             g.fillRect(0, 0, getWidth(), getHeight());
             drawField(g);
             drawFieldObjects(g);
+            drawGoals(g);
             drawMousePos(g);
         }
 
@@ -195,6 +196,23 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
             g.drawLine(m2PX(x1), m2PY(y1), m2PX(x2), m2PY(y2));
 
         }
+        
+        private void drawGoals(Graphics g) {
+        	drawGoal(g, Color.green, getOurGoal());
+        	drawGoal(g, Color.red, getOpponentGoal());
+        }
+        
+        private void drawGoal(Graphics g, Color c, Goal goal) {
+        	g.setColor(c);
+        	
+        	int xMin, width, yMax, height;
+        	xMin = m2PX(goal.getMinX());
+        	width = m2PX(goal.getMaxX())-m2PX(goal.getMinX());
+        	yMax = m2PY(goal.getMaxY());
+        	height = m2PY(goal.getMinY())-m2PY(goal.getMaxY());
+        	
+        	g.drawRect(xMin, yMax, width, height);
+        }
 
         
         /** Where the mouse was last detected on screen.
@@ -246,8 +264,7 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
         }
 
         private float pY2m(double y) {
-        	float out = ( ((float)y) / scale) - YSHIFTM;
-            return Globals.PITCH_HEIGHT + out;
+        	return YSHIFTM - (((float)y) / scale) + Globals.PITCH_HEIGHT;
         }
     }
 

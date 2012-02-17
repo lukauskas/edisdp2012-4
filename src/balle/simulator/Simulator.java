@@ -380,7 +380,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
         }
         
         public void propagateGoals() {
-        	// TODO: super.propagateGoals(xMin, xMax, yMin, yMax);
+        	super.propagateGoals(0, Globals.PITCH_WIDTH, 0, 0);
         }
     }
 

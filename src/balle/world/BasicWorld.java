@@ -4,8 +4,8 @@ public class BasicWorld extends AbstractWorld {
 
     private Snapshot prev;
 
-    public BasicWorld(boolean balleIsBlue) {
-        super(balleIsBlue);
+    public BasicWorld(boolean balleIsBlue, boolean goalIsLeft) {
+        super(balleIsBlue, goalIsLeft);
         prev = new EmptySnapshot();
     }
 

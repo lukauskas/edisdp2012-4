@@ -1,6 +1,7 @@
 package balle.world.processing;
 
 import balle.world.AbstractWorld;
+import balle.world.Goal;
 import balle.world.Snapshot;
 
 /**
@@ -21,6 +22,8 @@ public abstract class AbstractWorldProcessor extends Thread {
 
     private long                lastSnapshotReceived = 0;
     private double              fps                  = 0;
+    
+    //private Goal
 
     public double getFPS() {
         return fps;
@@ -77,6 +80,14 @@ public abstract class AbstractWorldProcessor extends Thread {
      */
     protected final Snapshot getSnapshot() {
         return snapshot;
+    }
+    
+    protected final Goal getOurGoal() {
+    	return world.getOurGoal();
+    }
+    
+    protected final Goal getOpponentGoal() {
+    	return world.getOpponentGoal();
     }
 
     /**
