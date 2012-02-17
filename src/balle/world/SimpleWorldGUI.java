@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -37,6 +39,7 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
         fpsPanel.add(fpsWarning);
 
         screen = new Screen();
+        screen.addMouseMotionListener(screen);
         panel.add(BorderLayout.NORTH, fpsPanel);
         panel.add(BorderLayout.CENTER, screen);
     }
@@ -46,7 +49,7 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
     }
 
     @SuppressWarnings("serial")
-    private class Screen extends JPanel {
+    private class Screen extends JPanel implements MouseMotionListener {
 
         private float       scale;
         private final float XSHIFTM     = 0.4f;
@@ -60,6 +63,7 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
             g.fillRect(0, 0, getWidth(), getHeight());
             drawField(g);
             drawFieldObjects(g);
+            drawMousePos(g);
         }
 
         private void drawField(Graphics g) {
@@ -192,7 +196,33 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 
         }
 
-        private int m2PX(double x) {
+        
+        /** Where the mouse was last detected on screen.
+         */
+        private java.awt.Point mouse;
+
+        private void drawMousePos(Graphics g) {
+        	if (mouse != null) {
+        		g.setColor(Color.RED);
+        		
+        		double x = pX2m(mouse.getX()), y = pY2m(mouse.getY());
+        		String s = String.format("Mouse Position (%.3f,%.3f)", x, y);
+        		
+        		g.drawString(s, 10, 10);
+        	}
+        }
+
+		@Override
+		public void mouseDragged(MouseEvent arg0) {
+			mouse = arg0.getPoint();
+		}
+
+		@Override
+		public void mouseMoved(MouseEvent arg0) {
+			mouse = arg0.getPoint();
+		}
+		
+		private int m2PX(double x) {
             return m2PX((float) x);
         }
 
@@ -208,7 +238,17 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
             y = Globals.PITCH_HEIGHT - y;
             return (int) ((y + YSHIFTM) * scale);
         }
+        
+        // Working backwards
+        
+        private float pX2m(double x) {
+            return (((float)x) / scale) - XSHIFTM;
+        }
 
+        private float pY2m(double y) {
+        	float out = ( ((float)y) / scale) - YSHIFTM;
+            return Globals.PITCH_HEIGHT + out;
+        }
     }
 
     private void redrawFPS() {
