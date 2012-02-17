@@ -148,5 +148,21 @@ public abstract class AbstractWorld implements Listener {
         pitchWidth = width;
         pitchHeight = height;
     }
+    
+    @Override
+    public void updateGoals(double xMin, double xMax, double yMin, double yMax) {
+    	left = new Goal(-100000,xMin,yMin,yMax);
+    	right = new Goal(xMax,100000,yMin,yMax);
+    }
+    
+    protected Goal left, right;
+    
+    public Goal getLeftGoal() {
+    	return left;
+    }
+    
+    public Goal getRightGoal() {
+    	return right;
+    }
 
 }
