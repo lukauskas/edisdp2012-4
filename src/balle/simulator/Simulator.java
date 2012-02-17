@@ -1,5 +1,7 @@
 package balle.simulator;
 
+import java.util.Random;
+
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 
@@ -46,6 +48,11 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
     private long          startTime;
 
     private CircleShape   ballShape;
+    private Random rand = new Random();
+
+	private boolean noisy;
+
+	private long lastFrameTime;
 
     public SoftBot getBlueSoft() {
         return blueSoft;
@@ -159,23 +166,31 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
         blue.updateRobot(blueSoft);
         yellow.updateRobot(yellowSoft);
         super.update();
-
-        // Update world with new information.
-        this.reader.update();
+        
+        // Update world with new information, throtteling the frame rate
+        if(1000f/(System.currentTimeMillis() - lastFrameTime) < Globals.SIMULATED_VISON_FRAMERATE) {
+        	lastFrameTime = System.currentTimeMillis();
+        	this.reader.update();
+        }
     }
 
     /**
      * Empty constructor, to make private. For constructor use createSimulator()
      */
-    protected Simulator() { /* James: Do not use. Use initTest() instead. */
+    protected Simulator(boolean noisy) { /* James: Do not use. Use initTest() instead. */
+    	this.noisy = noisy;
     }
 
+    public static Simulator createSimulator() {
+    	return createSimulator(true);
+    }
+    
     /**
      * Equivalent to a constructor.
      * 
      * @return A new simulator object.
      */
-    public static Simulator createSimulator() {
+    public static Simulator createSimulator(boolean noisy) {
         try {
             UIManager
                     .setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
@@ -187,7 +202,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
         TestbedModel model = new TestbedModel();
         TestbedPanel panel = new TestPanelJ2D(model);
         model.addCategory("Buggy");
-        Simulator pgui = new Simulator();
+        Simulator pgui = new Simulator(noisy);
         model.addTest(pgui);
         JFrame testbed = new TestbedFrame(model, panel);
         testbed.setTitle("Simulator");
@@ -371,10 +386,37 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 
             long timestamp = getTimeStamp();
 
+            if(noisy) {
+            	// set standard deviations
+            	float posSd = Globals.VISION_COORD_NOISE_SD;
+            	float angSd = Globals.VISION_ANGLE_NOISE_SD;
+            	
+            	// add noise to positions
+            	yPosX = genRand(posSd, yPosX);
+            	yPosY = genRand(posSd, yPosY);
+            	bPosX = genRand(posSd, bPosX);
+            	bPosY = genRand(posSd, bPosY);
+            	ballPosX = genRand(posSd, ballPosX);
+            	ballPosY = genRand(posSd, ballPosY);
+            	
+            	// add noise to angles
+            	yRad = genRandDeg(angSd, yRad);
+            	bRad = genRandDeg(angSd, bRad);
+            }
+            
             super.propagate(yPosX, yPosY, yRad, bPosX, bPosY, bRad, ballPosX,
                     ballPosY, timestamp);
         }
 
+        private float genRand(float sd, float mean) {
+        	System.out.println((((float)rand.nextGaussian()*sd) + mean));
+        	return ((float)rand.nextGaussian()*sd) + mean;
+        }
+        
+        private float genRandDeg(float sd, float mean) {
+        	return genRand(sd, mean)%360;
+        }
+        
         public void propagatePitchSize() {
             super.propagatePitchSize(Globals.PITCH_WIDTH, Globals.PITCH_HEIGHT);
         }

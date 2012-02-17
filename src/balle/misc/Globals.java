@@ -12,6 +12,11 @@ public class Globals {
     public static final float PITCH_HEIGHT  = 1.2192f; // Metres
     public static final float GOAL_POSITION = 0.31f;   // Metres
     
+    public static final float METERS_PER_PIXEL = PITCH_WIDTH / 605f;
+    
+    public static final float VISION_COORD_NOISE_SD = 0.49f * METERS_PER_PIXEL;	// in meters
+    public static final float VISION_ANGLE_NOISE_SD = 1.53f;	// in degrees
+    public static final float SIMULATED_VISON_FRAMERATE = 15f;
 
 	
 	public static float powerToVelocity(float p) {
