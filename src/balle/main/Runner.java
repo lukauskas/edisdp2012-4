@@ -43,6 +43,7 @@ public class Runner {
         parser.acceptsAll(asList("d", "dummy-controller"));
         parser.acceptsAll(asList("c", "colour", "color")).withRequiredArg()
                 .ofType(String.class);
+        parser.acceptsAll(asList("g", "goal"));
         return parser;
     }
 
@@ -69,11 +70,27 @@ public class Runner {
             balleIsBlue = false; // This is just to fool Eclipse about
                                  // balleIsBlue initialisation
         }
+        
+        boolean goalIsLeft;
+        if ("left".equals(options.valueOf("goal")))
+        	goalIsLeft = true;
+        else if ("right".equals(options.valueOf("goal")))
+        	goalIsLeft = false;
+        else {
+            System.out
+                    .println("Invalid goal provided, try one of the following:");
+            System.out.println("javac balle.main.Runner -g left");
+            System.out.println("javac balle.main.Runner -g right");
+            print_usage();
+            System.exit(-1);
+            goalIsLeft = false; // This is just to fool Eclipse about
+                                 // balleIsBlue initialisation
+        }
 
         if (options.has("simulator"))
-            runSimulator(balleIsBlue);
+            runSimulator(balleIsBlue, goalIsLeft);
         else
-            runRobot(balleIsBlue, options.has("dummy-controller"));
+            runRobot(balleIsBlue, goalIsLeft, options.has("dummy-controller"));
     }
 
     public static void initialiseGUI(Controller controller, AbstractWorld world) {
@@ -92,14 +109,14 @@ public class Runner {
 
     }
 
-    public static void runRobot(boolean balleIsBlue, boolean useDummyController) {
+    public static void runRobot(boolean balleIsBlue, boolean goalIsLeft, boolean useDummyController) {
 
         AbstractWorld world;
         SocketVisionReader visionInput;
         Controller controller;
 
         // Initialise world
-        world = new BasicWorld(balleIsBlue);
+        world = new BasicWorld(balleIsBlue, goalIsLeft);
 
         // Moving this forward so we do not start a GUI until controller is
         // initialised
@@ -123,9 +140,9 @@ public class Runner {
         visionInput.addListener(world);
     }
 
-    public static void runSimulator(boolean balleIsBlue) {
+    public static void runSimulator(boolean balleIsBlue, boolean goalIsLeft) {
         Simulator simulator = Simulator.createSimulator();
-        BasicWorld world = new BasicWorld(balleIsBlue);
+        BasicWorld world = new BasicWorld(balleIsBlue, goalIsLeft);
         simulator.addListener(world);
 
         SoftBot bot;

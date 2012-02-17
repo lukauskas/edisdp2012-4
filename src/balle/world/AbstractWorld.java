@@ -23,9 +23,11 @@ public abstract class AbstractWorld implements Listener {
     // JEV: Scanner is final and can't be extended, makes it difficult for the
     // simulator.
     private final boolean balleIsBlue;
+    private final boolean goalIsLeft;
 
-    public AbstractWorld(boolean isBalleBlue) {
+    public AbstractWorld(boolean isBalleBlue, boolean goalIsLeft) {
         this.balleIsBlue = isBalleBlue;
+        this.goalIsLeft = goalIsLeft;
     }
 
     /**
@@ -147,6 +149,29 @@ public abstract class AbstractWorld implements Listener {
 
         pitchWidth = width;
         pitchHeight = height;
+    }
+    
+    @Override
+    public void updateGoals(double xMin, double xMax, double yMin, double yMax) {
+    	left = new Goal(-100000,xMin,yMin,yMax);
+    	right = new Goal(xMax,100000,yMin,yMax);
+    }
+    
+    protected Goal left = new Goal(-0.2, 0, 0.3, 0.9);
+    protected Goal right = new Goal(2.45, 2.65, 0.3, 0.9);
+    
+    public Goal getOurGoal() {
+    	if (goalIsLeft)
+    		return right;
+    	else
+    		return left;
+    }
+    
+    public Goal getOpponentGoal() {
+    	if (goalIsLeft)
+    		return left;
+    	else
+    		return right;
     }
 
 }

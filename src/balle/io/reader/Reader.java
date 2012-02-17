@@ -38,5 +38,19 @@ public class Reader implements AbstractVisionReader {
             listener.updatePitchSize(width, height);
         }
     }
+    
+    /** Inform listeners of the position of the goals.
+     * 
+     * @param xMin Left-hand side of the pitch.
+     * @param xMax Right-hand side of the pitch.
+     * @param yMin Bottom of the goals.
+     * @param yMax Top of the goals.
+     */
+    protected final void propagateGoals(double xMin, double xMax, double yMin, double yMax) {
+    	
+    	for (Listener listener : listeners) {
+    		listener.updateGoals(xMin, xMax, yMin, yMax);
+    	}
+    }
 
 }

@@ -18,9 +18,9 @@ public class BasicWorldTest {
      */
     @Before
     public void init() {
-        worldB = new BasicWorld(true);
+        worldB = new BasicWorld(true,true);
         worldB.updatePitchSize(Globals.PITCH_WIDTH, Globals.PITCH_HEIGHT);
-        worldY = new BasicWorld(false);
+        worldY = new BasicWorld(false,true);
         worldY.updatePitchSize(Globals.PITCH_WIDTH, Globals.PITCH_HEIGHT);
     }
 
@@ -30,7 +30,7 @@ public class BasicWorldTest {
      */
     @Test
     public void testSnapshotIsEmptySnapshotInitially() {
-        BasicWorld world = new BasicWorld(true);
+        BasicWorld world = new BasicWorld(true,true);
         assertTrue(EmptySnapshot.class.isInstance(world.getSnapshot()));
     }
 

@@ -420,6 +420,10 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
         public void propagatePitchSize() {
             super.propagatePitchSize(Globals.PITCH_WIDTH, Globals.PITCH_HEIGHT);
         }
+        
+        public void propagateGoals() {
+        	super.propagateGoals(0, Globals.PITCH_WIDTH, 0, 0);
+        }
     }
 
     /**

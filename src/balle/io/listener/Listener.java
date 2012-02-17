@@ -7,4 +7,6 @@ public interface Listener {
             long timestamp);
 
     public void updatePitchSize(double width, double height);
+
+	public void updateGoals(double xMin, double xMax, double yMin, double yMax);
 }
