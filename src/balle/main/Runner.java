@@ -41,9 +41,8 @@ public class Runner {
         OptionParser parser = new OptionParser();
         parser.acceptsAll(asList("s", "simulator"));
         parser.acceptsAll(asList("d", "dummy-controller"));
-        parser.acceptsAll(asList("c", "colour", "color")).withRequiredArg()
-                .ofType(String.class);
-        parser.acceptsAll(asList("g", "goal"));
+        parser.acceptsAll(asList("c", "colour", "color")).withRequiredArg().ofType(String.class);
+        parser.acceptsAll(asList("g", "goal")).withRequiredArg().ofType(String.class);
         return parser;
     }
 
@@ -61,8 +60,7 @@ public class Runner {
         else if ("yellow".equals(options.valueOf("colour")))
             balleIsBlue = false;
         else {
-            System.out
-                    .println("Invalid colour provided, try one of the following:");
+            System.out.println("Invalid colour provided, try one of the following:");
             System.out.println("javac balle.main.Runner -c blue");
             System.out.println("javac balle.main.Runner -c yellow");
             print_usage();
@@ -70,21 +68,20 @@ public class Runner {
             balleIsBlue = false; // This is just to fool Eclipse about
                                  // balleIsBlue initialisation
         }
-        
+
         boolean goalIsLeft;
         if ("left".equals(options.valueOf("goal")))
-        	goalIsLeft = true;
+            goalIsLeft = true;
         else if ("right".equals(options.valueOf("goal")))
-        	goalIsLeft = false;
+            goalIsLeft = false;
         else {
-            System.out
-                    .println("Invalid goal provided, try one of the following:");
+            System.out.println("Invalid goal provided, try one of the following:");
             System.out.println("javac balle.main.Runner -g left");
             System.out.println("javac balle.main.Runner -g right");
             print_usage();
             System.exit(-1);
             goalIsLeft = false; // This is just to fool Eclipse about
-                                 // balleIsBlue initialisation
+                                // balleIsBlue initialisation
         }
 
         if (options.has("simulator"))
