@@ -53,8 +53,11 @@ public class Coord {
         return c.sub(this).abs();
     }
 
-    public double orientation() {
-        return Math.atan2(this.getY(), this.getX());
+    public Orientation orientation() {
+        double orientation_atan2 = Math.atan2(this.getY(), this.getX());
+        if (orientation_atan2 < 0)
+            orientation_atan2 = 2 * Math.PI + orientation_atan2;
+        return new Orientation(orientation_atan2, true);
     }
 
     /**
@@ -68,5 +71,19 @@ public class Coord {
      */
     public boolean isEstimated() {
         return estimated;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other == null)
+            return false;
+        if (other == this)
+            return true;
+        if (this.getClass() != other.getClass())
+            return false;
+        Coord otherCoord = (Coord) other;
+        return (otherCoord.getX() == this.getX())
+                && (otherCoord.getY() == this.getY())
+                && (otherCoord.isEstimated() == this.isEstimated());
     }
 }

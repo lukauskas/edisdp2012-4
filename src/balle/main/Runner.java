@@ -1,18 +1,25 @@
 package balle.main;
 
+import static java.util.Arrays.asList;
+
+import java.io.IOException;
+
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
+import balle.bluetooth.Communicator;
+import balle.controller.BluetoothController;
 import balle.controller.Controller;
 import balle.controller.DummyController;
 import balle.io.reader.SocketVisionReader;
 import balle.simulator.Simulator;
 import balle.simulator.SoftBot;
-import balle.strategy.AbstractStrategy;
-import balle.strategy.DummyStrategy;
-import balle.strategy.UserInputStrategy;
+import balle.strategy.StrategyFactory;
 import balle.world.AbstractWorld;
 import balle.world.BasicWorld;
+import balle.world.SimpleWorldGUI;
 
 /**
- * This is where the main executable code for BALL-E lies. It is responsible of
+ * This is where the main executable code for 4s lies. It is responsible of
  * initialising various subsystems of the code and make sure they interact.
  * 
  * 
@@ -22,81 +29,130 @@ import balle.world.BasicWorld;
 public class Runner {
 
     private static void print_usage() {
-        System.out.println("Usage: java balle.main.Runner <balle_colour>");
-        System.out
-                .println("Where <balle_colour> is either \"blue\" or \"yellow\"");
+        try {
+            getOptionParser().printHelpOn(System.out);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    public static OptionParser getOptionParser() {
+        OptionParser parser = new OptionParser();
+        parser.acceptsAll(asList("s", "simulator"));
+        parser.acceptsAll(asList("d", "dummy-controller"));
+        parser.acceptsAll(asList("c", "colour", "color")).withRequiredArg()
+                .ofType(String.class);
+        parser.acceptsAll(asList("g", "goal"));
+        return parser;
     }
 
     /**
      * @param args
      */
     public static void main(String[] args) {
-    	// Check the usage
-        if (args.length != 1) {
-            print_usage();
-            System.exit(-1);
-        }
+        OptionParser parser = getOptionParser();
+        OptionSet options = parser.parse(args);
 
         // Get the colour
         boolean balleIsBlue;
-        if (args[0].equals("blue"))
+        if ("blue".equals(options.valueOf("colour")))
             balleIsBlue = true;
-        else if (args[0].equals("yellow"))
+        else if ("yellow".equals(options.valueOf("colour")))
             balleIsBlue = false;
         else {
-            System.out.println("Invalid colour provided");
+            System.out
+                    .println("Invalid colour provided, try one of the following:");
+            System.out.println("javac balle.main.Runner -c blue");
+            System.out.println("javac balle.main.Runner -c yellow");
             print_usage();
             System.exit(-1);
             balleIsBlue = false; // This is just to fool Eclipse about
                                  // balleIsBlue initialisation
         }
         
-        // runRobot(balleIsBlue);
-        runSimulator(balleIsBlue);
+        boolean goalIsLeft;
+        if ("left".equals(options.valueOf("goal")))
+        	goalIsLeft = true;
+        else if ("right".equals(options.valueOf("goal")))
+        	goalIsLeft = false;
+        else {
+            System.out
+                    .println("Invalid goal provided, try one of the following:");
+            System.out.println("javac balle.main.Runner -g left");
+            System.out.println("javac balle.main.Runner -g right");
+            print_usage();
+            System.exit(-1);
+            goalIsLeft = false; // This is just to fool Eclipse about
+                                 // balleIsBlue initialisation
+        }
+
+        if (options.has("simulator"))
+            runSimulator(balleIsBlue, goalIsLeft);
+        else
+            runRobot(balleIsBlue, goalIsLeft, options.has("dummy-controller"));
     }
-    
-    public static void runRobot(boolean balleIsBlue) {
-    	
-    	AbstractWorld world;
+
+    public static void initialiseGUI(Controller controller, AbstractWorld world) {
+        SimpleWorldGUI gui;
+        GUITab mainWindow = new GUITab();
+
+        StratTab strategyTab = new StratTab(controller, world);
+        for (String strategy : StrategyFactory.availableDesignators())
+            strategyTab.addStrategy(strategy);
+
+        mainWindow.addToSidebar(strategyTab);
+
+        gui = new SimpleWorldGUI(world);
+        mainWindow.addToMainPanel(gui.getPanel());
+        gui.start();
+
+    }
+
+    public static void runRobot(boolean balleIsBlue, boolean goalIsLeft, boolean useDummyController) {
+
+        AbstractWorld world;
         SocketVisionReader visionInput;
         Controller controller;
-        AbstractStrategy strategy;
 
-        
-     // Initialise world
-        world = new BasicWorld(balleIsBlue);
+        // Initialise world
+        world = new BasicWorld(balleIsBlue, goalIsLeft);
 
-        // Create visionInput buffer
-        visionInput = new SocketVisionReader();
-        visionInput.addListener(world);
+        // Moving this forward so we do not start a GUI until controller is
+        // initialised
+        // If you're getting a merge conflict here leave this before
+        // SimpleWorldGUI start!
 
-        // Initialise controller
-        // controller = new BluetoothController(new Communicator());
-        controller = new DummyController();
-        strategy = new DummyStrategy(controller, world);
+        if (useDummyController)
+            controller = new DummyController();
+        else
+            controller = new BluetoothController(new Communicator());
+
         // Wait for controller to initialise
         while (!controller.isReady()) {
             continue;
         }
-        // Once the controller is ready, start the strategy
-        strategy.start();
+
+        initialiseGUI(controller, world);
+
+        // Create visionInput buffer
+        visionInput = new SocketVisionReader();
+        visionInput.addListener(world);
     }
-    
-    public static void runSimulator(boolean balleIsBlue) {
-    	Simulator simulator = Simulator.createSimulator();
-    	BasicWorld world = new BasicWorld(balleIsBlue);
-    	simulator.addListener(world);
-    	
-    	SoftBot bot;
-    	if (balleIsBlue)
-    		bot = simulator.getYellowSoft();
-    	else 
-    		bot = simulator.getBlueSoft();
-    	
-    	System.out.println(bot);
-    	
-    	AbstractStrategy s = new UserInputStrategy(bot, world);
-		s.start();
-    	
+
+    public static void runSimulator(boolean balleIsBlue, boolean goalIsLeft) {
+        Simulator simulator = Simulator.createSimulator();
+        BasicWorld world = new BasicWorld(balleIsBlue, goalIsLeft);
+        simulator.addListener(world);
+
+        SoftBot bot;
+        if (!balleIsBlue)
+            bot = simulator.getYellowSoft();
+        else
+            bot = simulator.getBlueSoft();
+
+        System.out.println(bot);
+
+        initialiseGUI(bot, world);
     }
 }

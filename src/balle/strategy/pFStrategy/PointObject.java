@@ -1,6 +1,4 @@
-package main.strategy.pFStrategy;
-
-import main.Runner;
+package balle.strategy.pFStrategy;
 
 //basic Point class includes x,y
 public class PointObject extends Vector implements Object {
@@ -73,10 +71,10 @@ public class PointObject extends Vector implements Object {
 					* (this.getX() - point.getLocation().getX())
 					+ (this.getY() - point.getLocation().getY())
 					* (this.getY() - point.getLocation().getY()));
-			if (Runner.DEBUG) {
+/*			if (Runner.DEBUG) {
 				System.out.println("obstacle Distance:" + distance);
 				System.out.println("PFPlanning::PointObject::inf_distance:"+infl_distance);
-			}		
+			}*/		
 			if (distance < infl_distance & power!=0) {
 				try
 				{
@@ -105,11 +103,11 @@ public class PointObject extends Vector implements Object {
 			Vector res=out_point.subtract(this);
 				System.out.println("goal Distance:" + res.size());
 			Vector final_res=res.mult(power * -1);
-			if (Runner.DEBUG){
+		/*	if (Runner.DEBUG){
 				System.out.println("PFPlanning::PointObject::attractive Force:"+final_res);
 				System.out.println("PFPlanning::PointObject::current:"+out_point);
 				System.out.println("PFPlanning::PointObject::destination:"+this);
-			}
+			}*/
 			return final_res;
 		}
 	}

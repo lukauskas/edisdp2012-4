@@ -6,4 +6,10 @@ lib/*
 bin/
 
 # Only for saving threshold values between runs
-vision/threshdefaults
+vision/threshdefaults*
+JBox2d.log
+*.orig
+*.log
+*~
+*.swp
+JBox2d.log

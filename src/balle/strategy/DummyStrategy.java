@@ -1,6 +1,7 @@
 package balle.strategy;
 
 import balle.controller.Controller;
+import balle.strategy.planner.AbstractPlanner;
 import balle.world.AbstractWorld;
 
 /**
@@ -10,10 +11,11 @@ import balle.world.AbstractWorld;
  * @author s0909773
  * 
  */
-public class DummyStrategy extends AbstractStrategy {
+public class DummyStrategy extends AbstractPlanner {
 
-    protected int stepNumber                = -1;
-    protected int timesMoveCalledOnThisStep = 0;
+    protected int  stepNumber   = -1;
+    protected long timer        = System.currentTimeMillis();
+    boolean        goingForward = false;
 
     public DummyStrategy(Controller controller, AbstractWorld world) {
         super(controller, world);
@@ -21,27 +23,31 @@ public class DummyStrategy extends AbstractStrategy {
 
     @Override
     protected void aiStep() {
-        stepNumber = (stepNumber + 1) % 100;
-        timesMoveCalledOnThisStep = 0;
     }
 
     @Override
     protected void aiMove(Controller controller) {
-
-        if (timesMoveCalledOnThisStep > 0)
-            return;
-
-        timesMoveCalledOnThisStep++;
-
-        if (stepNumber == 0) {
+        long t = System.currentTimeMillis();
+        long dt = t - timer;
+        if (dt > 0) {
+            // controller.backward(100);
+            controller.setWheelSpeeds(-720, -720);
+        } else {
             controller.stop();
-            controller.forward(controller.getMaximumWheelSpeed());
         }
+        //
+        // if (dt > 10000) {
+        // controller.stop();
+        // if(goingForward)
+        // controller.backward(controller.getMaximumWheelSpeed());
+        // else
+        // controller.forward(controller.getMaximumWheelSpeed());
+        // goingForward = !goingForward;
+        // }
+    }
 
-        else if (stepNumber == 50) {
-            controller.stop();
-            controller.backward(controller.getMaximumWheelSpeed());
-        }
-
+    @Override
+    public String toString() {
+        return "Dummy Strategy";
     }
 }
