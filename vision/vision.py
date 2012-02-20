@@ -1,5 +1,6 @@
 from __future__ import print_function
 import sys
+import os
 import time
 import math
 import socket
@@ -38,6 +39,9 @@ class Vision:
                 filetype = 'image'
 
             self.cap = VirtualCamera(sourcefile, filetype)
+        
+        calibrationPath = os.path.join('calibration', 'pitch{0}'.format(pitchnum))
+        self.cap.loadCalibration(os.path.join(sys.path[0], calibrationPath))
 
         self.gui = Gui()
         self.threshold = Threshold(pitchnum)
@@ -63,7 +67,12 @@ class Vision:
         
     def doStuff(self):
         while self.running:
-            frame = self.cap.getImage()
+            if self.cap.getCameraMatrix is None:
+                # No calibration matrices for pitch 0 atm
+                frame = self.cap.getImage()
+            else:
+                frame = self.cap.getImageUndistort()
+
             frame = self.preprocessor.preprocess(frame)
             
             self.gui.updateLayer('raw', frame)
@@ -73,7 +82,8 @@ class Vision:
 
             self.gui.loop()
         
-        self.socket.close()
+        if not self.stdout:
+            self.socket.close()
 
     def setNextPitchCorner(self, where):
         self.preprocessor.setNextPitchCorner(where)
@@ -81,6 +91,10 @@ class Vision:
         if self.preprocessor.hasPitchSize:
             print("Pitch size: {0!r}".format(self.preprocessor.pitch_size))
             self.outputPitchSize()
+            self.gui.setShowMouse(False)
+            self.gui.updateLayer('corner', None)
+        else:
+            self.gui.drawCrosshair(where, 'corner')
     
     def outputPitchSize(self):
         self.send('{0} {1} {2} \n'.format(
@@ -97,7 +111,11 @@ class Vision:
         for name in ['yellow', 'blue', 'ball']:
             entity = ents[name]
             x, y = entity.coordinates()
-            y = self.preprocessor.pitch_size[1] - y
+
+            # The rest of the system needs (0, 0) at the bottom left
+            if y != -1:
+                y = self.preprocessor.pitch_size[1] - y
+
             if name == 'ball':
                 self.send('{0} {1} '.format(x, y))
             else:

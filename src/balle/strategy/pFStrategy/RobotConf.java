@@ -4,19 +4,19 @@ package balle.strategy.pFStrategy;
 //b: distance between two wheels.
 //r: radius of the wheel.
 public class RobotConf {
-	private double b;
-	private double r;
+	private double distance;
+	private double radius;
 
-	public RobotConf(double b, double r) {
-		this.b = b;
-		this.r = r;
+	public RobotConf(double dist, double rad) {
+		this.distance = dist;
+		this.radius= rad;
 	}
 
 	public double getb() {
-		return b;
+		return distance;
 	}
 
 	public double getr() {
-		return r;
+		return radius;
 	}
 }

@@ -14,10 +14,10 @@ public class Orientation {
     public Orientation(double angle, boolean useRadians) {
 
         if (useRadians) {
-            angle = angle % (2*Math.PI);
+            angle = angle % (2 * Math.PI);
             angleInRadians = angle;
         } else {
-        	angle = angle % 360;
+            angle = angle % 360;
             angleInRadians = (angle * Math.PI) / 180;
         }
 
@@ -67,4 +67,15 @@ public class Orientation {
         return (angleInRadians * 180) / Math.PI;
     }
 
+    @Override
+    public boolean equals(Object other) {
+        if (other == null)
+            return false;
+        if (other == this)
+            return true;
+        if (this.getClass() != other.getClass())
+            return false;
+        Orientation otherOrientation = (Orientation) other;
+        return (otherOrientation.radians() - this.radians() < 0.000001);
+    }
 }
