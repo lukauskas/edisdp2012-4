@@ -69,7 +69,7 @@ public class PFPlanning {
         this.opponentAlphaPower = alpha;
     }
 
-    private void init(Pos robot, Pos opponent, Point ball, boolean orig) {
+    private void init(Pos robot, Pos opponent, Point ball) {
         PointObject opponentObj = new PointObject(opponent.getLocation(),
                 opponentPower, opponentInf, opponentAlphaPower);
         PointObject ballObj = new PointObject(ball, ballPower, Double.MAX_VALUE);
@@ -111,15 +111,11 @@ public class PFPlanning {
      *            opponent Pos
      * @param ball
      *            ball Location
-     * @param orig
-     *            eturn original vector, if unset return vector is left,right
-     *            wheels velocity, if set it will return the basic velocity
-     *            vector created by PFPlanner.
      * @return the velocity vec
      */
-    public VelocityVec update(Pos robot, Pos opponent, Point ball, boolean orig) {
+    public VelocityVec update(Pos robot, Pos opponent, Point ball) {
 
-        init(robot, opponent, ball, orig);
+        init(robot, opponent, ball);
 
         List<Object> complList = new ArrayList<Object>(objects);
         complList.add(this.opponent);
@@ -131,10 +127,8 @@ public class PFPlanning {
         if (vball.subtract(vrobot).norm() < STOP_DISTANCE) {
             res = new Vector(0, 0);
         }
-        if (orig)
-            return (VelocityVec) res;
-        else
-            return getVelocity(res, robot);
+
+        return getVelocity(res, robot);
 
     }
 

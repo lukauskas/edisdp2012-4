@@ -25,7 +25,8 @@ public class PFNavigation extends AbstractStrategy {
     // PFPlanning plann = new PFPlanning(conf, 100000,
     // Double.MAX_VALUE, 0.05, 500.0);
 
-    PFPlanning                  plann = new PFPlanning(conf, 0, 0.4, 16,
+    // TargetPower=16 works quite well.
+    PFPlanning                  plann = new PFPlanning(conf, 0, 1.5, 16,
                                               10000000.0);
 
     public PFNavigation(Controller controller, AbstractWorld world) {
@@ -54,7 +55,7 @@ public class PFNavigation extends AbstractStrategy {
                     .getBalle().getOrientation().radians());
             Point ball = new Point(snap.getBall().getPosition().getX(), snap
                     .getBall().getPosition().getY());
-            VelocityVec res = plann.update(initPos, opponent, ball, false);
+            VelocityVec res = plann.update(initPos, opponent, ball);
             LOG.trace("Left speed: " + Math.toDegrees(res.getLeft())
                     + "right speed: " + Math.toDegrees(res.getRight()));
             double resNorm = res.norm();

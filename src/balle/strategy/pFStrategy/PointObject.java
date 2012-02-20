@@ -45,6 +45,7 @@ public class PointObject extends Vector implements Object {
                     + (this.getY() - point.getY())
                     * (this.getY() - point.getY()));
             if (distance < infl_distance) {
+                LOG.trace("Within influence distance");
 
                 double p = power * (1 / distance - 1 / infl_distance) * 1
                         / (distance * distance) * 1 / distance;
