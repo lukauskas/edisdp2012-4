@@ -1,4 +1,6 @@
-package balle.world;
+package balle.world.objects;
+
+import balle.world.Coord;
 
 public interface StaticFieldObject {
 
