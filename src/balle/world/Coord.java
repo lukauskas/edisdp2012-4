@@ -1,5 +1,7 @@
 package balle.world;
 
+import balle.world.objects.FieldObject;
+
 public class Coord {
 
     private final double  x;
@@ -82,8 +84,36 @@ public class Coord {
         if (this.getClass() != other.getClass())
             return false;
         Coord otherCoord = (Coord) other;
-        return (otherCoord.getX() == this.getX())
-                && (otherCoord.getY() == this.getY())
+        return (otherCoord.getX() == this.getX()) && (otherCoord.getY() == this.getY())
                 && (otherCoord.isEstimated() == this.isEstimated());
+    }
+
+    /**
+     * Returns true if Coordinate is reachable via a straight line from another
+     * coordinate
+     * 
+     * @param fromCoordinate
+     *            the starting coordinate
+     * @return true, if coordinate is reachable in straight line from another
+     */
+    public boolean isReachableInStraightLineAndNotBlocked(Coord fromCoordinate) {
+        // TODO: Implement
+        return false;
+    }
+
+    /**
+     * Returns true if Coordinate is reachable via a straight line from another
+     * coordinate and is not blocked
+     * 
+     * @param fromCoordinate
+     *            the starting coordinate
+     * @param potentialObstacle
+     *            checks what could be the potential obstacle.
+     * @return true, if coordinate is reachable in straight line from another
+     */
+    public boolean isReachableInStraightLineAndNotBlocked(Coord fromCoordinate,
+            FieldObject potentialObstacle) {
+        // TODO: Implement
+        return false;
     }
 }
