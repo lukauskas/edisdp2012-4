@@ -13,7 +13,7 @@ public class PFPlanning {
     PointObject                 ball;
     double                      default_power = 5;
     RobotConf                   config;
-    final static double         STOP_DISTANCE = 0.05;
+    final static double         STOP_DISTANCE = 0.3;
     List<Object>                objects;
     /** power for opponent. */
     double                      opponentPower;
@@ -120,7 +120,7 @@ public class PFPlanning {
         List<Object> complList = new ArrayList<Object>(objects);
         complList.add(this.opponent);
 
-        Vector res = GoTo(complList, this.ball, robot.getLocation());
+        Vector res = GoTo(complList, this.ball, robot);
 
         Vector vball = new Vector(ball);
         Vector vrobot = new Vector(robot.getLocation());

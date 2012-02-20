@@ -26,8 +26,7 @@ public class PFNavigation extends AbstractStrategy {
     // Double.MAX_VALUE, 0.05, 500.0);
 
     // TargetPower=16 works quite well.
-    PFPlanning                  plann = new PFPlanning(conf, 0, 1.5, 16,
-                                              10000000.0);
+    PFPlanning                  plann = new PFPlanning(conf, 1, 1, 16, 0.5);
 
     public PFNavigation(Controller controller, AbstractWorld world) {
         super(controller, world);

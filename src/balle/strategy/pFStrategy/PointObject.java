@@ -49,6 +49,7 @@ public class PointObject extends Vector implements Object {
 
                 double p = power * (1 / distance - 1 / infl_distance) * 1
                         / (distance * distance) * 1 / distance;
+
                 Vector out_point = new Vector(point);
                 return out_point.subtract(this).mult(p);
             } else
