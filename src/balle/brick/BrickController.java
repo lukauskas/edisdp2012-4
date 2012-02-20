@@ -73,7 +73,7 @@ public class BrickController implements Controller {
     public void kick() {
         KICKER.setSpeed(900);
         KICKER.resetTachoCount();
-        KICKER.rotateTo(60);
+        KICKER.rotateTo(-60);
         KICKER.rotateTo(0);
     }
 
