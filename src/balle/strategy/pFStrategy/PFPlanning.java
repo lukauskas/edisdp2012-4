@@ -3,22 +3,26 @@ package balle.strategy.pFStrategy;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 public class PFPlanning {
-    Pos          robot;
-    PointObject  opponent;
-    PointObject  ball;
-    double       default_power = 5;
-    RobotConf    config;
-    double       Stopdistance  = 20;
-    List<Object> objects;
-    // power for opponent.
-    double       opponentPower;
-    // influence distance for opponent
-    double       opponentInf;
-    // power for goal location.
-    double       ballPower;
-    // power orientation, extended potential field.
-    double       opponentAlphaPower;
+    private static final Logger LOG           = Logger.getLogger(PFPlanning.class);
+
+    Pos                         robot;
+    PointObject                 opponent;
+    PointObject                 ball;
+    double                      default_power = 5;
+    RobotConf                   config;
+    final static double         STOP_DISTANCE = 20;
+    List<Object>                objects;
+    /** power for opponent. */
+    double                      opponentPower;
+    /** influence distance for opponent */
+    double                      opponentInf;
+    /** power for goal location. */
+    double                      ballPower;
+    /** power orientation, extended potential field. */
+    double                      opponentAlphaPower;
 
     /**
      * Constructor for PFPlanning:
@@ -75,26 +79,27 @@ public class PFPlanning {
 
     }
 
-    public VelocityVec update(Pos robot, Pos opponent, Point goal, Point ball,
-            boolean orig) {
-        init(robot, opponent, ball, orig);
-        Vector vgoal = new Vector(goal);
-        Vector vball = new Vector(ball);
-        Vector vres = vgoal.subtract(vball);
-        Vector threshold = new Vector(20, 20);
-        Vector finalres = vres.subtract(threshold);
-        PointObject obj = new PointObject(finalres, 10000, this.opponentInf);
-        List<Object> complList = new ArrayList<Object>(objects);
-        complList.add(this.opponent);
-        complList.add(obj);
-        Vector res = GoTo(complList, this.ball, robot.getLocation());
-
-        if (orig)
-            return new VelocityVec(res.getX(), res.getY());
-        else
-            return getVelocity(res, robot);
-
-    }
+    // public VelocityVec update(Pos robot, Pos opponent, Point goal, Point
+    // ball,
+    // boolean orig) {
+    // init(robot, opponent, ball, orig);
+    // Vector vgoal = new Vector(goal);
+    // Vector vball = new Vector(ball);
+    // Vector vres = vgoal.subtract(vball);
+    // Vector threshold = new Vector(20, 20);
+    // Vector finalres = vres.subtract(threshold);
+    // PointObject obj = new PointObject(finalres, 10000, this.opponentInf);
+    // List<Object> complList = new ArrayList<Object>(objects);
+    // complList.add(this.opponent);
+    // complList.add(obj);
+    // Vector res = GoTo(complList, this.ball, robot.getLocation());
+    //
+    // if (orig)
+    // return new VelocityVec(res.getX(), res.getY());
+    // else
+    // return getVelocity(res, robot);
+    //
+    // }
 
     /**
      * Given Pos of different objects, this function will create PointObjects to
@@ -115,12 +120,15 @@ public class PFPlanning {
     public VelocityVec update(Pos robot, Pos opponent, Point ball, boolean orig) {
 
         init(robot, opponent, ball, orig);
+
         List<Object> complList = new ArrayList<Object>(objects);
         complList.add(this.opponent);
+
         Vector res = GoTo(complList, this.ball, robot.getLocation());
+
         Vector vball = new Vector(ball);
         Vector vrobot = new Vector(robot.getLocation());
-        if (vball.subtract(vrobot).size() < Stopdistance) {
+        if (vball.subtract(vrobot).norm() < STOP_DISTANCE) {
             res = new Vector(0, 0);
         }
         if (orig)
@@ -146,7 +154,7 @@ public class PFPlanning {
                 * (start_point.getX() - dest_obj.getX())
                 + (start_point.getY() - dest_obj.getY())
                 * (start_point.getY() - dest_obj.getY()));
-        if (dist < Stopdistance) {
+        if (dist < STOP_DISTANCE) {
             return new Vector(0, 0);
         }
 
@@ -183,7 +191,7 @@ public class PFPlanning {
                 * (start_point.getLocation().getX() - dest_obj.getX())
                 + (start_point.getLocation().getY() - dest_obj.getY())
                 * (start_point.getLocation().getY() - dest_obj.getY()));
-        if (dist < Stopdistance) {
+        if (dist < STOP_DISTANCE) {
             return new Vector(0, 0);
         }
 
@@ -213,7 +221,6 @@ public class PFPlanning {
         double left = Vlin - r * Math.sin(VAng);
         double right = Vlin + r * Math.sin(VAng);
         VelocityVec vector = new VelocityVec(left, right);
-        // System.out.println("r: " + r+" left" + left + "right" + right);
         return vector;
     }
 
@@ -224,9 +231,10 @@ public class PFPlanning {
      */
     private VelocityVec getVelocity(Vector inputVel, Pos current) {
 
-        double size = inputVel.size();
+        double size = inputVel.norm();
         if (size == 0)
             return new VelocityVec(0, 0);
+
         double alpha = inputVel.normalAngle();
         double dist_alpha = alpha - current.getAngle();
         if (dist_alpha > Math.PI)
@@ -234,15 +242,8 @@ public class PFPlanning {
         else if (dist_alpha < -1 * Math.PI)
             dist_alpha = 2 * Math.PI + dist_alpha;
         double Vlin = Math.cos(dist_alpha) * size;
-        double angSize = 1 / size;
-        // if(*angSizeangSize>10)
-        // angSize=10;
+
         double Vang = 0.4 * dist_alpha / Math.PI;
-        // double threshold=0.1;
-        // if(Vang>threshold)
-        // Vang=threshold;
-        // if(Vang<-1*threshold)
-        // Vang=-1*threshold;
 
         return CvtVelocity(Vlin, Vang, config.getr());
     }
