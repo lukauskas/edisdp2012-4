@@ -7,6 +7,7 @@ import balle.strategy.pFStrategy.PFPlanning;
 import balle.strategy.pFStrategy.Point;
 import balle.strategy.pFStrategy.Pos;
 import balle.strategy.pFStrategy.RobotConf;
+import balle.strategy.pFStrategy.Vector;
 import balle.strategy.pFStrategy.VelocityVec;
 import balle.world.AbstractWorld;
 import balle.world.Snapshot;
@@ -17,15 +18,15 @@ public class PFNavigation extends AbstractStrategy {
 
     double                      b     = 13.0f;                               // wheel
                                                                               // width
-    double                      r     = 8.16f;                               // wheel
+    double                      r     = 8.16f / 2;                           // wheel
                                                                               // diameter
     RobotConf                   conf  = new RobotConf(b, r);
 
     // PFPlanning plann = new PFPlanning(conf, 100000,
     // Double.MAX_VALUE, 0.05, 500.0);
 
-    PFPlanning                  plann = new PFPlanning(conf, 100000, 1000,
-                                              0.04, 250000.0);
+    PFPlanning                  plann = new PFPlanning(conf, 0, 0.4, 16,
+                                              10000000.0);
 
     public PFNavigation(Controller controller, AbstractWorld world) {
         super(controller, world);
@@ -45,30 +46,33 @@ public class PFNavigation extends AbstractStrategy {
         if (snap != null) {
 
             Pos opponent = new Pos(new Point(snap.getOpponent().getPosition()
-                    .getX() * 100,
-                    snap.getOpponent().getPosition().getY() * 100), snap
+                    .getX(), snap.getOpponent().getPosition().getY()), snap
                     .getOpponent().getOrientation().radians());
             // Pos opponent = null;
             Pos initPos = new Pos(new Point(snap.getBalle().getPosition()
-                    .getX() * 100, snap.getBalle().getPosition().getY() * 100),
-                    snap.getBalle().getOrientation().radians());
-            Point ball = new Point(snap.getBall().getPosition().getX() * 100,
-                    snap.getBall().getPosition().getY() * 100);
+                    .getX(), snap.getBalle().getPosition().getY()), snap
+                    .getBalle().getOrientation().radians());
+            Point ball = new Point(snap.getBall().getPosition().getX(), snap
+                    .getBall().getPosition().getY());
             VelocityVec res = plann.update(initPos, opponent, ball, false);
-            double left = Math.toDegrees(res.getLeft());
-            double right = Math.toDegrees(res.getRight());
-            if (left > 700)
-                left = 700;
-            if (left < -700)
-                left = -700;
-            if (right > 700)
-                right = 700;
-            if (right < -700)
-                right = -700;
-            LOG.trace(opponent + " " + initPos + " " + ball + " " + left + " "
-                    + right);
+            LOG.trace("Left speed: " + Math.toDegrees(res.getLeft())
+                    + "right speed: " + Math.toDegrees(res.getRight()));
+            double resNorm = res.norm();
+
+            double left, right;
+            // If the speeds given are more than the maximum speeds allowed
+            // Scale them
+            if (resNorm > VelocityVec.MAXIMUM_NORM) {
+                Vector newRes = res.mult(1 / res.norm()).mult(
+                        VelocityVec.MAXIMUM_NORM);
+                res = new VelocityVec(newRes.getX(), newRes.getY());
+            }
+
+            left = Math.toDegrees(res.getLeft());
+            right = Math.toDegrees(res.getRight());
+            LOG.trace("Left speed: " + left + "right speed: " + right);
+
             controller.setWheelSpeeds((int) left, (int) right);
         }
     }
-
 }

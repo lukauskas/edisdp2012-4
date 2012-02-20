@@ -35,7 +35,7 @@ public class PointObject extends Vector implements Object {
         this(point.getX(), point.getY(), power, infl_distance, alpha);
     }
 
-    // Get vector for normal Potential Field algorithm
+    /** Get vector for normal Potential Field algorithm */
     @Override
     public Vector getVector(Point point, boolean repulsive) {
         if (repulsive) {

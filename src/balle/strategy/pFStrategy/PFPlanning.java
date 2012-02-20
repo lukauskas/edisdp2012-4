@@ -13,7 +13,7 @@ public class PFPlanning {
     PointObject                 ball;
     double                      default_power = 5;
     RobotConf                   config;
-    final static double         STOP_DISTANCE = 20;
+    final static double         STOP_DISTANCE = 0.05;
     List<Object>                objects;
     /** power for opponent. */
     double                      opponentPower;
