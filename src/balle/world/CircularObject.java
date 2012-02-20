@@ -17,4 +17,16 @@ public class CircularObject extends MovingPoint implements FieldObject {
     public double getRadius() {
         return radius;
     }
+
+    @Override
+    public boolean isNearWall() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean isInCorner() {
+        // TODO Auto-generated method stub
+        return false;
+    }
 }

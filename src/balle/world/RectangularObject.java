@@ -33,4 +33,16 @@ public class RectangularObject extends MovingPoint implements FieldObject {
         return false;
     }
 
+    @Override
+    public boolean isNearWall() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean isInCorner() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
 }
