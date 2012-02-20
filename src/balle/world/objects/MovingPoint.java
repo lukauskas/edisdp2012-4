@@ -1,14 +1,17 @@
-package balle.world;
+package balle.world.objects;
+
+import balle.world.Coord;
+import balle.world.Velocity;
 
 /**
  * Immutable
  */
-public class FieldObject {
+public class MovingPoint {
 
     private final Coord    position;
     private final Velocity velocity;
 
-    public FieldObject(Coord position, Velocity velocity) {
+    public MovingPoint(Coord position, Velocity velocity) {
         super();
 
         this.position = position;

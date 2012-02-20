@@ -2,8 +2,8 @@ package balle.strategy.executor.movement;
 
 import balle.controller.Controller;
 import balle.strategy.executor.Executor;
-import balle.world.FieldObject;
 import balle.world.Snapshot;
+import balle.world.objects.FieldObject;
 
 public interface MovementExecutor extends Executor {
 

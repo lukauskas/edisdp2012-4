@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import balle.misc.Globals;
+import balle.world.objects.Robot;
 
 public class BasicWorldTest {
 

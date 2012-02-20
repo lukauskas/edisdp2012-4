@@ -4,8 +4,8 @@ import balle.controller.Controller;
 import balle.strategy.planner.AbstractPlanner;
 import balle.world.AbstractWorld;
 import balle.world.Coord;
-import balle.world.FieldObject;
-import balle.world.Robot;
+import balle.world.objects.FieldObject;
+import balle.world.objects.Robot;
 
 public class Blocking extends AbstractPlanner {
 

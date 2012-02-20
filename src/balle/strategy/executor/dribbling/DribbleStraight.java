@@ -3,9 +3,9 @@ package balle.strategy.executor.dribbling;
 import balle.controller.Controller;
 import balle.strategy.executor.Executor;
 import balle.world.Coord;
-import balle.world.FieldObject;
-import balle.world.Robot;
 import balle.world.Snapshot;
+import balle.world.objects.FieldObject;
+import balle.world.objects.Robot;
 
 public class DribbleStraight implements Executor {
 
