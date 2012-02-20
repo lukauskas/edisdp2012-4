@@ -22,8 +22,8 @@ public abstract class AbstractWorldProcessor extends Thread {
 
     private long                lastSnapshotReceived = 0;
     private double              fps                  = 0;
-    
-    //private Goal
+
+    // private Goal
 
     public double getFPS() {
         return fps;
@@ -39,7 +39,7 @@ public abstract class AbstractWorldProcessor extends Thread {
     }
 
     @Override
-    public final void start() {
+    public void start() {
         shouldStop = false;
         super.start();
     }
@@ -56,9 +56,7 @@ public abstract class AbstractWorldProcessor extends Thread {
                 prevSnapshot = snapshot;
                 snapshot = newSnapshot;
 
-                if (prevSnapshot != null
-                        && snapshot.getTimestamp() != prevSnapshot
-                                .getTimestamp()) {
+                if (prevSnapshot != null && snapshot.getTimestamp() != prevSnapshot.getTimestamp()) {
                     registerSnapshotReceived();
 
                 }
@@ -81,13 +79,13 @@ public abstract class AbstractWorldProcessor extends Thread {
     protected final Snapshot getSnapshot() {
         return snapshot;
     }
-    
+
     protected final Goal getOurGoal() {
-    	return world.getOurGoal();
+        return world.getOurGoal();
     }
-    
+
     protected final Goal getOpponentGoal() {
-    	return world.getOpponentGoal();
+        return world.getOpponentGoal();
     }
 
     /**

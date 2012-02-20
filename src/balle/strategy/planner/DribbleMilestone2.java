@@ -1,5 +1,7 @@
 package balle.strategy.planner;
 
+import org.apache.log4j.Logger;
+
 import balle.controller.Controller;
 import balle.strategy.executor.dribbling.DribbleStraight;
 import balle.world.AbstractWorld;
@@ -7,9 +9,13 @@ import balle.world.Coord;
 import balle.world.Snapshot;
 
 public class DribbleMilestone2 extends AbstractPlanner {
+
+    private static final Logger LOG                = Logger.getLogger(DribbleMilestone2.class);
+
     DribbleStraight             executor;
     Coord                       startingCoordinate = null;
-    private static final double DISTANCE_TO_TRAVEL = 0.6; // in metres
+    private static final double DISTANCE_TO_TRAVEL = 0.6;                                      // in
+                                                                                                // metres
 
     public DribbleMilestone2(Controller controller, AbstractWorld world) {
         super(controller, world);
@@ -33,8 +39,9 @@ public class DribbleMilestone2 extends AbstractPlanner {
                                                                         // the
                                                                         // starting
                                                                         // position
+                LOG.info("Started dribbling");
             } else {
-                System.out.println("Cannot drible from here. Move ball closer");
+                LOG.warn("Cannot dribble from here. Move ball closer");
                 return;
             }
         } else {
@@ -45,7 +52,7 @@ public class DribbleMilestone2 extends AbstractPlanner {
             if (currentCoordinate.dist(startingCoordinate) < DISTANCE_TO_TRAVEL) {
                 executor.step(controller);
             } else {
-                System.out.println("Distance travelled. Finishing");
+                LOG.info("Distance travelled. Finishing");
                 executor.stop(controller);
             }
         }
