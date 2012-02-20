@@ -228,8 +228,6 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
             yMax = m2PY(goal.getMaxY()) - 2;
             height = m2PY(goal.getMinY()) - m2PY(goal.getMaxY());
             
-            System.out.println("xMin: " + xMin + " width: " + width + " yMax: " + yMax + " height: " + height);
-
             g.drawRect(xMin, yMax, width, height);
             // TODO: make sure this aligns to the goals that are drawn in black
         }
