@@ -20,11 +20,18 @@ public class PFPlanning {
     // power orientation, extended potential field.
     double       opponentAlphaPower;
 
-    // Constructor for PFPlanning:
-    // conf: Configuration parameters of the robot.
-    // opponentPower: Repulsive power for opponent
-    // opponentInf: Influence distance for opponent.
-    // ballPower: Power for goal position
+    /**
+     * Constructor for PFPlanning:
+     * 
+     * @param conf
+     *            Configuration parameters of the robot.
+     * @param opponentPower
+     *            Repulsive power for opponent
+     * @param opponentInf
+     *            Influence distance for opponent.
+     * @param targetPower
+     *            Power for goal position
+     */
     public PFPlanning(RobotConf conf, double opponentPower, double opponentInf,
             double targetPower) {
         this.config = conf;
@@ -34,12 +41,20 @@ public class PFPlanning {
         this.ballPower = targetPower;
     }
 
-    // Constructor for PFPlanning:
-    // conf: Configuration parameters of the robot.
-    // opponentPower: Repulsive power for opponent
-    // opponentInf: Influence distance for opponent.
-    // ballPower: Power for goal position
-    // alpha: Orientation power
+    /**
+     * Instantiates a new pF planning.
+     * 
+     * @param conf
+     *            Configuration parameters of the robot.
+     * @param opponentPower
+     *            Repulsive power for opponent
+     * @param opponentInf
+     *            Influence distance for opponent
+     * @param targetPower
+     *            Power for goal position
+     * @param alpha
+     *            Orientation power
+     */
     public PFPlanning(RobotConf conf, double opponentPower, double opponentInf,
             double targetPower, double alpha) {
         this.config = conf;
@@ -81,17 +96,22 @@ public class PFPlanning {
 
     }
 
-    // Given Pos of different objects, this function will create PointObjects to
-    // be used later.
-    // robot: robot Pos.
-    // opponent: opponent Pos.
-    // ball: ball Location.
-    // srr: add surrounding objects for target position to approach the target
-    // position
-    // from specific direction.
-    // orig: return original vector, if unset return vector is left,right wheels
-    // velocity, if
-    // if set it will return the basic velocity vector created by PFPlanner.
+    /**
+     * Given Pos of different objects, this function will create PointObjects to
+     * be used later.
+     * 
+     * @param robot
+     *            Pos.
+     * @param opponent
+     *            opponent Pos
+     * @param ball
+     *            ball Location
+     * @param orig
+     *            eturn original vector, if unset return vector is left,right
+     *            wheels velocity, if set it will return the basic velocity
+     *            vector created by PFPlanner.
+     * @return the velocity vec
+     */
     public VelocityVec update(Pos robot, Pos opponent, Point ball, boolean orig) {
 
         init(robot, opponent, ball, orig);
@@ -104,19 +124,21 @@ public class PFPlanning {
             res = new Vector(0, 0);
         }
         if (orig)
-            return (VelocityVec)res;
+            return (VelocityVec) res;
         else
             return getVelocity(res, robot);
 
     }
 
-    // Adds static object in the arena to list of static obstacles.
+    /** Adds static object in the arena to list of static obstacles. */
     public void AddObjects(Object r) {
         objects.add(r);
     }
 
-    // Actual function which computes the the next velocity vector to be applied
-    // to the robot.
+    /**
+     * Actual function which computes the the next velocity vector to be applied
+     * to the robot.
+     */
     public Vector GoTo(List<Object> obstacles, PointObject dest_obj,
             Point start_point) {
         // calculate distance so if we reached the target position we stop.
@@ -141,8 +163,18 @@ public class PFPlanning {
 
     }
 
-    // Extended Potential Field.This function takes into account the orientation
-    // of Robot.
+    /**
+     * Extended Potential Field.This function takes into account the orientation
+     * of Robot.
+     * 
+     * @param obstacles
+     *            the obstacles
+     * @param dest_obj
+     *            the dest_obj
+     * @param start_point
+     *            the start_point
+     * @return the vector
+     */
     public Vector GoTo(List<Object> obstacles, PointObject dest_obj,
             Pos start_point) {
         // calculate distance so if we reached the target position we stop.
@@ -168,8 +200,15 @@ public class PFPlanning {
 
     }
 
-    // This function translates linear and angular velocities to left and right
-    // velocities.
+    /**
+     * This function translates linear and angular velocities to left and right
+     * velocities.
+     * 
+     * @param Vlin
+     * @param VAng
+     * @param r
+     * @return
+     */
     private VelocityVec CvtVelocity(double Vlin, double VAng, double r) {
         double left = Vlin - r * Math.sin(VAng);
         double right = Vlin + r * Math.sin(VAng);
@@ -178,10 +217,11 @@ public class PFPlanning {
         return vector;
     }
 
-    // Given current Pos of the robot and current velocity this function
-    // computes linear and angular
-    // velocities for a differential drive robot using input parameters of the
-    // robot.
+    /**
+     * Given current Pos of the robot and current velocity this function
+     * computes linear and angular velocities for a differential drive robot
+     * using input parameters of the robot.
+     */
     private VelocityVec getVelocity(Vector inputVel, Pos current) {
 
         double size = inputVel.size();
