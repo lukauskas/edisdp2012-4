@@ -10,9 +10,11 @@ import java.awt.event.MouseMotionListener;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.apache.log4j.Logger;
+
 import balle.misc.Globals;
+import balle.world.objects.Ball;
 import balle.world.objects.Goal;
-import balle.world.objects.MovingPoint;
 import balle.world.objects.Robot;
 import balle.world.processing.AbstractWorldProcessor;
 
@@ -24,6 +26,8 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
     private final JLabel fpsText;
     private final JLabel fpsWarning;
     private final JLabel fps;
+    
+    private static final Logger LOG = Logger.getLogger(SimpleWorldGUI.class);
 
     public SimpleWorldGUI(AbstractWorld world) {
         super(world);
@@ -107,14 +111,18 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
             }
         }
 
-        private void drawBall(Graphics g, Color c, MovingPoint ball) {
+        private void drawBall(Graphics g, Color c, Ball ball) {
             // TODO: Use ball.getRadius() instead of constants here
+        	
+        	// Daniel: There is no method getRadius() for ball because its a MovingPoint object?
+        	// For the mean time I've changed the object to Ball
+        	
             // TODO: draw the velocity vector.
 
             if ((ball == null) || (ball.getPosition() == null)) {
                 return;
             }
-            float radius = Globals.BALL_RADIUS;
+            float radius = (float) ball.getRadius();
             Coord pos = ball.getPosition();
 
             if (!pos.isEstimated())
@@ -128,11 +136,8 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
         }
 
         private void drawRobot(Graphics g, Color c, Robot robot) {
-            // TODO: Use the robot.getWidth() and robot.getHight() instead of
-            // hardcoded ones
-            // TODO (optional): Draw robot in a different colour if
-            // robot.posessesBall and
-            // robot.isInScoringPosition()
+        	
+        	Snapshot s = getSnapshot();
 
             // Fail early, fail often
             if ((robot.getPosition() == null) || (robot.getOrientation() == null)) {
@@ -145,8 +150,8 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
             boolean isEstimated = robot.getPosition().isEstimated();
 
             // half length and width of robot
-            float hl = Globals.ROBOT_LENGTH / 2;
-            float hw = Globals.ROBOT_WIDTH / 2;
+            float hl = (float) (robot.getHeight() / 2);
+            float hw = (float) (robot.getWidth() / 2);
 
             // list of (x,y) positions of the corners of the robot
             // with the center at (0,0)
@@ -179,11 +184,21 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
                 ys[i] = m2PY(poly[i][1]);
             }
 
-            // draw
-            if (!isEstimated)
+            // draw robot, setting the colour depending on robot properties
+            // temporary colours until methods have been implemented
+            if (robot.possessesBall(s.getBall())) {
+            	if (robot.isInScoringPosition(s.getBall(), s.getOpponentsGoal(), s.getOpponent())) {
+            		LOG.info("Robot is in Scoring Position with possession of the ball");
+            		g.setColor(Color.MAGENTA);
+            	} else {
+            		LOG.info("Robot is in possession of the ball");
+            		g.setColor(Color.ORANGE);  
+            	}
+        	} else if (!isEstimated) {
                 g.setColor(Color.LIGHT_GRAY);
-            else
+        	} else {
                 g.setColor(Color.DARK_GRAY);
+        	}
 
             g.fillPolygon(xs, ys, n);
             g.setColor(c);
@@ -205,12 +220,15 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 
         private void drawGoal(Graphics g, Color c, Goal goal) {
             g.setColor(c);
-
+            
+            // Daniel: Does hardcoding the positions matter? 
             int xMin, width, yMax, height;
-            xMin = m2PX(goal.getMinX());
+            xMin = m2PX(goal.getMinX()) - 2;
             width = m2PX(goal.getMaxX()) - m2PX(goal.getMinX());
-            yMax = m2PY(goal.getMaxY());
+            yMax = m2PY(goal.getMaxY()) - 2;
             height = m2PY(goal.getMinY()) - m2PY(goal.getMaxY());
+            
+            System.out.println("xMin: " + xMin + " width: " + width + " yMax: " + yMax + " height: " + height);
 
             g.drawRect(xMin, yMax, width, height);
             // TODO: make sure this aligns to the goals that are drawn in black
@@ -298,7 +316,6 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 
     @Override
     protected void actionOnChange() {
-        // frame_counter++;
         screen.repaint();
     }
 
