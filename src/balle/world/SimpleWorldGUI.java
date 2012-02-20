@@ -108,6 +108,8 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
         }
 
         private void drawBall(Graphics g, Color c, MovingPoint ball) {
+            // TODO: Use ball.getRadius() instead of constants here
+            // TODO: draw the velocity vector.
 
             if ((ball == null) || (ball.getPosition() == null)) {
                 return;
@@ -126,6 +128,11 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
         }
 
         private void drawRobot(Graphics g, Color c, Robot robot) {
+            // TODO: Use the robot.getWidth() and robot.getHight() instead of
+            // hardcoded ones
+            // TODO (optional): Draw robot in a different colour if
+            // robot.posessesBall and
+            // robot.isInScoringPosition()
 
             // Fail early, fail often
             if ((robot.getPosition() == null) || (robot.getOrientation() == null)) {
@@ -206,6 +213,7 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
             height = m2PY(goal.getMinY()) - m2PY(goal.getMaxY());
 
             g.drawRect(xMin, yMax, width, height);
+            // TODO: make sure this aligns to the goals that are drawn in black
         }
 
         /**
