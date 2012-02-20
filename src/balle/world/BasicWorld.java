@@ -6,7 +6,7 @@ public class BasicWorld extends AbstractWorld {
 
     public BasicWorld(boolean balleIsBlue, boolean goalIsLeft) {
         super(balleIsBlue, goalIsLeft);
-        prev = new EmptySnapshot();
+        prev = new EmptySnapshot(getOpponentsGoal(), getOwnGoal());
     }
 
     @Override
@@ -113,7 +113,7 @@ public class BasicWorld extends AbstractWorld {
 
         synchronized (this) {
             // pack into a snapshot
-            this.prev = new Snapshot(them, ours, ball, timestamp);
+            this.prev = new Snapshot(them, ours, ball, getOpponentsGoal(), getOwnGoal(), timestamp);
         }
     }
 
@@ -121,7 +121,7 @@ public class BasicWorld extends AbstractWorld {
     public void updatePitchSize(double width, double height) {
         super.updatePitchSize(width, height);
         synchronized (this) {
-            this.prev = new EmptySnapshot();
+            this.prev = new EmptySnapshot(getOpponentsGoal(), getOwnGoal());
         }
     }
 }

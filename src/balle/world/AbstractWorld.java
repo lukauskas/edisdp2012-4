@@ -155,14 +155,14 @@ public abstract class AbstractWorld implements Listener {
     protected Goal left  = new Goal(-0.2, 0, 0.3, 0.9);
     protected Goal right = new Goal(2.45, 2.65, 0.3, 0.9);
 
-    public Goal getOurGoal() {
+    public Goal getOwnGoal() {
         if (goalIsLeft)
             return right;
         else
             return left;
     }
 
-    public Goal getOpponentGoal() {
+    public Goal getOpponentsGoal() {
         if (goalIsLeft)
             return left;
         else

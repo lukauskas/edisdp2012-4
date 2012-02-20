@@ -6,9 +6,8 @@ package balle.world;
  */
 public class EmptySnapshot extends Snapshot {
 
-    public EmptySnapshot() {
+    public EmptySnapshot(Goal opponentsGoal, Goal ownGoal) {
         super(new Robot(null, null, null), new Robot(null, null, null), new Ball(null, null),
-                System.currentTimeMillis());
+                opponentsGoal, ownGoal, System.currentTimeMillis());
     }
-
 }

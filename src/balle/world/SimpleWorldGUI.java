@@ -189,8 +189,8 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
         }
 
         private void drawGoals(Graphics g) {
-            drawGoal(g, Color.green, getOurGoal());
-            drawGoal(g, Color.red, getOpponentGoal());
+            drawGoal(g, Color.green, getSnapshot().getOwnGoal());
+            drawGoal(g, Color.red, getSnapshot().getOpponentsGoal());
         }
 
         private void drawGoal(Graphics g, Color c, Goal goal) {
