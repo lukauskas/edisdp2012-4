@@ -9,10 +9,11 @@ import balle.strategy.pFStrategy.Pos;
 import balle.strategy.pFStrategy.RobotConf;
 import balle.strategy.pFStrategy.Vector;
 import balle.strategy.pFStrategy.VelocityVec;
+import balle.strategy.planner.AbstractPlanner;
 import balle.world.AbstractWorld;
 import balle.world.Snapshot;
 
-public class PFNavigation extends AbstractStrategy {
+public class PFNavigation extends AbstractPlanner {
 
     private static final Logger LOG   = Logger.getLogger(PFNavigation.class);
 

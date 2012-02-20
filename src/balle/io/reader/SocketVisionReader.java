@@ -22,6 +22,7 @@ public class SocketVisionReader extends Reader {
 
     public static final String ENTITY_BIT     = "E";
     public static final String PITCH_SIZE_BIT = "P";
+    public static final String GOAL_POS_BIT   = "G";
 
     public SocketVisionReader() {
         new SocketThread().start();
@@ -88,6 +89,10 @@ public class SocketVisionReader extends Reader {
                 // System.out.println("Updating (pitch size): " + line);
                 propagatePitchSize(Double.parseDouble(tokens[1]),
                         Double.parseDouble(tokens[2]));
+            } else if (tokens[0].equals(GOAL_POS_BIT)) {
+            	// form: G XMIN XMAX YMIN YMAX
+            	propagateGoals(Double.parseDouble(tokens[1]), Double.parseDouble(tokens[2]),
+            					Double.parseDouble(tokens[3]), Double.parseDouble(tokens[4]) );
 
             } else {
                 // System.err.println("Could not decode: " + line);

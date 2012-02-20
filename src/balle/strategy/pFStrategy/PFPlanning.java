@@ -125,6 +125,7 @@ public class PFPlanning {
         Vector vball = new Vector(ball);
         Vector vrobot = new Vector(robot.getLocation());
         if (vball.subtract(vrobot).norm() < STOP_DISTANCE) {
+            LOG.info("Not moving as distance < STOP_DISTANCE");
             res = new Vector(0, 0);
         }
 

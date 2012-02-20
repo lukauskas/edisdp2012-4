@@ -10,10 +10,13 @@ public class TestRunner {
     }
 
     public static void testRobot(boolean balleIsBlue) {
-        Runner.runRobot(balleIsBlue, false);
+        Runner.runRobot(balleIsBlue, true, false, null); // TODO: FIX THIS or
+                                                         // delete and use
+                                                         // Runner
     }
 
     public static void testSimulator(boolean balleIsBlue) {
-        Runner.runSimulator(balleIsBlue);
+        Runner.runSimulator(balleIsBlue, true, null);// TODO: Fix this or delete
+                                                     // and use runner class
     }
 }

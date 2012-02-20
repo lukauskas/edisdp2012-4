@@ -1,14 +1,17 @@
-package balle.strategy;
+package balle.strategy.planner;
+
+import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
 import balle.world.AbstractWorld;
 import balle.world.processing.AbstractWorldProcessor;
 
-public abstract class AbstractStrategy extends AbstractWorldProcessor {
+public abstract class AbstractPlanner extends AbstractWorldProcessor {
 
-    private Controller controller;
+    private final Controller    controller;
+    private final static Logger LOG = Logger.getLogger(AbstractPlanner.class);
 
-    public AbstractStrategy(Controller controller, AbstractWorld world) {
+    public AbstractPlanner(Controller controller, AbstractWorld world) {
         super(world);
         this.controller = controller;
     }
@@ -30,11 +33,18 @@ public abstract class AbstractStrategy extends AbstractWorldProcessor {
     @Override
     public void cancel() {
         super.cancel();
+        LOG.info("Planner stopped");
         controller.stop();
     }
 
     @Override
     public String toString() {
         return this.getName();
+    }
+
+    @Override
+    public void start() {
+        super.start();
+        LOG.info("Planner started");
     }
 }

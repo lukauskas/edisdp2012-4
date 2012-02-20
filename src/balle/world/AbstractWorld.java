@@ -2,6 +2,8 @@ package balle.world;
 
 import balle.io.listener.Listener;
 import balle.misc.Globals;
+import balle.world.objects.Goal;
+import balle.world.objects.MovingPoint;
 
 /***
  * 
@@ -23,9 +25,11 @@ public abstract class AbstractWorld implements Listener {
     // JEV: Scanner is final and can't be extended, makes it difficult for the
     // simulator.
     private final boolean balleIsBlue;
+    private final boolean goalIsLeft;
 
-    public AbstractWorld(boolean isBalleBlue) {
+    public AbstractWorld(boolean isBalleBlue, boolean goalIsLeft) {
         this.balleIsBlue = isBalleBlue;
+        this.goalIsLeft = goalIsLeft;
     }
 
     /**
@@ -51,7 +55,7 @@ public abstract class AbstractWorld implements Listener {
      *            the object
      * @return new coordinate for the position of the object after timestep
      */
-    public Coord estimatedPosition(FieldObject object, double timestep) {
+    public Coord estimatedPosition(MovingPoint object, double timestep) {
         if ((object.getPosition() == null) || (object.getVelocity() == null))
             return null;
         else if (timestep == 0) {
@@ -60,8 +64,8 @@ public abstract class AbstractWorld implements Listener {
             // TODO: Make sure the robot does not go through the wall
             // make sure the ball bounces from the wall, etc.
 
-            return new Coord(object.getPosition().add(
-                    object.getVelocity().adjustLength(timestep)), true);
+            return new Coord(object.getPosition().add(object.getVelocity().adjustLength(timestep)),
+                    true);
     }
 
     /***
@@ -84,8 +88,7 @@ public abstract class AbstractWorld implements Listener {
      * @param ballPosY
      * @param timestamp
      */
-    abstract protected void updateScaled(Coord ourPos,
-            Orientation ourOrientation, Coord theirsPos,
+    abstract protected void updateScaled(Coord ourPos, Orientation ourOrientation, Coord theirsPos,
             Orientation theirsOrientation, Coord ballPos, long timestamp);
 
     protected double scaleXToMeters(double x) {
@@ -103,9 +106,8 @@ public abstract class AbstractWorld implements Listener {
     }
 
     @Override
-    public void update(double yPosX, double yPosY, double yDeg, double bPosX,
-            double bPosY, double bDeg, double ballPosX, double ballPosY,
-            long timestamp) {
+    public void update(double yPosX, double yPosY, double yDeg, double bPosX, double bPosY,
+            double bDeg, double ballPosX, double ballPosY, long timestamp) {
 
         if ((pitchWidth < 0) || (pitchHeight < 0)) {
             System.err
@@ -130,16 +132,13 @@ public abstract class AbstractWorld implements Listener {
         }
 
         if ((ballPosX != UNKNOWN_VALUE) && (ballPosY != UNKNOWN_VALUE)) {
-            ballPos = new Coord(scaleXToMeters(ballPosX),
-                    scaleYToMeters(ballPosY));
+            ballPos = new Coord(scaleXToMeters(ballPosX), scaleYToMeters(ballPosY));
         }
 
         if (isBlue())
-            updateScaled(bPos, bOrientation, yPos, yOrientation, ballPos,
-                    timestamp);
+            updateScaled(bPos, bOrientation, yPos, yOrientation, ballPos, timestamp);
         else
-            updateScaled(yPos, yOrientation, bPos, bOrientation, ballPos,
-                    timestamp);
+            updateScaled(yPos, yOrientation, bPos, bOrientation, ballPos, timestamp);
     }
 
     @Override
@@ -147,6 +146,29 @@ public abstract class AbstractWorld implements Listener {
 
         pitchWidth = width;
         pitchHeight = height;
+    }
+
+    @Override
+    public void updateGoals(double xMin, double xMax, double yMin, double yMax) {
+        left = new Goal(-100000, xMin, yMin, yMax);
+        right = new Goal(xMax, 100000, yMin, yMax);
+    }
+
+    protected Goal left  = new Goal(-0.2, 0, 0.3, 0.9);
+    protected Goal right = new Goal(2.45, 2.65, 0.3, 0.9);
+
+    public Goal getOwnGoal() {
+        if (goalIsLeft)
+            return right;
+        else
+            return left;
+    }
+
+    public Goal getOpponentsGoal() {
+        if (goalIsLeft)
+            return left;
+        else
+            return right;
     }
 
 }

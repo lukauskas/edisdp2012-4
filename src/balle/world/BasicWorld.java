@@ -1,12 +1,15 @@
 package balle.world;
 
+import balle.world.objects.Ball;
+import balle.world.objects.Robot;
+
 public class BasicWorld extends AbstractWorld {
 
     private Snapshot prev;
 
-    public BasicWorld(boolean balleIsBlue) {
-        super(balleIsBlue);
-        prev = new EmptySnapshot();
+    public BasicWorld(boolean balleIsBlue, boolean goalIsLeft) {
+        super(balleIsBlue, goalIsLeft);
+        prev = new EmptySnapshot(getOpponentsGoal(), getOwnGoal());
     }
 
     @Override
@@ -32,8 +35,7 @@ public class BasicWorld extends AbstractWorld {
      * @param currentPosition
      * @return
      */
-    protected boolean positionIsCloseToExpected(Coord previousPosition,
-            Coord currentPosition) {
+    protected boolean positionIsCloseToExpected(Coord previousPosition, Coord currentPosition) {
 
         final double EPSILON = 1; // 1 Metre
 
@@ -57,24 +59,23 @@ public class BasicWorld extends AbstractWorld {
      * 
      */
     @Override
-    public void updateScaled(Coord ourPosition, Orientation ourOrientation,
-            Coord theirsPosition, Orientation theirsOrientation,
-            Coord ballPosition, long timestamp) {
+    public void updateScaled(Coord ourPosition, Orientation ourOrientation, Coord theirsPosition,
+            Orientation theirsOrientation, Coord ballPosition, long timestamp) {
 
         Robot ours = null;
         Robot them = null;
-        FieldObject ball = null;
+        Ball ball = null;
 
         Snapshot prev = getSnapshot();
 
         // Check if the new positions make sense. For instance, discard
         // the ones that are unreasonably far away from the previous one
-        ourPosition = positionIsCloseToExpected(prev.getBalle().getPosition(),
-                ourPosition) ? ourPosition : null;
-        theirsPosition = positionIsCloseToExpected(prev.getOpponent()
-                .getPosition(), theirsPosition) ? theirsPosition : null;
-        ballPosition = positionIsCloseToExpected(prev.getBall().getPosition(),
-                ballPosition) ? ballPosition : null;
+        ourPosition = positionIsCloseToExpected(prev.getBalle().getPosition(), ourPosition) ? ourPosition
+                : null;
+        theirsPosition = positionIsCloseToExpected(prev.getOpponent().getPosition(), theirsPosition) ? theirsPosition
+                : null;
+        ballPosition = positionIsCloseToExpected(prev.getBall().getPosition(), ballPosition) ? ballPosition
+                : null;
 
         // change in time
         long deltaT = timestamp - prev.getTimestamp(); // Hopefully that does
@@ -99,8 +100,7 @@ public class BasicWorld extends AbstractWorld {
         // Calculate how much each position has changed between frames
         Coord oursDPos, themDPos, ballDPos;
         oursDPos = subtractOrNull(ourPosition, prev.getBalle().getPosition());
-        themDPos = subtractOrNull(theirsPosition, prev.getOpponent()
-                .getPosition());
+        themDPos = subtractOrNull(theirsPosition, prev.getOpponent().getPosition());
         ballDPos = subtractOrNull(ballPosition, prev.getBall().getPosition());
 
         // Recalculate the velocities from deltapositions above.
@@ -112,11 +112,11 @@ public class BasicWorld extends AbstractWorld {
         // put it all together (almost)
         them = new Robot(theirsPosition, themVel, theirsOrientation);
         ours = new Robot(ourPosition, oursVel, ourOrientation);
-        ball = new FieldObject(ballPosition, ballVel);
+        ball = new Ball(ballPosition, ballVel);
 
         synchronized (this) {
             // pack into a snapshot
-            this.prev = new Snapshot(them, ours, ball, timestamp);
+            this.prev = new Snapshot(them, ours, ball, getOpponentsGoal(), getOwnGoal(), timestamp);
         }
     }
 
@@ -124,7 +124,7 @@ public class BasicWorld extends AbstractWorld {
     public void updatePitchSize(double width, double height) {
         super.updatePitchSize(width, height);
         synchronized (this) {
-            this.prev = new EmptySnapshot();
+            this.prev = new EmptySnapshot(getOpponentsGoal(), getOwnGoal());
         }
     }
 }

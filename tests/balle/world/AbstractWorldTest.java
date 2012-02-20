@@ -10,8 +10,8 @@ import balle.misc.Globals;
 
 class AbstractWorldConcrete extends AbstractWorld {
 
-    public AbstractWorldConcrete(boolean isBalleBlue) {
-        super(isBalleBlue);
+    public AbstractWorldConcrete(boolean isBalleBlue, boolean goalIsLeft) {
+        super(isBalleBlue, goalIsLeft);
     }
 
     @Override
@@ -38,7 +38,7 @@ public class AbstractWorldTest {
      */
     @Test
     public void testScaleXToMeters() {
-        AbstractWorld world = new AbstractWorldConcrete(true);
+        AbstractWorld world = new AbstractWorldConcrete(true,true);
 
         world.updatePitchSize(Globals.PITCH_WIDTH * 2, Globals.PITCH_HEIGHT);
         assertEquals(0.5, world.scaleXToMeters(1), 0.0001);
@@ -54,7 +54,7 @@ public class AbstractWorldTest {
      */
     @Test
     public void testScaleYToMeters() {
-        AbstractWorld world = new AbstractWorldConcrete(true);
+        AbstractWorld world = new AbstractWorldConcrete(true,true);
 
         world.updatePitchSize(Globals.PITCH_WIDTH, Globals.PITCH_HEIGHT * 2);
         assertEquals(0.5, world.scaleYToMeters(1), 0.0001);
@@ -71,7 +71,7 @@ public class AbstractWorldTest {
      */
     @Test
     public void updateCallsUpdateScaledWithCorrectParameters() {
-        AbstractWorld world = spy(new AbstractWorldConcrete(false));
+        AbstractWorld world = spy(new AbstractWorldConcrete(false,true));
         // Both coordinates twice as big so it's easy to scale
         world.updatePitchSize(Globals.PITCH_WIDTH * 2, Globals.PITCH_HEIGHT * 2);
         world.update(0.2, 0.4, 0, 0.6, 0.8, 0, 1, 1.2, 0);
@@ -81,7 +81,7 @@ public class AbstractWorldTest {
                 new Orientation(0, false), new Coord(0.5, 0.6), 0);
 
         // Flip robot colour here
-        AbstractWorld world2 = spy(new AbstractWorldConcrete(true));
+        AbstractWorld world2 = spy(new AbstractWorldConcrete(true,true));
         // Both coordinates twice as big so it's easy to scale
         world2.updatePitchSize(Globals.PITCH_WIDTH * 2,
                 Globals.PITCH_HEIGHT * 2);
@@ -100,7 +100,7 @@ public class AbstractWorldTest {
      */
     @Test
     public void updateCallsUpdateScaledWithNullParameters() {
-        AbstractWorld world = spy(new AbstractWorldConcrete(false));
+        AbstractWorld world = spy(new AbstractWorldConcrete(false,true));
         // Both coordinates twice as big so it's easy to scale
         world.updatePitchSize(Globals.PITCH_WIDTH * 2, Globals.PITCH_HEIGHT * 2);
         world.update(-1, -1, 15, -1, -1, 0, -1, -1, 0);
@@ -108,7 +108,7 @@ public class AbstractWorldTest {
         verify(world).updateScaled(null, null, null, null, null, 0);
 
         // Flip robot colour here!
-        AbstractWorld world2 = spy(new AbstractWorldConcrete(true));
+        AbstractWorld world2 = spy(new AbstractWorldConcrete(true,true));
         // Both coordinates twice as big so it's easy to scale
         world2.updatePitchSize(Globals.PITCH_WIDTH * 2,
                 Globals.PITCH_HEIGHT * 2);

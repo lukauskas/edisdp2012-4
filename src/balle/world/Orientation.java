@@ -78,4 +78,9 @@ public class Orientation {
         Orientation otherOrientation = (Orientation) other;
         return (otherOrientation.radians() - this.radians() < 0.000001);
     }
+
+    public Orientation sub(Orientation targetOrientation) {
+        return new Orientation(this.radians() - targetOrientation.radians(),
+                true);
+    }
 }
