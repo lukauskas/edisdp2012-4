@@ -9,7 +9,7 @@ public class PFPlanning {
     PointObject  ball;
     double       default_power = 5;
     RobotConf    config;
-    double       Stopdistance  = 5;
+    double       Stopdistance  = 20;
     List<Object> objects;
     // power for opponent.
     double       opponentPower;
@@ -104,7 +104,7 @@ public class PFPlanning {
             res = new Vector(0, 0);
         }
         if (orig)
-            return (VelocityVec) res;
+            return (VelocityVec)res;
         else
             return getVelocity(res, robot);
 

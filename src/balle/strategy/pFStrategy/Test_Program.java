@@ -50,11 +50,11 @@ public class Test_Program {
 
 //		opponent=null;
 //		ball=null;
-//		ouput_allVectors(top_left, bottom_right,ball,opponent,
-//		plann,0.5,false);
+		ouput_allVectors(top_left, bottom_right,ball,opponent,
+		plann,0.5,false);
 		// 100,380,180,400,380,700,380
 
-		output_path(initPos, 1, ball, opponent, plann, false, conf);
+		//output_path(initPos, 1, ball, opponent, plann, false, conf);
 
 	}
 
@@ -97,8 +97,8 @@ public class Test_Program {
 				if(res.getLeft()==0&&res.getRight()==0)
 					break;
 				System.out.println("Sending :"
-						+ (int) res.getLeft() + " "
-						+ (int) res.getRight());
+						+ (int) Math.toDegrees(res.getLeft()) + " "
+						+ (int) Math.toDegrees(res.getRight()));
 				current = sim.move(res.getLeft(), res.getRight(), time_step);
 				System.out.println("Current position: "
 						+ current.getLocation().getX() + " "
@@ -158,9 +158,9 @@ public class Test_Program {
 					else
 						vec = planner.update(robot,
 								new Pos(new Point(0, 0), 0), b, true);
-				/*	writer.write(String.valueOf(x) + "," + String.valueOf(y)
+					System.out.println(String.valueOf(x) + "," + String.valueOf(y)
 							+ "," + String.valueOf(vec.getX()) + ","
-							+ String.valueOf(vec.getY()) + "\n");*/
+							+ String.valueOf(vec.getY()) + "\n");
 					writer.write(String.valueOf(x) + "," + "\n");
 					writer2.write(String.valueOf(y) + "," + "\n");
 				}
