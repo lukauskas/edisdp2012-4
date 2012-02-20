@@ -53,7 +53,7 @@ public abstract class AbstractWorld implements Listener {
      *            the object
      * @return new coordinate for the position of the object after timestep
      */
-    public Coord estimatedPosition(FieldObject object, double timestep) {
+    public Coord estimatedPosition(MovingPoint object, double timestep) {
         if ((object.getPosition() == null) || (object.getVelocity() == null))
             return null;
         else if (timestep == 0) {
@@ -62,8 +62,8 @@ public abstract class AbstractWorld implements Listener {
             // TODO: Make sure the robot does not go through the wall
             // make sure the ball bounces from the wall, etc.
 
-            return new Coord(object.getPosition().add(
-                    object.getVelocity().adjustLength(timestep)), true);
+            return new Coord(object.getPosition().add(object.getVelocity().adjustLength(timestep)),
+                    true);
     }
 
     /***
@@ -86,8 +86,7 @@ public abstract class AbstractWorld implements Listener {
      * @param ballPosY
      * @param timestamp
      */
-    abstract protected void updateScaled(Coord ourPos,
-            Orientation ourOrientation, Coord theirsPos,
+    abstract protected void updateScaled(Coord ourPos, Orientation ourOrientation, Coord theirsPos,
             Orientation theirsOrientation, Coord ballPos, long timestamp);
 
     protected double scaleXToMeters(double x) {
@@ -105,9 +104,8 @@ public abstract class AbstractWorld implements Listener {
     }
 
     @Override
-    public void update(double yPosX, double yPosY, double yDeg, double bPosX,
-            double bPosY, double bDeg, double ballPosX, double ballPosY,
-            long timestamp) {
+    public void update(double yPosX, double yPosY, double yDeg, double bPosX, double bPosY,
+            double bDeg, double ballPosX, double ballPosY, long timestamp) {
 
         if ((pitchWidth < 0) || (pitchHeight < 0)) {
             System.err
@@ -132,16 +130,13 @@ public abstract class AbstractWorld implements Listener {
         }
 
         if ((ballPosX != UNKNOWN_VALUE) && (ballPosY != UNKNOWN_VALUE)) {
-            ballPos = new Coord(scaleXToMeters(ballPosX),
-                    scaleYToMeters(ballPosY));
+            ballPos = new Coord(scaleXToMeters(ballPosX), scaleYToMeters(ballPosY));
         }
 
         if (isBlue())
-            updateScaled(bPos, bOrientation, yPos, yOrientation, ballPos,
-                    timestamp);
+            updateScaled(bPos, bOrientation, yPos, yOrientation, ballPos, timestamp);
         else
-            updateScaled(yPos, yOrientation, bPos, bOrientation, ballPos,
-                    timestamp);
+            updateScaled(yPos, yOrientation, bPos, bOrientation, ballPos, timestamp);
     }
 
     @Override
@@ -150,28 +145,28 @@ public abstract class AbstractWorld implements Listener {
         pitchWidth = width;
         pitchHeight = height;
     }
-    
+
     @Override
     public void updateGoals(double xMin, double xMax, double yMin, double yMax) {
-    	left = new Goal(-100000,xMin,yMin,yMax);
-    	right = new Goal(xMax,100000,yMin,yMax);
+        left = new Goal(-100000, xMin, yMin, yMax);
+        right = new Goal(xMax, 100000, yMin, yMax);
     }
-    
-    protected Goal left = new Goal(-0.2, 0, 0.3, 0.9);
+
+    protected Goal left  = new Goal(-0.2, 0, 0.3, 0.9);
     protected Goal right = new Goal(2.45, 2.65, 0.3, 0.9);
-    
+
     public Goal getOurGoal() {
-    	if (goalIsLeft)
-    		return right;
-    	else
-    		return left;
+        if (goalIsLeft)
+            return right;
+        else
+            return left;
     }
-    
+
     public Goal getOpponentGoal() {
-    	if (goalIsLeft)
-    		return left;
-    	else
-    		return right;
+        if (goalIsLeft)
+            return left;
+        else
+            return right;
     }
 
 }

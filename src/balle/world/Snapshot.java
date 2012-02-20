@@ -5,14 +5,13 @@ package balle.world;
  */
 public class Snapshot {
 
-    private final Robot       opponent;
-    private final Robot       bot;
-    private final FieldObject ball;
+    private final Robot opponent;
+    private final Robot bot;
+    private final Ball  ball;
 
-    private final long        timestamp;
+    private final long  timestamp;
 
-    public Snapshot(Robot opponent, Robot balle, FieldObject ball,
-            long timestamp) {
+    public Snapshot(Robot opponent, Robot balle, Ball ball, long timestamp) {
         super();
         this.opponent = opponent;
         this.bot = balle;
@@ -28,7 +27,7 @@ public class Snapshot {
         return bot;
     }
 
-    public FieldObject getBall() {
+    public Ball getBall() {
         return ball;
     }
 

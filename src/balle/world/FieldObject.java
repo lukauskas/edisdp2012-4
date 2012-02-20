@@ -1,26 +1,28 @@
 package balle.world;
 
-/**
- * Immutable
- */
-public class FieldObject {
+public interface FieldObject {
 
-    private final Coord    position;
-    private final Velocity velocity;
+    /**
+     * Gets the coordinate of the centroid of the object
+     * 
+     * @return the position
+     */
+    public abstract Coord getPosition();
 
-    public FieldObject(Coord position, Velocity velocity) {
-        super();
+    /**
+     * Gets the velocity of the object (centroid to centroid)
+     * 
+     * @return the velocity
+     */
+    public abstract Velocity getVelocity();
 
-        this.position = position;
-        this.velocity = velocity;
-    }
-
-    public Coord getPosition() {
-        return position;
-    }
-
-    public Velocity getVelocity() {
-        return velocity;
-    }
+    /**
+     * Returns true if point is contained in the object
+     * 
+     * @param point
+     *            the point in question
+     * @return true if point is in the object
+     */
+    public abstract boolean containsCoord(Coord point);
 
 }

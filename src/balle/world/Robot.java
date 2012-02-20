@@ -1,16 +1,10 @@
 package balle.world;
 
-public class Robot extends FieldObject {
+import balle.misc.Globals;
 
-    private final Orientation orientation;
+public class Robot extends RectangularObject {
 
     public Robot(Coord position, Velocity velocity, Orientation orientation) {
-        super(position, velocity);
-        this.orientation = orientation;
+        super(position, velocity, orientation, Globals.ROBOT_WIDTH, Globals.ROBOT_LENGTH);
     }
-
-    public Orientation getOrientation() {
-        return orientation;
-    }
-
 }
