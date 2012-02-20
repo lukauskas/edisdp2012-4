@@ -3,6 +3,8 @@
  */
 package balle.strategy.planner;
 
+import org.apache.log4j.Logger;
+
 import balle.controller.Controller;
 import balle.strategy.executor.movement.MovementExecutor;
 import balle.world.AbstractWorld;
@@ -13,14 +15,15 @@ import balle.world.AbstractWorld;
  */
 public class GoToBall extends AbstractPlanner {
 
-    MovementExecutor executorStrategy;
+    private static final Logger LOG = Logger.getLogger(GoToBall.class);
+
+    MovementExecutor            executorStrategy;
 
     /**
      * @param controller
      * @param world
      */
-    public GoToBall(Controller controller, AbstractWorld world,
-            MovementExecutor movementExecutor) {
+    public GoToBall(Controller controller, AbstractWorld world, MovementExecutor movementExecutor) {
         super(controller, world);
         executorStrategy = movementExecutor;
 
@@ -49,9 +52,7 @@ public class GoToBall extends AbstractPlanner {
         else {
             // Tell the strategy to stop doing whatever it was doing
             executorStrategy.stop(controller);
-
-            // Be happy
-            System.out.println("Finished");
+            LOG.info("We're finished");
         }
     }
 }
