@@ -14,7 +14,6 @@ import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
-import org.jbox2d.dynamics.joints.FrictionJoint;
 import org.jbox2d.dynamics.joints.FrictionJointDef;
 import org.jbox2d.dynamics.joints.WeldJointDef;
 import org.jbox2d.testbed.framework.TestbedFrame;
@@ -22,8 +21,6 @@ import org.jbox2d.testbed.framework.TestbedModel;
 import org.jbox2d.testbed.framework.TestbedPanel;
 import org.jbox2d.testbed.framework.TestbedTest;
 import org.jbox2d.testbed.framework.j2d.TestPanelJ2D;
-
-import sun.security.action.GetLongAction;
 
 import balle.io.listener.Listener;
 import balle.io.reader.AbstractVisionReader;
@@ -42,17 +39,17 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
     protected Robot       blue;
     protected Robot       yellow;
 
-    private SoftBot       blueSoft   = new SoftBot();
-    private SoftBot       yellowSoft = new SoftBot();
+    private final SoftBot blueSoft   = new SoftBot();
+    private final SoftBot yellowSoft = new SoftBot();
 
     private long          startTime;
 
     private CircleShape   ballShape;
-    private Random rand = new Random();
+    private final Random  rand       = new Random();
 
-	private boolean noisy;
+    private final boolean noisy;
 
-	private long lastFrameTime;
+    private long          lastFrameTime;
 
     public SoftBot getBlueSoft() {
         return blueSoft;
@@ -88,8 +85,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
         startTime = System.currentTimeMillis();
 
         // centre the camera
-        setCamera(new Vec2(1.22f * scale, 1.22f * scale),
-                getCachedCameraScale());
+        setCamera(new Vec2(1.22f * scale, 1.22f * scale), getCachedCameraScale());
         // No Gravity
         World w = getWorld();
         w.setGravity(new Vec2(0, 0));
@@ -148,8 +144,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
         // create robots at either end of pitch
         blue = new Robot(new Vec2((0.1f * scale), (float) (0.61 * scale)), 0f);
         blueSoft.setBody(blue.getBody());
-        yellow = new Robot(new Vec2((float) (2.34 * scale),
-                (float) (0.61 * scale)), 0f);
+        yellow = new Robot(new Vec2((float) (2.34 * scale), (float) (0.61 * scale)), 0f);
         yellowSoft.setBody(yellow.getBody());
 
         // Send the size of the pitch to the world
@@ -166,25 +161,28 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
         blue.updateRobot(blueSoft);
         yellow.updateRobot(yellowSoft);
         super.update();
-        
+
         // Update world with new information, throtteling the frame rate
-        if(1000f/(System.currentTimeMillis() - lastFrameTime) < Globals.SIMULATED_VISON_FRAMERATE) {
-        	lastFrameTime = System.currentTimeMillis();
-        	this.reader.update();
+        if (1000f / (System.currentTimeMillis() - lastFrameTime) < Globals.SIMULATED_VISON_FRAMERATE) {
+            lastFrameTime = System.currentTimeMillis();
+            this.reader.update();
         }
     }
 
     /**
      * Empty constructor, to make private. For constructor use createSimulator()
      */
-    protected Simulator(boolean noisy) { /* James: Do not use. Use initTest() instead. */
-    	this.noisy = noisy;
+    protected Simulator(boolean noisy) { /*
+                                          * James: Do not use. Use initTest()
+                                          * instead.
+                                          */
+        this.noisy = noisy;
     }
 
     public static Simulator createSimulator() {
-    	return createSimulator(true);
+        return createSimulator(true);
     }
-    
+
     /**
      * Equivalent to a constructor.
      * 
@@ -192,12 +190,10 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
      */
     public static Simulator createSimulator(boolean noisy) {
         try {
-            UIManager
-                    .setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
+            UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
         } catch (Exception e) {
-            System.out
-                    .println("Could not set the look and feel to nimbus.  "
-                            + "Hopefully you're on a mac so the window isn't ugly as crap.");
+            System.out.println("Could not set the look and feel to nimbus.  "
+                    + "Hopefully you're on a mac so the window isn't ugly as crap.");
         }
         TestbedModel model = new TestbedModel();
         TestbedPanel panel = new TestPanelJ2D(model);
@@ -215,21 +211,19 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 
     protected class Robot {
 
-        private Body               kicker;
+        private final Body         kicker;
 
-        private Body               robot;
+        private final Body         robot;
 
-        private final Vec2         kickPos        = new Vec2(0.12f * scale, 0);
+        private final Vec2         kickPos      = new Vec2(0.12f * scale, 0);
 
-        private final float        robotWidth     = Globals.ROBOT_WIDTH * scale
-                                                          / 2;
-        private final float        robotLength    = Globals.ROBOT_LENGTH
-                                                          * scale / 2;
+        private final float        robotWidth   = Globals.ROBOT_WIDTH * scale / 2;
+        private final float        robotLength  = Globals.ROBOT_LENGTH * scale / 2;
 
-        private final float        kickerWidth    = Globals.ROBOT_WIDTH * scale / 2;
-        private final float        kickerLength   = 0.04f * scale / 2;
-        private PolygonShape       kickerShape;
-        private static final float kickForce      = 20f;
+        private final float        kickerWidth  = Globals.ROBOT_WIDTH * scale / 2;
+        private final float        kickerLength = 0.04f * scale / 2;
+        private final PolygonShape kickerShape;
+        private static final float kickForce    = 20f;
 
         // wheel power (-1 for lock and 0 for float and (0,100] for power )
 
@@ -262,8 +256,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
             kickF.density = (1f / 0.36f) / scale;
             kickF.shape = kickerShape;
 
-            kickerBodyDef.position.set(robot.getWorldCenter().clone()
-                    .add(kickPos));
+            kickerBodyDef.position.set(robot.getWorldCenter().clone().add(kickPos));
             kicker = w.createBody(kickerBodyDef);
             kicker.createFixture(kickF);
 
@@ -274,34 +267,32 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 
         public boolean ballInRange() {
             Collision c = getWorld().getPool().getCollision();
-            return c.testOverlap(ballShape, kickerShape, ball.getTransform(),
-                    kicker.getTransform());
+            return c.testOverlap(ballShape, kickerShape, ball.getTransform(), kicker.getTransform());
         }
 
         public void updateRobot(SoftBot bot) {
 
             double blueAng = robot.getAngle();
-            
+
             // if we are turning
-            if(bot.isRotating()) {
-            	boolean turningLeft = bot.isTurningLeft();
-            	// get current angle - desired angle
-            	float dDA = bot.deltaDesiredAngle();
-            	if(!turningLeft && (0 <= dDA && dDA <= (Math.PI/4)) ||
-        		turningLeft && (0 >= dDA && dDA >= -(Math.PI/4))) {
-            		//stop
-            		bot.stop();
-            		System.out.println("done turning");
-            	}
+            if (bot.isRotating()) {
+                boolean turningLeft = bot.isTurningLeft();
+                // get current angle - desired angle
+                float dDA = bot.deltaDesiredAngle();
+                if (!turningLeft && (0 <= dDA && dDA <= (Math.PI / 4)) || turningLeft
+                        && (0 >= dDA && dDA >= -(Math.PI / 4))) {
+                    // stop
+                    bot.stop();
+                }
             }
-            
+
             float vl = linearVelocity(bot) * scale; // linear velocity
             float va = angularVelocityRadians(bot); // angular velocity
-            robot.setLinearVelocity(
-            		new Vec2((float) (vl * Math.cos(blueAng)),
-            				 (float) (vl * Math.sin(blueAng))));;
+            robot.setLinearVelocity(new Vec2((float) (vl * Math.cos(blueAng)), (float) (vl * Math
+                    .sin(blueAng))));
+            ;
             robot.setAngularVelocity(va);
-            //System.out.println(va);
+            // System.out.println(va);
 
             if (bot.isKicking() && ballInRange()) {
                 // Kick
@@ -316,18 +307,18 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
         public Body getBody() {
             return robot;
         }
-        
+
         private float angularVelocityRadians(SoftBot bot) {
-        	float vl = Globals.powerToVelocity(bot.getLeftWheelSpeed());
-        	float vr = Globals.powerToVelocity(bot.getRightWheelSpeed());
-        	float w = Globals.ROBOT_TRACK_WIDTH;
-        	return (vr - vl) / w;
+            float vl = Globals.powerToVelocity(bot.getLeftWheelSpeed());
+            float vr = Globals.powerToVelocity(bot.getRightWheelSpeed());
+            float w = Globals.ROBOT_TRACK_WIDTH;
+            return (vr - vl) / w;
         }
-        
+
         private float linearVelocity(SoftBot bot) {
-        	float vl = Globals.powerToVelocity(bot.getLeftWheelSpeed());
-        	float vr = Globals.powerToVelocity(bot.getRightWheelSpeed());
-        	return (vl + vr) / 2f;
+            float vl = Globals.powerToVelocity(bot.getLeftWheelSpeed());
+            float vr = Globals.powerToVelocity(bot.getRightWheelSpeed());
+            return (vl + vr) / 2f;
         }
     }
 
@@ -344,7 +335,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
         }
 
         private float convAngle(float a) {
-            return (180f/(float)Math.PI)*a;
+            return (180f / (float) Math.PI) * a;
         }
 
         private Vec2 convPos(Vec2 a) {
@@ -362,9 +353,8 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
             float yellowAng, blueAng;
             yellowAng = convAngle(yellow.robot.getAngle());
             blueAng = convAngle(blue.robot.getAngle());
-            return yellowPos.x + " " + yellowPos.y + " " + yellowAng + " "
-                    + bluePos.x + " " + bluePos.y + " " + blueAng + " "
-                    + getTimeStamp();
+            return yellowPos.x + " " + yellowPos.y + " " + yellowAng + " " + bluePos.x + " "
+                    + bluePos.y + " " + blueAng + " " + getTimeStamp();
         }
 
         public void update() {
@@ -386,43 +376,41 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 
             long timestamp = getTimeStamp();
 
-            if(noisy) {
-            	// set standard deviations
-            	float posSd = Globals.VISION_COORD_NOISE_SD;
-            	float angSd = Globals.VISION_ANGLE_NOISE_SD;
-            	
-            	// add noise to positions
-            	yPosX = genRand(posSd, yPosX);
-            	yPosY = genRand(posSd, yPosY);
-            	bPosX = genRand(posSd, bPosX);
-            	bPosY = genRand(posSd, bPosY);
-            	ballPosX = genRand(posSd, ballPosX);
-            	ballPosY = genRand(posSd, ballPosY);
-            	
-            	// add noise to angles
-            	yRad = genRandDeg(angSd, yRad);
-            	bRad = genRandDeg(angSd, bRad);
+            if (noisy) {
+                // set standard deviations
+                float posSd = Globals.VISION_COORD_NOISE_SD;
+                float angSd = Globals.VISION_ANGLE_NOISE_SD;
+
+                // add noise to positions
+                yPosX = genRand(posSd, yPosX);
+                yPosY = genRand(posSd, yPosY);
+                bPosX = genRand(posSd, bPosX);
+                bPosY = genRand(posSd, bPosY);
+                ballPosX = genRand(posSd, ballPosX);
+                ballPosY = genRand(posSd, ballPosY);
+
+                // add noise to angles
+                yRad = genRandDeg(angSd, yRad);
+                bRad = genRandDeg(angSd, bRad);
             }
-            
-            super.propagate(yPosX, yPosY, yRad, bPosX, bPosY, bRad, ballPosX,
-                    ballPosY, timestamp);
+
+            super.propagate(yPosX, yPosY, yRad, bPosX, bPosY, bRad, ballPosX, ballPosY, timestamp);
         }
 
         private float genRand(float sd, float mean) {
-        	System.out.println((((float)rand.nextGaussian()*sd) + mean));
-        	return ((float)rand.nextGaussian()*sd) + mean;
+            return ((float) rand.nextGaussian() * sd) + mean;
         }
-        
+
         private float genRandDeg(float sd, float mean) {
-        	return genRand(sd, mean)%360;
+            return genRand(sd, mean) % 360;
         }
-        
+
         public void propagatePitchSize() {
             super.propagatePitchSize(Globals.PITCH_WIDTH, Globals.PITCH_HEIGHT);
         }
-        
+
         public void propagateGoals() {
-        	super.propagateGoals(0, Globals.PITCH_WIDTH, 0, 0);
+            super.propagateGoals(0, Globals.PITCH_WIDTH, 0, 0);
         }
     }
 
