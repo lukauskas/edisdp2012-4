@@ -1,6 +1,9 @@
-package balle.world;
+package balle.world.objects;
 
 import balle.misc.Globals;
+import balle.world.Coord;
+import balle.world.Orientation;
+import balle.world.Velocity;
 
 public class Robot extends RectangularObject {
 

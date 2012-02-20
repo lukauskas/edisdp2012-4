@@ -1,5 +1,8 @@
 package balle.world;
 
+import balle.world.objects.Ball;
+import balle.world.objects.Robot;
+
 public class BasicWorld extends AbstractWorld {
 
     private Snapshot prev;

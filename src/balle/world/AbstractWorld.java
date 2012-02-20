@@ -2,6 +2,8 @@ package balle.world;
 
 import balle.io.listener.Listener;
 import balle.misc.Globals;
+import balle.world.objects.Goal;
+import balle.world.objects.MovingPoint;
 
 /***
  * 

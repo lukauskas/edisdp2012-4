@@ -1,5 +1,9 @@
 package balle.world;
 
+import balle.world.objects.Ball;
+import balle.world.objects.Goal;
+import balle.world.objects.Robot;
+
 /**
  * Immutable
  */

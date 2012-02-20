@@ -1,4 +1,8 @@
-package balle.world;
+package balle.world.objects;
+
+import balle.world.Coord;
+import balle.world.Orientation;
+import balle.world.Velocity;
 
 public class RectangularObject extends MovingPoint implements FieldObject {
     private final double      width;

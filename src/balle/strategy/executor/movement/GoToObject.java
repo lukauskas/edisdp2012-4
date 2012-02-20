@@ -3,10 +3,10 @@ package balle.strategy.executor.movement;
 import balle.controller.Controller;
 import balle.strategy.executor.turning.RotateToOrientationExecutor;
 import balle.world.Coord;
-import balle.world.FieldObject;
 import balle.world.Orientation;
-import balle.world.Robot;
 import balle.world.Snapshot;
+import balle.world.objects.FieldObject;
+import balle.world.objects.Robot;
 
 public class GoToObject implements MovementExecutor {
 

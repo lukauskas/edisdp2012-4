@@ -11,6 +11,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import balle.misc.Globals;
+import balle.world.objects.Goal;
+import balle.world.objects.MovingPoint;
+import balle.world.objects.Robot;
 import balle.world.processing.AbstractWorldProcessor;
 
 public class SimpleWorldGUI extends AbstractWorldProcessor {

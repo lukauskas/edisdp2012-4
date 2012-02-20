@@ -1,5 +1,9 @@
 package balle.world;
 
+import balle.world.objects.Ball;
+import balle.world.objects.Goal;
+import balle.world.objects.Robot;
+
 /**
  * An abstraction for Snapshot that creates it without any robots, etc. -- Just
  * to reduce the number of null checks.

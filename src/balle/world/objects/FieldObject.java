@@ -1,4 +1,7 @@
-package balle.world;
+package balle.world.objects;
+
+import balle.world.StaticFieldObject;
+import balle.world.Velocity;
 
 public interface FieldObject extends StaticFieldObject {
 

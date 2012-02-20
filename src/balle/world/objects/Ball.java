@@ -1,6 +1,8 @@
-package balle.world;
+package balle.world.objects;
 
 import balle.misc.Globals;
+import balle.world.Coord;
+import balle.world.Velocity;
 
 public class Ball extends CircularObject implements FieldObject {
 

@@ -1,4 +1,7 @@
-package balle.world;
+package balle.world.objects;
+
+import balle.world.Coord;
+import balle.world.StaticFieldObject;
 
 public class Goal implements StaticFieldObject {
 
