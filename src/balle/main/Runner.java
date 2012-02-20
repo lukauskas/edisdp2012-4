@@ -6,10 +6,6 @@ import java.io.IOException;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-
 import balle.bluetooth.Communicator;
 import balle.controller.BluetoothController;
 import balle.controller.Controller;
@@ -54,10 +50,6 @@ public class Runner {
      * @param args
      */
     public static void main(String[] args) {
-
-        Logger strategylogger = Logger.getLogger("balle.strategy");
-        strategylogger.setLevel(Level.DEBUG);
-
         OptionParser parser = getOptionParser();
         OptionSet options = parser.parse(args);
 
@@ -132,7 +124,6 @@ public class Runner {
     }
 
     public static void runSimulator(boolean balleIsBlue) {
-
         Simulator simulator = Simulator.createSimulator();
         BasicWorld world = new BasicWorld(balleIsBlue);
         simulator.addListener(world);
