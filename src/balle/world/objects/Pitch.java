@@ -50,7 +50,7 @@ public class Pitch implements StaticFieldObject {
 
 	@Override
 	public boolean intersects(Line line) {
-		return containsCoord(line.getA()) == containsCoord(line.getB());
+		return containsCoord(line.getA()) != containsCoord(line.getB());
 	}
 
 }
