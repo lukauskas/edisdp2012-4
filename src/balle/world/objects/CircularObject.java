@@ -2,6 +2,7 @@ package balle.world.objects;
 
 import balle.misc.Globals;
 import balle.world.Coord;
+import balle.world.Line;
 import balle.world.Velocity;
 
 public class CircularObject extends MovingPoint implements FieldObject {
@@ -62,4 +63,26 @@ public class CircularObject extends MovingPoint implements FieldObject {
         
        return false;
     }
+
+    
+    /*
+     * Checks if the circular object intersects the line given by the start and
+     * end points A and B
+     */
+	@Override
+	public boolean intersects(Line line) {
+		
+	    double x = line.getB().getX() - line.getA().getX();
+	    double y = line.getB().getY() - line.getA().getY();
+	    double r = Math.sqrt(x*x + y*y);
+	    double D = line.getA().getX()*line.getB().getY() - line.getB().getX()*line.getA().getY();
+	    
+	    double Delta = this.getRadius()*this.getRadius()*(r*r) - D*D;
+		
+		if(Delta < 0) return false;
+		if(Delta > 0) return true;
+		if(Delta == 0) return true; // Line is tangent to the object
+	    
+		return false;
+	}
 }
