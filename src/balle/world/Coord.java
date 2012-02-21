@@ -130,4 +130,9 @@ public class Coord {
 		nY = x*Math.sin(theta) + y*Math.cos(theta);
 		return new Coord(nX, nY);
 	}
+	
+	@Override
+	public String toString() {
+		return "("+x+","+y+")";
+	}
 }
