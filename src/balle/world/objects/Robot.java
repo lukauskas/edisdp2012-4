@@ -1,5 +1,7 @@
 package balle.world.objects;
 
+import java.awt.geom.Line2D;
+
 import balle.misc.Globals;
 import balle.world.Coord;
 import balle.world.Orientation;
@@ -40,8 +42,25 @@ public class Robot extends RectangularObject {
      * @return true, if is in scoring position
      */
     public boolean isInScoringPosition(Ball ball, Goal goal, Robot otherRobot) {
-        // TODO: implement this
-        return false;
+        if (!possessesBall(ball))
+        	return false;
+        
+        double x1, y1, x2, y2, x3, y3, x4, y4;
+        x1 = goal.getLeftPostCoord().getX();
+        y1 = goal.getLeftPostCoord().getY();
+        x2 = goal.getRightPostCoord().getX();
+        y2 = goal.getRightPostCoord().getY();
+        
+        x3 = ball.getPosition().getX();
+        y3 = ball.getPosition().getY();
+        
+        Coord target = new Coord(Globals.ROBOT_MAX_KICK_DISTANCE, 0);
+        target.rotate(getOrientation());
+        
+        x4 = target.getX();
+        y4 = target.getY();
+        
+        return Line2D.linesIntersect(x1, y1, x2, y2, x3, y3, x4, y4);
     }
 
 }

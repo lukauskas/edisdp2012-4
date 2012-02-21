@@ -1,5 +1,7 @@
 package balle.world;
 
+import java.awt.Point;
+
 import balle.world.objects.FieldObject;
 import balle.world.objects.Pitch;
 
@@ -129,5 +131,11 @@ public class Coord {
 		nX = x*Math.cos(theta) - y*Math.sin(theta);
 		nY = x*Math.sin(theta) + y*Math.cos(theta);
 		return new Coord(nX, nY);
+	}
+
+	public Point getPoint() {
+		Point out = new Point();
+		out.setLocation(x, y);
+		return out;
 	}
 }

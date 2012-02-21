@@ -7,6 +7,8 @@ public class Globals {
     public static final float ROBOT_LENGTH  = 0.2f;
     public static final float ROBOT_TRACK_WIDTH = 0.15f; // TODO CHECK THIS
     
+    public static final float ROBOT_MAX_KICK_DISTANCE = 1.5f;
+    
 
     public static final float PITCH_WIDTH   = 2.4384f; // Metres
     public static final float PITCH_HEIGHT  = 1.2192f; // Metres
