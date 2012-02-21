@@ -31,10 +31,15 @@ public class RectangularObject extends MovingPoint implements FieldObject {
 
     @Override
     public boolean containsCoord(Coord point) {
-        // TODO Implement this function!
-        // Should check the orientation, width and height.
-
-        return false;
+        Coord dPoint = new Coord(point.getX()-getPosition().getX(),
+        							point.getY()-getPosition().getY());
+        
+        dPoint = dPoint.rotate(getOrientation());
+        if (dPoint.getX() < (-width/2.0f)) return false;
+        if (dPoint.getX() > (width/2.0f)) return false;
+        if (dPoint.getY() < (-height/2.0f)) return false;
+        if (dPoint.getY() > (height/2.0f)) return false;
+        return true;
     }
 
     @Override

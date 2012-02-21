@@ -1,6 +1,7 @@
 package balle.world;
 
 import balle.world.objects.FieldObject;
+import balle.world.objects.Pitch;
 
 public class Coord {
 
@@ -96,9 +97,8 @@ public class Coord {
      *            the starting coordinate
      * @return true, if coordinate is reachable in straight line from another
      */
-    public boolean isReachableInStraightLineAndNotBlocked(Coord fromCoordinate) {
-        // TODO: Implement
-        return false;
+    public boolean isReachableInStraightLineAndNotBlocked(Coord fromCoordinate, Pitch pitch) {
+        return pitch.containsCoord(this) && pitch.containsCoord(fromCoordinate);
     }
 
     /**
@@ -111,9 +111,23 @@ public class Coord {
      *            checks what could be the potential obstacle.
      * @return true, if coordinate is reachable in straight line from another
      */
-    public boolean isReachableInStraightLineAndNotBlocked(Coord fromCoordinate,
+    public boolean isReachableInStraightLineAndNotBlocked(Coord fromCoordinate, Pitch pitch,
             FieldObject potentialObstacle) {
-        // TODO: Implement
-        return false;
+        if (!this.isReachableInStraightLineAndNotBlocked(fromCoordinate, pitch))
+        	return false;
+        else
+        	return true;
     }
+
+    /** Creats a new coord rotated clockwise by an angle.
+     * 
+     * @param orientation 
+     */
+	public Coord rotate(Orientation orientation) {
+		double theta, nX, nY;
+		theta = orientation.radians();
+		nX = x*Math.cos(theta) - y*Math.sin(theta);
+		nY = x*Math.sin(theta) + y*Math.cos(theta);
+		return new Coord(nX, nY);
+	}
 }

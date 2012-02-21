@@ -150,12 +150,12 @@ public abstract class AbstractWorld implements Listener {
 
     @Override
     public void updateGoals(double xMin, double xMax, double yMin, double yMax) {
-        left = new Goal(-100000, xMin, yMin, yMax);
-        right = new Goal(xMax, 100000, yMin, yMax);
+        left = new Goal(true, -100000, xMin, yMin, yMax);
+        right = new Goal(false, xMax, 100000, yMin, yMax);
     }
 
-    protected Goal left  = new Goal(-0.2, 0, 0.3, 0.9);
-    protected Goal right = new Goal(2.45, 2.65, 0.3, 0.9);
+    protected Goal left  = new Goal(true, -0.2, 0, 0.3, 0.9);
+    protected Goal right = new Goal(false, 2.45, 2.65, 0.3, 0.9);
 
     public Goal getOwnGoal() {
         if (goalIsLeft)
