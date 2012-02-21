@@ -11,6 +11,9 @@ public class Robot extends RectangularObject {
         super(position, velocity, orientation, Globals.ROBOT_WIDTH, Globals.ROBOT_LENGTH);
     }
 
+    
+    public static final double POSSESS_DISTANCE = 0.1;
+    
     /**
      * Returns true if the robot is in possession of the ball. That is if the
      * ball is close enough to the kicker that it can kick it.
@@ -19,8 +22,11 @@ public class Robot extends RectangularObject {
      * @return true, if robot is in possession of the ball
      */
     public boolean possessesBall(Ball ball) {
-        // TODO: implement this.
-        return false;
+        Coord possessPosition = new Coord(this.getHeight()/2, 0);
+        possessPosition.rotate(getOrientation());
+        
+        Coord dBall = ball.getPosition().sub(possessPosition);
+        return dBall.abs() < POSSESS_DISTANCE;
     }
 
     /**
