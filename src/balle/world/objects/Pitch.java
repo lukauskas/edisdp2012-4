@@ -1,6 +1,7 @@
 package balle.world.objects;
 
 import balle.world.Coord;
+import balle.world.Line;
 
 public class Pitch implements StaticFieldObject {
 
@@ -46,5 +47,10 @@ public class Pitch implements StaticFieldObject {
             return false;
         return true;
     }
+
+	@Override
+	public boolean intersects(Line line) {
+		return containsCoord(line.getA()) == containsCoord(line.getB());
+	}
 
 }

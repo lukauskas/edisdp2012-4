@@ -6,6 +6,7 @@ import java.awt.geom.Point2D;
 
 import balle.misc.Globals;
 import balle.world.Coord;
+import balle.world.Line;
 import balle.world.Orientation;
 import balle.world.Velocity;
 
@@ -88,5 +89,29 @@ public class RectangularObject extends MovingPoint implements FieldObject {
         
        return false;
     }
+
+	@Override
+	public boolean intersects(Line line) {
+		if (containsCoord(line.getA()) != containsCoord(line.getB())) return true;
+		
+		line = new Line(line.getA(), line.getB());
+		line.rotate(getOrientation());
+		line.add(getPosition());
+				
+		double minX, maxX, minY, maxY;
+		minX = -width/2.0;
+		maxX = width/2.0;
+		minY = -height/2.0;
+		maxY = height/2.0;
+		
+		double lMinX, lMaxX, lMinY, lMaxY;
+		lMinX = Math.min(line.getA().getX(), line.getB().getX());
+		lMaxX = Math.max(line.getA().getX(), line.getB().getX());
+		lMinY = Math.min(line.getA().getY(), line.getB().getY());
+		lMaxY = Math.max(line.getA().getY(), line.getB().getY());
+		
+		return lMinX < minX && maxX < lMaxX && lMinY < minY && maxY < lMaxY;
+	}
+    
 
 }

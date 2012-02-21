@@ -1,6 +1,7 @@
 package balle.world.objects;
 
 import balle.world.Coord;
+import balle.world.Line;
 
 public class Goal implements StaticFieldObject {
 
@@ -72,5 +73,18 @@ public class Goal implements StaticFieldObject {
         else
         	return new Coord(maxX, maxY);
     }
+    
+    @Override
+	public boolean intersects(Line line) {
+		if (containsCoord(line.getA()) != containsCoord(line.getB())) return true;
+		
+		double lMinX, lMaxX, lMinY, lMaxY;
+		lMinX = Math.min(line.getA().getX(), line.getB().getX());
+		lMaxX = Math.max(line.getA().getX(), line.getB().getX());
+		lMinY = Math.min(line.getA().getY(), line.getB().getY());
+		lMaxY = Math.max(line.getA().getY(), line.getB().getY());
+		
+		return lMinX < minX && maxX < lMaxX && lMinY < minY && maxY < lMaxY;
+	}
 
 }

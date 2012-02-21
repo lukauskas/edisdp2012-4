@@ -17,4 +17,14 @@ public class Line {
 		this.b = b;
 	}
 
+	public void rotate(Orientation orientation) {
+		a.rotate(orientation);
+		b.rotate(orientation);
+	}
+
+	public void add(Coord position) {
+		a.add(position);
+		b.add(position);
+	}
+
 }
