@@ -4,15 +4,13 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 
+import balle.misc.Globals;
 import balle.world.Coord;
 import balle.world.Orientation;
 import balle.world.Velocity;
 
 public class RectangularObject extends MovingPoint implements FieldObject {
     
-	private final static double DISTANCE_TO_WALL = 0.1;
-	private final static double DISTANCE_TO_CORNER = 0.2;
-	
 	private final double      width;
     private final double      height;
     private final Orientation orientation;
@@ -59,10 +57,10 @@ public class RectangularObject extends MovingPoint implements FieldObject {
     	 */
     	
     	double minX, maxX, minY, maxY;
-    	minX = p.getMinX() + DISTANCE_TO_WALL;
-    	maxX = p.getMaxX() - DISTANCE_TO_WALL;
-    	minY = p.getMinY() + DISTANCE_TO_WALL;
-    	maxY = p.getMaxY() - DISTANCE_TO_WALL;
+    	minX = p.getMinX() + Globals.DISTANCE_TO_WALL;
+    	maxX = p.getMaxX() - Globals.DISTANCE_TO_WALL;
+    	minY = p.getMinY() + Globals.DISTANCE_TO_WALL;
+    	maxY = p.getMaxY() - Globals.DISTANCE_TO_WALL;
     	
     	if (getPosition().getX() < minX)	return true;
     	if (getPosition().getX() > maxX)	return true;
@@ -74,9 +72,21 @@ public class RectangularObject extends MovingPoint implements FieldObject {
     }
 
     @Override
-    public boolean isInCorner() {
-        // TODO Auto-generated method stub
-        return false;
+    public boolean isInCorner(Pitch p) {
+        Coord c[] = new Coord[4];
+        c[0] = new Coord(p.getMinX(), p.getMinY());
+        c[1] = new Coord(p.getMinX(), p.getMaxY());
+        c[2] = new Coord(p.getMaxX(), p.getMinY());
+        c[3] = new Coord(p.getMaxX(), p.getMaxY());
+        
+        for (Coord each : c)
+        	each = each.sub(getPosition());
+        
+        for (Coord each : c)
+        	if (each.abs() < Globals.DISTANCE_TO_CORNER)
+        		return true;
+        
+       return false;
     }
 
 }

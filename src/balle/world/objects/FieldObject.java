@@ -23,6 +23,6 @@ public interface FieldObject extends StaticFieldObject {
      * 
      * @return true, if is in corner
      */
-    public abstract boolean isInCorner();
+    public abstract boolean isInCorner(Pitch p);
 
 }
