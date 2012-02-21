@@ -22,7 +22,7 @@ public class CircularObject extends MovingPoint implements FieldObject {
     }
 
     @Override
-    public boolean isNearWall() {
+    public boolean isNearWall(Pitch p) {
         // TODO Auto-generated method stub
         return false;
     }
