@@ -5,8 +5,9 @@ lib/*
 *.pyc
 bin/
 
-# Only for saving threshold values between runs
-vision/threshdefaults*
+# Only for saving values between runs
+vision/data
+
 JBox2d.log
 *.orig
 *.log
