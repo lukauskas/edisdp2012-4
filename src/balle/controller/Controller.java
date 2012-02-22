@@ -70,4 +70,6 @@ public interface Controller {
      * Penalty kick
      */
     public abstract void penaltyKick();
+    
+    //public abstract void gentleKick(int speed, int angle);
 }

@@ -73,8 +73,15 @@ public class BrickController implements Controller {
     public void kick() {
         KICKER.setSpeed(900);
         KICKER.resetTachoCount();
-        KICKER.rotateTo(-60);
+        KICKER.rotateTo(60);
         KICKER.rotateTo(0);
+    }
+    
+    public void gentleKick(int speed, int angle ) {
+    	KICKER.setSpeed(speed);
+    	KICKER.resetTachoCount();
+    	KICKER.rotateTo(angle);
+    	KICKER.rotateTo(0);
     }
 
     public float getTravelDistance() {

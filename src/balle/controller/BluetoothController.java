@@ -129,4 +129,10 @@ public class BluetoothController implements Controller {
         return connection.isConnected();
     }
 
+/*	@Override
+	public void gentleKick(int speed, int angle) {
+		// TODO Auto-generated method stub
+		
+	}*/
+
 }
