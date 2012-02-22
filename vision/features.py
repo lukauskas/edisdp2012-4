@@ -14,7 +14,7 @@ class Features:
     #     }
 
     Sizes = { 'ball'     : (20, 100),
-          'T'         : (300, 800),
+          'T'         : (100, 800),
         }
 
     def __init__(self, display, threshold):
