@@ -229,7 +229,6 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
             height = m2PY(goal.getMinY()) - m2PY(goal.getMaxY());
             
             g.drawRect(xMin, yMax, width, height);
-            // TODO: make sure this aligns to the goals that are drawn in black
         }
 
         /**
