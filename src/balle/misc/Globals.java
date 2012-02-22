@@ -7,6 +7,11 @@ public class Globals {
     public static final float ROBOT_LENGTH  = 0.2f;
     public static final float ROBOT_TRACK_WIDTH = 0.15f; // TODO CHECK THIS
     
+    public static final float ROBOT_MAX_KICK_DISTANCE = 1.5f; // Meters TODO CHECK THIS
+    
+    // For defining near corner, and near wall areas.
+    public final static double DISTANCE_TO_WALL = 0.1;
+	public final static double DISTANCE_TO_CORNER = 0.2;
 
     public static final float PITCH_WIDTH   = 2.4384f; // Metres
     public static final float PITCH_HEIGHT  = 1.2192f; // Metres

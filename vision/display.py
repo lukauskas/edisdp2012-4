@@ -33,7 +33,6 @@ class Gui:
 
         # These layers are drawn regardless of the current layerset
         self._persistentLayers = {
-                'fps': None,
                 'mouse': None
         }
 
@@ -73,7 +72,6 @@ class Gui:
 
                 toDraw.draw(entityLayer)
 
-        # draw fps
         for layer in self._persistentLayers.itervalues():
             if layer is not None:
                 baseLayer.addDrawingLayer(layer)
@@ -94,20 +92,21 @@ class Gui:
         self._lastFrame = thisFrame
         self._lastFrameTime = thisFrameTime
 
-        # Draw the text
-        size = self._layers['raw'].size() # This could break
-
-        layer = DrawingLayer(size)
+        layer = self._layers['raw'].dl()
         layer.ezViewText('{0:.2f} fps'.format(fps), (10, 10))
-        self.updateLayer('fps', layer)
 
-    def drawCrosshair(self, pos, layerName):
+    def drawCrosshair(self, pos, layerName = None):
         size = self._layers['raw'].size()
-        layer = self.getDrawingLayer()
+        if layerName is not None:
+            layer = self.getDrawingLayer()
+        else:
+            layer = self._layers['raw'].dl()
+
         layer.line((0, pos[1]), (size[0], pos[1]), color=(0, 0, 255))
         layer.line((pos[0], 0), (pos[0], size[1]), color=(0, 0, 255))
 
-        self.updateLayer(layerName, layer)
+        if layerName is not None:
+            self.updateLayer(layerName, layer)
 
  
     def loop(self):
@@ -131,10 +130,13 @@ class Gui:
             self._eventHandler.processClick((mouseX, mouseY))
         
         self._lastMouseState = mouseLeft
-            
-        # Process OpenCV events (for if the focus is on the thresholding window)
-        c = cv.WaitKey(16)
-        self._eventHandler.processKey(chr(c % 0x100))
+        
+        # Processing OpenCV events requires calling cv.WaitKey() with a reasonable timeout,
+        # which hits our framerate hard (NOTE: Need to confirm this on DICE), so only do
+        # this if the focus isn't on the pygame (image) window`
+        if not pygame.key.get_focused():
+            c = cv.WaitKey(2)
+            self._eventHandler.processKey(chr(c % 0x100))
 
         self.__updateFps()
         self.__draw()
