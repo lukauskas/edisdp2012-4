@@ -1,16 +1,20 @@
 import math
 
 import cv
-from SimpleCV import Image, Features, DrawingLayer
+from SimpleCV import Image, Features, DrawingLayer, BlobMaker
 from threshold import Threshold
 
 class Features:
     # Sizes of various features
     # Format : ( min_w, max_w, min_l, max_l)
     # width is defined as the shorter dimension
-    Sizes = { 'ball'     : (4, 20, 4,  20),
-          'T'         : (15, 40, 20, 55),
-          'dirmarker' : (3,  12, 3,  12),
+    # Sizes = { 'ball'     : (4, 20, 4,  20),
+    #       'T'         : (15, 40, 20, 55),
+    #       'dirmarker' : (3,  12, 3,  12),
+    #     }
+
+    Sizes = { 'ball'     : (20, 100),
+          'T'         : (300, 800),
         }
 
     def __init__(self, display, threshold):
@@ -45,8 +49,10 @@ class Features:
         nonZero = cv.CountNonZero(image.getGrayscaleMatrix())
         if nonZero < 10:
             return Entity()
-
-        blobs = image.findBlobs()
+        
+        size = self.Sizes[which]
+        blobmaker = BlobMaker()
+        blobs = blobmaker.extractFromBinary(image, image, minsize=size[0], maxsize=size[1])
 
         if blobs is None:
             return Entity()
@@ -70,8 +76,11 @@ class Features:
 
         expected = self.Sizes[which]
 
-        return expected[0] < width < expected[1] \
-            and expected[2] < length < expected[3]
+        # return expected[0] < width < expected[1] \
+        #     and expected[2] < length < expected[3]
+
+        area = feature.area()
+        return expected[0] < area < expected[1]
 
 class Entity:
 
