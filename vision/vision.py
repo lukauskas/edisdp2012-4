@@ -136,9 +136,21 @@ class Vision:
         else:
             self.socket.send(string)
 
+class OptParser(OptionParser):
+    """
+    The default OptionParser exits with exit code 2
+    if OptionParser.error() is called. Unfortunately this
+    screws up our vision restart script which tries to indefinitely
+    restart the vision system with bad options. This just exits with
+    0 instead so everything works.
+    """
+    def error(self, msg):
+        self.print_usage(sys.stderr)
+        self.exit(0, "%s: error: %s\n" % (self.get_prog_name(), msg))
+
 if __name__ == "__main__":
 
-    parser = OptionParser()
+    parser = OptParser()
     parser.add_option('-p', '--pitch', dest='pitch', type='int', metavar='PITCH',
                       help='PITCH should be 0 for main pitch, 1 for the other pitch')
 
