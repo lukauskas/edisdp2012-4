@@ -59,7 +59,7 @@ public class Runner {
 	public static void initialiseLogging(StrategyLogPane strategyLogPane) {
 		// Make sure to log strategy logs to the GUI as well
 		Logger strategyLogger = Logger.getLogger("balle.strategy");
-		strategyLogger.setLevel(Level.INFO);
+		strategyLogger.setLevel(Level.TRACE);
 		Appender strategyAppender = new StrategyLogAppender(strategyLogPane);
 		strategyAppender.setLayout(new PatternLayout("%-5p %c %x - %m%n"));
 		strategyLogger.addAppender(strategyAppender);

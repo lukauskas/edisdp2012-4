@@ -6,30 +6,35 @@ import balle.strategy.executor.turning.FaceAngle;
 import balle.strategy.planner.AbstractPlanner;
 import balle.strategy.planner.DribbleMilestone2;
 import balle.strategy.planner.GoToBall;
+import balle.strategy.planner.KickFromWall;
 import balle.world.AbstractWorld;
 
 public class StrategyFactory {
-    public static String[] availableDesignators() {
+	public static String[] availableDesignators() {
 
-        String[] designators = { "GoToBall", "Dribble", "Blocking" };
-        return designators;
-    }
+		String[] designators = { "GoToBall", "Dribble", "Blocking",
+				"BallNearWall" };
+		return designators;
+	}
 
-    public static AbstractPlanner createClass(String designator,
-            Controller controller, AbstractWorld world)
-            throws UnknownDesignatorException {
+	public static AbstractPlanner createClass(String designator,
+			Controller controller, AbstractWorld world)
+			throws UnknownDesignatorException {
 
-        if (designator.equals("GoToBall")) {
-            return new GoToBall(controller, world, new GoToObject(
-                    new FaceAngle()));
-        } else if (designator.equals("DummyStrategy")) {
-            return new DummyStrategy(controller, world);
-        } else if (designator.equals("Blocking")) {
-            return new Blocking(controller, world);
-        } else if (designator.equals("Dribble")) {
-            return new DribbleMilestone2(controller, world);
-        } else
-            throw new UnknownDesignatorException("Don't know strategy \""
-                    + designator + "\"");
-    }
+		if (designator.equals("GoToBall")) {
+			return new GoToBall(controller, world, new GoToObject(
+					new FaceAngle()));
+		} else if (designator.equals("DummyStrategy")) {
+			return new DummyStrategy(controller, world);
+		} else if (designator.equals("Blocking")) {
+			return new Blocking(controller, world);
+		} else if (designator.equals("Dribble")) {
+			return new DribbleMilestone2(controller, world);
+		} else if (designator.equals("BallNearWall")) {
+			return new KickFromWall(controller, world, new GoToObject(
+					new FaceAngle()));
+		} else
+			throw new UnknownDesignatorException("Don't know strategy \""
+					+ designator + "\"");
+	}
 }
