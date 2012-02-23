@@ -110,13 +110,6 @@ public class Roboto {
         return true;
     }
 
-    public static void stopEverything(Controller controller,
-            ListenerThread listener) {
-        Sound.twoBeeps();
-        controller.stop();
-        listener.cancel();
-    }
-
     /**
      * Main program
      * 
@@ -133,6 +126,7 @@ public class Roboto {
                 break;
 
             drawMessage("Connecting...");
+            Sound.twoBeeps();
 
             BTConnection connection = Bluetooth.waitForConnection();
 
@@ -150,8 +144,12 @@ public class Roboto {
             while (true) {
                 // Enter button click will halt the program
                 if (Button.ENTER.isPressed()) {
-                    stopEverything(controller, listener);
+                    controller.stop();
+                    listener.cancel();
                     break;
+                }
+                if (Button.ESCAPE.isPressed()) {
+                    return;
                 }
                 try {
                     // Check for sensors when idle

@@ -77,9 +77,12 @@ public class BrickController implements Controller {
     public void kick() {
         KICKER.setSpeed(900);
         KICKER.resetTachoCount();
-        KICKER.rotateTo(60);
-        KICKER.rotateTo(0);
-
+        KICKER.forward();
+        try {
+            Thread.sleep(80);
+        } catch (InterruptedException e) {
+        }
+        KICKER.rotateTo(1);
     }
 
     public float getTravelDistance() {
