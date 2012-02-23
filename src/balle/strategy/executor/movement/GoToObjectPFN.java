@@ -46,7 +46,7 @@ public class GoToObjectPFN implements MovementExecutor {
     public GoToObjectPFN(double stopDistance) {
         this.stopDistance = stopDistance;
         RobotConf conf = new RobotConf(ROBOT_TRACK_WIDTH, WHEEL_RADIUS);
-        plann = new PFPlanning(conf, 0, 1, 16, 0.5);
+        plann = new PFPlanning(conf, 0, 1, 12, 0.5);
     }
 
     @Override
@@ -73,7 +73,9 @@ public class GoToObjectPFN implements MovementExecutor {
 
     @Override
     public boolean isPossible() {
-        return (snapshot != null) && (target != null);
+        return ((snapshot != null) && (target != null)
+                && (snapshot.getBalle().getPosition() != null) && (snapshot
+                .getBalle().getOrientation() != null));
     }
 
     @Override
