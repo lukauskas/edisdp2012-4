@@ -87,7 +87,8 @@ public class Coord {
         if (this.getClass() != other.getClass())
             return false;
         Coord otherCoord = (Coord) other;
-        return (otherCoord.getX() == this.getX()) && (otherCoord.getY() == this.getY())
+        return (otherCoord.getX() == this.getX())
+                && (otherCoord.getY() == this.getY())
                 && (otherCoord.isEstimated() == this.isEstimated());
     }
 
@@ -99,7 +100,8 @@ public class Coord {
      *            the starting coordinate
      * @return true, if coordinate is reachable in straight line from another
      */
-    public boolean isReachableInStraightLineAndNotBlocked(Coord fromCoordinate, Pitch pitch) {
+    public boolean isReachableInStraightLineAndNotBlocked(Coord fromCoordinate,
+            Pitch pitch) {
         return pitch.containsCoord(this) && pitch.containsCoord(fromCoordinate);
     }
 
@@ -113,35 +115,35 @@ public class Coord {
      *            checks what could be the potential obstacle.
      * @return true, if coordinate is reachable in straight line from another
      */
-    public boolean isReachableInStraightLineAndNotBlocked(Coord fromCoordinate, Pitch pitch,
-            FieldObject potentialObstacle) {
+    public boolean isReachableInStraightLineAndNotBlocked(Coord fromCoordinate,
+            Pitch pitch, FieldObject potentialObstacle) {
         if (!this.isReachableInStraightLineAndNotBlocked(fromCoordinate, pitch))
-        	return false;
+            return false;
         else
-        	return true;
+            return true;
     }
 
-    /** Creats a new coord rotated clockwise by an angle.
+    /**
+     * Creates a new coord rotated counter-clockwise by an angle.
      * 
-     * @param orientation 
+     * @param orientation
      */
-	public Coord rotate(Orientation orientation) {
-		double theta, nX, nY;
-		theta = orientation.radians();
-		nX = x*Math.cos(theta) - y*Math.sin(theta);
-		nY = x*Math.sin(theta) + y*Math.cos(theta);
-		return new Coord(nX, nY);
-	}
+    public Coord rotate(Orientation orientation) {
+        double theta, nX, nY;
+        theta = orientation.radians();
+        nX = getX() * Math.cos(theta) - getY() * Math.sin(theta);
+        nY = getX() * Math.sin(theta) + getY() * Math.cos(theta);
+        return new Coord(nX, nY);
+    }
 
-	public Point getPoint() {
-		Point out = new Point();
-		out.setLocation(x, y);
-		return out;
-	}
-	
-	
-	@Override
-	public String toString() {
-		return "("+x+","+y+")";
-	}
+    public Point getPoint() {
+        Point out = new Point();
+        out.setLocation(x, y);
+        return out;
+    }
+
+    @Override
+    public String toString() {
+        return "(" + x + "," + y + ")";
+    }
 }
