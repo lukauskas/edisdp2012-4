@@ -15,6 +15,7 @@ public class KickFromWall extends AbstractPlanner {
 
 	MovementExecutor movementStrategy;
 	boolean secondStep = false;
+	boolean kicked = false;
 
 	public KickFromWall(Controller controller, AbstractWorld world,
 			MovementExecutor movementStrategy) {
@@ -43,18 +44,18 @@ public class KickFromWall extends AbstractPlanner {
 				.getMaxX() / 2) {
 			if (snap.getBall().getPosition().getY() < snap.getPitch().getMaxY() / 2) {
 				targetX = snap.getBall().getPosition().getX() + 0.2;
-				targetY = snap.getBall().getPosition().getY() + 0.2;
+				targetY = snap.getBall().getPosition().getY() + 0.1;
 			} else {
 				targetX = snap.getBall().getPosition().getX() + 0.2;
-				targetY = snap.getBall().getPosition().getY() - 0.2;
+				targetY = snap.getBall().getPosition().getY() - 0.1;
 			}
 		} else {
 			if (snap.getBall().getPosition().getY() < snap.getPitch().getMaxY() / 2) {
 				targetX = snap.getBall().getPosition().getX() - 0.2;
-				targetY = snap.getBall().getPosition().getY() + 0.2;
+				targetY = snap.getBall().getPosition().getY() + 0.1;
 			} else {
 				targetX = snap.getBall().getPosition().getX() - 0.2;
-				targetY = snap.getBall().getPosition().getY() - 0.2;
+				targetY = snap.getBall().getPosition().getY() - 0.1;
 			}
 		}
 
@@ -67,7 +68,7 @@ public class KickFromWall extends AbstractPlanner {
 			movementStrategy.updateTarget(loc);
 			LOG.trace("Going to location");
 		} else {
-			movementStrategy.updateTarget(snap.getBall());
+			// movementStrategy.updateTarget(snap.getBall());
 			LOG.trace("Going to ball");
 		}
 
@@ -75,8 +76,10 @@ public class KickFromWall extends AbstractPlanner {
 			movementStrategy.step(controller);
 		else {
 			movementStrategy.stop(controller);
-			if (secondStep) {
-				controller.kick();
+			if (secondStep && !kicked) {
+
+				// controller.kick();
+				kicked = true;
 				LOG.trace("KICKING");
 			}
 			secondStep = true;
