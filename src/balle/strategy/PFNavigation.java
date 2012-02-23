@@ -58,7 +58,7 @@ public class PFNavigation extends AbstractPlanner {
                     .getBall().getPosition().getY());
             VelocityVec res = plann.update(initPos, opponent, ball);
             LOG.trace("Left speed: " + Math.toDegrees(res.getLeft())
-                    + "right speed: " + Math.toDegrees(res.getRight()));
+                    + ", right speed: " + Math.toDegrees(res.getRight()));
             double resNorm = res.norm();
 
             double left, right;
@@ -72,7 +72,7 @@ public class PFNavigation extends AbstractPlanner {
 
             left = Math.toDegrees(res.getLeft());
             right = Math.toDegrees(res.getRight());
-            LOG.trace("Left speed: " + left + "right speed: " + right);
+            LOG.trace("Left speed: " + left + " right speed: " + right);
 
             controller.setWheelSpeeds((int) left, (int) right);
         }

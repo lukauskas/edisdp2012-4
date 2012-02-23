@@ -13,7 +13,6 @@ public class PFPlanning {
     PointObject                 ball;
     double                      default_power = 5;
     RobotConf                   config;
-    final static double         STOP_DISTANCE = 0.3;
     List<Object>                objects;
     /** power for opponent. */
     double                      opponentPower;
@@ -118,16 +117,10 @@ public class PFPlanning {
         init(robot, opponent, ball);
 
         List<Object> complList = new ArrayList<Object>(objects);
-        complList.add(this.opponent);
+        if (this.opponent != null)
+            complList.add(this.opponent);
 
         Vector res = GoTo(complList, this.ball, robot.getLocation());
-
-        Vector vball = new Vector(ball);
-        Vector vrobot = new Vector(robot.getLocation());
-        if (vball.subtract(vrobot).norm() < STOP_DISTANCE) {
-            LOG.info("Not moving as distance < STOP_DISTANCE");
-            res = new Vector(0, 0);
-        }
 
         return getVelocity(res, robot);
 
@@ -149,9 +142,6 @@ public class PFPlanning {
                 * (start_point.getX() - dest_obj.getX())
                 + (start_point.getY() - dest_obj.getY())
                 * (start_point.getY() - dest_obj.getY()));
-        if (dist < STOP_DISTANCE) {
-            return new Vector(0, 0);
-        }
 
         Vector rep = new Vector(0, 0);
         // iterate through all obstacles and compute sum of all repulsive
@@ -186,9 +176,6 @@ public class PFPlanning {
                 * (start_point.getLocation().getX() - dest_obj.getX())
                 + (start_point.getLocation().getY() - dest_obj.getY())
                 * (start_point.getLocation().getY() - dest_obj.getY()));
-        if (dist < STOP_DISTANCE) {
-            return new Vector(0, 0);
-        }
 
         Vector rep = new Vector(0, 0);
         // iterate through all obstacles and compute sum of all repulsive

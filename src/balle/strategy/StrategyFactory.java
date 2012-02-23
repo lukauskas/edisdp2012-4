@@ -2,6 +2,7 @@ package balle.strategy;
 
 import balle.controller.Controller;
 import balle.strategy.executor.movement.GoToObject;
+import balle.strategy.executor.movement.GoToObjectPFN;
 import balle.strategy.executor.turning.FaceAngle;
 import balle.strategy.planner.AbstractPlanner;
 import balle.strategy.planner.DribbleMilestone2;
@@ -11,8 +12,8 @@ import balle.world.AbstractWorld;
 public class StrategyFactory {
     public static String[] availableDesignators() {
 
-        String[] designators = { "GoToBall", "Dribble", "Blocking",
-                "PFNavigation" };
+        String[] designators = { "GoToBall", "GoToBallPFN", "Dribble",
+                "Blocking", "PFNavigation" };
         return designators;
     }
 
@@ -23,6 +24,8 @@ public class StrategyFactory {
         if (designator.equals("GoToBall")) {
             return new GoToBall(controller, world, new GoToObject(
                     new FaceAngle()));
+        } else if (designator.equals("GoToBallPFN")) {
+            return new GoToBall(controller, world, new GoToObjectPFN(0.15f));
         } else if (designator.equals("DummyStrategy")) {
             return new DummyStrategy(controller, world);
         } else if (designator.equals("Blocking")) {
