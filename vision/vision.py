@@ -52,14 +52,14 @@ class Vision:
         eventHandler = self.gui.getEventHandler()
         eventHandler.addListener('q', self.quit)
 
+        if not self.stdout:
+            self.connect()
+
         if self.preprocessor.hasPitchSize:
             self.outputPitchSize()
             self.gui.setShowMouse(False)
         else:
             eventHandler.setClickListener(self.setNextPitchCorner)
-        
-        if not self.stdout:
-            self.connect()
             
         self.doStuff()
         
