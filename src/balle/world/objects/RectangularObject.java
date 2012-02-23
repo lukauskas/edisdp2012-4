@@ -95,8 +95,8 @@ public class RectangularObject extends MovingPoint implements FieldObject {
 		if (containsCoord(line.getA()) != containsCoord(line.getB())) return true;
 		
 		line = new Line(line.getA(), line.getB());
-		line.rotate(getOrientation());
-		line.add(getPosition());
+		line = line.rotate(getOrientation());
+		line = line.add(getPosition());
 				
 		double minX, maxX, minY, maxY;
 		minX = -width/2.0;
