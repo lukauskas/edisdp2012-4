@@ -45,15 +45,32 @@ public class CoordTests {
     }
 
     /**
-     * Given coordinates (1,0) and angle of pi/2 radians, rotate function should
-     * transform the coordinates to (0,1)
+     * Given coordinates (1,0) and appropriate angle, the rotate function should
+     * rotate the coordinates correctly.
      */
     @Test
     public void testRotate() {
         Coord c = new Coord(1, 0);
+
+        // rotate((1,0), PI/2) = (0,1)
         Coord newCoord = c.rotate(new Orientation(Math.PI / 2, true));
         assertEquals(0, newCoord.getX(), 0.000001);
         assertEquals(1, newCoord.getY(), 0.000001);
+
+        // rotate((1,0), PI) = (-1,0)
+        Coord newCoord2 = c.rotate(new Orientation(Math.PI, true));
+        assertEquals(-1, newCoord2.getX(), 0.000001);
+        assertEquals(0, newCoord2.getY(), 0.000001);
+
+        // rotate((1,0), 3/2 * PI) = (0,-1)
+        Coord newCoord3 = c.rotate(new Orientation((3 * Math.PI) / 2, true));
+        assertEquals(0, newCoord3.getX(), 0.000001);
+        assertEquals(-1, newCoord3.getY(), 0.000001);
+
+        // rotate((1,0), 2 * PI) = (1,0)
+        Coord newCoord4 = c.rotate(new Orientation(2 * Math.PI, true));
+        assertEquals(1, newCoord4.getX(), 0.000001);
+        assertEquals(0, newCoord4.getY(), 0.000001);
     }
 
 }

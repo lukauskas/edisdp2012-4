@@ -25,7 +25,8 @@ public class Robot extends RectangularObject {
      */
     public boolean possessesBall(Ball ball) {
         Coord possessVector = new Coord(this.getHeight() / 2.0, 0);
-        possessVector.rotate(getOrientation());
+        possessVector = possessVector.rotate(getOrientation());
+
         Coord possessPosition = getPosition().add(possessVector);
 
         double distance = ball.getPosition().dist(possessPosition);
