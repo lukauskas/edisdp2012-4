@@ -2,7 +2,6 @@ package balle.brick;
 
 import java.io.DataInputStream;
 
-import lejos.nxt.Battery;
 import lejos.nxt.Button;
 import lejos.nxt.LCD;
 import lejos.nxt.SensorPort;
@@ -121,7 +120,7 @@ public class Roboto {
                             controller.stop();
                         }
 
-                        drawMessage("Battery: " + Battery.getVoltage());
+                        // drawMessage("Battery: " + Battery.getVoltage());
                     }
 
                     int hashedMessage = input.readInt();
