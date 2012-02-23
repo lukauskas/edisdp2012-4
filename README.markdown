@@ -4,15 +4,9 @@ SDP Group  4
 To run the vision code:
 ------------------------
  
-Source the 'env' file:
+Run "runvision.sh"
 
-    . env
-
-
-Run vision.py
-
-    cd vision/
-    python vision.py -p[0|1]
+    ./vision/runvision.sh -p(0|1)
 
 where -p is 0 for the main pitch, or 1 for the other one. See vision.py --help for more options.
     

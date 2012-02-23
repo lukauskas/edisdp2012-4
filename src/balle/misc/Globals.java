@@ -1,5 +1,7 @@
 package balle.misc;
 
+import balle.world.objects.Pitch;
+
 public class Globals {
 
     public static final float  BALL_RADIUS               = 0.02135f;
@@ -42,4 +44,7 @@ public class Globals {
         return v * (720f / 0.4f);
     }
 
+	public static Pitch getPitch() {
+		return new Pitch(0, PITCH_WIDTH, 0, PITCH_HEIGHT);
+	}
 }
