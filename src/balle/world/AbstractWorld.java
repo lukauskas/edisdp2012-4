@@ -4,6 +4,7 @@ import balle.io.listener.Listener;
 import balle.misc.Globals;
 import balle.world.objects.Goal;
 import balle.world.objects.MovingPoint;
+import balle.world.objects.Pitch;
 
 /***
  * 
@@ -17,158 +18,170 @@ import balle.world.objects.MovingPoint;
  */
 public abstract class AbstractWorld implements Listener {
 
-    public final int      UNKNOWN_VALUE = -1;
+	public final int UNKNOWN_VALUE = -1;
 
-    private double        pitchWidth    = -1;
-    private double        pitchHeight   = -1;
+	private double pitchWidth = -1;
+	private double pitchHeight = -1;
 
-    // JEV: Scanner is final and can't be extended, makes it difficult for the
-    // simulator.
-    private final boolean balleIsBlue;
-    private final boolean goalIsLeft;
+	// JEV: Scanner is final and can't be extended, makes it difficult for the
+	// simulator.
+	private final boolean balleIsBlue;
+	private final boolean goalIsLeft;
 
-    public AbstractWorld(boolean isBalleBlue, boolean goalIsLeft) {
-        this.balleIsBlue = isBalleBlue;
-        this.goalIsLeft = goalIsLeft;
-    }
+	private final Pitch pitch;
 
-    /**
-     * Returns whether our robot is blue or not
-     * 
-     * @return true if our robot is the blue one, false otherwise
-     */
-    protected boolean isBlue() {
-        return balleIsBlue;
-    }
+	public AbstractWorld(boolean isBalleBlue, boolean goalIsLeft, Pitch pitch) {
+		this.balleIsBlue = isBalleBlue;
+		this.pitch = pitch;
+		this.goalIsLeft = goalIsLeft;
+	}
 
-    /**
-     * // TODO James: this sounds like more of a job for within strategy. NOPE!
-     * 1) We do not want to reimplement this for all strategies 2) We DO want
-     * the world class to use this to estimate coordinates in case vision fails!
-     * 
-     * Estimated position of the object after timestep (in miliseconds)
-     * 
-     * @param object
-     *            object which position to estimate
-     * @param timestep
-     *            time in miliseconds after which to estiamte the position of
-     *            the object
-     * @return new coordinate for the position of the object after timestep
-     */
-    public Coord estimatedPosition(MovingPoint object, double timestep) {
-        if ((object.getPosition() == null) || (object.getVelocity() == null))
-            return null;
-        else if (timestep == 0) {
-            return object.getPosition();
-        } else
-            // TODO: Make sure the robot does not go through the wall
-            // make sure the ball bounces from the wall, etc.
+	public Pitch getPitch() {
+		return pitch;
+	}
 
-            return new Coord(object.getPosition().add(object.getVelocity().adjustLength(timestep)),
-                    true);
-    }
+	/**
+	 * Returns whether our robot is blue or not
+	 * 
+	 * @return true if our robot is the blue one, false otherwise
+	 */
+	protected boolean isBlue() {
+		return balleIsBlue;
+	}
 
-    /***
-     * Gets the best guess of the coordinates of the robot (our team's robot).
-     * 
-     * @return coordinates of the robot.
-     */
-    public abstract Snapshot getSnapshot();
+	/**
+	 * // TODO James: this sounds like more of a job for within strategy. NOPE!
+	 * 1) We do not want to reimplement this for all strategies 2) We DO want
+	 * the world class to use this to estimate coordinates in case vision fails!
+	 * 
+	 * Estimated position of the object after timestep (in miliseconds)
+	 * 
+	 * @param object
+	 *            object which position to estimate
+	 * @param timestep
+	 *            time in miliseconds after which to estiamte the position of
+	 *            the object
+	 * @return new coordinate for the position of the object after timestep
+	 */
+	public Coord estimatedPosition(MovingPoint object, double timestep) {
+		if ((object.getPosition() == null) || (object.getVelocity() == null))
+			return null;
+		else if (timestep == 0) {
+			return object.getPosition();
+		} else
+			// TODO: Make sure the robot does not go through the wall
+			// make sure the ball bounces from the wall, etc.
 
-    /**
-     * Update the current state of the world using scaled coordinates
-     * 
-     * @param yPosX
-     * @param yPosY
-     * @param yRad
-     * @param bPosX
-     * @param bPosY
-     * @param bRad
-     * @param ballPosX
-     * @param ballPosY
-     * @param timestamp
-     */
-    abstract protected void updateScaled(Coord ourPos, Orientation ourOrientation, Coord theirsPos,
-            Orientation theirsOrientation, Coord ballPos, long timestamp);
+			return new Coord(object.getPosition().add(
+					object.getVelocity().adjustLength(timestep)), true);
+	}
 
-    protected double scaleXToMeters(double x) {
-        if (x < 0)
-            return x;
+	/***
+	 * Gets the best guess of the coordinates of the robot (our team's robot).
+	 * 
+	 * @return coordinates of the robot.
+	 */
+	public abstract Snapshot getSnapshot();
 
-        return (x / pitchWidth) * Globals.PITCH_WIDTH;
-    }
+	/**
+	 * Update the current state of the world using scaled coordinates
+	 * 
+	 * @param yPosX
+	 * @param yPosY
+	 * @param yRad
+	 * @param bPosX
+	 * @param bPosY
+	 * @param bRad
+	 * @param ballPosX
+	 * @param ballPosY
+	 * @param timestamp
+	 */
+	abstract protected void updateScaled(Coord ourPos,
+			Orientation ourOrientation, Coord theirsPos,
+			Orientation theirsOrientation, Coord ballPos, long timestamp);
 
-    protected double scaleYToMeters(double y) {
-        if (y < 0)
-            return y;
+	protected double scaleXToMeters(double x) {
+		if (x < 0)
+			return x;
 
-        return (y / pitchHeight) * Globals.PITCH_HEIGHT;
-    }
+		return (x / pitchWidth) * Globals.PITCH_WIDTH;
+	}
 
-    @Override
-    public void update(double yPosX, double yPosY, double yDeg, double bPosX, double bPosY,
-            double bDeg, double ballPosX, double ballPosY, long timestamp) {
+	protected double scaleYToMeters(double y) {
+		if (y < 0)
+			return y;
 
-        if ((pitchWidth < 0) || (pitchHeight < 0)) {
-            System.err
-                    .println("Cannot update locations as pitch size is not set properly. Restart vision");
-            return;
-        }
+		return (y / pitchHeight) * Globals.PITCH_HEIGHT;
+	}
 
-        Coord yPos = null;
-        Orientation yOrientation = null;
-        Coord bPos = null;
-        Orientation bOrientation = null;
-        Coord ballPos = null;
+	@Override
+	public void update(double yPosX, double yPosY, double yDeg, double bPosX,
+			double bPosY, double bDeg, double ballPosX, double ballPosY,
+			long timestamp) {
 
-        if ((yPosX != UNKNOWN_VALUE) && (yPosY != UNKNOWN_VALUE)) {
-            yPos = new Coord(scaleXToMeters(yPosX), scaleYToMeters(yPosY));
-            yOrientation = new Orientation(yDeg, false);
-        }
+		if ((pitchWidth < 0) || (pitchHeight < 0)) {
+			System.err
+					.println("Cannot update locations as pitch size is not set properly. Restart vision");
+			return;
+		}
 
-        if ((bPosX != UNKNOWN_VALUE) && (bPosY != UNKNOWN_VALUE)) {
-            bPos = new Coord(scaleXToMeters(bPosX), scaleYToMeters(bPosY));
-            bOrientation = new Orientation(bDeg, false);
-        }
+		Coord yPos = null;
+		Orientation yOrientation = null;
+		Coord bPos = null;
+		Orientation bOrientation = null;
+		Coord ballPos = null;
 
-        if ((ballPosX != UNKNOWN_VALUE) && (ballPosY != UNKNOWN_VALUE)) {
-            ballPos = new Coord(scaleXToMeters(ballPosX), scaleYToMeters(ballPosY));
-        }
+		if ((yPosX != UNKNOWN_VALUE) && (yPosY != UNKNOWN_VALUE)) {
+			yPos = new Coord(scaleXToMeters(yPosX), scaleYToMeters(yPosY));
+			yOrientation = new Orientation(yDeg, false);
+		}
 
-        if (isBlue())
-            updateScaled(bPos, bOrientation, yPos, yOrientation, ballPos, timestamp);
-        else
-            updateScaled(yPos, yOrientation, bPos, bOrientation, ballPos, timestamp);
-    }
+		if ((bPosX != UNKNOWN_VALUE) && (bPosY != UNKNOWN_VALUE)) {
+			bPos = new Coord(scaleXToMeters(bPosX), scaleYToMeters(bPosY));
+			bOrientation = new Orientation(bDeg, false);
+		}
 
-    @Override
-    public void updatePitchSize(double width, double height) {
+		if ((ballPosX != UNKNOWN_VALUE) && (ballPosY != UNKNOWN_VALUE)) {
+			ballPos = new Coord(scaleXToMeters(ballPosX),
+					scaleYToMeters(ballPosY));
+		}
 
-        pitchWidth = width;
-        pitchHeight = height;
-    }
+		if (isBlue())
+			updateScaled(bPos, bOrientation, yPos, yOrientation, ballPos,
+					timestamp);
+		else
+			updateScaled(yPos, yOrientation, bPos, bOrientation, ballPos,
+					timestamp);
+	}
 
-    @Override
-    public void updateGoals(double xMin, double xMax, double yMin, double yMax) {
-        left = new Goal(true, -100000, xMin, yMin, yMax);
-        right = new Goal(false, xMax, 100000, yMin, yMax);
-    }
+	@Override
+	public void updatePitchSize(double width, double height) {
 
-    protected Goal left  = new Goal(true, -0.2, 0, 0.3, 0.9);
-    protected Goal right = new Goal(false, 2.45, 2.65, 0.3, 0.9);
+		pitchWidth = width;
+		pitchHeight = height;
+	}
 
-    public Goal getOwnGoal() {
-        if (goalIsLeft)
-            return right;
-        else
-            return left;
-    }
+	@Override
+	public void updateGoals(double xMin, double xMax, double yMin, double yMax) {
+		left = new Goal(true, -100000, xMin, yMin, yMax);
+		right = new Goal(false, xMax, 100000, yMin, yMax);
+	}
 
-    public Goal getOpponentsGoal() {
-        if (goalIsLeft)
-            return left;
-        else
-            return right;
-    }
+	protected Goal left = new Goal(true, -0.2, 0, 0.3, 0.9);
+	protected Goal right = new Goal(false, 2.45, 2.65, 0.3, 0.9);
+
+	public Goal getOwnGoal() {
+		if (goalIsLeft)
+			return right;
+		else
+			return left;
+	}
+
+	public Goal getOpponentsGoal() {
+		if (goalIsLeft)
+			return left;
+		else
+			return right;
+	}
 
 }
