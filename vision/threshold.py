@@ -1,13 +1,12 @@
 import cv
 import os
-import sys
-import cPickle
+import util
 from SimpleCV import Image, ColorSpace
 
 class Threshold:
     
     # File for storing temporary threshold defaults
-    filepath = "threshdefaults_{0}"
+    filepath = os.path.join('data', 'threshdefaults_{0}')
 
     def __init__(self, pitch):
         
@@ -15,21 +14,16 @@ class Threshold:
         self.__getDefaults()
         
     def __getDefaults(self):
-        self._values = {}
+        self._values = None
         
-        path = self.__getFilePath()
-        if os.path.exists(path):
-            f = open(path, 'r')
-            self._values = cPickle.load(f)
-        else:
+        path = self.filepath.format(self._pitch)
+        self._values = util.loadFromFile(path)
+
+        if self._values is None:
             self._values = defaults[self._pitch]
             
     def __saveDefaults(self):
-        f = open(self.__getFilePath(), 'w')
-        cPickle.dump(self._values, f)
-
-    def __getFilePath(self):
-        return os.path.join(sys.path[0], self.filepath.format(self._pitch))
+        util.dumpToFile(self._values, self.filepath.format(self._pitch))
 
     def yellowT(self, frame):
         return self.threshold(frame, self._values['yellow'][0], self._values['yellow'][1])

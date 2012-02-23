@@ -1,14 +1,31 @@
 import cv
+import os
+import util
 from SimpleCV import Image
 from operator import sub
 
 class Preprocessor:
     
-    #_cropRect = (0, 60, 640, 350)
+    _filepath = os.path.join('data', 'pitch_size')
     
-    def __init__(self):
-        self.hasPitchSize = False
-        self._cropRect = []
+    def __init__(self, resetPitchSize):
+        self._cropRect = None
+
+        if not resetPitchSize:
+            self.__loadPitchSize()
+
+        if self._cropRect is None:
+            self._cropRect = []
+            self.hasPitchSize = False
+        else:
+            self.hasPitchSize = True
+
+    def __savePitchSize(self):
+        util.dumpToFile(self._cropRect, self._filepath)
+
+    def __loadPitchSize(self):
+        self._cropRect = util.loadFromFile(self._filepath)
+        print self._cropRect
 
     @property
     def pitch_size(self):
@@ -23,15 +40,18 @@ class Preprocessor:
 
         length = len(self._cropRect)
         if length == 0:
-            next = where
+            self._cropRect.extend(where)
         elif length == 2:
             print where
             next = map(sub, where, self._cropRect)
             self.hasPitchSize = True
+            self._cropRect.extend(next)
+
+            self.__savePitchSize()
         else:
             return
 
-        self._cropRect.extend(next)
+
         print "Cropped rectangle {0}".format(self._cropRect)
         
     def preprocess(self, frame):
