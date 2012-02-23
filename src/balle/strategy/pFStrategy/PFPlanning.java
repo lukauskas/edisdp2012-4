@@ -120,7 +120,7 @@ public class PFPlanning {
         List<Object> complList = new ArrayList<Object>(objects);
         complList.add(this.opponent);
 
-        Vector res = GoTo(complList, this.ball, robot);
+        Vector res = GoTo(complList, this.ball, robot.getLocation());
 
         Vector vball = new Vector(ball);
         Vector vrobot = new Vector(robot.getLocation());

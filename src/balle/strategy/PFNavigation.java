@@ -27,7 +27,7 @@ public class PFNavigation extends AbstractPlanner {
     // Double.MAX_VALUE, 0.05, 500.0);
 
     // TargetPower=16 works quite well.
-    PFPlanning                  plann = new PFPlanning(conf, 1, 1, 16, 0.5);
+    PFPlanning                  plann = new PFPlanning(conf, 0, 1, 16, 0.5);
 
     public PFNavigation(Controller controller, AbstractWorld world) {
         super(controller, world);
@@ -45,7 +45,8 @@ public class PFNavigation extends AbstractPlanner {
         Snapshot snap = getSnapshot();
 
         if (snap != null) {
-
+            if (snap.getBalle().getPosition() == null)
+                return;
             Pos opponent = new Pos(new Point(snap.getOpponent().getPosition()
                     .getX(), snap.getOpponent().getPosition().getY()), snap
                     .getOpponent().getOrientation().radians());
