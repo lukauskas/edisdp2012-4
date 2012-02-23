@@ -62,16 +62,7 @@ public class PFNavigation extends AbstractPlanner {
             double left, right;
             // If the speeds given are more than the maximum speeds allowed
             // Scale them
-            if ((Math.abs(res.getLeft()) > Math
-                    .toRadians(VelocityVec.MAX_SPEED))
-                    || (Math.abs(res.getRight()) > Math
-                            .toRadians(VelocityVec.MAX_SPEED))) {
-                double theta = res.normalAngle();
-                VelocityVec newRes = new VelocityVec(Math.cos(theta)
-                        * VelocityVec.MAXIMUM_NORM, Math.sin(theta)
-                        * VelocityVec.MAXIMUM_NORM);
-                res = newRes;
-            }
+            res = res.scale();
 
             left = Math.toDegrees(res.getLeft());
             right = Math.toDegrees(res.getRight());
