@@ -58,4 +58,4 @@ export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$NXJ_BIN"
 export DYLD_LIBRARY_PATH="$DYLD_LIBRARY_PATH:$NXJ_BIN"
 
 	
-java -classpath "bin:lib/jopt-simple-4.3.jar" -Dnxj.home="$NXJ_HOME" -Djava.library.path="$NXJ_BIN" -Xbootclasspath/a:"$NXJ_CP_TOOL" balle.main.Runner "$@"
+java -classpath "bin:lib/*:/usr/share/java/log4j.jar" -Dnxj.home="$NXJ_HOME" -Djava.library.path="$NXJ_BIN" -Xbootclasspath/a:"$NXJ_CP_TOOL" balle.main.Runner "$@"
