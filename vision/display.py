@@ -67,16 +67,14 @@ class Gui:
                 baseLayer.addDrawingLayer(toDraw)
 
             else:
-                #layer = DrawingLayer(size)
-                #baseLayer.addDrawingLayer(layer)
-
                 toDraw.draw(entityLayer)
 
         for layer in self._persistentLayers.itervalues():
             if layer is not None:
                 baseLayer.addDrawingLayer(layer)
 
-        baseLayer.save(self._display)
+        finalImage = baseLayer.applyLayers()
+        self._display.writeFrame(finalImage, fit=False)
 
     def __updateFps(self):
         smoothConst = 0.1

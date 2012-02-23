@@ -3,6 +3,7 @@ package balle.brick;
 import lejos.nxt.Motor;
 import lejos.robotics.navigation.TachoPilot;
 import balle.controller.Controller;
+import balle.misc.Globals;
 
 /**
  * The Control class. Handles the actual driving and movement of the bot, once
@@ -15,23 +16,26 @@ import balle.controller.Controller;
  * @author sauliusl
  */
 public class BrickController implements Controller {
-    TachoPilot         pilot;
-    public int         maxPilotSpeed       = 600;    // 20 for friendlies
+    TachoPilot           pilot;
+    public int           maxPilotSpeed       = 600;                               // 20
+                                                                                   // for
+                                                                                   // friendlies
 
-    public final Motor LEFT_WHEEL          = Motor.B;
-    public final Motor RIGHT_WHEEL         = Motor.C;
-    public final Motor KICKER              = Motor.A;
+    public final Motor   LEFT_WHEEL          = Motor.B;
+    public final Motor   RIGHT_WHEEL         = Motor.C;
+    public final Motor   KICKER              = Motor.A;
 
-    public final float WHEEL_DIAMETER      = 81.6f;  // milimetres
-                                                      // milimetres
-    public final float TRACK_WIDTH         = 130f;
+    public final boolean INVERSE_WHEELS      = true;
 
-    public final int   MAXIMUM_MOTOR_SPEED = 720;
+    public final float   WHEEL_DIAMETER      = Globals.ROBOT_WHEEL_DIAMETER * 100; // milimetres
+    public final float   TRACK_WIDTH         = Globals.ROBOT_TRACK_WIDTH * 100;   // milimetres
+
+    public final int     MAXIMUM_MOTOR_SPEED = 720;
 
     public BrickController() {
 
         pilot = new TachoPilot(WHEEL_DIAMETER, TRACK_WIDTH, LEFT_WHEEL,
-                RIGHT_WHEEL);
+                RIGHT_WHEEL, INVERSE_WHEELS);
         pilot.setMoveSpeed(maxPilotSpeed);
         pilot.setTurnSpeed(45); // 45 has been working fine.
         pilot.regulateSpeed(true);
@@ -75,6 +79,7 @@ public class BrickController implements Controller {
         KICKER.resetTachoCount();
         KICKER.rotateTo(60);
         KICKER.rotateTo(0);
+
     }
     
     public void gentleKick(int speed, int angle ) {
@@ -113,6 +118,10 @@ public class BrickController implements Controller {
         if (rightWheelSpeed > MAXIMUM_MOTOR_SPEED)
             rightWheelSpeed = MAXIMUM_MOTOR_SPEED;
 
+        if (INVERSE_WHEELS) {
+            leftWheelSpeed *= -1;
+            rightWheelSpeed *= -1;
+        }
         setMotorSpeed(LEFT_WHEEL, leftWheelSpeed);
         setMotorSpeed(RIGHT_WHEEL, rightWheelSpeed);
     }
