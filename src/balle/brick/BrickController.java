@@ -17,9 +17,9 @@ import balle.misc.Globals;
  */
 public class BrickController implements Controller {
     TachoPilot           pilot;
-    public int           maxPilotSpeed       = 600;                               // 20
-                                                                                   // for
-                                                                                   // friendlies
+    public int           maxPilotSpeed       = 600;                         // 20
+                                                                             // for
+                                                                             // friendlies
 
     public final Motor   LEFT_WHEEL          = Motor.B;
     public final Motor   RIGHT_WHEEL         = Motor.C;
@@ -27,8 +27,8 @@ public class BrickController implements Controller {
 
     public final boolean INVERSE_WHEELS      = true;
 
-    public final float   WHEEL_DIAMETER      = Globals.ROBOT_WHEEL_DIAMETER * 100; // milimetres
-    public final float   TRACK_WIDTH         = Globals.ROBOT_TRACK_WIDTH * 100;   // milimetres
+    public final float   WHEEL_DIAMETER      = Globals.ROBOT_WHEEL_DIAMETER; // metres
+    public final float   TRACK_WIDTH         = Globals.ROBOT_TRACK_WIDTH;   // metres
 
     public final int     MAXIMUM_MOTOR_SPEED = 720;
 
