@@ -29,7 +29,7 @@ public class Robot extends RectangularObject {
         Coord possessPosition = getPosition().add(possessVector);
 
         double distance = ball.getPosition().dist(possessPosition);
-        return distance < POSSESS_DISTANCE + ball.getRadius();
+        return distance <= POSSESS_DISTANCE + ball.getRadius();
     }
 
     /**
