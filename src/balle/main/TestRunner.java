@@ -10,13 +10,17 @@ public class TestRunner {
     }
 
     public static void testRobot(boolean balleIsBlue) {
-        Runner.runRobot(balleIsBlue, true, false, null); // TODO: FIX THIS or
+    	StrategyLogPane strategyLog = new StrategyLogPane();
+        Runner.initialiseLogging(strategyLog);
+        Runner.runRobot(balleIsBlue, true, false, strategyLog); // TODO: FIX THIS or
                                                          // delete and use
                                                          // Runner
     }
 
     public static void testSimulator(boolean balleIsBlue) {
-        Runner.runSimulator(balleIsBlue, true, null);// TODO: Fix this or delete
+    	StrategyLogPane strategyLog = new StrategyLogPane();
+        Runner.initialiseLogging(strategyLog);
+        Runner.runSimulator(balleIsBlue, true, strategyLog);// TODO: Fix this or delete
                                                      // and use runner class
     }
 }

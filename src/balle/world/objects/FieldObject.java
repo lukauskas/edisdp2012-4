@@ -16,13 +16,13 @@ public interface FieldObject extends StaticFieldObject {
      * 
      * @return true, if the object is indeed near the wall
      */
-    public abstract boolean isNearWall();
+    public abstract boolean isNearWall(Pitch p);
 
     /**
      * Checks if an object is in a corner
      * 
      * @return true, if is in corner
      */
-    public abstract boolean isInCorner();
+    public abstract boolean isInCorner(Pitch p);
 
 }

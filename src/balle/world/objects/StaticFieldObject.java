@@ -1,6 +1,7 @@
 package balle.world.objects;
 
 import balle.world.Coord;
+import balle.world.Line;
 
 public interface StaticFieldObject {
 
@@ -19,5 +20,8 @@ public interface StaticFieldObject {
      * @return true if point is in the object
      */
     public abstract boolean containsCoord(Coord point);
+    
+    
+    public abstract boolean intersects(Line line);
 
 }

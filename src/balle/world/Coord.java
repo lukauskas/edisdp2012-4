@@ -1,6 +1,9 @@
 package balle.world;
 
+import java.awt.Point;
+
 import balle.world.objects.FieldObject;
+import balle.world.objects.Pitch;
 
 public class Coord {
 
@@ -84,7 +87,8 @@ public class Coord {
         if (this.getClass() != other.getClass())
             return false;
         Coord otherCoord = (Coord) other;
-        return (otherCoord.getX() == this.getX()) && (otherCoord.getY() == this.getY())
+        return (otherCoord.getX() == this.getX())
+                && (otherCoord.getY() == this.getY())
                 && (otherCoord.isEstimated() == this.isEstimated());
     }
 
@@ -96,9 +100,9 @@ public class Coord {
      *            the starting coordinate
      * @return true, if coordinate is reachable in straight line from another
      */
-    public boolean isReachableInStraightLineAndNotBlocked(Coord fromCoordinate) {
-        // TODO: Implement
-        return false;
+    public boolean isReachableInStraightLineAndNotBlocked(Coord fromCoordinate,
+            Pitch pitch) {
+        return pitch.containsCoord(this) && pitch.containsCoord(fromCoordinate);
     }
 
     /**
@@ -112,8 +116,34 @@ public class Coord {
      * @return true, if coordinate is reachable in straight line from another
      */
     public boolean isReachableInStraightLineAndNotBlocked(Coord fromCoordinate,
-            FieldObject potentialObstacle) {
-        // TODO: Implement
-        return false;
+            Pitch pitch, FieldObject potentialObstacle) {
+        if (!this.isReachableInStraightLineAndNotBlocked(fromCoordinate, pitch))
+            return false;
+        else
+            return true;
+    }
+
+    /**
+     * Creates a new coord rotated counter-clockwise by an angle.
+     * 
+     * @param orientation
+     */
+    public Coord rotate(Orientation orientation) {
+        double theta, nX, nY;
+        theta = orientation.radians();
+        nX = getX() * Math.cos(theta) - getY() * Math.sin(theta);
+        nY = getX() * Math.sin(theta) + getY() * Math.cos(theta);
+        return new Coord(nX, nY);
+    }
+
+    public Point getPoint() {
+        Point out = new Point();
+        out.setLocation(x, y);
+        return out;
+    }
+
+    @Override
+    public String toString() {
+        return "(" + x + "," + y + ")";
     }
 }
