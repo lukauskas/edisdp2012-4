@@ -44,31 +44,31 @@ public class KickFromWall extends AbstractPlanner {
 				.getMaxX() / 2) {
 			if (snap.getBall().getPosition().getY() < snap.getPitch().getMaxY() / 2) {
 				targetX = snap.getBall().getPosition().getX() + 0.2;
-				targetY = snap.getBall().getPosition().getY() + 0.1;
+				targetY = snap.getBall().getPosition().getY() + 0.05;
 			} else {
 				targetX = snap.getBall().getPosition().getX() + 0.2;
-				targetY = snap.getBall().getPosition().getY() - 0.1;
+				targetY = snap.getBall().getPosition().getY() - 0.05;
 			}
 		} else {
 			if (snap.getBall().getPosition().getY() < snap.getPitch().getMaxY() / 2) {
 				targetX = snap.getBall().getPosition().getX() - 0.2;
-				targetY = snap.getBall().getPosition().getY() + 0.1;
+				targetY = snap.getBall().getPosition().getY() + 0.05;
 			} else {
 				targetX = snap.getBall().getPosition().getX() - 0.2;
-				targetY = snap.getBall().getPosition().getY() - 0.1;
+				targetY = snap.getBall().getPosition().getY() - 0.05;
 			}
 		}
-
-		Coord coord = new Coord(targetX, targetY);
 
 		movementStrategy.updateState(snap);
 
 		if (!secondStep) {
-			Location loc = new Location(coord);
+			Location loc = new Location(new Coord(targetX, targetY));
 			movementStrategy.updateTarget(loc);
 			LOG.trace("Going to location");
 		} else {
-			// movementStrategy.updateTarget(snap.getBall());
+			Location loc2 = new Location(new Coord(snap.getBall().getPosition()
+					.getX(), targetY));
+			movementStrategy.updateTarget(loc2);
 			LOG.trace("Going to ball");
 		}
 
@@ -78,7 +78,7 @@ public class KickFromWall extends AbstractPlanner {
 			movementStrategy.stop(controller);
 			if (secondStep && !kicked) {
 
-				// controller.kick();
+				controller.kick();
 				kicked = true;
 				LOG.trace("KICKING");
 			}
