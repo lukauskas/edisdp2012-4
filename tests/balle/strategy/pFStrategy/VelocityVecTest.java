@@ -19,15 +19,15 @@ public class VelocityVecTest {
 
         VelocityVec newVec = v.scale();
 
-        assertEquals(VelocityVec.MAX_SPEED,
-                Math.abs(Math.toDegrees(newVec.getLeft())), 0.00001);
+        assertEquals(-VelocityVec.MAX_SPEED, Math.toDegrees(newVec.getLeft()),
+                0.00001);
         assertTrue(
                 Math.abs(Math.toDegrees(newVec.getRight())) + " > "
                         + VelocityVec.MAX_SPEED,
                 Math.abs(Math.toDegrees(newVec.getRight())) <= VelocityVec.MAX_SPEED);
 
-        VelocityVec v2 = new VelocityVec(Math.toRadians(-615),
-                Math.toRadians(-809));
+        VelocityVec v2 = new VelocityVec(Math.toRadians(615),
+                Math.toRadians(809));
 
         VelocityVec newVec2 = v2.scale();
 
@@ -35,7 +35,7 @@ public class VelocityVecTest {
                 Math.abs(Math.toDegrees(newVec2.getLeft())) + " > "
                         + VelocityVec.MAX_SPEED,
                 Math.abs(Math.toDegrees(newVec2.getLeft())) <= VelocityVec.MAX_SPEED);
-        assertEquals(VelocityVec.MAX_SPEED,
-                Math.abs(Math.toDegrees(newVec2.getRight())), 0.00001);
+        assertEquals(VelocityVec.MAX_SPEED, Math.toDegrees(newVec2.getRight()),
+                0.00001);
     }
 }

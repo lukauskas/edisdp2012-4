@@ -8,7 +8,6 @@ import balle.strategy.pFStrategy.PFPlanning;
 import balle.strategy.pFStrategy.Point;
 import balle.strategy.pFStrategy.Pos;
 import balle.strategy.pFStrategy.RobotConf;
-import balle.strategy.pFStrategy.Vector;
 import balle.strategy.pFStrategy.VelocityVec;
 import balle.world.Snapshot;
 import balle.world.objects.FieldObject;
@@ -90,7 +89,7 @@ public class GoToObjectPFN implements MovementExecutor {
             return;
 
         Pos opponent;
-        if (snapshot.getOpponent() == null)
+        if (snapshot.getOpponent().getOrientation() == null)
             opponent = null;
         else
             opponent = new Pos(new Point(snapshot.getOpponent().getPosition()
@@ -109,16 +108,9 @@ public class GoToObjectPFN implements MovementExecutor {
         VelocityVec res = plann.update(initPos, opponent, targetLoc);
         LOG.trace("UNSCALED Left speed: " + Math.toDegrees(res.getLeft())
                 + " right speed: " + Math.toDegrees(res.getRight()));
-        double resNorm = res.norm();
-
         double left, right;
-        // If the speeds given are more than the maximum speeds allowed
-        // Scale them
-        if (resNorm > VelocityVec.MAXIMUM_NORM) {
-            Vector newRes = res.mult(1 / res.norm()).mult(
-                    VelocityVec.MAXIMUM_NORM);
-            res = new VelocityVec(newRes.getX(), newRes.getY());
-        }
+
+        res = res.scale();
 
         left = Math.toDegrees(res.getLeft());
         right = Math.toDegrees(res.getRight());

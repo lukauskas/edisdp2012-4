@@ -69,11 +69,15 @@ public class PFPlanning {
     }
 
     private void init(Pos robot, Pos opponent, Point ball) {
-        PointObject opponentObj = new PointObject(opponent.getLocation(),
-                opponentPower, opponentInf, opponentAlphaPower);
+        if (opponent != null) {
+            PointObject opponentObj = new PointObject(opponent.getLocation(),
+                    opponentPower, opponentInf, opponentAlphaPower);
+            this.opponent = opponentObj;
+        } else
+            this.opponent = null;
+
         PointObject ballObj = new PointObject(ball, ballPower, Double.MAX_VALUE);
         this.robot = robot;
-        this.opponent = opponentObj;
         this.ball = ballObj;
 
     }
