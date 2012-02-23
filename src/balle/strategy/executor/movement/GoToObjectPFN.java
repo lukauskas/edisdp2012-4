@@ -8,7 +8,6 @@ import balle.strategy.pFStrategy.PFPlanning;
 import balle.strategy.pFStrategy.Point;
 import balle.strategy.pFStrategy.Pos;
 import balle.strategy.pFStrategy.RobotConf;
-import balle.strategy.pFStrategy.Vector;
 import balle.strategy.pFStrategy.VelocityVec;
 import balle.world.Snapshot;
 import balle.world.objects.FieldObject;
@@ -46,7 +45,7 @@ public class GoToObjectPFN implements MovementExecutor {
     public GoToObjectPFN(double stopDistance) {
         this.stopDistance = stopDistance;
         RobotConf conf = new RobotConf(ROBOT_TRACK_WIDTH, WHEEL_RADIUS);
-        plann = new PFPlanning(conf, 0, 1, 16, 0.5);
+        plann = new PFPlanning(conf, 0, 1, 12, 0.5);
     }
 
     @Override
@@ -73,7 +72,9 @@ public class GoToObjectPFN implements MovementExecutor {
 
     @Override
     public boolean isPossible() {
-        return (snapshot != null) && (target != null);
+        return ((snapshot != null) && (target != null)
+                && (snapshot.getBalle().getPosition() != null) && (snapshot
+                .getBalle().getOrientation() != null));
     }
 
     @Override
@@ -88,7 +89,7 @@ public class GoToObjectPFN implements MovementExecutor {
             return;
 
         Pos opponent;
-        if (snapshot.getOpponent() == null)
+        if (snapshot.getOpponent().getOrientation() == null)
             opponent = null;
         else
             opponent = new Pos(new Point(snapshot.getOpponent().getPosition()
@@ -107,16 +108,9 @@ public class GoToObjectPFN implements MovementExecutor {
         VelocityVec res = plann.update(initPos, opponent, targetLoc);
         LOG.trace("UNSCALED Left speed: " + Math.toDegrees(res.getLeft())
                 + " right speed: " + Math.toDegrees(res.getRight()));
-        double resNorm = res.norm();
-
         double left, right;
-        // If the speeds given are more than the maximum speeds allowed
-        // Scale them
-        if (resNorm > VelocityVec.MAXIMUM_NORM) {
-            Vector newRes = res.mult(1 / res.norm()).mult(
-                    VelocityVec.MAXIMUM_NORM);
-            res = new VelocityVec(newRes.getX(), newRes.getY());
-        }
+
+        res = res.scale();
 
         left = Math.toDegrees(res.getLeft());
         right = Math.toDegrees(res.getRight());

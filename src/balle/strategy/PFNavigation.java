@@ -7,7 +7,6 @@ import balle.strategy.pFStrategy.PFPlanning;
 import balle.strategy.pFStrategy.Point;
 import balle.strategy.pFStrategy.Pos;
 import balle.strategy.pFStrategy.RobotConf;
-import balle.strategy.pFStrategy.Vector;
 import balle.strategy.pFStrategy.VelocityVec;
 import balle.strategy.planner.AbstractPlanner;
 import balle.world.AbstractWorld;
@@ -59,16 +58,11 @@ public class PFNavigation extends AbstractPlanner {
             VelocityVec res = plann.update(initPos, opponent, ball);
             LOG.trace("Left speed: " + Math.toDegrees(res.getLeft())
                     + ", right speed: " + Math.toDegrees(res.getRight()));
-            double resNorm = res.norm();
 
             double left, right;
             // If the speeds given are more than the maximum speeds allowed
             // Scale them
-            if (resNorm > VelocityVec.MAXIMUM_NORM) {
-                Vector newRes = res.mult(1 / res.norm()).mult(
-                        VelocityVec.MAXIMUM_NORM);
-                res = new VelocityVec(newRes.getX(), newRes.getY());
-            }
+            res = res.scale();
 
             left = Math.toDegrees(res.getLeft());
             right = Math.toDegrees(res.getRight());

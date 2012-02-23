@@ -69,11 +69,15 @@ public class PFPlanning {
     }
 
     private void init(Pos robot, Pos opponent, Point ball) {
-        PointObject opponentObj = new PointObject(opponent.getLocation(),
-                opponentPower, opponentInf, opponentAlphaPower);
+        if (opponent != null) {
+            PointObject opponentObj = new PointObject(opponent.getLocation(),
+                    opponentPower, opponentInf, opponentAlphaPower);
+            this.opponent = opponentObj;
+        } else
+            this.opponent = null;
+
         PointObject ballObj = new PointObject(ball, ballPower, Double.MAX_VALUE);
         this.robot = robot;
-        this.opponent = opponentObj;
         this.ball = ballObj;
 
     }
@@ -137,11 +141,6 @@ public class PFPlanning {
      */
     public Vector GoTo(List<Object> obstacles, PointObject dest_obj,
             Point start_point) {
-        // calculate distance so if we reached the target position we stop.
-        double dist = Math.sqrt((start_point.getX() - dest_obj.getX())
-                * (start_point.getX() - dest_obj.getX())
-                + (start_point.getY() - dest_obj.getY())
-                * (start_point.getY() - dest_obj.getY()));
 
         Vector rep = new Vector(0, 0);
         // iterate through all obstacles and compute sum of all repulsive
@@ -170,12 +169,6 @@ public class PFPlanning {
      */
     public Vector GoTo(List<Object> obstacles, PointObject dest_obj,
             Pos start_point) {
-        // calculate distance so if we reached the target position we stop.
-        double dist = Math.sqrt((start_point.getLocation().getX() - dest_obj
-                .getX())
-                * (start_point.getLocation().getX() - dest_obj.getX())
-                + (start_point.getLocation().getY() - dest_obj.getY())
-                * (start_point.getLocation().getY() - dest_obj.getY()));
 
         Vector rep = new Vector(0, 0);
         // iterate through all obstacles and compute sum of all repulsive
@@ -225,7 +218,7 @@ public class PFPlanning {
             dist_alpha = 2 * Math.PI + dist_alpha;
         double Vlin = Math.cos(dist_alpha) * size;
 
-        double Vang = 0.4 * dist_alpha / Math.PI;
+        double Vang = dist_alpha / Math.PI; // 0.8 works better than 0.4
 
         return CvtVelocity(Vlin, Vang, config.getr());
     }
