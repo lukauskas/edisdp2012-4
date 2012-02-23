@@ -3,7 +3,7 @@ package balle.strategy.pFStrategy;
 //a Velocity vector that includes left and right wheels.
 public class VelocityVec extends Vector {
 
-    public static final int    MAX_SPEED    = 720;       // Degrees/s
+    public static final int    MAX_SPEED    = 900;       // Degrees/s
     public static final double MAXIMUM_NORM = Math.sqrt(Math
                                                     .toRadians(MAX_SPEED)
                                                     * Math.toRadians(MAX_SPEED)
