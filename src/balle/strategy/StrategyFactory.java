@@ -7,13 +7,14 @@ import balle.strategy.executor.turning.FaceAngle;
 import balle.strategy.planner.AbstractPlanner;
 import balle.strategy.planner.DribbleMilestone2;
 import balle.strategy.planner.GoToBall;
+import balle.strategy.planner.KickCapacityTest;
 import balle.world.AbstractWorld;
 
 public class StrategyFactory {
     public static String[] availableDesignators() {
 
         String[] designators = { "GoToBall", "GoToBallPFN", "Dribble",
-                "Blocking", "PFNavigation" };
+                "Blocking", "PFNavigation", "KickCapacityTest" };
         return designators;
     }
 
@@ -34,6 +35,8 @@ public class StrategyFactory {
             return new DribbleMilestone2(controller, world);
         } else if (designator.equals("PFNavigation")) {
             return new PFNavigation(controller, world);
+        } else if (designator.equals("KickCapacityTest")) {
+            return new KickCapacityTest(controller, world);
         } else
             throw new UnknownDesignatorException("Don't know strategy \""
                     + designator + "\"");
