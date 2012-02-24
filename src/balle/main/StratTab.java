@@ -37,13 +37,13 @@ public class StratTab extends JPanel implements ActionListener {
 
     private final static String LABEL_TEXT = "Select strategy";
 
-    public StratTab(Controller controller, AbstractWorld world) {
+    public StratTab(Controller controller, AbstractWorld world,
+            StrategyRunner strategyRunner) {
         super();
         this.controller = controller;
         this.world = world;
         // Initialise strategy runner
-        strategyRunner = new StrategyRunner(controller, world);
-        strategyRunner.start();
+        this.strategyRunner = strategyRunner;
 
         // Class Variables
         top = new JPanel();
