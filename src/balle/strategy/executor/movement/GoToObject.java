@@ -5,15 +5,15 @@ import balle.strategy.executor.turning.RotateToOrientationExecutor;
 import balle.world.Coord;
 import balle.world.Orientation;
 import balle.world.Snapshot;
-import balle.world.objects.FieldObject;
 import balle.world.objects.Robot;
+import balle.world.objects.StaticFieldObject;
 
 public class GoToObject implements MovementExecutor {
 
     private final static double DISTANCE_TO_STOP_AT       = 0.2;
     private final static double EPSILON                   = 0.00001;
 
-    protected FieldObject       target                    = null;
+    protected StaticFieldObject target                    = null;
     protected Snapshot          currentState              = null;
     private boolean             isMoving                  = false;
 
@@ -27,7 +27,7 @@ public class GoToObject implements MovementExecutor {
     }
 
     @Override
-    public void updateTarget(FieldObject target) {
+    public void updateTarget(StaticFieldObject target) {
         this.target = target;
     }
 

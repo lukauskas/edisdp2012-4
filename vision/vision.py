@@ -25,7 +25,7 @@ PITCH_SIZE_BIT  = 'P';
 
 class Vision:
     
-    def __init__(self, pitchnum, stdout, sourcefile):
+    def __init__(self, pitchnum, stdout, sourcefile, resetPitchSize):
                
         self.running = True
         
@@ -46,15 +46,20 @@ class Vision:
         self.gui = Gui()
         self.threshold = Threshold(pitchnum)
         self.thresholdGui = ThresholdGui(self.threshold, self.gui)
-        self.preprocessor = Preprocessor()
+        self.preprocessor = Preprocessor(resetPitchSize)
         self.features = Features(self.gui, self.threshold)
         
         eventHandler = self.gui.getEventHandler()
         eventHandler.addListener('q', self.quit)
-        eventHandler.setClickListener(self.setNextPitchCorner)
-        
+
         if not self.stdout:
             self.connect()
+
+        if self.preprocessor.hasPitchSize:
+            self.outputPitchSize()
+            self.gui.setShowMouse(False)
+        else:
+            eventHandler.setClickListener(self.setNextPitchCorner)
             
         self.doStuff()
         
@@ -97,6 +102,7 @@ class Vision:
             self.gui.drawCrosshair(where, 'corner')
     
     def outputPitchSize(self):
+        print(self.preprocessor.pitch_size)
         self.send('{0} {1} {2} \n'.format(
                 PITCH_SIZE_BIT, self.preprocessor.pitch_size[0], self.preprocessor.pitch_size[1]))
 
@@ -130,9 +136,21 @@ class Vision:
         else:
             self.socket.send(string)
 
+class OptParser(OptionParser):
+    """
+    The default OptionParser exits with exit code 2
+    if OptionParser.error() is called. Unfortunately this
+    screws up our vision restart script which tries to indefinitely
+    restart the vision system with bad options. This just exits with
+    0 instead so everything works.
+    """
+    def error(self, msg):
+        self.print_usage(sys.stderr)
+        self.exit(0, "%s: error: %s\n" % (self.get_prog_name(), msg))
+
 if __name__ == "__main__":
 
-    parser = OptionParser()
+    parser = OptParser()
     parser.add_option('-p', '--pitch', dest='pitch', type='int', metavar='PITCH',
                       help='PITCH should be 0 for main pitch, 1 for the other pitch')
 
@@ -142,12 +160,15 @@ if __name__ == "__main__":
     parser.add_option('-s', '--stdout', action='store_true', dest='stdout', default=False,
                       help='Send output to stdout instead of using a socket')
 
+    parser.add_option('-r', '--reset', action='store_true', dest='resetPitchSize', default=False,
+                      help='Don\'t restore the last run\'s saved pitch size')
+
     (options, args) = parser.parse_args()
 
     if options.pitch not in [0,1]:
         parser.error('Pitch must be 0 or 1')
 
-    Vision(options.pitch, options.stdout, options.file)
+    Vision(options.pitch, options.stdout, options.file, options.resetPitchSize)
 
 
 

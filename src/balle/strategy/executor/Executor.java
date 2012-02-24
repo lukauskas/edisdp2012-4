@@ -1,9 +1,8 @@
 package balle.strategy.executor;
 
-import balle.controller.Controller;
-import balle.world.Snapshot;
+import balle.strategy.Strategy;
 
-public interface Executor {
+public interface Executor extends Strategy {
 
     /**
      * Is the executor finished executing the task given;
@@ -15,24 +14,5 @@ public interface Executor {
      * achieve;
      */
     public boolean isPossible();
-
-    /**
-     * Notify the executor of a change in the current state
-     * 
-     * @param snapshot
-     */
-    public void updateState(Snapshot snapshot);
-
-    /**
-     * Tell the executor to do a step (e.g. move forward).
-     */
-    public void step(Controller controller);
-
-    /**
-     * Tell the executor to stop doing whatever it was doing.
-     * 
-     * @param controller
-     */
-    public void stop(Controller controller);
 
 }

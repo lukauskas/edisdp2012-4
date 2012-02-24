@@ -18,6 +18,7 @@ import balle.controller.Controller;
 import balle.controller.DummyController;
 import balle.io.reader.SocketVisionReader;
 import balle.logging.StrategyLogAppender;
+import balle.misc.Globals;
 import balle.simulator.Simulator;
 import balle.simulator.SoftBot;
 import balle.strategy.StrategyFactory;
@@ -48,15 +49,23 @@ public class Runner {
         OptionParser parser = new OptionParser();
         parser.acceptsAll(asList("s", "simulator"));
         parser.acceptsAll(asList("d", "dummy-controller"));
-        parser.acceptsAll(asList("c", "colour", "color")).withRequiredArg().ofType(String.class);
-        parser.acceptsAll(asList("g", "goal")).withRequiredArg().ofType(String.class);
+        parser.acceptsAll(asList("c", "colour", "color")).withRequiredArg()
+                .ofType(String.class);
+        parser.acceptsAll(asList("g", "goal")).withRequiredArg()
+                .ofType(String.class);
+        parser.acceptsAll(asList("v", "verbose"));
         return parser;
     }
 
-    public static void initialiseLogging(StrategyLogPane strategyLogPane) {
+    public static void initialiseLogging(StrategyLogPane strategyLogPane,
+            boolean verbose) {
+        if (verbose) {
+            Logger.getRootLogger().setLevel(Level.TRACE);
+        } else {
+            Logger.getRootLogger().setLevel(Level.DEBUG);
+        }
         // Make sure to log strategy logs to the GUI as well
         Logger strategyLogger = Logger.getLogger("balle.strategy");
-        strategyLogger.setLevel(Level.INFO);
         Appender strategyAppender = new StrategyLogAppender(strategyLogPane);
         strategyAppender.setLayout(new PatternLayout("%-5p %c %x - %m%n"));
         strategyLogger.addAppender(strategyAppender);
@@ -76,7 +85,8 @@ public class Runner {
         else if ("yellow".equals(options.valueOf("colour")))
             balleIsBlue = false;
         else {
-            System.out.println("Invalid colour provided, try one of the following:");
+            System.out
+                    .println("Invalid colour provided, try one of the following:");
             System.out.println("javac balle.main.Runner -c blue");
             System.out.println("javac balle.main.Runner -c yellow");
             print_usage();
@@ -91,7 +101,8 @@ public class Runner {
         else if ("right".equals(options.valueOf("goal")))
             goalIsLeft = false;
         else {
-            System.out.println("Invalid goal provided, try one of the following:");
+            System.out
+                    .println("Invalid goal provided, try one of the following:");
             System.out.println("javac balle.main.Runner -g left");
             System.out.println("javac balle.main.Runner -g right");
             print_usage();
@@ -101,16 +112,17 @@ public class Runner {
         }
         StrategyLogPane strategyLog = new StrategyLogPane();
 
-        initialiseLogging(strategyLog);
+        initialiseLogging(strategyLog, options.has("verbose"));
 
         if (options.has("simulator"))
             runSimulator(balleIsBlue, goalIsLeft, strategyLog);
         else
-            runRobot(balleIsBlue, goalIsLeft, options.has("dummy-controller"), strategyLog);
+            runRobot(balleIsBlue, goalIsLeft, options.has("dummy-controller"),
+                    strategyLog);
     }
 
-    public static void initialiseGUI(Controller controller, AbstractWorld world,
-            StrategyLogPane strategyLog) {
+    public static void initialiseGUI(Controller controller,
+            AbstractWorld world, StrategyLogPane strategyLog) {
         SimpleWorldGUI gui;
         GUITab mainWindow = new GUITab();
 
@@ -135,7 +147,7 @@ public class Runner {
         Controller controller;
 
         // Initialise world
-        world = new BasicWorld(balleIsBlue, goalIsLeft);
+        world = new BasicWorld(balleIsBlue, goalIsLeft, Globals.getPitch());
 
         // Moving this forward so we do not start a GUI until controller is
         // initialised
@@ -162,7 +174,8 @@ public class Runner {
     public static void runSimulator(boolean balleIsBlue, boolean goalIsLeft,
             StrategyLogPane strategyLog) {
         Simulator simulator = Simulator.createSimulator();
-        BasicWorld world = new BasicWorld(balleIsBlue, goalIsLeft);
+        BasicWorld world = new BasicWorld(balleIsBlue, goalIsLeft,
+                Globals.getPitch());
         simulator.addListener(world);
 
         SoftBot bot;

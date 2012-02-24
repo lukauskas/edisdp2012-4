@@ -2,6 +2,7 @@ package balle.world;
 
 import balle.world.objects.Ball;
 import balle.world.objects.Goal;
+import balle.world.objects.Pitch;
 import balle.world.objects.Robot;
 
 /**
@@ -10,8 +11,9 @@ import balle.world.objects.Robot;
  */
 public class EmptySnapshot extends Snapshot {
 
-    public EmptySnapshot(Goal opponentsGoal, Goal ownGoal) {
-        super(new Robot(null, null, null), new Robot(null, null, null), new Ball(null, null),
-                opponentsGoal, ownGoal, System.currentTimeMillis());
-    }
+	public EmptySnapshot(Goal opponentsGoal, Goal ownGoal, Pitch pitch) {
+		super(new Robot(null, null, null), new Robot(null, null, null),
+				new Ball(null, null), opponentsGoal, ownGoal, pitch, System
+						.currentTimeMillis());
+	}
 }

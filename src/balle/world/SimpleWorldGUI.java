@@ -20,13 +20,13 @@ import balle.world.processing.AbstractWorldProcessor;
 
 public class SimpleWorldGUI extends AbstractWorldProcessor {
 
-    private final JPanel panel;
-    private final Screen screen;
-    private final JPanel fpsPanel;
-    private final JLabel fpsText;
-    private final JLabel fpsWarning;
-    private final JLabel fps;
-    
+    private final JPanel        panel;
+    private final Screen        screen;
+    private final JPanel        fpsPanel;
+    private final JLabel        fpsText;
+    private final JLabel        fpsWarning;
+    private final JLabel        fps;
+
     private static final Logger LOG = Logger.getLogger(SimpleWorldGUI.class);
 
     public SimpleWorldGUI(AbstractWorld world) {
@@ -70,36 +70,42 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
             g.fillRect(0, 0, getWidth(), getHeight());
             drawField(g);
             drawFieldObjects(g);
-            drawGoals(g);
+
             drawMousePos(g);
         }
 
         private void drawField(Graphics g) {
             g.setColor(Color.BLACK);
             drawLineTransformMeters(g, 0f, 0f, Globals.PITCH_WIDTH, 0f);
-            drawLineTransformMeters(g, 0f, Globals.PITCH_HEIGHT, Globals.PITCH_WIDTH,
-                    Globals.PITCH_HEIGHT);
+            drawLineTransformMeters(g, 0f, Globals.PITCH_HEIGHT,
+                    Globals.PITCH_WIDTH, Globals.PITCH_HEIGHT);
             drawLineTransformMeters(g, 0f, 0f, 0f, Globals.GOAL_POSITION);
-            drawLineTransformMeters(g, Globals.PITCH_WIDTH, 0f, Globals.PITCH_WIDTH,
-                    Globals.GOAL_POSITION);
-            drawLineTransformMeters(g, 0f, Globals.PITCH_HEIGHT, 0f, Globals.PITCH_HEIGHT
-                    - Globals.GOAL_POSITION);
-            drawLineTransformMeters(g, Globals.PITCH_WIDTH, Globals.PITCH_HEIGHT,
-                    Globals.PITCH_WIDTH, Globals.PITCH_HEIGHT - Globals.GOAL_POSITION);
-            // Left-hand goal area
-            drawLineTransformMeters(g, 0f, Globals.GOAL_POSITION, -0.1f, Globals.GOAL_POSITION);
-            drawLineTransformMeters(g, -0.1f, Globals.GOAL_POSITION, -0.1f, Globals.PITCH_HEIGHT
-                    - Globals.GOAL_POSITION);
-            drawLineTransformMeters(g, Globals.PITCH_WIDTH, Globals.GOAL_POSITION,
-                    Globals.PITCH_WIDTH + 0.1f, Globals.GOAL_POSITION);
-            // Right-hand goal area
-            drawLineTransformMeters(g, Globals.PITCH_WIDTH, Globals.PITCH_HEIGHT
-                    - Globals.GOAL_POSITION, Globals.PITCH_WIDTH + 0.1f, Globals.PITCH_HEIGHT
-                    - Globals.GOAL_POSITION);
-            drawLineTransformMeters(g, 0f, Globals.PITCH_HEIGHT - Globals.GOAL_POSITION, -0.1f,
+            drawLineTransformMeters(g, Globals.PITCH_WIDTH, 0f,
+                    Globals.PITCH_WIDTH, Globals.GOAL_POSITION);
+            drawLineTransformMeters(g, 0f, Globals.PITCH_HEIGHT, 0f,
                     Globals.PITCH_HEIGHT - Globals.GOAL_POSITION);
-            drawLineTransformMeters(g, Globals.PITCH_WIDTH + 0.1f, Globals.GOAL_POSITION,
-                    Globals.PITCH_WIDTH + 0.1f, Globals.PITCH_HEIGHT - Globals.GOAL_POSITION);
+            drawLineTransformMeters(g, Globals.PITCH_WIDTH,
+                    Globals.PITCH_HEIGHT, Globals.PITCH_WIDTH,
+                    Globals.PITCH_HEIGHT - Globals.GOAL_POSITION);
+            // Left-hand goal area
+            drawLineTransformMeters(g, 0f, Globals.GOAL_POSITION, -0.1f,
+                    Globals.GOAL_POSITION);
+            drawLineTransformMeters(g, -0.1f, Globals.GOAL_POSITION, -0.1f,
+                    Globals.PITCH_HEIGHT - Globals.GOAL_POSITION);
+            drawLineTransformMeters(g, Globals.PITCH_WIDTH,
+                    Globals.GOAL_POSITION, Globals.PITCH_WIDTH + 0.1f,
+                    Globals.GOAL_POSITION);
+            // Right-hand goal area
+            drawLineTransformMeters(g, Globals.PITCH_WIDTH,
+                    Globals.PITCH_HEIGHT - Globals.GOAL_POSITION,
+                    Globals.PITCH_WIDTH + 0.1f, Globals.PITCH_HEIGHT
+                            - Globals.GOAL_POSITION);
+            drawLineTransformMeters(g, 0f, Globals.PITCH_HEIGHT
+                    - Globals.GOAL_POSITION, -0.1f, Globals.PITCH_HEIGHT
+                    - Globals.GOAL_POSITION);
+            drawLineTransformMeters(g, Globals.PITCH_WIDTH + 0.1f,
+                    Globals.GOAL_POSITION, Globals.PITCH_WIDTH + 0.1f,
+                    Globals.PITCH_HEIGHT - Globals.GOAL_POSITION);
         }
 
         private void drawFieldObjects(Graphics g) {
@@ -108,15 +114,17 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
                 drawRobot(g, Color.GREEN, s.getBalle());
                 drawRobot(g, Color.RED, s.getOpponent());
                 drawBall(g, Color.RED, s.getBall());
+                drawGoals(g);
             }
         }
 
         private void drawBall(Graphics g, Color c, Ball ball) {
             // TODO: Use ball.getRadius() instead of constants here
-        	
-        	// Daniel: There is no method getRadius() for ball because its a MovingPoint object?
-        	// For the mean time I've changed the object to Ball
-        	
+
+            // Daniel: There is no method getRadius() for ball because its a
+            // MovingPoint object?
+            // For the mean time I've changed the object to Ball
+
             // TODO: draw the velocity vector.
 
             if ((ball == null) || (ball.getPosition() == null)) {
@@ -131,16 +139,17 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
                 g.setColor(Color.LIGHT_GRAY);
 
             float w = radius * 2 * scale;
-            g.fillOval((int) (m2PX(pos.getX()) - (w / 2)), (int) (m2PY(pos.getY()) - (w / 2)),
-                    (int) w, (int) w);
+            g.fillOval((int) (m2PX(pos.getX()) - (w / 2)),
+                    (int) (m2PY(pos.getY()) - (w / 2)), (int) w, (int) w);
         }
 
         private void drawRobot(Graphics g, Color c, Robot robot) {
-        	
-        	Snapshot s = getSnapshot();
+
+            Snapshot s = getSnapshot();
 
             // Fail early, fail often
-            if ((robot.getPosition() == null) || (robot.getOrientation() == null)) {
+            if ((robot.getPosition() == null)
+                    || (robot.getOrientation() == null)) {
                 return;
             }
 
@@ -155,7 +164,8 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 
             // list of (x,y) positions of the corners of the robot
             // with the center at (0,0)
-            float[][] poly = new float[][] { { hl, hw }, { hl, -hw }, { -hl, -hw }, { -hl, hw } };
+            float[][] poly = new float[][] { { hl, hw }, { hl, -hw },
+                    { -hl, -hw }, { -hl, hw } };
 
             // for each point
             double a = robot.getOrientation().radians();
@@ -187,27 +197,27 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
             // draw robot, setting the colour depending on robot properties
             // temporary colours until methods have been implemented
             if (robot.possessesBall(s.getBall())) {
-            	if (robot.isInScoringPosition(s.getBall(), s.getOpponentsGoal(), s.getOpponent())) {
-            		LOG.info("Robot is in Scoring Position with possession of the ball");
-            		g.setColor(Color.MAGENTA);
-            	} else {
-            		LOG.info("Robot is in possession of the ball");
-            		g.setColor(Color.ORANGE);  
-            	}
-        	} else if (!isEstimated) {
+                if (robot.isInScoringPosition(s.getBall(),
+                        s.getOpponentsGoal(), s.getOpponent())) {
+                    g.setColor(Color.MAGENTA);
+                } else {
+                    g.setColor(Color.ORANGE);
+                }
+            } else if (!isEstimated) {
                 g.setColor(Color.LIGHT_GRAY);
-        	} else {
+            } else {
                 g.setColor(Color.DARK_GRAY);
-        	}
+            }
 
             g.fillPolygon(xs, ys, n);
             g.setColor(c);
-            g.fillPolygon(new int[] { xs[2], xs[3], m2PX(x) }, new int[] { ys[2], ys[3], m2PY(y) },
-                    3);
+            g.fillPolygon(new int[] { xs[2], xs[3], m2PX(x) }, new int[] {
+                    ys[2], ys[3], m2PY(y) }, 3);
         }
 
         // Convert meters into pixels and draws line
-        private void drawLineTransformMeters(Graphics g, float x1, float y1, float x2, float y2) {
+        private void drawLineTransformMeters(Graphics g, float x1, float y1,
+                float x2, float y2) {
 
             g.drawLine(m2PX(x1), m2PY(y1), m2PX(x2), m2PY(y2));
 
@@ -220,14 +230,14 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 
         private void drawGoal(Graphics g, Color c, Goal goal) {
             g.setColor(c);
-            
-            // Daniel: Does hardcoding the positions matter? 
+
+            // Daniel: Does hardcoding the positions matter?
             int xMin, width, yMax, height;
             xMin = m2PX(goal.getMinX()) - 2;
             width = m2PX(goal.getMaxX()) - m2PX(goal.getMinX());
             yMax = m2PY(goal.getMaxY()) - 2;
             height = m2PY(goal.getMinY()) - m2PY(goal.getMaxY());
-            
+
             g.drawRect(xMin, yMax, width, height);
         }
 

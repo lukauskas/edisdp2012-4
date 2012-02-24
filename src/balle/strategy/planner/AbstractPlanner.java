@@ -1,50 +1,34 @@
 package balle.strategy.planner;
 
-import org.apache.log4j.Logger;
-
 import balle.controller.Controller;
-import balle.world.AbstractWorld;
-import balle.world.processing.AbstractWorldProcessor;
+import balle.strategy.Strategy;
+import balle.world.Snapshot;
 
-public abstract class AbstractPlanner extends AbstractWorldProcessor {
+public abstract class AbstractPlanner implements Strategy {
+    private Snapshot snapshot;
 
-    private final Controller    controller;
-    private final static Logger LOG = Logger.getLogger(AbstractPlanner.class);
+    /**
+     * Notify the executor of a change in the current state
+     * 
+     * @Override
+     * @param snapshot
+     */
+    @Override
+    public void updateState(Snapshot snapshot) {
+        this.snapshot = snapshot;
+    }
 
-    public AbstractPlanner(Controller controller, AbstractWorld world) {
-        super(world);
-        this.controller = controller;
+    /**
+     * Returns the current snapshot
+     * 
+     * @return the snapshot
+     */
+    protected Snapshot getSnapshot() {
+        return snapshot;
     }
 
     @Override
-    protected void actionOnStep() {
-        aiStep();
-    }
-
-    @Override
-    protected void actionOnChange() {
-        aiMove(controller);
-    }
-
-    protected abstract void aiStep();
-
-    protected abstract void aiMove(Controller controller);
-
-    @Override
-    public void cancel() {
-        super.cancel();
-        LOG.info("Planner stopped");
+    public void stop(Controller controller) {
         controller.stop();
-    }
-
-    @Override
-    public String toString() {
-        return this.getName();
-    }
-
-    @Override
-    public void start() {
-        super.start();
-        LOG.info("Planner started");
     }
 }

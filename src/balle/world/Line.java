@@ -2,7 +2,7 @@ package balle.world;
 
 public class Line {
 	
-	Coord a, b;
+	private final Coord a, b;
 	
 	public Coord getA() {
 		return a;
@@ -17,14 +17,12 @@ public class Line {
 		this.b = b;
 	}
 
-	public void rotate(Orientation orientation) {
-		a.rotate(orientation);
-		b.rotate(orientation);
+	public Line rotate(Orientation orientation) {
+		return new Line(a.rotate(orientation), b.rotate(orientation));
 	}
 
-	public void add(Coord position) {
-		a.add(position);
-		b.add(position);
+	public Line add(Coord position) {
+		return new Line(a.add(position), b.add(position));
 	}
 
 }

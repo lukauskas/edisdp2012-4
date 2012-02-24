@@ -7,7 +7,6 @@ import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
 import balle.strategy.executor.movement.MovementExecutor;
-import balle.world.AbstractWorld;
 
 /**
  * @author s0909773
@@ -23,20 +22,13 @@ public class GoToBall extends AbstractPlanner {
      * @param controller
      * @param world
      */
-    public GoToBall(Controller controller, AbstractWorld world, MovementExecutor movementExecutor) {
-        super(controller, world);
+    public GoToBall(MovementExecutor movementExecutor) {
         executorStrategy = movementExecutor;
 
     }
 
     @Override
-    protected void aiStep() {
-        // Do .. nothing?
-
-    }
-
-    @Override
-    protected void aiMove(Controller controller) {
+    public void step(Controller controller) {
         if (getSnapshot() == null)
             return;
 
@@ -47,12 +39,19 @@ public class GoToBall extends AbstractPlanner {
         executorStrategy.updateTarget(getSnapshot().getBall());
 
         // If it says it is not finished, tell it to do something for a step.
-        if (!executorStrategy.isFinished())
+        if (!executorStrategy.isFinished()) {
             executorStrategy.step(controller);
-        else {
+        } else {
             // Tell the strategy to stop doing whatever it was doing
             executorStrategy.stop(controller);
             LOG.info("We're finished");
         }
+    }
+
+    @Override
+    public void stop(Controller controller) {
+        if (!executorStrategy.isFinished())
+            executorStrategy.stop(controller);
+
     }
 }
