@@ -11,13 +11,6 @@ public class Coord {
     private final double  y;
 
     private final boolean estimated;
-
-    public Coord(Coord coord) {
-    	super();
-    	this.x = coord.x;
-    	this.y = coord.y;
-    	this.estimated = false;
-    }
     
     public Coord(double x, double y) {
         super();
