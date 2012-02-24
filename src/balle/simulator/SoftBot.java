@@ -138,11 +138,17 @@ public class SoftBot implements Controller {
 	 * @return
 	 */
 	public float deltaDesiredAngle() {
-		float d = (float) (body.getAngle() % (2 * Math.PI)) - getDesiredAngle();
+		float d = (float) ((body.getAngle()% (2 * (float)Math.PI)) - getDesiredAngle());
+		// -2PI <= d <= 2PI
+		// if |d| > PI then change direction of the angle
+		if(Math.abs(d) > Math.PI) {
+			if(d < 0) d += 2*Math.PI;
+			else      d -= 2*Math.PI;
+		}
 		if (d == Math.PI) {
 			return d;
 		}
-		return d % (float) Math.PI;
+		return d;
 	}
 
 	public boolean isRotating() {
