@@ -4,6 +4,7 @@ import java.awt.geom.Line2D;
 
 import balle.misc.Globals;
 import balle.world.Coord;
+import balle.world.Line;
 import balle.world.Orientation;
 import balle.world.Velocity;
 
@@ -34,6 +35,27 @@ public class Robot extends RectangularObject {
     }
 
     /**
+     * Returns the line that would represents the path of the ball if the robot
+     * kicked it
+     * 
+     * @param ball
+     * @return
+     */
+    public Line getBallKickLine(Ball ball) {
+        double x0, y0, x1, y1;
+        x0 = ball.getPosition().getX();
+        y0 = ball.getPosition().getY();
+
+        Coord target = new Coord(Globals.ROBOT_MAX_KICK_DISTANCE, 0);
+        target.rotate(getOrientation());
+
+        x1 = target.getX();
+        y1 = target.getY();
+
+        return new Line(x0, y0, x1, y1);
+    }
+
+    /**
      * Checks if the robot can score from this position. That is if it is in
      * possession of the ball and facing the goal and other robot is is not
      * blocking the path to the goal.
@@ -53,16 +75,11 @@ public class Robot extends RectangularObject {
         x2 = goal.getRightPostCoord().getX();
         y2 = goal.getRightPostCoord().getY();
 
-        x3 = ball.getPosition().getX();
-        y3 = ball.getPosition().getY();
+        Line ballKickLine = getBallKickLine(ball);
 
-        Coord target = new Coord(Globals.ROBOT_MAX_KICK_DISTANCE, 0);
-        target.rotate(getOrientation());
-
-        x4 = target.getX();
-        y4 = target.getY();
-
-        return Line2D.linesIntersect(x1, y1, x2, y2, x3, y3, x4, y4);
+        return Line2D.linesIntersect(x1, y1, x2, y2,
+                ballKickLine.getA().getX(), ballKickLine.getA().getY(),
+                ballKickLine.getB().getX(), ballKickLine.getB().getY());
     }
 
     /**
