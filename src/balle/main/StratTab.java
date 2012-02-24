@@ -10,15 +10,18 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.apache.log4j.Logger;
+
 import balle.controller.Controller;
 import balle.strategy.StrategyFactory;
+import balle.strategy.StrategyRunner;
 import balle.strategy.UnknownDesignatorException;
-import balle.strategy.planner.AbstractPlanner;
 import balle.world.AbstractWorld;
 
 @SuppressWarnings("serial")
 public class StratTab extends JPanel implements ActionListener {
 
+    private static final Logger LOG        = Logger.getLogger(StratTab.class);
     // GUI
     private JPanel              top;
     private JButton             button;
@@ -26,18 +29,21 @@ public class StratTab extends JPanel implements ActionListener {
     private JLabel              label;
 
     private ArrayList<String>   stratTabs;
-    private String[]            strings                = new String[0];
+    private String[]            strings    = new String[0];
 
-    private AbstractPlanner    currentRunningStrategy = null;
+    private StrategyRunner      strategyRunner;
     private Controller          controller;
     private AbstractWorld       world;
 
-    private final static String LABEL_TEXT             = "Select strategy";
+    private final static String LABEL_TEXT = "Select strategy";
 
     public StratTab(Controller controller, AbstractWorld world) {
         super();
         this.controller = controller;
         this.world = world;
+        // Initialise strategy runner
+        strategyRunner = new StrategyRunner(controller, world);
+        strategyRunner.start();
 
         // Class Variables
         top = new JPanel();
@@ -64,19 +70,18 @@ public class StratTab extends JPanel implements ActionListener {
         if (button.getText().equals("Start")) {
             String selectedStrategy = stratTabs.get(menu.getSelectedIndex());
             try {
-                currentRunningStrategy = StrategyFactory.createClass(
-                        selectedStrategy, controller, world);
+                strategyRunner.startStrategy(StrategyFactory.createClass(
+                        selectedStrategy, controller, world));
             } catch (UnknownDesignatorException e) {
-                System.err.println("Could not start strategy \""
-                        + currentRunningStrategy + "\": " + e);
+                LOG.error("Cannot start starategy \"" + selectedStrategy
+                        + "\": " + e.toString());
                 return;
             }
             button.setText("Stop");
-            currentRunningStrategy.start();
 
         } else {
             button.setText("Start");
-            currentRunningStrategy.cancel();
+            strategyRunner.stopStrategy();
         }
     }
 

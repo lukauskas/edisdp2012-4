@@ -2,7 +2,6 @@ package balle.strategy;
 
 import balle.controller.Controller;
 import balle.strategy.planner.AbstractPlanner;
-import balle.world.AbstractWorld;
 
 /**
  * A Dummy strategy for the robot, the robot will go forward for 50 aiSteps()
@@ -17,16 +16,8 @@ public class DummyStrategy extends AbstractPlanner {
     protected long timer        = System.currentTimeMillis();
     boolean        goingForward = false;
 
-    public DummyStrategy(Controller controller, AbstractWorld world) {
-        super(controller, world);
-    }
-
     @Override
-    protected void aiStep() {
-    }
-
-    @Override
-    protected void aiMove(Controller controller) {
+    public void step(Controller controller) {
         long t = System.currentTimeMillis();
         long dt = t - timer;
         if (dt > 0) {
@@ -49,5 +40,10 @@ public class DummyStrategy extends AbstractPlanner {
     @Override
     public String toString() {
         return "Dummy Strategy";
+    }
+
+    @Override
+    public void stop(Controller controller) {
+        controller.stop();
     }
 }

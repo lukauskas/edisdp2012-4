@@ -4,7 +4,6 @@ import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
 import balle.strategy.executor.dribbling.DribbleStraight;
-import balle.world.AbstractWorld;
 import balle.world.Coord;
 import balle.world.Snapshot;
 
@@ -17,19 +16,12 @@ public class DribbleMilestone2 extends AbstractPlanner {
     private static final double DISTANCE_TO_TRAVEL = 0.6;                                      // in
                                                                                                 // metres
 
-    public DribbleMilestone2(Controller controller, AbstractWorld world) {
-        super(controller, world);
+    public DribbleMilestone2() {
         executor = new DribbleStraight();
     }
 
     @Override
-    protected void aiStep() {
-        // do nothing
-
-    }
-
-    @Override
-    protected void aiMove(Controller controller) {
+    public void step(Controller controller) {
         Snapshot snapshot = getSnapshot();
         executor.updateState(snapshot);
 
@@ -57,5 +49,10 @@ public class DribbleMilestone2 extends AbstractPlanner {
             }
         }
 
+    }
+
+    @Override
+    public void stop(Controller controller) {
+        controller.stop();
     }
 }
