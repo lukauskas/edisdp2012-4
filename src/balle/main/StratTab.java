@@ -70,8 +70,8 @@ public class StratTab extends JPanel implements ActionListener {
         if (button.getText().equals("Start")) {
             String selectedStrategy = stratTabs.get(menu.getSelectedIndex());
             try {
-                strategyRunner.startStrategy(StrategyFactory.createClass(
-                        selectedStrategy, controller, world));
+                strategyRunner.startStrategy(StrategyFactory
+                        .createClass(selectedStrategy));
             } catch (UnknownDesignatorException e) {
                 LOG.error("Cannot start starategy \"" + selectedStrategy
                         + "\": " + e.toString());

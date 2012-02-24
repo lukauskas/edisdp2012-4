@@ -1,13 +1,11 @@
 package balle.strategy;
 
-import balle.controller.Controller;
 import balle.strategy.executor.movement.GoToObject;
 import balle.strategy.executor.movement.GoToObjectPFN;
 import balle.strategy.executor.turning.FaceAngle;
 import balle.strategy.planner.AbstractPlanner;
 import balle.strategy.planner.DribbleMilestone2;
 import balle.strategy.planner.GoToBall;
-import balle.world.AbstractWorld;
 
 public class StrategyFactory {
     public static String[] availableDesignators() {
@@ -17,8 +15,7 @@ public class StrategyFactory {
         return designators;
     }
 
-    public static AbstractPlanner createClass(String designator,
-            Controller controller, AbstractWorld world)
+    public static AbstractPlanner createClass(String designator)
             throws UnknownDesignatorException {
 
         if (designator.equals("GoToBall")) {
