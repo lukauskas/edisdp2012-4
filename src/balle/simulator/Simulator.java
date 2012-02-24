@@ -163,7 +163,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
         super.update();
 
         // Update world with new information, throtteling the frame rate
-        if (1000f / (System.currentTimeMillis() - lastFrameTime) < Globals.SIMULATED_VISON_FRAMERATE) {
+        if (System.currentTimeMillis() - lastFrameTime > 1000f/Globals.SIMULATED_VISON_FRAMERATE) {
             lastFrameTime = System.currentTimeMillis();
             this.reader.update();
         }
