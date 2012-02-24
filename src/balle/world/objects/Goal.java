@@ -32,6 +32,14 @@ public class Goal implements StaticFieldObject {
         this.maxY = maxY;
     }
 
+    public Line getGoalLine() {
+    	double x = leftGoal?minX:maxX;
+    	double y1 = maxY;
+    	double y2 = minY;
+    	
+    	return new Line(x,y1,x,y2);
+    }
+    
     @Override
     public Coord getPosition() {
         return new Coord((minX + maxX) / 2, (minY + maxY / 2));
@@ -76,7 +84,7 @@ public class Goal implements StaticFieldObject {
     
     @Override
 	public boolean intersects(Line line) {
-		if (containsCoord(line.getA()) != containsCoord(line.getB())) return true;
+		if (containsCoord(line.getA()) || containsCoord(line.getB())) return true;
 		
 		double lMinX, lMaxX, lMinY, lMaxY;
 		lMinX = Math.min(line.getA().getX(), line.getB().getX());
@@ -85,6 +93,11 @@ public class Goal implements StaticFieldObject {
 		lMaxY = Math.max(line.getA().getY(), line.getB().getY());
 		
 		return lMinX < minX && maxX < lMaxX && lMinY < minY && maxY < lMaxY;
+	}
+    
+    @Override
+	public Coord getIntersect(Line line) {
+		
 	}
 
 }
