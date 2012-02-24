@@ -1,6 +1,9 @@
 package balle.strategy.executor.dribbling;
 
+import java.util.ArrayList;
+
 import balle.controller.Controller;
+import balle.main.Drawable;
 import balle.strategy.executor.Executor;
 import balle.world.Coord;
 import balle.world.Snapshot;
@@ -147,6 +150,11 @@ public class DribbleStraight implements Executor {
             controller.stop();
             isMoving = false;
         }
+    }
+
+    @Override
+    public ArrayList<Drawable> getDrawables() {
+        return new ArrayList<Drawable>();
     }
 
 }

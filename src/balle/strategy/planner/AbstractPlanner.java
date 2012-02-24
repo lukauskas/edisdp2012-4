@@ -1,6 +1,9 @@
 package balle.strategy.planner;
 
+import java.util.ArrayList;
+
 import balle.controller.Controller;
+import balle.main.Drawable;
 import balle.strategy.Strategy;
 import balle.world.Snapshot;
 
@@ -30,5 +33,10 @@ public abstract class AbstractPlanner implements Strategy {
     @Override
     public void stop(Controller controller) {
         controller.stop();
+    }
+
+    @Override
+    public ArrayList<Drawable> getDrawables() {
+        return new ArrayList<Drawable>();
     }
 }

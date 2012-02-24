@@ -1,8 +1,11 @@
 package balle.strategy.executor.movement;
 
+import java.util.ArrayList;
+
 import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
+import balle.main.Drawable;
 import balle.misc.Globals;
 import balle.strategy.pFStrategy.PFPlanning;
 import balle.strategy.pFStrategy.Point;
@@ -119,4 +122,8 @@ public class GoToObjectPFN implements MovementExecutor {
         controller.setWheelSpeeds((int) left, (int) right);
     }
 
+    @Override
+    public ArrayList<Drawable> getDrawables() {
+        return new ArrayList<Drawable>();
+    }
 }

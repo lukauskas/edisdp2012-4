@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
 import balle.world.AbstractWorld;
+import balle.world.SimpleWorldGUI;
 import balle.world.processing.AbstractWorldProcessor;
 
 public class StrategyRunner extends AbstractWorldProcessor {
@@ -12,11 +13,24 @@ public class StrategyRunner extends AbstractWorldProcessor {
     private final static Logger LOG = Logger.getLogger(StrategyRunner.class);
 
     private Strategy            currentStrategy;
+    private SimpleWorldGUI      gui;
 
-    public StrategyRunner(Controller controller, AbstractWorld world) {
+    /**
+     * Initialises strategy runner
+     * 
+     * @param controller
+     *            controller that will be used to move the robot
+     * @param world
+     *            world that will be used
+     * @param gui
+     *            GUI that Drawables will be drawn on.
+     */
+    public StrategyRunner(Controller controller, AbstractWorld world,
+            SimpleWorldGUI gui) {
         super(world);
         this.controller = controller;
         this.currentStrategy = null;
+        this.gui = gui;
     }
 
     @Override
@@ -29,6 +43,7 @@ public class StrategyRunner extends AbstractWorldProcessor {
         if (currentStrategy != null) {
             currentStrategy.updateState(getSnapshot());
             currentStrategy.step(controller);
+            gui.setDrawables(currentStrategy.getDrawables());
         }
 
     }

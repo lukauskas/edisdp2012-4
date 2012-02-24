@@ -1,6 +1,9 @@
 package balle.strategy.executor.movement;
 
+import java.util.ArrayList;
+
 import balle.controller.Controller;
+import balle.main.Drawable;
 import balle.strategy.executor.turning.RotateToOrientationExecutor;
 import balle.world.Coord;
 import balle.world.Orientation;
@@ -133,5 +136,10 @@ public class GoToObject implements MovementExecutor {
         // Note that we do not want to just call controller.stop()
         // blindly in case there are some other executors using it. (even though
         // there shouldn't be)
+    }
+
+    @Override
+    public ArrayList<Drawable> getDrawables() {
+        return new ArrayList<Drawable>();
     }
 }
