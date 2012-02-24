@@ -22,6 +22,7 @@ import balle.misc.Globals;
 import balle.simulator.Simulator;
 import balle.simulator.SoftBot;
 import balle.strategy.StrategyFactory;
+import balle.strategy.StrategyRunner;
 import balle.world.AbstractWorld;
 import balle.world.BasicWorld;
 import balle.world.SimpleWorldGUI;
@@ -124,18 +125,23 @@ public class Runner {
     public static void initialiseGUI(Controller controller,
             AbstractWorld world, StrategyLogPane strategyLog) {
         SimpleWorldGUI gui;
+        gui = new SimpleWorldGUI(world);
         GUITab mainWindow = new GUITab();
 
-        StratTab strategyTab = new StratTab(controller, world);
+        StrategyRunner strategyRunner = new StrategyRunner(controller, world,
+                gui);
+
+        StratTab strategyTab = new StratTab(controller, world, strategyRunner);
         for (String strategy : StrategyFactory.availableDesignators())
             strategyTab.addStrategy(strategy);
 
         mainWindow.addToSidebar(strategyTab);
         mainWindow.addToSidebar(strategyLog);
 
-        gui = new SimpleWorldGUI(world);
         mainWindow.addToMainPanel(gui.getPanel());
         gui.start();
+
+        strategyRunner.start();
 
     }
 

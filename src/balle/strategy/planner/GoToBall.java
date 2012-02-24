@@ -3,10 +3,14 @@
  */
 package balle.strategy.planner;
 
+import java.awt.Color;
+
 import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
+import balle.main.Drawable;
 import balle.strategy.executor.movement.MovementExecutor;
+import balle.world.objects.Ball;
 
 /**
  * @author s0909773
@@ -36,7 +40,12 @@ public class GoToBall extends AbstractPlanner {
         executorStrategy.updateState(getSnapshot());
         // Update the target's location in executorStrategy (e.g. if target
         // moved)
-        executorStrategy.updateTarget(getSnapshot().getBall());
+        Ball ball = getSnapshot().getBall();
+        executorStrategy.updateTarget(ball);
+        // Draw the target
+        if (ball.getPosition() != null)
+            addDrawable(new Drawable(Drawable.POINT, ball.getPosition().getX(),
+                    ball.getPosition().getY(), Color.CYAN));
 
         // If it says it is not finished, tell it to do something for a step.
         if (!executorStrategy.isFinished()) {

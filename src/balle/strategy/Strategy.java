@@ -1,6 +1,9 @@
 package balle.strategy;
 
+import java.util.ArrayList;
+
 import balle.controller.Controller;
+import balle.main.Drawable;
 import balle.world.Snapshot;
 
 public interface Strategy {
@@ -23,5 +26,11 @@ public interface Strategy {
      * @param controller
      */
     public void stop(Controller controller);
+
+    /**
+     * Retrieves all Drawable objects from the strategy
+     * 
+     */
+    public ArrayList<Drawable> getDrawables();
 
 }
