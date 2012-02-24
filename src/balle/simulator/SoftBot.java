@@ -133,7 +133,7 @@ public class SoftBot implements Controller {
 	}
 
 	/**
-	 * return the angles to the desired angle. mod 180
+	 * return the angles to the desired angle. between -PI and PI
 	 * 
 	 * @return
 	 */
