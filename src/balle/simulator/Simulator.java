@@ -180,7 +180,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
     }
 
     public static Simulator createSimulator() {
-        return createSimulator(true);
+        return createSimulator(false);
     }
 
     /**
@@ -279,8 +279,8 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
                 boolean turningLeft = bot.isTurningLeft();
                 // get current angle - desired angle
                 float dDA = bot.deltaDesiredAngle();
-                if (!turningLeft && (0 <= dDA && dDA <= (Math.PI / 4)) || turningLeft
-                        && (0 >= dDA && dDA >= -(Math.PI / 4))) {
+                if ((!turningLeft && (0 <= dDA && dDA <=  (Math.PI / 4))) ||	// turning right
+                	 (turningLeft && (0 >= dDA && dDA >= -(Math.PI / 4)))) {	// turning left
                     // stop
                     bot.stop();
                 }
