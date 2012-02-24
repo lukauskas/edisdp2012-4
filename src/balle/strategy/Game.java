@@ -67,6 +67,7 @@ public class Game extends AbstractPlanner {
             LOG.info("Defending");
             // Let defensiveStrategy deal with it!
             defensiveStrategy.step(controller);
+            addDrawables(defensiveStrategy.getDrawables());
         } else if (!ball.isNearWall(pitch)) {
             LOG.info("Approaching ball");
             // Approach ball

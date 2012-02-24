@@ -4,6 +4,7 @@ import balle.strategy.executor.movement.GoToObject;
 import balle.strategy.executor.movement.GoToObjectPFN;
 import balle.strategy.executor.turning.FaceAngle;
 import balle.strategy.planner.AbstractPlanner;
+import balle.strategy.planner.DefensiveStrategy;
 import balle.strategy.planner.DribbleMilestone2;
 import balle.strategy.planner.GoToBall;
 
@@ -31,7 +32,7 @@ public class StrategyFactory {
         } else if (designator.equals("PFNavigation")) {
             return new PFNavigation();
         } else if (designator.equals("DefensiveStrategy")) {
-            return new DefensiveStrategy();
+            return new DefensiveStrategy(new GoToObjectPFN(0.15f));
         } else if (designator.equals("Game")) {
             return new Game();
         } else
