@@ -22,6 +22,11 @@ public class Line {
         this.b = b;
     }
 
+    public boolean contains(Coord a) {
+        // TODO: fix fix fix!
+        return false;
+    }
+
     /**
      * rotate the line around the origin
      * 
