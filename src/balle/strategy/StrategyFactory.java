@@ -32,7 +32,7 @@ public class StrategyFactory {
         } else if (designator.equals("PFNavigation")) {
             return new PFNavigation();
         } else if (designator.equals("DefensiveStrategy")) {
-            return new DefensiveStrategy(new GoToObjectPFN(0.2f));
+            return new DefensiveStrategy(new GoToObjectPFN(0.1f));
         } else if (designator.equals("Game")) {
             return new Game();
         } else
