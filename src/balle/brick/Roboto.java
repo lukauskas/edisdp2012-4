@@ -1,10 +1,12 @@
 package balle.brick;
 
 import java.io.DataInputStream;
+import java.io.IOException;
 
 import lejos.nxt.Button;
 import lejos.nxt.LCD;
 import lejos.nxt.SensorPort;
+import lejos.nxt.Sound;
 import lejos.nxt.TouchSensor;
 import lejos.nxt.comm.BTConnection;
 import lejos.nxt.comm.Bluetooth;
@@ -16,6 +18,51 @@ import balle.bluetooth.messages.MessageRotate;
 import balle.bluetooth.messages.MessageStop;
 import balle.controller.Controller;
 
+class ListenerThread extends Thread {
+    DataInputStream input;
+    boolean         shouldStop;
+    int             command;
+    boolean         commandConsumed;
+
+    ListenerThread(DataInputStream input) {
+        this.input = input;
+        this.shouldStop = false;
+        this.commandConsumed = true;
+    }
+
+    @Override
+    public void run() {
+
+        while (!shouldStop) {
+            try {
+                int command = input.readInt();
+                setCommand(command);
+            } catch (IOException e) {
+                shouldStop = true;
+            }
+        }
+    }
+
+    private synchronized void setCommand(int command) {
+        this.command = command;
+        commandConsumed = false;
+    }
+
+    public synchronized int getCommand() {
+        commandConsumed = true;
+        return command;
+    }
+
+    public synchronized boolean available() {
+        return !commandConsumed;
+    }
+
+    public void cancel() {
+        shouldStop = true;
+    }
+
+}
+
 /**
  * Create a connection to Roboto from the computer. execute commands send from
  * the computer test out movements of Roboto.
@@ -23,13 +70,6 @@ import balle.controller.Controller;
  * @author s0815695
  */
 public class Roboto {
-
-    public static final int MESSAGE_EXIT    = -1;
-    public static final int MESSAGE_ROTATE  = 3;
-    public static final int MESSAGE_STOP    = 4;
-    public static final int MESSAGE_KICK    = 5;
-    public static final int MESSAGE_MOVE    = 6;
-    public static final int MESSAGE_PENALTY = 7;
 
     /**
      * Processes the decoded message and issues correct commands to controller
@@ -86,44 +126,44 @@ public class Roboto {
                 break;
 
             drawMessage("Connecting...");
+            Sound.twoBeeps();
 
             BTConnection connection = Bluetooth.waitForConnection();
 
             drawMessage("Connected");
+            Sound.beep();
 
             DataInputStream input = connection.openDataInputStream();
+            ListenerThread listener = new ListenerThread(input);
 
             Controller controller = new BrickController();
             MessageDecoder decoder = new MessageDecoder();
 
-            mainLoop: while (true) {
+            listener.start();
+
+            while (true) {
                 // Enter button click will halt the program
                 if (Button.ENTER.isPressed()) {
                     controller.stop();
+                    listener.cancel();
                     break;
                 }
+                if (Button.ESCAPE.isPressed()) {
+                    return;
+                }
                 try {
-                    // no input available
-                    while (input.available() == 0) {
-                        // Enter button click will halt the program
-                        if (Button.ENTER.isPressed()) {
-                            controller.stop();
-                            break mainLoop;
-                        }
-
-                        // Check for sensors when idle
-                        if (touchLeft.isPressed() || touchRight.isPressed()) {
-                            controller.backward(controller
-                                    .getMaximumWheelSpeed());
-                            drawMessage("Obstacle detected. Backing up");
-                            Thread.sleep(400);
-                            controller.stop();
-                        }
-
-                        // drawMessage("Battery: " + Battery.getVoltage());
+                    // Check for sensors when idle
+                    if (touchLeft.isPressed() || touchRight.isPressed()) {
+                        controller.backward(controller.getMaximumWheelSpeed());
+                        drawMessage("Obstacle detected. Backing up");
+                        Thread.sleep(400);
+                        controller.stop();
                     }
 
-                    int hashedMessage = input.readInt();
+                    if (!listener.available())
+                        continue;
+
+                    int hashedMessage = listener.getCommand();
                     AbstractMessage message = decoder
                             .decodeMessage(hashedMessage);
                     if (message == null) {

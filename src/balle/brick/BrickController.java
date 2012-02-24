@@ -16,21 +16,21 @@ import balle.misc.Globals;
  * @author sauliusl
  */
 public class BrickController implements Controller {
-    TachoPilot           pilot;
-    public int           maxPilotSpeed       = 600;                               // 20
-                                                                                   // for
-                                                                                   // friendlies
+    TachoPilot              pilot;
+    public int              maxPilotSpeed       = 600;                         // 20
+                                                                                // for
+                                                                                // friendlies
 
-    public final Motor   LEFT_WHEEL          = Motor.B;
-    public final Motor   RIGHT_WHEEL         = Motor.C;
-    public final Motor   KICKER              = Motor.A;
+    public final Motor      LEFT_WHEEL          = Motor.B;
+    public final Motor      RIGHT_WHEEL         = Motor.C;
+    public final Motor      KICKER              = Motor.A;
 
-    public final boolean INVERSE_WHEELS      = true;
+    public final boolean    INVERSE_WHEELS      = true;
 
-    public final float   WHEEL_DIAMETER      = Globals.ROBOT_WHEEL_DIAMETER * 100; // milimetres
-    public final float   TRACK_WIDTH         = Globals.ROBOT_TRACK_WIDTH * 100;   // milimetres
+    public final float      WHEEL_DIAMETER      = Globals.ROBOT_WHEEL_DIAMETER; // metres
+    public final float      TRACK_WIDTH         = Globals.ROBOT_TRACK_WIDTH;   // metres
 
-    public final int     MAXIMUM_MOTOR_SPEED = 720;
+    public static final int MAXIMUM_MOTOR_SPEED = Globals.MAXIMUM_MOTOR_SPEED;
 
     public BrickController() {
 
@@ -77,9 +77,12 @@ public class BrickController implements Controller {
     public void kick() {
         KICKER.setSpeed(900);
         KICKER.resetTachoCount();
-        KICKER.rotateTo(60);
-        KICKER.rotateTo(0);
-
+        KICKER.forward();
+        try {
+            Thread.sleep(80);
+        } catch (InterruptedException e) {
+        }
+        KICKER.rotateTo(1);
     }
     
     public void gentleKick(int speed, int angle ) {

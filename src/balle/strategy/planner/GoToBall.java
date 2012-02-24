@@ -23,7 +23,8 @@ public class GoToBall extends AbstractPlanner {
      * @param controller
      * @param world
      */
-    public GoToBall(Controller controller, AbstractWorld world, MovementExecutor movementExecutor) {
+    public GoToBall(Controller controller, AbstractWorld world,
+            MovementExecutor movementExecutor) {
         super(controller, world);
         executorStrategy = movementExecutor;
 
@@ -47,9 +48,9 @@ public class GoToBall extends AbstractPlanner {
         executorStrategy.updateTarget(getSnapshot().getBall());
 
         // If it says it is not finished, tell it to do something for a step.
-        if (!executorStrategy.isFinished())
+        if (!executorStrategy.isFinished()) {
             executorStrategy.step(controller);
-        else {
+        } else {
             // Tell the strategy to stop doing whatever it was doing
             executorStrategy.stop(controller);
             LOG.info("We're finished");

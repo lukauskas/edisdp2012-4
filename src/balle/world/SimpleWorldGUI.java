@@ -199,10 +199,8 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
             if (robot.possessesBall(s.getBall())) {
                 if (robot.isInScoringPosition(s.getBall(),
                         s.getOpponentsGoal(), s.getOpponent())) {
-                    LOG.info("Robot is in Scoring Position with possession of the ball");
                     g.setColor(Color.MAGENTA);
                 } else {
-                    LOG.info("Robot is in possession of the ball");
                     g.setColor(Color.ORANGE);
                 }
             } else if (!isEstimated) {

@@ -31,6 +31,8 @@ public class Globals {
                                                                                      // degrees
     public static final float  SIMULATED_VISON_FRAMERATE = 15f;
 
+    public static final int    MAXIMUM_MOTOR_SPEED       = 900;
+
     public static float powerToVelocity(float p) {
         return p * (0.4f / 720f);
         // boolean isNeg = p < 0;
@@ -44,7 +46,7 @@ public class Globals {
         return v * (720f / 0.4f);
     }
 
-	public static Pitch getPitch() {
-		return new Pitch(0, PITCH_WIDTH, 0, PITCH_HEIGHT);
-	}
+    public static Pitch getPitch() {
+        return new Pitch(0, PITCH_WIDTH, 0, PITCH_HEIGHT);
+    }
 }

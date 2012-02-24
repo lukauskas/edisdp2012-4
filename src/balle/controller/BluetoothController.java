@@ -7,6 +7,7 @@ import balle.bluetooth.messages.MessageKick;
 import balle.bluetooth.messages.MessageMove;
 import balle.bluetooth.messages.MessageRotate;
 import balle.bluetooth.messages.MessageStop;
+import balle.brick.BrickController;
 
 public class BluetoothController implements Controller {
     Communicator connection;
@@ -20,9 +21,11 @@ public class BluetoothController implements Controller {
         try {
             connection.send(new MessageStop(1).hash());
         } catch (InvalidOpcodeException e) {
-            System.err.println("Failed to send message FLOAT_WHEELS -- invalid opcode");
+            System.err
+                    .println("Failed to send message FLOAT_WHEELS -- invalid opcode");
         } catch (InvalidArgumentException e) {
-            System.err.println("Failed to send message FLOAT_WHEELS -- invalid argument");
+            System.err
+                    .println("Failed to send message FLOAT_WHEELS -- invalid argument");
         }
     }
 
@@ -33,7 +36,8 @@ public class BluetoothController implements Controller {
         } catch (InvalidOpcodeException e) {
             System.err.println("Failed to send message STOP -- invalid opcode");
         } catch (InvalidArgumentException e) {
-            System.err.println("Failed to send message STOP -- invalid argument");
+            System.err
+                    .println("Failed to send message STOP -- invalid argument");
         }
     }
 
@@ -44,7 +48,8 @@ public class BluetoothController implements Controller {
         } catch (InvalidOpcodeException e) {
             System.err.println("Failed to send message KICK -- invalid opcode");
         } catch (InvalidArgumentException e) {
-            System.err.println("Failed to send message KICK -- invalid argument");
+            System.err
+                    .println("Failed to send message KICK -- invalid argument");
         }
     }
 
@@ -58,7 +63,8 @@ public class BluetoothController implements Controller {
         try {
             connection.send(new MessageMove(-speed, -speed).hash());
         } catch (InvalidOpcodeException e) {
-            System.err.println("Failed to send message BACKWARD -- invalid opcode");
+            System.err
+                    .println("Failed to send message BACKWARD -- invalid opcode");
         } catch (InvalidArgumentException e) {
             System.err.println("Failed to send message BACKWARD(" + speed + ")"
                     + "-- invalid argument");
@@ -76,7 +82,8 @@ public class BluetoothController implements Controller {
         try {
             connection.send(new MessageMove(speed, speed).hash());
         } catch (InvalidOpcodeException e) {
-            System.err.println("Failed to send message FORWARD -- invalid opcode");
+            System.err
+                    .println("Failed to send message FORWARD -- invalid opcode");
         } catch (InvalidArgumentException e) {
             System.err.println("Failed to send message FORWARD(" + speed + ")"
                     + "-- invalid argument");
@@ -88,10 +95,11 @@ public class BluetoothController implements Controller {
         try {
             connection.send(new MessageRotate(degrees, speed).hash());
         } catch (InvalidOpcodeException e) {
-            System.err.println("Failed to send message ROTATE -- invalid opcode");
+            System.err
+                    .println("Failed to send message ROTATE -- invalid opcode");
         } catch (InvalidArgumentException e) {
-            System.err.println("Failed to send message ROTATE(" + degrees + ", " + speed + ")"
-                    + "-- invalid argument");
+            System.err.println("Failed to send message ROTATE(" + degrees
+                    + ", " + speed + ")" + "-- invalid argument");
         }
 
     }
@@ -99,18 +107,21 @@ public class BluetoothController implements Controller {
     @Override
     public void setWheelSpeeds(int leftWheelSpeed, int rightWheelSpeed) {
         try {
-            connection.send(new MessageMove(leftWheelSpeed, rightWheelSpeed).hash());
+            connection.send(new MessageMove(leftWheelSpeed, rightWheelSpeed)
+                    .hash());
         } catch (InvalidOpcodeException e) {
-            System.err.println("Failed to send message SETWHEELSPEEDS -- invalid opcode");
+            System.err
+                    .println("Failed to send message SETWHEELSPEEDS -- invalid opcode");
         } catch (InvalidArgumentException e) {
-            System.err.println("Failed to send message SETWHEELSPEEDS(" + leftWheelSpeed + ", "
-                    + rightWheelSpeed + ")" + "-- invalid argument");
+            System.err.println("Failed to send message SETWHEELSPEEDS("
+                    + leftWheelSpeed + ", " + rightWheelSpeed + ")"
+                    + "-- invalid argument");
         }
     }
 
     @Override
     public int getMaximumWheelSpeed() {
-        return 720;
+        return BrickController.MAXIMUM_MOTOR_SPEED;
     }
 
     @Override
@@ -118,9 +129,11 @@ public class BluetoothController implements Controller {
         try {
             connection.send(new MessageKick(1).hash());
         } catch (InvalidOpcodeException e) {
-            System.err.println("Failed to send message PENALTY_KICK -- invalid argument");
+            System.err
+                    .println("Failed to send message PENALTY_KICK -- invalid argument");
         } catch (InvalidArgumentException e) {
-            System.err.println("Failed to send message PENALTY_KICK -- invalid argument");
+            System.err
+                    .println("Failed to send message PENALTY_KICK -- invalid argument");
         }
     }
 
