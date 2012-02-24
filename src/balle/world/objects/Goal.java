@@ -97,9 +97,4 @@ public class Goal implements StaticFieldObject {
 		return lMinX < minX && maxX < lMaxX && lMinY < minY && maxY < lMaxY;
 	}
     
-    @Override
-	public Coord getIntersect(Line line) {
-		
-	}
-
 }

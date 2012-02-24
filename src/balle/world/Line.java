@@ -26,8 +26,11 @@ public class Line {
     }
 
     public boolean contains(Coord a) {
-        // TODO: fix fix fix!
-        return false;
+    	double dist = getLine2DVersion().ptLineDist(a.getX(), a.getY());
+    	if(dist != 0) {
+    		return false;
+    	}
+    	return getLine2DVersion().getBounds2D().contains(a.getX(), a.getY());
     }
 
     /**
@@ -45,9 +48,6 @@ public class Line {
     }
     
     public Coord getIntersect(Line l) {
-//		double m1 = (b.getY()-y1)/(b.getX()-x1);
-//		double m2 = (l.getB().getY()-y2)/(l.getB().getX()-x2);
-
     	double x1,x2,y1,y2;
     	
     	x1 = a.getX();
@@ -74,15 +74,20 @@ public class Line {
 	    else{
 	        double x = (b2*c1 - b1*c2)/det;
 	        double y = (a1*c2 - a2*c1)/det;
-	        
-	        contains();
+	        Coord p = new Coord(x,y);
+	        if(contains(p) && l.contains(p)) {
+	        	return p;
+	        }
+	        else {
+	        	return null;
+	        }
 	    }
 	    
 	    
     }
     
     public boolean overLaps(Line l) {
-    	return intersects(l) && 
+    	return false;
     }
     
     public boolean intersects(Line l) {
