@@ -54,6 +54,20 @@ public class Robot extends RectangularObject {
 
         return new Line(x0, y0, x1, y1);
     }
+    
+    public Line getFacingLine() {
+    	double x0, y0, x1, y1;
+        x0 = getPosition().getX();
+        y0 = getPosition().getY();
+
+        Coord target = new Coord(Globals.ROBOT_MAX_KICK_DISTANCE, 0);
+        target.rotate(getOrientation());
+
+        x1 = target.getX();
+        y1 = target.getY();
+
+        return new Line(x0, y0, x1, y1);
+    }
 
     /**
      * Checks if the robot can score from this position. That is if it is in
@@ -66,20 +80,7 @@ public class Robot extends RectangularObject {
      * @return true, if is in scoring position
      */
     public boolean isInScoringPosition(Ball ball, Goal goal, Robot otherRobot) {
-        if (!possessesBall(ball))
-            return false;
-
-        double x1, y1, x2, y2, x3, y3, x4, y4;
-        x1 = goal.getLeftPostCoord().getX();
-        y1 = goal.getLeftPostCoord().getY();
-        x2 = goal.getRightPostCoord().getX();
-        y2 = goal.getRightPostCoord().getY();
-
-        Line ballKickLine = getBallKickLine(ball);
-
-        return Line2D.linesIntersect(x1, y1, x2, y2,
-                ballKickLine.getA().getX(), ballKickLine.getA().getY(),
-                ballKickLine.getB().getX(), ballKickLine.getB().getY());
+        return possessesBall(ball) && isFacingGoal(goal) && !otherRobot.intersects(getFacingLine());
     }
 
     /**
@@ -91,8 +92,18 @@ public class Robot extends RectangularObject {
      * @return
      */
     public boolean isFacingGoal(Goal goal) {
-        // TODO: finish
-        return true;
+
+        double x1, y1, x2, y2;
+        x1 = goal.getLeftPostCoord().getX();
+        y1 = goal.getLeftPostCoord().getY();
+        x2 = goal.getRightPostCoord().getX();
+        y2 = goal.getRightPostCoord().getY();
+
+        Line facingLine = getFacingLine();
+
+        return Line2D.linesIntersect(x1, y1, x2, y2,
+                facingLine.getA().getX(), facingLine.getA().getY(),
+                facingLine.getB().getX(), facingLine.getB().getY());
     }
 
 }

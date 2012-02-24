@@ -12,6 +12,13 @@ public class Coord {
 
     private final boolean estimated;
 
+    public Coord(Coord coord) {
+    	super();
+    	this.x = coord.x;
+    	this.y = coord.y;
+    	this.estimated = false;
+    }
+    
     public Coord(double x, double y) {
         super();
         this.x = x;
@@ -119,8 +126,11 @@ public class Coord {
             Pitch pitch, FieldObject potentialObstacle) {
         if (!this.isReachableInStraightLineAndNotBlocked(fromCoordinate, pitch))
             return false;
-        else
-            return true;
+        
+        Line line = new Line(new Coord(this.getX(), this.getY()),
+        						new Coord(fromCoordinate.getX(), fromCoordinate.getY()) );
+        
+        return !potentialObstacle.intersects(line);
     }
 
     /**
