@@ -44,6 +44,7 @@ public class Game extends AbstractPlanner {
 
     @Override
     public void step(Controller controller) {
+
         Snapshot snapshot = getSnapshot();
         Robot ourRobot = snapshot.getBalle();
         Robot opponent = snapshot.getOpponent();
@@ -70,6 +71,7 @@ public class Game extends AbstractPlanner {
             LOG.info("Approaching ball");
             // Approach ball
             goToBallStrategy.step(controller);
+            addDrawables(goToBallStrategy.getDrawables());
         } else if (ball.isNearWall(pitch)) {
             // TODO: Pick it
             // pickBallFromWallStrategy.step(controller);

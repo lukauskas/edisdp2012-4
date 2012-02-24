@@ -92,7 +92,7 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 
         private void drawDrawable(Graphics g, Drawable drawable) {
             if (drawable.getType() == Drawable.POINT) {
-                float w = 4;
+                float w = 5;
                 g.setColor(drawable.getColour());
                 g.fillOval((int) (m2PX(drawable.getX()) - (w / 2)),
                         (int) (m2PY(drawable.getY()) - (w / 2)), (int) w,
