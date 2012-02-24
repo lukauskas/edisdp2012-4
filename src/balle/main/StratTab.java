@@ -41,7 +41,9 @@ public class StratTab extends JPanel implements ActionListener {
         super();
         this.controller = controller;
         this.world = world;
-        this.strategyRunner = new StrategyRunner(controller, world);
+        // Initialise strategy runner
+        strategyRunner = new StrategyRunner(controller, world);
+        strategyRunner.start();
 
         // Class Variables
         top = new JPanel();
