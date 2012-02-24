@@ -35,7 +35,7 @@ public class Globals {
 
 	public static float powerToVelocity(float p) {
 		if(p > MAXIMUM_MOTOR_SPEED) p = MAXIMUM_MOTOR_SPEED;
-		if(p < -MAXIMUM_MOTOR_SPEED) p = -MAXIMUM_MOTOR_SPEED;
+		else if(p < -MAXIMUM_MOTOR_SPEED) p = -MAXIMUM_MOTOR_SPEED;
 		return p * (0.4f/720f);
 	//	if(p==0) return 0;
 	//	boolean isNeg = p < 0;
