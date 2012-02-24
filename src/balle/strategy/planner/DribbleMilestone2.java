@@ -50,9 +50,4 @@ public class DribbleMilestone2 extends AbstractPlanner {
         }
 
     }
-
-    @Override
-    public void stop(Controller controller) {
-        controller.stop();
-    }
 }

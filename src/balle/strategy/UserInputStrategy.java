@@ -165,10 +165,4 @@ public class UserInputStrategy extends AbstractPlanner {
 
         }
     }
-
-    @Override
-    public void stop(Controller controller) {
-        controller.stop();
-    }
-
 }
