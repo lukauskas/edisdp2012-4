@@ -5,8 +5,8 @@ import balle.world.Line;
 
 public class Goal implements StaticFieldObject {
 
-	private final boolean leftGoal;
-    private final double minX, maxX, minY, maxY;
+    private final boolean leftGoal;
+    private final double  minX, maxX, minY, maxY;
 
     public double getMinX() {
         return minX;
@@ -24,22 +24,15 @@ public class Goal implements StaticFieldObject {
         return maxY;
     }
 
-    public Goal(boolean leftGoal, double minX, double maxX, double minY, double maxY) {
-    	this.leftGoal = leftGoal;
+    public Goal(boolean leftGoal, double minX, double maxX, double minY,
+            double maxY) {
+        this.leftGoal = leftGoal;
         this.minX = minX;
         this.maxX = maxX;
         this.minY = minY;
         this.maxY = maxY;
     }
 
-    public Line getGoalLine() {
-    	double x = leftGoal?minX:maxX;
-    	double y1 = maxY;
-    	double y2 = minY;
-    	
-    	return new Line(x,y1,x,y2);
-    }
-    
     @Override
     public Coord getPosition() {
         return new Coord((minX + maxX) / 2, (minY + maxY / 2));
@@ -64,10 +57,10 @@ public class Goal implements StaticFieldObject {
      * @return the left goal post coord
      */
     public Coord getLeftPostCoord() {
-    	if (leftGoal)
-    		return new Coord(minX,maxY);
-    	else
-    		return new Coord(maxX,minY);
+        if (leftGoal)
+            return new Coord(minX, maxY);
+        else
+            return new Coord(maxX, minY);
     }
 
     /**
@@ -77,11 +70,20 @@ public class Goal implements StaticFieldObject {
      */
     public Coord getRightPostCoord() {
         if (leftGoal)
-        	return new Coord(minX, minY);
+            return new Coord(minX, minY);
         else
-        	return new Coord(maxX, maxY);
+            return new Coord(maxX, maxY);
     }
-    
+
+    /**
+     * Returns the Goal Line
+     * 
+     * @return
+     */
+    public Line getGoalLine() {
+        return new Line(getLeftPostCoord(), getRightPostCoord());
+    }
+
     @Override
 	public boolean intersects(Line line) {
 		if (containsCoord(line.getA()) || containsCoord(line.getB())) return true;
