@@ -66,10 +66,4 @@ public class Blocking extends AbstractPlanner {
         }
 
     }
-
-    @Override
-    public void stop(Controller controller) {
-        controller.stop();
-
-    }
 }

@@ -41,9 +41,4 @@ public class DummyStrategy extends AbstractPlanner {
     public String toString() {
         return "Dummy Strategy";
     }
-
-    @Override
-    public void stop(Controller controller) {
-        controller.stop();
-    }
 }

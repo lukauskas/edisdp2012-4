@@ -61,8 +61,4 @@ public class PFNavigation extends AbstractPlanner {
         }
     }
 
-    @Override
-    public void stop(Controller controller) {
-        controller.stop();
-    }
 }

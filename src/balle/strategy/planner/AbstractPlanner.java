@@ -1,5 +1,6 @@
 package balle.strategy.planner;
 
+import balle.controller.Controller;
 import balle.strategy.Strategy;
 import balle.world.Snapshot;
 
@@ -24,5 +25,10 @@ public abstract class AbstractPlanner implements Strategy {
      */
     protected Snapshot getSnapshot() {
         return snapshot;
+    }
+
+    @Override
+    public void stop(Controller controller) {
+        controller.stop();
     }
 }
