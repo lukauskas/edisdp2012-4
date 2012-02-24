@@ -10,7 +10,7 @@ import balle.strategy.pFStrategy.Pos;
 import balle.strategy.pFStrategy.RobotConf;
 import balle.strategy.pFStrategy.VelocityVec;
 import balle.world.Snapshot;
-import balle.world.objects.FieldObject;
+import balle.world.objects.StaticFieldObject;
 
 public class GoToObjectPFN implements MovementExecutor {
     private Snapshot            snapshot          = null;
@@ -31,9 +31,9 @@ public class GoToObjectPFN implements MovementExecutor {
         this.stopDistance = stopDistance;
     }
 
-    private FieldObject target;
+    private StaticFieldObject target;
 
-    PFPlanning          plann;
+    PFPlanning                plann;
 
     /**
      * Instantiates a new go to object executor that uses Potential Fields
@@ -55,7 +55,7 @@ public class GoToObjectPFN implements MovementExecutor {
     }
 
     @Override
-    public void updateTarget(FieldObject target) {
+    public void updateTarget(StaticFieldObject target) {
         this.target = target;
 
     }
