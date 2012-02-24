@@ -224,8 +224,8 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
         }
 
         private void drawGoals(Graphics g) {
-            drawGoal(g, Color.green, getSnapshot().getOwnGoal());
-            drawGoal(g, Color.red, getSnapshot().getOpponentsGoal());
+            drawGoal(g, Color.red, getSnapshot().getOwnGoal());
+            drawGoal(g, Color.green, getSnapshot().getOpponentsGoal());
         }
 
         private void drawGoal(Graphics g, Color c, Goal goal) {
@@ -303,7 +303,7 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 
         double timePerFrame = 1000.0 / fpsCount;
         if ((fpsCount > 0) && (age < timePerFrame * 1.5)) {
-            fps.setForeground(Color.GREEN);
+            fps.setForeground(new Color(50, 150, 50));
             fpsWarning.setVisible(false);
         } else if ((fpsCount > 0) && (age < timePerFrame * 3)) {
             fps.setForeground(Color.ORANGE);
