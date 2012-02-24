@@ -215,16 +215,16 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 
         private final Body         robot;
 
-        private final Vec2         kickPos      = new Vec2(0.12f * scale, 0);
 
         private final float        robotWidth   = Globals.ROBOT_WIDTH * scale / 2;
         private final float        robotLength  = Globals.ROBOT_LENGTH * scale / 2;
 
         private final float        kickerWidth  = Globals.ROBOT_WIDTH * scale / 2;
-        private final float        kickerLength = 0.04f * scale / 2;
+        private final float        kickerLength = Globals.ROBOT_POSSESS_DISTANCE * scale / 2;
+        private final Vec2         kickPos      = new Vec2((robotLength+kickerLength), 0);
         private final PolygonShape kickerShape;
         private static final float kickForce    = 20f;
-
+       
         // wheel power (-1 for lock and 0 for float and (0,100] for power )
 
         public Robot(Vec2 startingPos, float angle) {

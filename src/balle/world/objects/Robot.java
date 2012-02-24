@@ -14,8 +14,6 @@ public class Robot extends RectangularObject {
                 Globals.ROBOT_LENGTH);
     }
 
-    public static final double POSSESS_DISTANCE = 0.05;
-
     /**
      * Returns true if the robot is in possession of the ball. That is if the
      * ball is close enough to the kicker that it can kick it.
@@ -32,7 +30,7 @@ public class Robot extends RectangularObject {
         Coord possessPosition = getPosition().add(possessVector);
 
         double distance = ball.getPosition().dist(possessPosition);
-        return distance <= POSSESS_DISTANCE + ball.getRadius();
+        return distance <= Globals.ROBOT_POSSESS_DISTANCE + ball.getRadius();
     }
 
     /**
