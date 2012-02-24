@@ -25,6 +25,11 @@ public class Line {
         this.b = b;
     }
 
+    public boolean contains(Coord a) {
+        // TODO: fix fix fix!
+        return false;
+    }
+
     /**
      * rotate the line around the origin
      * 
@@ -90,7 +95,7 @@ public class Line {
      * @return
      */
     public Coord midpoint() {
-        return new Coord((getA().getX() + getB().getY()) / 2.0,
+        return new Coord((getA().getX() + getB().getX()) / 2.0,
                 (getA().getY() + getB().getY()) / 2.0);
     }
     

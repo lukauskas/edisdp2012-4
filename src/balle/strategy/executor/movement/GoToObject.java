@@ -13,7 +13,7 @@ import balle.world.objects.StaticFieldObject;
 
 public class GoToObject implements MovementExecutor {
 
-    private final static double DISTANCE_TO_STOP_AT       = 0.2;
+    private double              stopDistance              = 0.2;
     private final static double EPSILON                   = 0.00001;
 
     protected StaticFieldObject target                    = null;
@@ -41,7 +41,7 @@ public class GoToObject implements MovementExecutor {
         if ((target == null) || (currentPosition == null)) {
             return false;
         }
-        return ((currentPosition.dist(target.getPosition()) - DISTANCE_TO_STOP_AT) < EPSILON);
+        return ((currentPosition.dist(target.getPosition()) - stopDistance) < EPSILON);
     }
 
     @Override
@@ -141,5 +141,11 @@ public class GoToObject implements MovementExecutor {
     @Override
     public ArrayList<Drawable> getDrawables() {
         return new ArrayList<Drawable>();
+    }
+
+    @Override
+    public void setStopDistance(double stopDistance) {
+        this.stopDistance = stopDistance;
+
     }
 }

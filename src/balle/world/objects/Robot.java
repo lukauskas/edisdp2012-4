@@ -92,7 +92,7 @@ public class Robot extends RectangularObject {
      */
     public boolean isFacingGoal(Goal goal) {
         // TODO: finish
-        return false;
+        return true;
     }
 
 }
