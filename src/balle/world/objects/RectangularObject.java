@@ -2,7 +2,11 @@ package balle.world.objects;
 
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+
+import sun.security.action.GetLongAction;
 
 import balle.misc.Globals;
 import balle.world.Coord;
@@ -92,26 +96,40 @@ public class RectangularObject extends MovingPoint implements FieldObject {
 
 	@Override
 	public boolean intersects(Line line) {
-		if (containsCoord(line.getA()) != containsCoord(line.getB())) return true;
+		if (containsCoord(line.getA()) || containsCoord(line.getB())) return true;
 		
-		line = new Line(line.getA(), line.getB());
-		line = line.rotate(getOrientation());
-		line = line.add(getPosition());
-				
-		double minX, maxX, minY, maxY;
-		minX = -width/2.0;
-		maxX = width/2.0;
-		minY = -height/2.0;
-		maxY = height/2.0;
+		Coord myA = line.getA();
+		Coord myB = line.getB();
+		Line2D l = new Line2D.Double(myA.getX(), myA.getY(), myB.getX(), myB.getY());
+
+		double hw = getWidth()/2;
+		double hh = getHeight()/2;
+
+		Line a = new Line( hw,  hh,  hw, -hh);
+		Line b = new Line( hw, -hh, -hw, -hh);
+		Line c = new Line(-hw, -hh, -hw,  hh);
+		Line d = new Line(-hw,  hh,  hw,  hh);
+		Orientation o = getOrientation();
+		a.rotate(o);
+		b.rotate(o);
+		c.rotate(o);
+		d.rotate(o);
+		Coord p = getPosition();
+		a = a.add(p);
+		b = b.add(p);
+		c = c.add(p);
+		d = d.add(p);
+		Line2D a2D = new Line2D.Double(a.getA().getX(),  a.getA().getY(),  a.getB().getX(),  a.getB().getY());
+		Line2D b2D = new Line2D.Double(b.getA().getX(),  b.getA().getY(),  b.getB().getX(),  b.getB().getY());
+		Line2D c2D = new Line2D.Double(c.getA().getX(),  c.getA().getY(),  c.getB().getX(),  c.getB().getY());
+		Line2D d2D = new Line2D.Double(d.getA().getX(),  d.getA().getY(),  d.getB().getX(),  d.getB().getY());
 		
-		double lMinX, lMaxX, lMinY, lMaxY;
-		lMinX = Math.min(line.getA().getX(), line.getB().getX());
-		lMaxX = Math.max(line.getA().getX(), line.getB().getX());
-		lMinY = Math.min(line.getA().getY(), line.getB().getY());
-		lMaxY = Math.max(line.getA().getY(), line.getB().getY());
-		
-		return lMinX < minX && maxX < lMaxX && lMinY < minY && maxY < lMaxY;
+		// if the line l intersects any of the lines connecting the corners of
+		// this rectangle, then return true;
+		return 	l.intersectsLine(a2D) ||
+				l.intersectsLine(b2D) ||
+				l.intersectsLine(c2D) ||
+				l.intersectsLine(d2D);
 	}
-    
 
 }

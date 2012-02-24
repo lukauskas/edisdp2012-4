@@ -125,6 +125,7 @@ public class Coord {
 
     /**
      * Creates a new coord rotated counter-clockwise by an angle.
+     * around the origin
      * 
      * @param orientation
      */
