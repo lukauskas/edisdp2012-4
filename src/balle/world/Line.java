@@ -47,7 +47,7 @@ public class Line {
      * @return
      */
     public Coord midpoint() {
-        return new Coord((getA().getX() + getB().getY()) / 2.0,
+        return new Coord((getA().getX() + getB().getX()) / 2.0,
                 (getA().getY() + getB().getY()) / 2.0);
     }
 }
