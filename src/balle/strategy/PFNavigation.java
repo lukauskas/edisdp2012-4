@@ -9,7 +9,6 @@ import balle.strategy.pFStrategy.Pos;
 import balle.strategy.pFStrategy.RobotConf;
 import balle.strategy.pFStrategy.VelocityVec;
 import balle.strategy.planner.AbstractPlanner;
-import balle.world.AbstractWorld;
 import balle.world.Snapshot;
 
 public class PFNavigation extends AbstractPlanner {
@@ -28,18 +27,8 @@ public class PFNavigation extends AbstractPlanner {
     // TargetPower=16 works quite well.
     PFPlanning                  plann = new PFPlanning(conf, 0, 1, 16, 0.5);
 
-    public PFNavigation(Controller controller, AbstractWorld world) {
-        super(controller, world);
-    }
-
     @Override
-    protected void aiStep() {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    protected void aiMove(Controller controller) {
+    public void step(Controller controller) {
         // TODO Auto-generated method stub
         Snapshot snap = getSnapshot();
 
@@ -70,5 +59,10 @@ public class PFNavigation extends AbstractPlanner {
 
             controller.setWheelSpeeds((int) left, (int) right);
         }
+    }
+
+    @Override
+    public void stop(Controller controller) {
+        controller.stop();
     }
 }

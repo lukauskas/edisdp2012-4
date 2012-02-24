@@ -6,19 +6,19 @@ import balle.world.Snapshot;
 public interface Strategy {
 
     /**
-     * Notify the executor of a change in the current state
+     * Notify the strategy of a change in the current state
      * 
      * @param snapshot
      */
     public void updateState(Snapshot snapshot);
 
     /**
-     * Tell the executor to do a step (e.g. move forward).
+     * Tell the strategy to do a step (e.g. move forward).
      */
     public void step(Controller controller);
 
     /**
-     * Tell the executor to stop doing whatever it was doing.
+     * Tell the strategy to stop doing whatever it was doing.
      * 
      * @param controller
      */

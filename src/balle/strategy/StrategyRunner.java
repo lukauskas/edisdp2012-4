@@ -13,7 +13,7 @@ public class StrategyRunner extends AbstractWorldProcessor {
 
     private Strategy            currentStrategy;
 
-    public StrategyRunner(AbstractWorld world, Controller controller) {
+    public StrategyRunner(Controller controller, AbstractWorld world) {
         super(world);
         this.controller = controller;
         this.currentStrategy = null;
