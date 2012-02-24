@@ -40,6 +40,10 @@ public class Line {
     public Line add(Coord position) {
         return new Line(a.add(position), b.add(position));
     }
+    
+    public Coord getIntersect() {
+    	
+    }
 
     /**
      * Returns the midpoint of the line

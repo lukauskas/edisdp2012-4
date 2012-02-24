@@ -22,6 +22,8 @@ public class Globals {
     public static final float  PITCH_WIDTH               = 2.4384f;                 // Metres
     public static final float  PITCH_HEIGHT              = 1.2192f;                 // Metres
     public static final float  GOAL_POSITION             = 0.31f;                   // Metres
+    
+    public static final float ROBOT_POSSESS_DISTANCE = 0.05f;
 
     public static final float  METERS_PER_PIXEL          = PITCH_WIDTH / 605f;
 
