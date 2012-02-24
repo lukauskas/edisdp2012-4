@@ -16,7 +16,7 @@ public class StrategyFactoryTest {
         String[] availableDesignators = StrategyFactory.availableDesignators();
         for (String designator : availableDesignators) {
             // An actual test
-            StrategyFactory.createClass(designator, null, null);
+            StrategyFactory.createClass(designator);
         }
     }
 
