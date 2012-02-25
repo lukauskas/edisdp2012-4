@@ -123,7 +123,7 @@ public class Runner {
     }
 
     public static void initialiseGUI(Controller controller,
-            AbstractWorld world, StrategyLogPane strategyLog) {
+            AbstractWorld world, StrategyLogPane strategyLog, Simulator simulator) {
         SimpleWorldGUI gui;
         gui = new SimpleWorldGUI(world);
         GUITab mainWindow = new GUITab();
@@ -131,7 +131,7 @@ public class Runner {
         StrategyRunner strategyRunner = new StrategyRunner(controller, world,
                 gui);
 
-        StratTab strategyTab = new StratTab(controller, world, strategyRunner);
+        StratTab strategyTab = new StratTab(controller, world, strategyRunner, simulator);
         for (String strategy : StrategyFactory.availableDesignators())
             strategyTab.addStrategy(strategy);
 
@@ -170,7 +170,7 @@ public class Runner {
             continue;
         }
 
-        initialiseGUI(controller, world, strategyLog);
+        initialiseGUI(controller, world, strategyLog, null);
 
         // Create visionInput buffer
         visionInput = new SocketVisionReader();
@@ -192,6 +192,6 @@ public class Runner {
 
         System.out.println(bot);
 
-        initialiseGUI(bot, world, strategyLog);
+        initialiseGUI(bot, world, strategyLog, simulator);
     }
 }
