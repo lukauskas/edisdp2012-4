@@ -30,6 +30,7 @@ public class GoToObjectPFN implements MovementExecutor {
         return stopDistance;
     }
 
+    @Override
     public void setStopDistance(double stopDistance) {
         this.stopDistance = stopDistance;
     }
@@ -48,7 +49,9 @@ public class GoToObjectPFN implements MovementExecutor {
     public GoToObjectPFN(double stopDistance) {
         this.stopDistance = stopDistance;
         RobotConf conf = new RobotConf(ROBOT_TRACK_WIDTH, WHEEL_RADIUS);
-        plann = new PFPlanning(conf, 0, 1, 12, 0.5);
+        // plann = new PFPlanning(conf, 0, 1, 12, 0.5); // No opponent avoidance
+        // Avoids opponent:
+        plann = new PFPlanning(conf, 0.05, 0.4, 16, 32);
     }
 
     @Override
@@ -65,8 +68,7 @@ public class GoToObjectPFN implements MovementExecutor {
 
     @Override
     public boolean isFinished() {
-        if ((snapshot == null) || (target == null)
-                || (target.getPosition() == null)
+        if ((snapshot == null) || (target == null) || (target.getPosition() == null)
                 || (snapshot.getBalle().getPosition() == null))
             return false;
         return target.getPosition().dist(snapshot.getBalle().getPosition()) <= getStopDistance();
@@ -76,8 +78,8 @@ public class GoToObjectPFN implements MovementExecutor {
     @Override
     public boolean isPossible() {
         return ((snapshot != null) && (target != null)
-                && (snapshot.getBalle().getPosition() != null) && (snapshot
-                .getBalle().getOrientation() != null));
+                && (snapshot.getBalle().getPosition() != null) && (snapshot.getBalle()
+                .getOrientation() != null));
     }
 
     @Override
@@ -95,22 +97,20 @@ public class GoToObjectPFN implements MovementExecutor {
         if (snapshot.getOpponent().getOrientation() == null)
             opponent = null;
         else
-            opponent = new Pos(new Point(snapshot.getOpponent().getPosition()
-                    .getX(), snapshot.getOpponent().getPosition().getY()),
-                    snapshot.getOpponent().getOrientation().radians());
+            opponent = new Pos(new Point(snapshot.getOpponent().getPosition().getX(), snapshot
+                    .getOpponent().getPosition().getY()), snapshot.getOpponent().getOrientation()
+                    .radians());
 
         // Our pos
-        Pos initPos = new Pos(new Point(snapshot.getBalle().getPosition()
-                .getX(), snapshot.getBalle().getPosition().getY()), snapshot
-                .getBalle().getOrientation().radians());
+        Pos initPos = new Pos(new Point(snapshot.getBalle().getPosition().getX(), snapshot
+                .getBalle().getPosition().getY()), snapshot.getBalle().getOrientation().radians());
 
         // Target pos
-        Point targetLoc = new Point(target.getPosition().getX(), target
-                .getPosition().getY());
+        Point targetLoc = new Point(target.getPosition().getX(), target.getPosition().getY());
 
         VelocityVec res = plann.update(initPos, opponent, targetLoc);
-        LOG.trace("UNSCALED Left speed: " + Math.toDegrees(res.getLeft())
-                + " right speed: " + Math.toDegrees(res.getRight()));
+        LOG.trace("UNSCALED Left speed: " + Math.toDegrees(res.getLeft()) + " right speed: "
+                + Math.toDegrees(res.getRight()));
         double left, right;
 
         res = res.scale();
