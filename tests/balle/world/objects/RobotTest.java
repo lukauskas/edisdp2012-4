@@ -46,6 +46,21 @@ public class RobotTest {
     }
 
     /**
+     * Given a robot, robot's facing line should contain a point that is just in
+     * front of it.
+     */
+    @Test
+    public void testFacingLine() {
+
+        Robot robot = new Robot(new Coord(0.5, 0.5), new Velocity(0, 0, 1),
+                new Orientation(0, true));
+        Line facingLine = robot.getFacingLine();
+        Coord testPoint = new Coord(0.5 + robot.getHeight() / 2, 0.5);
+        assertTrue(facingLine.contains(testPoint));
+
+    }
+
+    /**
      * Given a robot and a ball that is located just in front of it, the ball
      * kick line should contain a point that is 1 ball radius away from the
      * center of the ball towards the robot's orientation;
