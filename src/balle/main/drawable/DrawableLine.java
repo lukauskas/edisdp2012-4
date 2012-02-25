@@ -13,6 +13,7 @@ public class DrawableLine implements Drawable {
 
     @Override
     public void draw(Graphics g, Scaler scaler) {
+        g.setColor(colour);
         g.drawLine(scaler.m2PX(line.getA().getX()), scaler.m2PY(line.getA().getY()),
                 scaler.m2PX(line.getB().getX()), scaler.m2PY(line.getB().getY()));
     }
