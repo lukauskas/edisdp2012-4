@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import balle.misc.Globals;
 import balle.world.Coord;
+import balle.world.Line;
 import balle.world.Orientation;
 import balle.world.Velocity;
 
@@ -20,8 +21,8 @@ public class RobotTest {
         Robot robot = new Robot(new Coord(0.5, 0.5), new Velocity(0, 0, 1),
                 new Orientation(0, true));
 
-        Ball ball = new Ball(new Coord(0.5 + robot.getHeight() / 2
-                + Globals.BALL_RADIUS, 0.5), new Velocity(0, 0, 1));
+        Ball ball = new Ball(new Coord(0.5 + robot.getHeight() / 2 + Globals.BALL_RADIUS, 0.5),
+                new Velocity(0, 0, 1));
 
         assertTrue(robot.possessesBall(ball));
 
@@ -34,13 +35,33 @@ public class RobotTest {
      */
     @Test
     public void testPossessesBallOtherWayAround() {
-        Robot robot = new Robot(new Coord(0.5, 0.5), new Velocity(0, 0, 1),
-                new Orientation(-Math.PI, true));
+        Robot robot = new Robot(new Coord(0.5, 0.5), new Velocity(0, 0, 1), new Orientation(
+                -Math.PI, true));
 
-        Ball ball = new Ball(new Coord(0.5 - robot.getHeight() / 2
-                - Globals.BALL_RADIUS, 0.5), new Velocity(0, 0, 1));
+        Ball ball = new Ball(new Coord(0.5 - robot.getHeight() / 2 - Globals.BALL_RADIUS, 0.5),
+                new Velocity(0, 0, 1));
 
         assertTrue(robot.possessesBall(ball));
+
+    }
+
+    /**
+     * Given a robot and a ball that is located just in front of it, the ball
+     * kick line should contain a point that is 1 ball radius away from the
+     * center of the ball towards the robot's orientation;
+     */
+    @Test
+    public void testBallKickLine() {
+
+        Robot robot = new Robot(new Coord(0.5, 0.5), new Velocity(0, 0, 1),
+                new Orientation(0, true));
+
+        Ball ball = new Ball(new Coord(0.5 + robot.getHeight() / 2 + Globals.BALL_RADIUS, 0.5),
+                new Velocity(0, 0, 1));
+
+        Line ballKickLine = robot.getBallKickLine(ball);
+        Coord testPoint = new Coord(0.5 + robot.getHeight() / 2 + 2 * Globals.BALL_RADIUS, 0.5);
+        assertTrue(ballKickLine.contains(testPoint));
 
     }
 }
