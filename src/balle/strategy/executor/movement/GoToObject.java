@@ -1,19 +1,22 @@
 package balle.strategy.executor.movement;
 
+import java.util.ArrayList;
+
 import balle.controller.Controller;
+import balle.main.Drawable;
 import balle.strategy.executor.turning.RotateToOrientationExecutor;
 import balle.world.Coord;
 import balle.world.Orientation;
 import balle.world.Snapshot;
-import balle.world.objects.FieldObject;
 import balle.world.objects.Robot;
+import balle.world.objects.StaticFieldObject;
 
 public class GoToObject implements MovementExecutor {
 
-    private final static double DISTANCE_TO_STOP_AT       = 0.2;
+    private double              stopDistance              = 0.2;
     private final static double EPSILON                   = 0.00001;
 
-    protected FieldObject       target                    = null;
+    protected StaticFieldObject target                    = null;
     protected Snapshot          currentState              = null;
     private boolean             isMoving                  = false;
 
@@ -27,7 +30,7 @@ public class GoToObject implements MovementExecutor {
     }
 
     @Override
-    public void updateTarget(FieldObject target) {
+    public void updateTarget(StaticFieldObject target) {
         this.target = target;
     }
 
@@ -38,7 +41,7 @@ public class GoToObject implements MovementExecutor {
         if ((target == null) || (currentPosition == null)) {
             return false;
         }
-        return ((currentPosition.dist(target.getPosition()) - DISTANCE_TO_STOP_AT) < EPSILON);
+        return ((currentPosition.dist(target.getPosition()) - stopDistance) < EPSILON);
     }
 
     @Override
@@ -133,5 +136,16 @@ public class GoToObject implements MovementExecutor {
         // Note that we do not want to just call controller.stop()
         // blindly in case there are some other executors using it. (even though
         // there shouldn't be)
+    }
+
+    @Override
+    public ArrayList<Drawable> getDrawables() {
+        return new ArrayList<Drawable>();
+    }
+
+    @Override
+    public void setStopDistance(double stopDistance) {
+        this.stopDistance = stopDistance;
+
     }
 }

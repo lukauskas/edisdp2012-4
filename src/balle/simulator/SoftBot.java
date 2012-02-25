@@ -31,15 +31,13 @@ public class SoftBot implements Controller {
 	@Override
 	public void backward(int speed) {
 		rotating = false;
-		leftWheelSpeed = -speed;
-		rightWheelSpeed = -speed;
+		setWheelSpeeds(-speed, -speed);
 	}
 
 	@Override
 	public void forward(int speed) {
 		rotating = false;
-		leftWheelSpeed = speed;
-		rightWheelSpeed = speed;
+		setWheelSpeeds(speed, speed);
 	}
 
 	@Override
@@ -52,8 +50,7 @@ public class SoftBot implements Controller {
 	@Override
 	public void stop() {
 		rotating = false;
-		leftWheelSpeed = 0;
-		rightWheelSpeed = 0;
+		setWheelSpeeds(0,0);
 	}
 
 	/**
@@ -72,13 +69,11 @@ public class SoftBot implements Controller {
 				* Globals.ROBOT_TRACK_WIDTH * (float) Math.PI) / 360f);
 		// turning right
 		if (deg < 0) {
-			leftWheelSpeed = wheelVelocity;
-			rightWheelSpeed = -wheelVelocity;
-			// turning left
-		} else {
-			leftWheelSpeed = -wheelVelocity;
-			rightWheelSpeed = wheelVelocity;
-
+			setWheelSpeeds((int)wheelVelocity, (int)-wheelVelocity);
+		}
+		// turning left
+		else {
+			setWheelSpeeds((int)-wheelVelocity, (int)wheelVelocity);
 		}
 
 		desiredAngle = (body.getAngle() + ((float) Math.PI * deg / 180))
@@ -91,6 +86,12 @@ public class SoftBot implements Controller {
 	@Override
 	public void setWheelSpeeds(int leftWheelSpeed, int rightWheelSpeed) {
 		rotating = false;
+		int max = getMaximumWheelSpeed();
+		if(leftWheelSpeed > max) leftWheelSpeed = max;
+		else if(leftWheelSpeed < -max) leftWheelSpeed = -max;
+		if(rightWheelSpeed > max) rightWheelSpeed = max;
+		else if(rightWheelSpeed < -max) rightWheelSpeed = -max;
+		
 		this.leftWheelSpeed = leftWheelSpeed;
 		this.rightWheelSpeed = rightWheelSpeed;
 		// System.out.println("setWheelSpeeds(): "+leftWheelSpeed+" "+rightWheelSpeed);
@@ -99,7 +100,7 @@ public class SoftBot implements Controller {
 
 	@Override
 	public int getMaximumWheelSpeed() {
-		return 720;
+		return Globals.MAXIMUM_MOTOR_SPEED;
 	}
 
 	@Override
@@ -133,16 +134,22 @@ public class SoftBot implements Controller {
 	}
 
 	/**
-	 * return the angles to the desired angle. mod 180
+	 * return the angles to the desired angle. between -PI and PI
 	 * 
 	 * @return
 	 */
 	public float deltaDesiredAngle() {
-		float d = (float) (body.getAngle() % (2 * Math.PI)) - getDesiredAngle();
+		float d = (float) ((body.getAngle()% (2 * (float)Math.PI)) - getDesiredAngle());
+		// -2PI <= d <= 2PI
+		// if |d| > PI then change direction of the angle
+		if(Math.abs(d) > Math.PI) {
+			if(d < 0) d += 2*Math.PI;
+			else      d -= 2*Math.PI;
+		}
 		if (d == Math.PI) {
 			return d;
 		}
-		return d % (float) Math.PI;
+		return d;
 	}
 
 	public boolean isRotating() {
