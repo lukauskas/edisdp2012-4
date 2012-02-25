@@ -16,16 +16,16 @@ public class PFNavigation extends AbstractPlanner {
     private static final Logger LOG   = Logger.getLogger(PFNavigation.class);
 
     // Track width
-    double                      b     = 13.0f;
+    double                      b     = 0.013f;
     // Wheel radius
-    double                      r     = 8.16f / 2;
+    double                      r     = 0.0816f / 2;
     RobotConf                   conf  = new RobotConf(b, r);
 
     // PFPlanning plann = new PFPlanning(conf, 100000,
     // Double.MAX_VALUE, 0.05, 500.0);
 
     // TargetPower=16 works quite well.
-    PFPlanning                  plann = new PFPlanning(conf, 0.05, 0.4, 16, 32);
+    PFPlanning                  plann = new PFPlanning(conf, 0.05, 0.4, 52, 80);
 
     @Override
     public void step(Controller controller) {
