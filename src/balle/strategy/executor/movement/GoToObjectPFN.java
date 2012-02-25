@@ -10,6 +10,7 @@ import balle.misc.Globals;
 import balle.strategy.pFStrategy.PFPlanning;
 import balle.strategy.pFStrategy.Point;
 import balle.strategy.pFStrategy.Pos;
+import balle.strategy.pFStrategy.RectObject;
 import balle.strategy.pFStrategy.RobotConf;
 import balle.strategy.pFStrategy.VelocityVec;
 import balle.world.Snapshot;
@@ -22,7 +23,7 @@ public class GoToObjectPFN implements MovementExecutor {
 
     // cm
     private static final double ROBOT_TRACK_WIDTH = Globals.ROBOT_TRACK_WIDTH * 100;
-    private static final double WHEEL_RADIUS      = Globals.ROBOT_WHEEL_DIAMETER * 100 / 2;
+    private static final double WHEEL_RADIUS      = Globals.ROBOT_WHEEL_DIAMETER * 100 / 2.0;
 
     private double              stopDistance;                                                // meters
 
@@ -51,7 +52,23 @@ public class GoToObjectPFN implements MovementExecutor {
         RobotConf conf = new RobotConf(ROBOT_TRACK_WIDTH, WHEEL_RADIUS);
         // plann = new PFPlanning(conf, 0, 1, 12, 0.5); // No opponent avoidance
         // Avoids opponent:
-        plann = new PFPlanning(conf, 0.05, 0.4, 16, 32);
+        plann = new PFPlanning(conf, 0.05, 0.4, 20, 32);
+
+        // Add walls
+        double wallPower = 0.01;
+        RectObject leftWall = new RectObject(new Point(0, Globals.PITCH_HEIGHT), new Point(0, 0),
+                wallPower, Double.MAX_VALUE);
+        RectObject rightWall = new RectObject(new Point(Globals.PITCH_WIDTH, Globals.PITCH_HEIGHT),
+                new Point(Globals.PITCH_WIDTH, 0), wallPower, Double.MAX_VALUE);
+        RectObject topWall = new RectObject(new Point(0, Globals.PITCH_HEIGHT), new Point(
+                Globals.PITCH_WIDTH, Globals.PITCH_HEIGHT), wallPower, Double.MAX_VALUE);
+        RectObject bottomWall = new RectObject(new Point(0, 0), new Point(Globals.PITCH_WIDTH, 0),
+                wallPower, Double.MAX_VALUE);
+
+        plann.addObject(leftWall);
+        plann.addObject(rightWall);
+        plann.addObject(topWall);
+        plann.addObject(bottomWall);
     }
 
     @Override

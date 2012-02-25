@@ -110,7 +110,7 @@ public class PFPlanning {
     }
 
     /** Adds static object in the arena to list of static obstacles. */
-    public void AddObjects(Object r) {
+    public void addObject(Object r) {
         objects.add(r);
     }
 
