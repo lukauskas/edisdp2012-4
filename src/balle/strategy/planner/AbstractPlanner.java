@@ -3,13 +3,13 @@ package balle.strategy.planner;
 import java.util.ArrayList;
 
 import balle.controller.Controller;
-import balle.main.Drawable;
+import balle.main.drawable.Drawable;
 import balle.strategy.Strategy;
 import balle.world.Snapshot;
 
 public abstract class AbstractPlanner implements Strategy {
-    private Snapshot            snapshot;
-    private ArrayList<Drawable> drawables = new ArrayList<Drawable>();
+    private Snapshot                  snapshot;
+    private final ArrayList<Drawable> drawables = new ArrayList<Drawable>();
 
     /**
      * Notify the executor of a change in the current state

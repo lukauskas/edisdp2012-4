@@ -3,7 +3,7 @@ package balle.strategy.executor.movement;
 import java.util.ArrayList;
 
 import balle.controller.Controller;
-import balle.main.Drawable;
+import balle.main.drawable.Drawable;
 import balle.strategy.executor.turning.RotateToOrientationExecutor;
 import balle.world.Coord;
 import balle.world.Orientation;
@@ -89,18 +89,15 @@ public class GoToObject implements MovementExecutor {
                 turningExecutor.step(controller);
                 return; // Continue
             } else {
-                Orientation orientationToTarget = targetCoord.sub(
-                        currentPosition).orientation();
+                Orientation orientationToTarget = targetCoord.sub(currentPosition).orientation();
                 turningExecutor.setTargetOrientation(orientationToTarget);
                 double turnAngle = turningExecutor.getAngleToTurn();
                 double dist = targetCoord.dist(robot.getPosition());
-                double distDiffFromTarget = Math
-                        .abs(Math.sin(turnAngle) * dist);
+                double distDiffFromTarget = Math.abs(Math.sin(turnAngle) * dist);
 
                 // sin(180) = sin(0) thus the check
                 if ((Math.abs(turnAngle) > Math.PI / 2)
-                        || (Math.abs(distDiffFromTarget) > DISTANCE_DIFF_TO_TURN_FOR
-                                * dist)) {
+                        || (Math.abs(distDiffFromTarget) > DISTANCE_DIFF_TO_TURN_FOR * dist)) {
 
                     if (isMoving) {
                         controller.stop();

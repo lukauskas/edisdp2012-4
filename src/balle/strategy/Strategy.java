@@ -3,7 +3,7 @@ package balle.strategy;
 import java.util.ArrayList;
 
 import balle.controller.Controller;
-import balle.main.Drawable;
+import balle.main.drawable.Drawable;
 import balle.world.Snapshot;
 
 public interface Strategy {

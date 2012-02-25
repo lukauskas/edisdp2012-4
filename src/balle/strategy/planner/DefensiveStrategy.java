@@ -4,6 +4,7 @@ import java.awt.Color;
 
 import org.apache.log4j.Logger;
 
+import balle.main.drawable.DrawableLine;
 import balle.strategy.executor.movement.MovementExecutor;
 import balle.world.Coord;
 import balle.world.Line;
@@ -33,8 +34,8 @@ public class DefensiveStrategy extends GoToBall {
         if (opponent.getPosition() == null)
             return null;
 
-        Line defenceLine = new Line(opponent.getPosition(), ownGoal
-                .getGoalLine().midpoint());
+        Line defenceLine = new Line(opponent.getPosition(), ownGoal.getGoalLine().midpoint());
+        addDrawable(new DrawableLine(defenceLine, Color.WHITE));
 
         // TODO: change this to point of intersection.
         return defenceLine.midpoint();
@@ -47,7 +48,7 @@ public class DefensiveStrategy extends GoToBall {
 
     @Override
     protected Color getTargetColor() {
-        return Color.CYAN;
+        return Color.PINK;
     }
 
 }
