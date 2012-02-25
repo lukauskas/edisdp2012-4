@@ -1,7 +1,5 @@
 package balle.world.objects;
 
-import java.awt.geom.Line2D;
-
 import balle.misc.Globals;
 import balle.world.Coord;
 import balle.world.Line;
@@ -11,8 +9,7 @@ import balle.world.Velocity;
 public class Robot extends RectangularObject {
 
     public Robot(Coord position, Velocity velocity, Orientation orientation) {
-        super(position, velocity, orientation, Globals.ROBOT_WIDTH,
-                Globals.ROBOT_LENGTH);
+        super(position, velocity, orientation, Globals.ROBOT_WIDTH, Globals.ROBOT_LENGTH);
     }
 
     /**
@@ -29,7 +26,7 @@ public class Robot extends RectangularObject {
         possessVector = possessVector.rotate(getOrientation());
 
         Coord possessPosition = getPosition().add(possessVector);
-        
+
         double distance = ball.getPosition().dist(possessPosition);
         return distance <= Globals.ROBOT_POSSESS_DISTANCE + ball.getRadius();
     }
@@ -54,13 +51,13 @@ public class Robot extends RectangularObject {
 
         return new Line(x0, y0, x1, y1);
     }
-    
+
     public Line getFacingLine() {
-    	double x0, y0, x1, y1;
+        double x0, y0, x1, y1;
         x0 = getPosition().getX();
         y0 = getPosition().getY();
 
-        Coord target = new Coord(Globals.ROBOT_MAX_KICK_DISTANCE, 0);
+        Coord target = new Coord(Globals.PITCH_WIDTH, 0);
         target.rotate(getOrientation());
 
         x1 = target.getX();
@@ -93,17 +90,11 @@ public class Robot extends RectangularObject {
      */
     public boolean isFacingGoal(Goal goal) {
 
-        double x1, y1, x2, y2;
-        x1 = goal.getLeftPostCoord().getX();
-        y1 = goal.getLeftPostCoord().getY();
-        x2 = goal.getRightPostCoord().getX();
-        y2 = goal.getRightPostCoord().getY();
-
+        Line goalLine = goal.getGoalLine();
         Line facingLine = getFacingLine();
 
-        return Line2D.linesIntersect(x1, y1, x2, y2,
-                facingLine.getA().getX(), facingLine.getA().getY(),
-                facingLine.getB().getX(), facingLine.getB().getY());
+        return facingLine.intersects(goalLine);
+
     }
 
 }
