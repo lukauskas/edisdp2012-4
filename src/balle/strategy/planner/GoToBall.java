@@ -8,7 +8,7 @@ import java.awt.Color;
 import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
-import balle.main.Drawable;
+import balle.main.drawable.Dot;
 import balle.strategy.executor.movement.MovementExecutor;
 import balle.world.objects.StaticFieldObject;
 
@@ -52,8 +52,7 @@ public class GoToBall extends AbstractPlanner {
         executorStrategy.updateTarget(target);
         // Draw the target
         if (target.getPosition() != null)
-            addDrawable(new Drawable(Drawable.POINT, target.getPosition()
-                    .getX(), target.getPosition().getY(), getTargetColor()));
+            addDrawable(new Dot(target.getPosition(), getTargetColor()));
 
         // If it says it is not finished, tell it to do something for a step.
         if (!executorStrategy.isFinished()) {

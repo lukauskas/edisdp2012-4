@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
-import balle.main.Drawable;
+import balle.main.drawable.Drawable;
 import balle.misc.Globals;
 import balle.strategy.pFStrategy.PFPlanning;
 import balle.strategy.pFStrategy.Point;

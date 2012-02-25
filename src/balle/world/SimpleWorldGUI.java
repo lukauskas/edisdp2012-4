@@ -13,7 +13,7 @@ import javax.swing.JPanel;
 
 import org.apache.log4j.Logger;
 
-import balle.main.Drawable;
+import balle.main.drawable.Drawable;
 import balle.misc.Globals;
 import balle.world.objects.Ball;
 import balle.world.objects.Goal;
@@ -76,7 +76,7 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
         }
 
         public void setDrawables(ArrayList<Drawable> drawables) {
-            this.drawables = drawables;
+            this.drawables = new ArrayList<Drawable>(drawables);
         }
 
         @Override
@@ -91,19 +91,9 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
             drawMousePos(g);
 
             for (Drawable d : drawables) {
-                drawDrawable(g, d);
+                d.draw(g, scaler);
             }
             drawables.clear();
-        }
-
-        private void drawDrawable(Graphics g, Drawable drawable) {
-            if (drawable.getType() == Drawable.POINT) {
-                float w = 5;
-                g.setColor(drawable.getColour());
-                g.fillOval((int) (scaler.m2PX(drawable.getX()) - (w / 2)),
-                        (int) (scaler.m2PY(drawable.getY()) - (w / 2)), (int) w, (int) w);
-            } else
-                LOG.error("Cannot draw Drawable of type " + drawable.getType());
         }
 
         private void drawField(Graphics g) {

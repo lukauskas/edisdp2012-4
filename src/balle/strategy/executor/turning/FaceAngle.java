@@ -3,7 +3,7 @@ package balle.strategy.executor.turning;
 import java.util.ArrayList;
 
 import balle.controller.Controller;
-import balle.main.Drawable;
+import balle.main.drawable.Drawable;
 import balle.strategy.executor.Executor;
 import balle.world.Orientation;
 import balle.world.Snapshot;
@@ -85,8 +85,7 @@ public class FaceAngle implements Executor, RotateToOrientationExecutor {
     }
 
     private int calculateTimeToTurn(double radiansToTurn) {
-        return (int) Math.round(Math.abs(radiansToTurn)
-                / ((Math.toRadians(TURN_SPEED / 1000.0))))
+        return (int) Math.round(Math.abs(radiansToTurn) / ((Math.toRadians(TURN_SPEED / 1000.0))))
                 + ADDITIONAL_TIME_TO_TURN;
     }
 
