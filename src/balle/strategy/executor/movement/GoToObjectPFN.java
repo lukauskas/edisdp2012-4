@@ -1,8 +1,11 @@
 package balle.strategy.executor.movement;
 
+import java.util.ArrayList;
+
 import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
+import balle.main.Drawable;
 import balle.misc.Globals;
 import balle.strategy.pFStrategy.PFPlanning;
 import balle.strategy.pFStrategy.Point;
@@ -10,7 +13,7 @@ import balle.strategy.pFStrategy.Pos;
 import balle.strategy.pFStrategy.RobotConf;
 import balle.strategy.pFStrategy.VelocityVec;
 import balle.world.Snapshot;
-import balle.world.objects.FieldObject;
+import balle.world.objects.StaticFieldObject;
 
 public class GoToObjectPFN implements MovementExecutor {
     private Snapshot            snapshot          = null;
@@ -31,9 +34,9 @@ public class GoToObjectPFN implements MovementExecutor {
         this.stopDistance = stopDistance;
     }
 
-    private FieldObject target;
+    private StaticFieldObject target;
 
-    PFPlanning          plann;
+    PFPlanning                plann;
 
     /**
      * Instantiates a new go to object executor that uses Potential Fields
@@ -55,7 +58,7 @@ public class GoToObjectPFN implements MovementExecutor {
     }
 
     @Override
-    public void updateTarget(FieldObject target) {
+    public void updateTarget(StaticFieldObject target) {
         this.target = target;
 
     }
@@ -119,4 +122,8 @@ public class GoToObjectPFN implements MovementExecutor {
         controller.setWheelSpeeds((int) left, (int) right);
     }
 
+    @Override
+    public ArrayList<Drawable> getDrawables() {
+        return new ArrayList<Drawable>();
+    }
 }

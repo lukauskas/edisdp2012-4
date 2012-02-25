@@ -6,12 +6,14 @@ import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+import java.util.ArrayList;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.apache.log4j.Logger;
 
+import balle.main.Drawable;
 import balle.misc.Globals;
 import balle.world.objects.Ball;
 import balle.world.objects.Goal;
@@ -51,6 +53,10 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
         panel.add(BorderLayout.CENTER, screen);
     }
 
+    public void setDrawables(ArrayList<Drawable> drawables) {
+        screen.setDrawables(drawables);
+    }
+
     public JPanel getPanel() {
         return panel;
     }
@@ -58,10 +64,15 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
     @SuppressWarnings("serial")
     private class Screen extends JPanel implements MouseMotionListener {
 
-        private float       scale;
-        private final float XSHIFTM     = 0.4f;
-        private final float YSHIFTM     = 0.39f;
-        private final float VIEWHEIGHTM = 2;
+        private float               scale;
+        private final float         XSHIFTM     = 0.4f;
+        private final float         YSHIFTM     = 0.39f;
+        private final float         VIEWHEIGHTM = 2;
+        private ArrayList<Drawable> drawables   = new ArrayList<Drawable>();
+
+        public void setDrawables(ArrayList<Drawable> drawables) {
+            this.drawables = drawables;
+        }
 
         @Override
         public void paintComponent(Graphics g) {
@@ -72,6 +83,22 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
             drawFieldObjects(g);
 
             drawMousePos(g);
+
+            for (Drawable d : drawables) {
+                drawDrawable(g, d);
+            }
+            drawables.clear();
+        }
+
+        private void drawDrawable(Graphics g, Drawable drawable) {
+            if (drawable.getType() == Drawable.POINT) {
+                float w = 5;
+                g.setColor(drawable.getColour());
+                g.fillOval((int) (m2PX(drawable.getX()) - (w / 2)),
+                        (int) (m2PY(drawable.getY()) - (w / 2)), (int) w,
+                        (int) w);
+            } else
+                LOG.error("Cannot draw Drawable of type " + drawable.getType());
         }
 
         private void drawField(Graphics g) {
@@ -224,8 +251,8 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
         }
 
         private void drawGoals(Graphics g) {
-            drawGoal(g, Color.green, getSnapshot().getOwnGoal());
-            drawGoal(g, Color.red, getSnapshot().getOpponentsGoal());
+            drawGoal(g, Color.red, getSnapshot().getOwnGoal());
+            drawGoal(g, Color.green, getSnapshot().getOpponentsGoal());
         }
 
         private void drawGoal(Graphics g, Color c, Goal goal) {
@@ -303,7 +330,7 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 
         double timePerFrame = 1000.0 / fpsCount;
         if ((fpsCount > 0) && (age < timePerFrame * 1.5)) {
-            fps.setForeground(Color.GREEN);
+            fps.setForeground(new Color(50, 150, 50));
             fpsWarning.setVisible(false);
         } else if ((fpsCount > 0) && (age < timePerFrame * 3)) {
             fps.setForeground(Color.ORANGE);

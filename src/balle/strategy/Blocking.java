@@ -2,7 +2,6 @@ package balle.strategy;
 
 import balle.controller.Controller;
 import balle.strategy.planner.AbstractPlanner;
-import balle.world.AbstractWorld;
 import balle.world.Coord;
 import balle.world.objects.FieldObject;
 import balle.world.objects.Robot;
@@ -13,19 +12,8 @@ public class Blocking extends AbstractPlanner {
     private boolean goingForward  = false;
     private boolean goingBackward = false;
 
-    public Blocking(Controller controller, AbstractWorld world) {
-        super(controller, world);
-        // TODO Auto-generated constructor stub
-    }
-
     @Override
-    protected void aiStep() {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    protected void aiMove(Controller controller) {
+    public void step(Controller controller) {
         if (getSnapshot() == null) {
             System.out.println("No Snapshot");
             return;

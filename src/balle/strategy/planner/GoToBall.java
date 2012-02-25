@@ -3,11 +3,14 @@
  */
 package balle.strategy.planner;
 
+import java.awt.Color;
+
 import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
+import balle.main.Drawable;
 import balle.strategy.executor.movement.MovementExecutor;
-import balle.world.AbstractWorld;
+import balle.world.objects.StaticFieldObject;
 
 /**
  * @author s0909773
@@ -23,21 +26,21 @@ public class GoToBall extends AbstractPlanner {
      * @param controller
      * @param world
      */
-    public GoToBall(Controller controller, AbstractWorld world,
-            MovementExecutor movementExecutor) {
-        super(controller, world);
+    public GoToBall(MovementExecutor movementExecutor) {
         executorStrategy = movementExecutor;
 
     }
 
-    @Override
-    protected void aiStep() {
-        // Do .. nothing?
+    protected StaticFieldObject getTarget() {
+        return getSnapshot().getBall();
+    }
 
+    protected Color getTargetColor() {
+        return Color.CYAN;
     }
 
     @Override
-    protected void aiMove(Controller controller) {
+    public void step(Controller controller) {
         if (getSnapshot() == null)
             return;
 
@@ -45,7 +48,12 @@ public class GoToBall extends AbstractPlanner {
         executorStrategy.updateState(getSnapshot());
         // Update the target's location in executorStrategy (e.g. if target
         // moved)
-        executorStrategy.updateTarget(getSnapshot().getBall());
+        StaticFieldObject target = getTarget();
+        executorStrategy.updateTarget(target);
+        // Draw the target
+        if (target.getPosition() != null)
+            addDrawable(new Drawable(Drawable.POINT, target.getPosition()
+                    .getX(), target.getPosition().getY(), getTargetColor()));
 
         // If it says it is not finished, tell it to do something for a step.
         if (!executorStrategy.isFinished()) {
@@ -55,5 +63,12 @@ public class GoToBall extends AbstractPlanner {
             executorStrategy.stop(controller);
             LOG.info("We're finished");
         }
+    }
+
+    @Override
+    public void stop(Controller controller) {
+        if (!executorStrategy.isFinished())
+            executorStrategy.stop(controller);
+
     }
 }

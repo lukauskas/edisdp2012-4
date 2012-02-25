@@ -1,50 +1,67 @@
 package balle.strategy.planner;
 
-import org.apache.log4j.Logger;
+import java.util.ArrayList;
 
 import balle.controller.Controller;
-import balle.world.AbstractWorld;
-import balle.world.processing.AbstractWorldProcessor;
+import balle.main.Drawable;
+import balle.strategy.Strategy;
+import balle.world.Snapshot;
 
-public abstract class AbstractPlanner extends AbstractWorldProcessor {
+public abstract class AbstractPlanner implements Strategy {
+    private Snapshot            snapshot;
+    private ArrayList<Drawable> drawables = new ArrayList<Drawable>();
 
-    private final Controller    controller;
-    private final static Logger LOG = Logger.getLogger(AbstractPlanner.class);
+    /**
+     * Notify the executor of a change in the current state
+     * 
+     * @Override
+     * @param snapshot
+     */
+    @Override
+    public void updateState(Snapshot snapshot) {
+        this.snapshot = snapshot;
+        clearDrawables();
+    }
 
-    public AbstractPlanner(Controller controller, AbstractWorld world) {
-        super(world);
-        this.controller = controller;
+    /**
+     * Returns the current snapshot
+     * 
+     * @return the snapshot
+     */
+    protected Snapshot getSnapshot() {
+        return snapshot;
     }
 
     @Override
-    protected void actionOnStep() {
-        aiStep();
-    }
-
-    @Override
-    protected void actionOnChange() {
-        aiMove(controller);
-    }
-
-    protected abstract void aiStep();
-
-    protected abstract void aiMove(Controller controller);
-
-    @Override
-    public void cancel() {
-        super.cancel();
-        LOG.info("Planner stopped");
+    public void stop(Controller controller) {
         controller.stop();
     }
 
     @Override
-    public String toString() {
-        return this.getName();
+    public ArrayList<Drawable> getDrawables() {
+        return drawables;
     }
 
-    @Override
-    public void start() {
-        super.start();
-        LOG.info("Planner started");
+    protected void clearDrawables() {
+        drawables.clear();
     }
+
+    /**
+     * Add a new drawable to the list
+     * 
+     * @param drawable
+     */
+    protected void addDrawable(Drawable drawable) {
+        drawables.add(drawable);
+    }
+
+    /**
+     * Adds a list of drawables to the current set
+     * 
+     * @param drawables
+     */
+    protected void addDrawables(ArrayList<Drawable> drawables) {
+        this.drawables.addAll(drawables);
+    }
+
 }
