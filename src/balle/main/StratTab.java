@@ -28,7 +28,8 @@ public class StratTab extends JPanel implements ActionListener {
     private JPanel				southPanel;
     private JButton             button;
     private JButton             randomButton;
-    private JButton             resetButton;			
+    private JButton             resetButton;
+    private JButton				noiseButton;
     private JComboBox           menu;
     private JLabel              label;
 
@@ -73,8 +74,13 @@ public class StratTab extends JPanel implements ActionListener {
         resetButton.setEnabled(simulator != null);
         resetButton.setActionCommand("reset");
         
-        southPanel.add(BorderLayout.NORTH, randomButton);
+        noiseButton = new JButton("Noise: Off");
+        noiseButton.addActionListener(this);
+        noiseButton.setActionCommand("noise");
+        
+        southPanel.add(BorderLayout.WEST, randomButton);
         southPanel.add(BorderLayout.SOUTH, resetButton);
+        southPanel.add(BorderLayout.EAST, noiseButton);
         
         
         menu = new JComboBox(strings);
@@ -131,6 +137,12 @@ public class StratTab extends JPanel implements ActionListener {
 			button.setText("Start");
 			resetRobots(simulator);
 			resetBall(simulator);
+		} else if (event.getActionCommand().equals("noise")) {
+			if (noiseButton.getText().equals("Noise: Off")) {
+				noiseButton.setText("Noise: On");
+			} else {
+				noiseButton.setText("Noise: Off");
+			}
 		}
 	}
 
