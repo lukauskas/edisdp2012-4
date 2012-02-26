@@ -26,7 +26,7 @@ public class Line {
 
     public boolean contains(Coord a) {
         double dist = getLine2DVersion().ptLineDist(a.getX(), a.getY());
-        if (dist != 0) {
+        if (dist > 0.000001) {
             return false;
         }
 
