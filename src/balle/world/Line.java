@@ -122,4 +122,31 @@ public class Line {
     public double maxY() {
         return Math.max(getA().getY(), getB().getY());
     }
+
+    /**
+     * Returns a point that the closest point on the line segment to the given
+     * point.
+     * 
+     * @param p
+     *            the point provided
+     * @return the closest point
+     */
+    public Coord closestPoint(Coord p) {
+
+        Coord AP = p.sub(getA());
+        Coord AB = getB().sub(getA());
+
+        double t = AB.sqrAbs() / AP.dot(AB);
+
+        Coord closest = new Coord(getA().getX() + AB.getX() * t, getA().getY() + AB.getY() * t);
+        // Check if the closest point is in the segment
+        if (this.contains(closest)) {
+            return closest;
+        } else {
+            if (getA().dist(p) < getB().dist(p))
+                return getA();
+            else
+                return getB();
+        }
+    }
 }

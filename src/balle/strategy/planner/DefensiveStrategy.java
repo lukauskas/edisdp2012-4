@@ -33,9 +33,11 @@ public class DefensiveStrategy extends GoToBall {
         Robot opponent = snapshot.getOpponent();
         Ball ball = snapshot.getBall();
         Robot our = snapshot.getBalle();
-        if (opponent.getPosition() == null)
+        if (our.getPosition() == null)
             return null;
         if (ball.getPosition() == null)
+            return null;
+        if (opponent.getPosition() == null)
             return null;
 
         Coord intersectionPoint = opponent.getBallKickLine(ball)
@@ -54,8 +56,7 @@ public class DefensiveStrategy extends GoToBall {
         Line defenceLine = new Line(ball.getPosition(), intersectionPoint);
         addDrawable(new DrawableLine(defenceLine, Color.WHITE));
 
-        // TODO: change this to point of intersection.
-        return defenceLine.midpoint();
+        return defenceLine.closestPoint(our.getPosition());
     }
 
     @Override
