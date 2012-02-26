@@ -76,11 +76,7 @@ public class Game extends AbstractPlanner {
                 controller.stop();
                 controller.kick();
             } else {
-                // TODO: change this to check whether we are facing towards our
-                // half of the pitch
-                // or towards the opponents half, do not kick if were kicking
-                // back to our side
-                if (!ourRobot.isFacingGoal(ownGoal)) {
+                if (!ourRobot.isFacingGoalHalf(ownGoal)) {
                     // Just try moving the ball forward
                     controller.kick();
                 } else {
