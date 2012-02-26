@@ -52,6 +52,11 @@ public class Robot extends RectangularObject {
         return new Line(x0, y0, x1, y1);
     }
 
+    /**
+     * Returns that represents the robot's facing direction
+     * 
+     * @return the facing line
+     */
     public Line getFacingLine() {
         double x0, y0, x1, y1;
         x0 = getPosition().getX();
@@ -62,6 +67,26 @@ public class Robot extends RectangularObject {
 
         x1 = x0 + target.getX();
         y1 = y0 + target.getY();
+
+        return new Line(x0, y0, x1, y1);
+    }
+
+    /**
+     * Gets the facing line of the robot. Similar to the getFacingLine but the
+     * line returned stretches both forward and backward from the robot.
+     * 
+     * @return the facing line both ways
+     */
+    public Line getFacingLineBothWays() {
+        double x0, y0, x1, y1;
+
+        Coord target = new Coord(Globals.PITCH_WIDTH, 0);
+        target = target.rotate(getOrientation());
+
+        x0 = getPosition().getX() - target.getX();
+        y0 = getPosition().getY() - target.getY();
+        x1 = getPosition().getX() + target.getX();
+        y1 = getPosition().getY() + target.getY();
 
         return new Line(x0, y0, x1, y1);
     }

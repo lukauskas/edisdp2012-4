@@ -117,4 +117,48 @@ public class RobotTest {
         assertTrue(ballKickLine.contains(testPoint));
 
     }
+
+    /**
+     * Given a robot, robot's facing line should contain a point that is just in
+     * front of it and just next to its back, and the robot itself.
+     */
+    @Test
+    public void testFacingLineBothWay() {
+
+        Robot robot = new Robot(new Coord(0.5, 0.5), new Velocity(0, 0, 1), new Orientation(
+                -Math.PI, true));
+        Line facingLine = robot.getFacingLineBothWays();
+        // Just back of
+        Coord testPoint = new Coord(0.5 + robot.getHeight() / 2, 0.5);
+        // Just in front
+        Coord testPoint2 = new Coord(0.5 - robot.getHeight() / 2, 0.5);
+        // The robot
+        Coord testPoint3 = new Coord(0.5, 0.5);
+        assertTrue(facingLine.contains(testPoint));
+        assertTrue(facingLine.contains(testPoint2));
+        assertTrue(facingLine.contains(testPoint3));
+    }
+
+    /**
+     * Given a robot, robot's facing line should contain a point that is just in
+     * front of it and just next to its back, and the robot itself. Different
+     * from the testFacingLineBothWays as the robot orientation is 180 degrees
+     * around
+     */
+    @Test
+    public void testFacingLineBothWaysOtherWayAround() {
+
+        Robot robot = new Robot(new Coord(0.5, 0.5), new Velocity(0, 0, 1),
+                new Orientation(0, true));
+        Line facingLine = robot.getFacingLineBothWays();
+        // Just in front
+        Coord testPoint = new Coord(0.5 + robot.getHeight() / 2, 0.5);
+        // Just back of
+        Coord testPoint2 = new Coord(0.5 - robot.getHeight() / 2, 0.5);
+        // The robot
+        Coord testPoint3 = new Coord(0.5, 0.5);
+        assertTrue(facingLine.contains(testPoint));
+        assertTrue(facingLine.contains(testPoint2));
+        assertTrue(facingLine.contains(testPoint3));
+    }
 }

@@ -12,7 +12,7 @@ public class StrategyFactory {
     public static String[] availableDesignators() {
 
         String[] designators = { "GoToBall", "GoToBallPFN", "Dribble", "Blocking", "PFNavigation",
-                "DefensiveStrategy", "Game", "GameFromPenaltyKick" };
+                "DefensiveStrategy", "Game", "GameFromPenaltyKick", "GameFromPenaltyDefence" };
         return designators;
     }
 
@@ -36,6 +36,8 @@ public class StrategyFactory {
             return new Game();
         } else if (designator.equals("GameFromPenaltyKick")) {
             return new GameFromPenaltyKick();
+        } else if (designator.equals("GameFromPenaltyDefence")) {
+            return new GameFromPenaltyDefence();
         } else
             throw new UnknownDesignatorException("Don't know strategy \"" + designator + "\"");
     }
