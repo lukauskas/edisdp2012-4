@@ -46,8 +46,8 @@ public class Robot extends RectangularObject {
         Coord target = new Coord(Globals.ROBOT_MAX_KICK_DISTANCE, 0);
         target.rotate(getOrientation());
 
-        x1 = target.getX();
-        y1 = target.getY();
+        x1 = x0 + target.getX();
+        y1 = y0 + target.getY();
 
         return new Line(x0, y0, x1, y1);
     }
@@ -60,8 +60,8 @@ public class Robot extends RectangularObject {
         Coord target = new Coord(Globals.PITCH_WIDTH, 0);
         target.rotate(getOrientation());
 
-        x1 = target.getX();
-        y1 = target.getY();
+        x1 = x0 + target.getX();
+        y1 = y0 + target.getY();
 
         return new Line(x0, y0, x1, y1);
     }
