@@ -1,11 +1,8 @@
 package balle.strategy;
 
-import java.awt.Color;
-
 import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
-import balle.main.drawable.DrawableLine;
 import balle.strategy.planner.AbstractPlanner;
 import balle.world.Snapshot;
 import balle.world.objects.Ball;
@@ -56,14 +53,6 @@ public class Game extends AbstractPlanner {
         Goal opponentsGoal = snapshot.getOpponentsGoal();
         Pitch pitch = snapshot.getPitch();
 
-        if (ourRobot.possessesBall(ball)) {
-            addDrawable(new DrawableLine(ourRobot.getBallKickLine(ball), Color.BLUE));
-            addDrawable(new DrawableLine(ourRobot.getFacingLine(), Color.CYAN));
-        }
-        if (opponent.possessesBall(ball)) {
-            addDrawable(new DrawableLine(opponent.getBallKickLine(ball), Color.BLUE));
-            addDrawable(new DrawableLine(opponent.getFacingLine(), Color.CYAN));
-        }
         if (ourRobot.possessesBall(ball)) {
             // Kick if we are facing opponents goal
             if (ourRobot.isFacingGoal(opponentsGoal)) {

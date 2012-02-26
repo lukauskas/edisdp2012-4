@@ -60,7 +60,6 @@ public class GoToBall extends AbstractPlanner {
         } else {
             // Tell the strategy to stop doing whatever it was doing
             executorStrategy.stop(controller);
-            LOG.info("We're finished");
         }
     }
 

@@ -94,7 +94,7 @@ public class GoToObjectPFN implements MovementExecutor {
 
     @Override
     public boolean isPossible() {
-        return ((snapshot != null) && (target != null)
+        return ((snapshot != null) && (target != null) && (target.getPosition() != null)
                 && (snapshot.getBalle().getPosition() != null) && (snapshot.getBalle()
                 .getOrientation() != null));
     }

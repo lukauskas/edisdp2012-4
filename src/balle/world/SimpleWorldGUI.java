@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 import org.apache.log4j.Logger;
 
 import balle.main.drawable.Drawable;
+import balle.main.drawable.DrawableLine;
 import balle.misc.Globals;
 import balle.world.objects.Ball;
 import balle.world.objects.Goal;
@@ -211,11 +212,15 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
             // draw robot, setting the colour depending on robot properties
             // temporary colours until methods have been implemented
             if (robot.possessesBall(s.getBall())) {
+                DrawableLine ballKickLine = new DrawableLine(robot.getBallKickLine(s.getBall()),
+                        Color.BLUE);
+                ballKickLine.draw(g, scaler);
                 if (robot.isInScoringPosition(s.getBall(), s.getOpponentsGoal(), s.getOpponent())) {
                     g.setColor(Color.MAGENTA);
                 } else {
                     g.setColor(Color.ORANGE);
                 }
+
             } else if (!isEstimated) {
                 g.setColor(Color.LIGHT_GRAY);
             } else {
@@ -223,6 +228,10 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
             }
 
             g.fillPolygon(xs, ys, n);
+
+            DrawableLine orientationLine = new DrawableLine(robot.getFacingLine(), c);
+            orientationLine.draw(g, scaler);
+
             g.setColor(c);
             g.fillPolygon(new int[] { xs[2], xs[3], scaler.m2PX(x) }, new int[] { ys[2], ys[3],
                     scaler.m2PY(y) }, 3);
