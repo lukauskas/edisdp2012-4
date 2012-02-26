@@ -59,14 +59,29 @@ public class Game extends AbstractPlanner {
                 LOG.info("Kicking the ball");
                 controller.kick();
             } else {
-                // TODO: turn towards opponent's goal?? or maybe go around ball?
-                LOG.error("Unimplemented turn towards opponent's goal!");
+                // TODO: change this to check whether we are facing towards our
+                // half of the pitch
+                // or towards the opponents half, do not kick if were kicking
+                // back to our side
+                if (!ourRobot.isFacingGoal(ownGoal)) {
+                    // Just try moving the ball forward
+                    controller.kick();
+                } else {
+                    // TODO: turn the robot slightly so we face away from our
+                    // own goal
+                    // setWheelSpeeds to some low number and turn to correct
+                    // direction here
+                    LOG.error("Unimplemented turn towards opponent's goal!");
+                }
             }
         } else if ((opponent.possessesBall(ball)) && (opponent.isFacingGoal(ownGoal))) {
             LOG.info("Defending");
             // Let defensiveStrategy deal with it!
             defensiveStrategy.step(controller);
             addDrawables(defensiveStrategy.getDrawables());
+        } else if (ball.isNear(ourRobot)) {
+            LOG.info("Ball is near our robot, turning to it");
+            // TODO: turn to ball here
         } else if (!ball.isNearWall(pitch)) {
             LOG.info("Approaching ball");
             // Approach ball
