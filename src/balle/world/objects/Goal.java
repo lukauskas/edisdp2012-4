@@ -23,6 +23,14 @@ public class Goal implements StaticFieldObject {
     public double getMaxY() {
         return maxY;
     }
+    
+    public boolean isLeftGoal() {
+    	return leftGoal;
+    }
+    
+    public boolean isRightGoal() {
+    	return !leftGoal;
+    }
 
     public Goal(boolean leftGoal, double minX, double maxX, double minY,
             double maxY) {
