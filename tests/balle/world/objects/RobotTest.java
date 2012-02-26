@@ -61,9 +61,25 @@ public class RobotTest {
     }
 
     /**
+     * Given a robot, robot's facing line should contain a point that is just in
+     * front of it. Same to the testFacingLine, only difference is robot's
+     * orientation
+     */
+    @Test
+    public void testFacingLineOtherwayAround() {
+
+        Robot robot = new Robot(new Coord(0.5, 0.5), new Velocity(0, 0, 1), new Orientation(
+                Math.PI, true));
+        Line facingLine = robot.getFacingLine();
+        Coord testPoint = new Coord(0.5 - robot.getHeight() / 2, 0.5);
+        assertTrue(facingLine.contains(testPoint));
+
+    }
+
+    /**
      * Given a robot and a ball that is located just in front of it, the ball
      * kick line should contain a point that is 1 ball radius away from the
-     * center of the ball towards the robot's orientation;
+     * center of the ball towards the robot's orientation.
      */
     @Test
     public void testBallKickLine() {
@@ -76,6 +92,28 @@ public class RobotTest {
 
         Line ballKickLine = robot.getBallKickLine(ball);
         Coord testPoint = new Coord(0.5 + robot.getHeight() / 2 + 2 * Globals.BALL_RADIUS, 0.5);
+        assertTrue(ballKickLine.contains(testPoint));
+
+    }
+
+    /**
+     * Given a robot and a ball that is located just in front of it, the ball
+     * kick line should contain a point that is 1 ball radius away from the
+     * center of the ball towards the robot's orientation.
+     * 
+     * Same as testBallKickLine, but robot's orienation is other way around
+     */
+    @Test
+    public void testBallKickLineOtherWayAround() {
+
+        Robot robot = new Robot(new Coord(0.5, 0.5), new Velocity(0, 0, 1), new Orientation(
+                Math.PI, true));
+
+        Ball ball = new Ball(new Coord(0.5 - robot.getHeight() / 2 - Globals.BALL_RADIUS, 0.5),
+                new Velocity(0, 0, 1));
+
+        Line ballKickLine = robot.getBallKickLine(ball);
+        Coord testPoint = new Coord(0.5 - robot.getHeight() / 2 - 2 * Globals.BALL_RADIUS, 0.5);
         assertTrue(ballKickLine.contains(testPoint));
 
     }

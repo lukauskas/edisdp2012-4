@@ -58,6 +58,13 @@ public class Game extends AbstractPlanner {
 
         if (ourRobot.possessesBall(ball)) {
             addDrawable(new DrawableLine(ourRobot.getBallKickLine(ball), Color.BLUE));
+            addDrawable(new DrawableLine(ourRobot.getFacingLine(), Color.CYAN));
+        }
+        if (opponent.possessesBall(ball)) {
+            addDrawable(new DrawableLine(opponent.getBallKickLine(ball), Color.BLUE));
+            addDrawable(new DrawableLine(opponent.getFacingLine(), Color.CYAN));
+        }
+        if (ourRobot.possessesBall(ball)) {
             // Kick if we are facing opponents goal
             if (ourRobot.isFacingGoal(opponentsGoal)) {
                 LOG.info("Kicking the ball");
