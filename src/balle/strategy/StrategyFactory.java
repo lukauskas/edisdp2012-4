@@ -11,13 +11,12 @@ import balle.strategy.planner.GoToBall;
 public class StrategyFactory {
     public static String[] availableDesignators() {
 
-        String[] designators = { "GoToBall", "GoToBallPFN", "Dribble",
-                "Blocking", "PFNavigation", "DefensiveStrategy", "Game" };
+        String[] designators = { "GoToBall", "GoToBallPFN", "Dribble", "Blocking", "PFNavigation",
+                "DefensiveStrategy", "Game", "GameFromPenaltyKick" };
         return designators;
     }
 
-    public static AbstractPlanner createClass(String designator)
-            throws UnknownDesignatorException {
+    public static AbstractPlanner createClass(String designator) throws UnknownDesignatorException {
 
         if (designator.equals("GoToBall")) {
             return new GoToBall(new GoToObject(new FaceAngle()));
@@ -35,8 +34,9 @@ public class StrategyFactory {
             return new DefensiveStrategy(new GoToObjectPFN(0.1f));
         } else if (designator.equals("Game")) {
             return new Game();
+        } else if (designator.equals("GameFromPenaltyKick")) {
+            return new GameFromPenaltyKick();
         } else
-            throw new UnknownDesignatorException("Don't know strategy \""
-                    + designator + "\"");
+            throw new UnknownDesignatorException("Don't know strategy \"" + designator + "\"");
     }
 }
