@@ -47,6 +47,7 @@ public class DefensiveStrategy extends GoToBall {
             LOG.debug("No intersection between getBallKickLine and getGoalLine");
             intersectionPoint = opponent.getFacingLine().getIntersect(ownGoal.getGoalLine());
             if (intersectionPoint == null) {
+                // TODO: fix this, this case should not be happening
                 LOG.error("Opponent is not even facing our goal. Defensive strategy should not be in play");
                 return null;
             }

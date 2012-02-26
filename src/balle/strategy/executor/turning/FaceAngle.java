@@ -120,8 +120,25 @@ public class FaceAngle implements Executor, RotateToOrientationExecutor {
         if (!isPossible())
             return 0;
 
+        return getAngleToTurn(currentState.getBalle().getOrientation(), targetOrientation);
+    }
+
+    /**
+     * Returns the angle required to turn using atan2 style radians. Positive
+     * angle means to turn CCW this much radians, whereas negative means turning
+     * CW that amount of radians.
+     * 
+     * @param currentOrientation
+     *            current orientation of the robot
+     * @param targetOrientation
+     *            target orientation
+     * @return the angle to turn
+     */
+    public static double getAngleToTurn(Orientation currentOr, Orientation targetOrientation) {
+        if ((currentOr == null) || (targetOrientation == null))
+            return 0;
+
         double angleToTarget = targetOrientation.atan2styleradians();
-        Orientation currentOr = currentState.getBalle().getOrientation();
         double currentOrientation = currentOr.atan2styleradians();
 
         double turnLeftAngle, turnRightAngle;

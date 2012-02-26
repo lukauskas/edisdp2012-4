@@ -3,7 +3,10 @@ package balle.strategy;
 import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
+import balle.strategy.executor.turning.FaceAngle;
+import balle.strategy.executor.turning.RotateToOrientationExecutor;
 import balle.strategy.planner.AbstractPlanner;
+import balle.world.Orientation;
 import balle.world.Snapshot;
 import balle.world.objects.Ball;
 import balle.world.objects.Goal;
@@ -18,13 +21,22 @@ public class Game extends AbstractPlanner {
     Strategy                    defensiveStrategy;
     Strategy                    goToBallStrategy;
     Strategy                    pickBallFromWallStrategy;
+    RotateToOrientationExecutor turningExecutor;
 
     public Game() throws UnknownDesignatorException {
         defensiveStrategy = StrategyFactory.createClass("DefensiveStrategy");
+        // TODO: implement a new strategy that inherits from GoToBall but always
+        // approaches the ball from correct angle. (This can be done by always
+        // pointing robot
+        // to a location that is say 0.2 m before the ball in correct direction
+        // and then, once the robot reaches it, pointing it to the ball itself
+        // so it reaches it.
         goToBallStrategy = StrategyFactory.createClass("GoToBallPFN");
         // TODO: UPDATE THIS
         pickBallFromWallStrategy = StrategyFactory.createClass("DummyStrategy");
-
+        // TODO: Implement a new turning executor that does not use rotate()
+        // command
+        turningExecutor = new FaceAngle();
     }
 
     @Override
@@ -40,6 +52,7 @@ public class Game extends AbstractPlanner {
         // Propagate the state to our strategies
         defensiveStrategy.updateState(snapshot);
         goToBallStrategy.updateState(snapshot);
+        turningExecutor.updateState(snapshot);
     }
 
     @Override
@@ -53,10 +66,14 @@ public class Game extends AbstractPlanner {
         Goal opponentsGoal = snapshot.getOpponentsGoal();
         Pitch pitch = snapshot.getPitch();
 
+        Orientation targetOrientation = ball.getPosition().sub(ourRobot.getPosition())
+                .orientation();
+
         if (ourRobot.possessesBall(ball)) {
             // Kick if we are facing opponents goal
             if (ourRobot.isFacingGoal(opponentsGoal)) {
                 LOG.info("Kicking the ball");
+                controller.stop();
                 controller.kick();
             } else {
                 // TODO: change this to check whether we are facing towards our
@@ -68,9 +85,14 @@ public class Game extends AbstractPlanner {
                     controller.kick();
                 } else {
                     // TODO: turn the robot slightly so we face away from our
-                    // own goal
-                    // setWheelSpeeds to some low number and turn to correct
-                    // direction here
+                    // own goal.
+                    // Implement a turning executor that would use
+                    // setWheelSpeeds to some arbitrary low
+                    // number (say -300,300 and 300,-300) to turn to correct
+                    // direction and use it here.
+                    // it has to be similar to FaceAngle executor but should not
+                    // use the controller.rotate()
+                    // command that is blocking.
                     LOG.error("Unimplemented turn towards opponent's goal!");
                 }
             }
@@ -79,9 +101,11 @@ public class Game extends AbstractPlanner {
             // Let defensiveStrategy deal with it!
             defensiveStrategy.step(controller);
             addDrawables(defensiveStrategy.getDrawables());
-        } else if (ball.isNear(ourRobot)) {
+        } else if (ball.isNear(ourRobot)
+                && FaceAngle.getAngleToTurn(ourRobot.getOrientation(), targetOrientation) > (Math.PI / 4)) {
             LOG.info("Ball is near our robot, turning to it");
-            // TODO: turn to ball here
+            turningExecutor.setTargetOrientation(targetOrientation);
+            turningExecutor.step(controller);
         } else if (!ball.isNearWall(pitch)) {
             LOG.info("Approaching ball");
             // Approach ball
