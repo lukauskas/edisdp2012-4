@@ -9,11 +9,11 @@ import balle.world.processing.AbstractWorldProcessor;
 
 public class StrategyRunner extends AbstractWorldProcessor {
 
-    private final Controller    controller;
-    private final static Logger LOG = Logger.getLogger(StrategyRunner.class);
+    private final Controller     controller;
+    private final static Logger  LOG = Logger.getLogger(StrategyRunner.class);
 
-    private Strategy            currentStrategy;
-    private SimpleWorldGUI      gui;
+    private Strategy             currentStrategy;
+    private final SimpleWorldGUI gui;
 
     /**
      * Initialises strategy runner
@@ -25,8 +25,7 @@ public class StrategyRunner extends AbstractWorldProcessor {
      * @param gui
      *            GUI that Drawables will be drawn on.
      */
-    public StrategyRunner(Controller controller, AbstractWorld world,
-            SimpleWorldGUI gui) {
+    public StrategyRunner(Controller controller, AbstractWorld world, SimpleWorldGUI gui) {
         super(world);
         this.controller = controller;
         this.currentStrategy = null;
@@ -42,7 +41,12 @@ public class StrategyRunner extends AbstractWorldProcessor {
     protected void actionOnChange() {
         if (currentStrategy != null) {
             currentStrategy.updateState(getSnapshot());
-            currentStrategy.step(controller);
+            try {
+                currentStrategy.step(controller);
+            } catch (Exception e) {
+                LOG.error("Strategy raised exception" + e.toString());
+                controller.stop();
+            }
             gui.setDrawables(currentStrategy.getDrawables());
         }
 
