@@ -22,8 +22,8 @@ public class Globals {
     public static final float  PITCH_WIDTH               = 2.4384f;                 // Metres
     public static final float  PITCH_HEIGHT              = 1.2192f;                 // Metres
     public static final float  GOAL_POSITION             = 0.31f;                   // Metres
-    
-    public static final float ROBOT_POSSESS_DISTANCE = 0.05f;
+
+    public static final float  ROBOT_POSSESS_DISTANCE    = 0.07f;
 
     public static final float  METERS_PER_PIXEL          = PITCH_WIDTH / 605f;
 
@@ -35,23 +35,25 @@ public class Globals {
 
     public static final int    MAXIMUM_MOTOR_SPEED       = 900;
 
-	public static float powerToVelocity(float p) {
-		if(p > MAXIMUM_MOTOR_SPEED) p = MAXIMUM_MOTOR_SPEED;
-		else if(p < -MAXIMUM_MOTOR_SPEED) p = -MAXIMUM_MOTOR_SPEED;
-		return p * (0.4f/720f);
-	//	if(p==0) return 0;
-	//	boolean isNeg = p < 0;
-	//	if(isNeg) p = -p;
-	//	float absVelocity =  (float)(2f / Math.exp(-0.0025f * p + 3.1187));
-	//	absVelocity /= (1f+Math.exp(-0.1f*(p-50)));
-	//	return isNeg?-absVelocity:absVelocity;
-	}
+    public static float powerToVelocity(float p) {
+        if (p > MAXIMUM_MOTOR_SPEED)
+            p = MAXIMUM_MOTOR_SPEED;
+        else if (p < -MAXIMUM_MOTOR_SPEED)
+            p = -MAXIMUM_MOTOR_SPEED;
+        return p * (0.4f / 720f);
+        // if(p==0) return 0;
+        // boolean isNeg = p < 0;
+        // if(isNeg) p = -p;
+        // float absVelocity = (float)(2f / Math.exp(-0.0025f * p + 3.1187));
+        // absVelocity /= (1f+Math.exp(-0.1f*(p-50)));
+        // return isNeg?-absVelocity:absVelocity;
+    }
 
-	public static float velocityToPower(float v) {
-		return v * (720f/0.4f);
-	//	if(v==0) return 0;
-	//	return (float) (Math.log(((1f/(v))*2))-3.1187)/-0.0025f
-	};
+    public static float velocityToPower(float v) {
+        return v * (720f / 0.4f);
+        // if(v==0) return 0;
+        // return (float) (Math.log(((1f/(v))*2))-3.1187)/-0.0025f
+    };
 
     public static Pitch getPitch() {
         return new Pitch(0, PITCH_WIDTH, 0, PITCH_HEIGHT);
