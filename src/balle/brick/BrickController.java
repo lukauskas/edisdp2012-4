@@ -82,14 +82,14 @@ public class BrickController implements Controller {
             Thread.sleep(80);
         } catch (InterruptedException e) {
         }
-        KICKER.rotateTo(1);
+        KICKER.rotateTo(0);
     }
-    
-    public void gentleKick(int speed, int angle ) {
-    	KICKER.setSpeed(speed);
-    	KICKER.resetTachoCount();
-    	KICKER.rotateTo(angle);
-    	KICKER.rotateTo(0);
+
+    public void gentleKick(int speed, int angle) {
+        KICKER.setSpeed(speed);
+        KICKER.resetTachoCount();
+        KICKER.rotateTo(angle);
+        KICKER.rotateTo(0);
     }
 
     public float getTravelDistance() {
