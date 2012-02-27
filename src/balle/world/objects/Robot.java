@@ -121,5 +121,36 @@ public class Robot extends RectangularObject {
         return facingLine.intersects(goalLine);
 
     }
+    
+    /** TODO write test
+     * 
+     * @return True, if robot is facing left.
+     */
+    public boolean isFacingLeft() {
+    	Line fl = this.getFacingLine();
+    	return (fl.getB().getX() - fl.getA().getX()) < 0;
+    }
+    
+    /** TODO write test
+     * 
+     * @return True, if the robot is facing right
+     */
+    public boolean isFacingRight() {
+    	Line fl = this.getFacingLine();
+    	return (fl.getB().getX() - fl.getA().getX()) > 0;
+    }
+    
+    /**
+     * Returns true if this robot is facing to the half of the pitch that this
+     * goal is present.
+     * 
+     * TODO write test
+     * 
+     * @param goal
+     * @return
+     */
+    public boolean isFacingGoalHalf(Goal goal) {
+    	return isFacingLeft() == goal.isLeftGoal();
+    }
 
 }
