@@ -31,4 +31,6 @@ public interface MovementExecutor extends Executor {
 	@Override
 	public void step(Controller controller);
 
+    public void setStopDistance(double stopDistance);
+
 }

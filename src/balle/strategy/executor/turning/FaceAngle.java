@@ -1,6 +1,9 @@
 package balle.strategy.executor.turning;
 
+import java.util.ArrayList;
+
 import balle.controller.Controller;
+import balle.main.drawable.Drawable;
 import balle.strategy.executor.Executor;
 import balle.world.Orientation;
 import balle.world.Snapshot;
@@ -82,8 +85,7 @@ public class FaceAngle implements Executor, RotateToOrientationExecutor {
     }
 
     private int calculateTimeToTurn(double radiansToTurn) {
-        return (int) Math.round(Math.abs(radiansToTurn)
-                / ((Math.toRadians(TURN_SPEED / 1000.0))))
+        return (int) Math.round(Math.abs(radiansToTurn) / ((Math.toRadians(TURN_SPEED / 1000.0))))
                 + ADDITIONAL_TIME_TO_TURN;
     }
 
@@ -118,27 +120,7 @@ public class FaceAngle implements Executor, RotateToOrientationExecutor {
         if (!isPossible())
             return 0;
 
-        double angleToTarget = targetOrientation.atan2styleradians();
-        Orientation currentOr = currentState.getBalle().getOrientation();
-        double currentOrientation = currentOr.atan2styleradians();
-
-        double turnLeftAngle, turnRightAngle;
-        if (angleToTarget > currentOrientation) {
-            turnLeftAngle = angleToTarget - currentOrientation;
-            turnRightAngle = currentOrientation + (2 * Math.PI - angleToTarget);
-        } else {
-            turnLeftAngle = (2 * Math.PI) - currentOrientation + angleToTarget;
-            turnRightAngle = currentOrientation - angleToTarget;
-        }
-
-        double turnAngle;
-
-        if (turnLeftAngle < turnRightAngle)
-            turnAngle = turnLeftAngle;
-        else
-            turnAngle = -turnRightAngle;
-
-        return turnAngle;
+        return currentState.getBalle().getAngleToTurn(targetOrientation);
     }
 
     @Override
@@ -169,6 +151,11 @@ public class FaceAngle implements Executor, RotateToOrientationExecutor {
         startedTurning = 0;
         timeToTurn = 0;
         needStop = false;
+    }
+
+    @Override
+    public ArrayList<Drawable> getDrawables() {
+        return new ArrayList<Drawable>();
     }
 
 }

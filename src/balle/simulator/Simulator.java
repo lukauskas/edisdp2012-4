@@ -26,6 +26,7 @@ import balle.io.listener.Listener;
 import balle.io.reader.AbstractVisionReader;
 import balle.io.reader.Reader;
 import balle.misc.Globals;
+import balle.world.Coord;
 
 public class Simulator extends TestbedTest implements AbstractVisionReader {
 
@@ -121,31 +122,10 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
         addEdge(2.54f * scale, 0.31f * scale, 2.54f * scale, 0.91f * scale);
 
         // Create ball
-        ballShape = new CircleShape();
-        ballShape.m_radius = Globals.BALL_RADIUS * scale;
-        FixtureDef f = new FixtureDef();
-        f.shape = ballShape;
-        f.density = (1f / 0.36f) / scale;
-        BodyDef bd = new BodyDef();
-        bd.type = BodyType.DYNAMIC;
-        bd.position.set(1.22f * scale, 0.61f * scale);
-        bd.bullet = true;
-        ball = w.createBody(bd);
-        ball.createFixture(f);
-        ball.setLinearDamping(0);
-
-        // TODO correct friction
-        FrictionJointDef ballFriction = new FrictionJointDef();
-        ballFriction.initialize(ball, ground, ball.getWorldCenter());
-        ballFriction.maxForce = 0.1f;
-        ballFriction.maxTorque = 0.001f;
-        w.createJoint(ballFriction);
+        resetBallPosition();
 
         // create robots at either end of pitch
-        blue = new Robot(new Vec2((0.1f * scale), (float) (0.61 * scale)), 0f);
-        blueSoft.setBody(blue.getBody());
-        yellow = new Robot(new Vec2((float) (2.34 * scale), (float) (0.61 * scale)), 0f);
-        yellowSoft.setBody(yellow.getBody());
+        resetRobotPositions();
 
         // Send the size of the pitch to the world
         this.reader.propagatePitchSize();
@@ -163,7 +143,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
         super.update();
 
         // Update world with new information, throtteling the frame rate
-        if (1000f / (System.currentTimeMillis() - lastFrameTime) < Globals.SIMULATED_VISON_FRAMERATE) {
+        if (System.currentTimeMillis() - lastFrameTime > 1000f/Globals.SIMULATED_VISON_FRAMERATE) {
             lastFrameTime = System.currentTimeMillis();
             this.reader.update();
         }
@@ -180,7 +160,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
     }
 
     public static Simulator createSimulator() {
-        return createSimulator(true);
+        return createSimulator(false);
     }
 
     /**
@@ -215,26 +195,39 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 
         private final Body         robot;
 
-        private final Vec2         kickPos      = new Vec2(0.12f * scale, 0);
 
         private final float        robotWidth   = Globals.ROBOT_WIDTH * scale / 2;
         private final float        robotLength  = Globals.ROBOT_LENGTH * scale / 2;
 
         private final float        kickerWidth  = Globals.ROBOT_WIDTH * scale / 2;
-        private final float        kickerLength = 0.04f * scale / 2;
+        private final float        kickerLength = Globals.ROBOT_POSSESS_DISTANCE * scale / 2;
+        private Vec2         kickPos      = new Vec2((robotLength+kickerLength), 0);
         private final PolygonShape kickerShape;
         private static final float kickForce    = 20f;
-
+       
         // wheel power (-1 for lock and 0 for float and (0,100] for power )
 
         public Robot(Vec2 startingPos, float angle) {
             World w = getWorld();
             int robotIndex = robotNo++;
-
+            BodyDef robotBodyDef = new BodyDef();
+           // BodyDef wheelBodyDef = new BodyDef();
+            BodyDef kickerBodyDef = new BodyDef();
+            
+            	robotBodyDef.angle=0.0174532925f*angle;
+            	kickerBodyDef.angle=0.0174532925f*angle;
+            	float x=0.12f*scale;
+            	float y=0f;
+            	float newx=x*(float)Math.cos(0.0174532925f*angle)-y*(float)Math.sin(0.0174532925f*angle);
+            	float newy=x*(float)Math.sin(0.0174532925f*angle)+y*(float)Math.cos(0.0174532925f*angle);
+            	
+            	kickPos     = new Vec2(newx,newy);
+                
+            
             // Create Robot body, set position from Constructor
             PolygonShape robotShape = new PolygonShape();
             robotShape.setAsBox(robotLength, robotWidth);
-            BodyDef robotBodyDef = new BodyDef();
+          //  BodyDef robotBodyDef = new BodyDef();
             robotBodyDef.type = BodyType.DYNAMIC;
             robotBodyDef.position.set(startingPos);
             robotBodyDef.angularDamping = 0;
@@ -248,7 +241,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 
             kickerShape = new PolygonShape();
             kickerShape.setAsBox(kickerLength, kickerWidth);
-            BodyDef kickerBodyDef = new BodyDef();
+          //  BodyDef kickerBodyDef = new BodyDef();
             kickerBodyDef.type = BodyType.DYNAMIC;
             FixtureDef kickF = new FixtureDef();
             kickF.filter.maskBits = 0x0;
@@ -279,8 +272,8 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
                 boolean turningLeft = bot.isTurningLeft();
                 // get current angle - desired angle
                 float dDA = bot.deltaDesiredAngle();
-                if (!turningLeft && (0 <= dDA && dDA <= (Math.PI / 4)) || turningLeft
-                        && (0 >= dDA && dDA >= -(Math.PI / 4))) {
+                if ((!turningLeft && (0 <= dDA && dDA <=  (Math.PI / 4))) ||	// turning right
+                	 (turningLeft && (0 >= dDA && dDA >= -(Math.PI / 4)))) {	// turning left
                     // stop
                     bot.stop();
                 }
@@ -375,7 +368,26 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
             ballPosY = ballPos.y;
 
             long timestamp = getTimeStamp();
-
+            
+            if (true) {
+	            // Simulate Height/Observed_Position distortion.
+	            Coord yCoord, bCoord, worldCenter;
+	            Vec2 worldVec = convPos(ground.getPosition());
+	            worldCenter = new Coord(worldVec.x, worldVec.y);
+	            yCoord = new Coord(yPosX, yPosY);
+	            bCoord = new Coord(bPosX, bPosY);
+	            
+	            double distortion = Globals.CAMERA_HEIGHT / (Globals.CAMERA_HEIGHT - Globals.ROBOT_HEIGHT);
+	            yCoord = yCoord.sub(worldCenter).mult(distortion).add(worldCenter);
+	            bCoord = bCoord.sub(worldCenter).mult(distortion).add(worldCenter);
+	            
+	            yPosX = (float) yCoord.getX();
+	            yPosY = (float) yCoord.getY();
+	            
+	            bPosX = (float) bCoord.getX();
+	            bPosY = (float) bCoord.getY();
+	        }
+            
             if (noisy) {
                 // set standard deviations
                 float posSd = Globals.VISION_COORD_NOISE_SD;
@@ -424,5 +436,103 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
     public void addListener(Listener listener) {
         reader.addListener(listener);
     }
+
+	public void randomiseBallPosition() {
+		World w = getWorld();
+		w.destroyBody(ball);
+
+		ballShape = new CircleShape();
+		ballShape.m_radius = Globals.BALL_RADIUS * scale;
+		FixtureDef f = new FixtureDef();
+		f.shape = ballShape;
+		f.density = (1f / 0.36f) / scale;
+		BodyDef bd = new BodyDef();
+		bd.type = BodyType.DYNAMIC;
+		bd.position.set((float) (Math.random() * Globals.PITCH_WIDTH * scale),
+				(float) (Math.random() * Globals.PITCH_HEIGHT * scale));
+		bd.bullet = true;
+		ball = w.createBody(bd);
+		ball.createFixture(f);
+		ball.setLinearDamping(0);
+	}
+
+	public void randomiseRobotPositions() {
+		World w = getWorld();
+
+		// float random1 = (Globals.ROBOT_LENGTH/2) + (float)Math.random() * (
+		// Globals.PITCH_WIDTH - Globals.ROBOT_LENGTH);
+		// float random2 = (Globals.ROBOT_LENGTH/2) + (float)Math.random() * (
+		// Globals.PITCH_WIDTH - Globals.ROBOT_LENGTH);
+		w.destroyBody(blue.getBody());
+		w.destroyBody(blue.kicker);
+		// blue = new Robot(new Vec2((float) ((random1 * (Globals.PITCH_WIDTH +
+		// Globals.ROBOT_LENGTH)) * scale), (float) ((Math.random() *
+		// (Globals.PITCH_HEIGHT - Globals.ROBOT_LENGTH)) * scale)), 0f);
+		blue = new Robot(new Vec2(
+				(float) ((Math.random() * Globals.PITCH_WIDTH) * scale),
+				(float) ((Math.random() * Globals.PITCH_HEIGHT) * scale)),
+				(float) (Math.random() * 360));
+		blueSoft.setBody(blue.getBody());
+
+		w.destroyBody(yellow.getBody());
+		w.destroyBody(yellow.kicker);
+		// yellow = new Robot(new Vec2((float) ((random2 * (Globals.PITCH_WIDTH
+		// + Globals.ROBOT_LENGTH)) * scale), (float) ((Math.random() *
+		// (Globals.PITCH_HEIGHT - Globals.ROBOT_LENGTH)) * scale)), 0f);
+		yellow = new Robot(new Vec2(
+				(float) ((Math.random() * Globals.PITCH_WIDTH) * scale),
+				(float) ((Math.random() * Globals.PITCH_HEIGHT) * scale)),
+				(float) (Math.random() * 360));
+		yellowSoft.setBody(yellow.getBody());
+	}
+
+	public void resetBallPosition() {
+		World w = getWorld();
+
+		if (ball != null) {
+			w.destroyBody(ball);
+		}
+
+		ballShape = new CircleShape();
+		ballShape.m_radius = Globals.BALL_RADIUS * scale;
+		FixtureDef f = new FixtureDef();
+		f.shape = ballShape;
+		f.density = (1f / 0.36f) / scale;
+		BodyDef bd = new BodyDef();
+		bd.type = BodyType.DYNAMIC;
+		bd.position.set(1.22f * scale, 0.61f * scale);
+		bd.bullet = true;
+		ball = w.createBody(bd);
+		ball.createFixture(f);
+		ball.setLinearDamping(0);
+
+		// TODO correct friction
+		FrictionJointDef ballFriction = new FrictionJointDef();
+		ballFriction.initialize(ball, ground, ball.getWorldCenter());
+		ballFriction.maxForce = 0.1f;
+		ballFriction.maxTorque = 0.001f;
+		w.createJoint(ballFriction);
+	}
+
+	public void resetRobotPositions() {
+		World w = getWorld();
+
+		// If called when simulator is first created, just makes robots
+		// else, destroys old robots and makes new ones
+		if (blue != null) {
+			w.destroyBody(blue.getBody());
+			w.destroyBody(blue.kicker);
+		}
+		blue = new Robot(new Vec2((0.1f * scale), (float) (0.61 * scale)), 0f);
+		blueSoft.setBody(blue.getBody());
+
+		if (yellow != null) {
+			w.destroyBody(yellow.getBody());
+			w.destroyBody(yellow.kicker);
+		}
+		yellow = new Robot(new Vec2((float) (2.34 * scale),
+				(float) (0.61 * scale)), 180f);
+		yellowSoft.setBody(yellow.getBody());
+	}
 
 }

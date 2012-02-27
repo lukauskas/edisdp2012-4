@@ -18,8 +18,7 @@ public class PointObject extends Vector implements Object {
         this.alpha = 1;
     }
 
-    public PointObject(double x, double y, double power, double infl_distance,
-            double alpha) {
+    public PointObject(double x, double y, double power, double infl_distance, double alpha) {
         super(x, y);
         this.power = power;
         this.infl_distance = infl_distance;
@@ -30,8 +29,7 @@ public class PointObject extends Vector implements Object {
         this(point.getX(), point.getY(), power, infl_distance);
     }
 
-    public PointObject(Point point, double power, double infl_distance,
-            double alpha) {
+    public PointObject(Point point, double power, double infl_distance, double alpha) {
         this(point.getX(), point.getY(), power, infl_distance, alpha);
     }
 
@@ -40,15 +38,13 @@ public class PointObject extends Vector implements Object {
     public Vector getVector(Point point, boolean repulsive) {
         if (repulsive) {
 
-            double distance = Math.sqrt((this.getX() - point.getX())
-                    * (this.getX() - point.getX())
-                    + (this.getY() - point.getY())
-                    * (this.getY() - point.getY()));
+            double distance = Math.sqrt((this.getX() - point.getX()) * (this.getX() - point.getX())
+                    + (this.getY() - point.getY()) * (this.getY() - point.getY()));
             if (distance < infl_distance) {
                 LOG.trace("Within influence distance");
 
-                double p = power * (1 / distance - 1 / infl_distance) * 1
-                        / (distance * distance) * 1 / distance;
+                double p = power * (1 / distance - 1 / infl_distance) * 1 / (distance * distance)
+                        * 1 / distance;
 
                 Vector out_point = new Vector(point);
                 return out_point.subtract(this).mult(p);
@@ -72,30 +68,31 @@ public class PointObject extends Vector implements Object {
     @Override
     public Vector getVector(Pos point, boolean repulsive) {
         if (repulsive) {
-            double distance = Math.sqrt((this.getX() - point.getLocation()
-                    .getX())
+            double distance = Math.sqrt((this.getX() - point.getLocation().getX())
                     * (this.getX() - point.getLocation().getX())
                     + (this.getY() - point.getLocation().getY())
                     * (this.getY() - point.getLocation().getY()));
 
-            LOG.debug("obstacle Distance:" + distance);
-            LOG.debug("inf_distance:" + infl_distance);
-
-            if (distance < infl_distance & power != 0) {
+            if ((distance < infl_distance) && (power != 0)) {
+                LOG.trace("Influenced by obstacle");
                 try {
                     Vector out_point = new Vector(point.getLocation());
                     out_point = this.subtract(out_point);
-                    double angle = Math.atan2(out_point.getY(),
-                            out_point.getX());
+                    double angle = Math.atan2(out_point.getY(), out_point.getX());
                     double diffAngle = Math.abs(angle - point.getAngle());
                     double norm = Util.map2Pi(diffAngle);
-                    LOG.debug("Angle: " + norm);
+                    LOG.trace("Angle: " + norm);
                     double p = power * (1 / distance - 1 / infl_distance)
-                            * (1 / (distance * distance)) * (1 / distance)
-                            * ((Math.PI - norm) / (Math.PI)) * alpha;
+                            * (1 / (distance * distance)) * (1 / distance);
+                    double orientationComponent = ((Math.PI - norm) / (Math.PI)) * alpha;
+
+                    LOG.trace("p: " + p + " orientationComponent: " + orientationComponent);
+                    p *= orientationComponent;
+                    LOG.trace("Final: " + p);
+
                     return out_point.mult(-1 * p);
                 } catch (Exception ex) {
-                    LOG.debug("Exception thrown");
+                    LOG.error("Exception thrown");
                     return new Vector(new Point(0, 0));
                 }
             } else
@@ -104,12 +101,8 @@ public class PointObject extends Vector implements Object {
 
             Vector out_point = new Vector(point.getLocation());
             Vector res = out_point.subtract(this);
-            LOG.debug("goal Distance:" + res.norm());
             Vector final_res = res.mult(power * -1);
-
-            LOG.debug("Force:" + final_res);
-            LOG.debug("current:" + out_point);
-            LOG.debug("destination:" + this);
+            LOG.trace("Attraction power " + final_res.norm());
 
             return final_res;
         }

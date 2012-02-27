@@ -6,12 +6,15 @@ import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+import java.util.ArrayList;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.apache.log4j.Logger;
 
+import balle.main.drawable.Drawable;
+import balle.main.drawable.DrawableLine;
 import balle.misc.Globals;
 import balle.world.objects.Ball;
 import balle.world.objects.Goal;
@@ -51,6 +54,10 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
         panel.add(BorderLayout.CENTER, screen);
     }
 
+    public void setDrawables(ArrayList<Drawable> drawables) {
+        screen.setDrawables(drawables);
+    }
+
     public JPanel getPanel() {
         return panel;
     }
@@ -58,54 +65,64 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
     @SuppressWarnings("serial")
     private class Screen extends JPanel implements MouseMotionListener {
 
-        private float       scale;
-        private final float XSHIFTM     = 0.4f;
-        private final float YSHIFTM     = 0.39f;
-        private final float VIEWHEIGHTM = 2;
+        private final float         XSHIFTM     = 0.4f;
+        private final float         YSHIFTM     = 0.39f;
+        private final float         VIEWHEIGHTM = 2;
+        private ArrayList<Drawable> drawables   = new ArrayList<Drawable>();
+        private final Scaler        scaler;
+
+        public Screen() {
+            super();
+            scaler = new Scaler(XSHIFTM, YSHIFTM);
+        }
+
+        public void setDrawables(ArrayList<Drawable> drawables) {
+            this.drawables = new ArrayList<Drawable>(drawables);
+        }
 
         @Override
         public void paintComponent(Graphics g) {
-            scale = getHeight() / VIEWHEIGHTM;
+            float scale = getHeight() / VIEWHEIGHTM;
+            scaler.setScale(scale);
             g.setColor(new Color(72, 104, 22));
             g.fillRect(0, 0, getWidth(), getHeight());
             drawField(g);
             drawFieldObjects(g);
 
             drawMousePos(g);
+
+            for (Drawable d : drawables) {
+                d.draw(g, scaler);
+            }
+            drawables.clear();
         }
 
         private void drawField(Graphics g) {
             g.setColor(Color.BLACK);
             drawLineTransformMeters(g, 0f, 0f, Globals.PITCH_WIDTH, 0f);
-            drawLineTransformMeters(g, 0f, Globals.PITCH_HEIGHT,
-                    Globals.PITCH_WIDTH, Globals.PITCH_HEIGHT);
+            drawLineTransformMeters(g, 0f, Globals.PITCH_HEIGHT, Globals.PITCH_WIDTH,
+                    Globals.PITCH_HEIGHT);
             drawLineTransformMeters(g, 0f, 0f, 0f, Globals.GOAL_POSITION);
-            drawLineTransformMeters(g, Globals.PITCH_WIDTH, 0f,
-                    Globals.PITCH_WIDTH, Globals.GOAL_POSITION);
-            drawLineTransformMeters(g, 0f, Globals.PITCH_HEIGHT, 0f,
-                    Globals.PITCH_HEIGHT - Globals.GOAL_POSITION);
-            drawLineTransformMeters(g, Globals.PITCH_WIDTH,
-                    Globals.PITCH_HEIGHT, Globals.PITCH_WIDTH,
-                    Globals.PITCH_HEIGHT - Globals.GOAL_POSITION);
-            // Left-hand goal area
-            drawLineTransformMeters(g, 0f, Globals.GOAL_POSITION, -0.1f,
+            drawLineTransformMeters(g, Globals.PITCH_WIDTH, 0f, Globals.PITCH_WIDTH,
                     Globals.GOAL_POSITION);
-            drawLineTransformMeters(g, -0.1f, Globals.GOAL_POSITION, -0.1f,
-                    Globals.PITCH_HEIGHT - Globals.GOAL_POSITION);
-            drawLineTransformMeters(g, Globals.PITCH_WIDTH,
-                    Globals.GOAL_POSITION, Globals.PITCH_WIDTH + 0.1f,
-                    Globals.GOAL_POSITION);
-            // Right-hand goal area
-            drawLineTransformMeters(g, Globals.PITCH_WIDTH,
-                    Globals.PITCH_HEIGHT - Globals.GOAL_POSITION,
-                    Globals.PITCH_WIDTH + 0.1f, Globals.PITCH_HEIGHT
-                            - Globals.GOAL_POSITION);
-            drawLineTransformMeters(g, 0f, Globals.PITCH_HEIGHT
-                    - Globals.GOAL_POSITION, -0.1f, Globals.PITCH_HEIGHT
+            drawLineTransformMeters(g, 0f, Globals.PITCH_HEIGHT, 0f, Globals.PITCH_HEIGHT
                     - Globals.GOAL_POSITION);
-            drawLineTransformMeters(g, Globals.PITCH_WIDTH + 0.1f,
-                    Globals.GOAL_POSITION, Globals.PITCH_WIDTH + 0.1f,
+            drawLineTransformMeters(g, Globals.PITCH_WIDTH, Globals.PITCH_HEIGHT,
+                    Globals.PITCH_WIDTH, Globals.PITCH_HEIGHT - Globals.GOAL_POSITION);
+            // Left-hand goal area
+            drawLineTransformMeters(g, 0f, Globals.GOAL_POSITION, -0.1f, Globals.GOAL_POSITION);
+            drawLineTransformMeters(g, -0.1f, Globals.GOAL_POSITION, -0.1f, Globals.PITCH_HEIGHT
+                    - Globals.GOAL_POSITION);
+            drawLineTransformMeters(g, Globals.PITCH_WIDTH, Globals.GOAL_POSITION,
+                    Globals.PITCH_WIDTH + 0.1f, Globals.GOAL_POSITION);
+            // Right-hand goal area
+            drawLineTransformMeters(g, Globals.PITCH_WIDTH, Globals.PITCH_HEIGHT
+                    - Globals.GOAL_POSITION, Globals.PITCH_WIDTH + 0.1f, Globals.PITCH_HEIGHT
+                    - Globals.GOAL_POSITION);
+            drawLineTransformMeters(g, 0f, Globals.PITCH_HEIGHT - Globals.GOAL_POSITION, -0.1f,
                     Globals.PITCH_HEIGHT - Globals.GOAL_POSITION);
+            drawLineTransformMeters(g, Globals.PITCH_WIDTH + 0.1f, Globals.GOAL_POSITION,
+                    Globals.PITCH_WIDTH + 0.1f, Globals.PITCH_HEIGHT - Globals.GOAL_POSITION);
         }
 
         private void drawFieldObjects(Graphics g) {
@@ -138,9 +155,9 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
             else
                 g.setColor(Color.LIGHT_GRAY);
 
-            float w = radius * 2 * scale;
-            g.fillOval((int) (m2PX(pos.getX()) - (w / 2)),
-                    (int) (m2PY(pos.getY()) - (w / 2)), (int) w, (int) w);
+            float w = radius * 2 * scaler.getScale();
+            g.fillOval((int) (scaler.m2PX(pos.getX()) - (w / 2)),
+                    (int) (scaler.m2PY(pos.getY()) - (w / 2)), (int) w, (int) w);
         }
 
         private void drawRobot(Graphics g, Color c, Robot robot) {
@@ -148,8 +165,7 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
             Snapshot s = getSnapshot();
 
             // Fail early, fail often
-            if ((robot.getPosition() == null)
-                    || (robot.getOrientation() == null)) {
+            if ((robot.getPosition() == null) || (robot.getOrientation() == null)) {
                 return;
             }
 
@@ -164,8 +180,7 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 
             // list of (x,y) positions of the corners of the robot
             // with the center at (0,0)
-            float[][] poly = new float[][] { { hl, hw }, { hl, -hw },
-                    { -hl, -hw }, { -hl, hw } };
+            float[][] poly = new float[][] { { hl, hw }, { hl, -hw }, { -hl, -hw }, { -hl, hw } };
 
             // for each point
             double a = robot.getOrientation().radians();
@@ -190,19 +205,22 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
             int[] xs = new int[n];
             int[] ys = new int[n];
             for (int i = 0; i < n; i++) {
-                xs[i] = m2PX(poly[i][0]);
-                ys[i] = m2PY(poly[i][1]);
+                xs[i] = scaler.m2PX(poly[i][0]);
+                ys[i] = scaler.m2PY(poly[i][1]);
             }
 
             // draw robot, setting the colour depending on robot properties
             // temporary colours until methods have been implemented
             if (robot.possessesBall(s.getBall())) {
-                if (robot.isInScoringPosition(s.getBall(),
-                        s.getOpponentsGoal(), s.getOpponent())) {
+                DrawableLine ballKickLine = new DrawableLine(robot.getBallKickLine(s.getBall()),
+                        Color.BLUE);
+                ballKickLine.draw(g, scaler);
+                if (robot.isInScoringPosition(s.getBall(), s.getOpponentsGoal(), s.getOpponent())) {
                     g.setColor(Color.MAGENTA);
                 } else {
                     g.setColor(Color.ORANGE);
                 }
+
             } else if (!isEstimated) {
                 g.setColor(Color.LIGHT_GRAY);
             } else {
@@ -210,22 +228,25 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
             }
 
             g.fillPolygon(xs, ys, n);
+
+            DrawableLine orientationLine = new DrawableLine(robot.getFacingLine(), c);
+            orientationLine.draw(g, scaler);
+
             g.setColor(c);
-            g.fillPolygon(new int[] { xs[2], xs[3], m2PX(x) }, new int[] {
-                    ys[2], ys[3], m2PY(y) }, 3);
+            g.fillPolygon(new int[] { xs[2], xs[3], scaler.m2PX(x) }, new int[] { ys[2], ys[3],
+                    scaler.m2PY(y) }, 3);
         }
 
         // Convert meters into pixels and draws line
-        private void drawLineTransformMeters(Graphics g, float x1, float y1,
-                float x2, float y2) {
+        private void drawLineTransformMeters(Graphics g, float x1, float y1, float x2, float y2) {
 
-            g.drawLine(m2PX(x1), m2PY(y1), m2PX(x2), m2PY(y2));
+            g.drawLine(scaler.m2PX(x1), scaler.m2PY(y1), scaler.m2PX(x2), scaler.m2PY(y2));
 
         }
 
         private void drawGoals(Graphics g) {
-            drawGoal(g, Color.green, getSnapshot().getOwnGoal());
-            drawGoal(g, Color.red, getSnapshot().getOpponentsGoal());
+            drawGoal(g, Color.red, getSnapshot().getOwnGoal());
+            drawGoal(g, Color.green, getSnapshot().getOpponentsGoal());
         }
 
         private void drawGoal(Graphics g, Color c, Goal goal) {
@@ -233,10 +254,10 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 
             // Daniel: Does hardcoding the positions matter?
             int xMin, width, yMax, height;
-            xMin = m2PX(goal.getMinX()) - 2;
-            width = m2PX(goal.getMaxX()) - m2PX(goal.getMinX());
-            yMax = m2PY(goal.getMaxY()) - 2;
-            height = m2PY(goal.getMinY()) - m2PY(goal.getMaxY());
+            xMin = scaler.m2PX(goal.getMinX()) - 2;
+            width = scaler.m2PX(goal.getMaxX()) - scaler.m2PX(goal.getMinX());
+            yMax = scaler.m2PY(goal.getMaxY()) - 2;
+            height = scaler.m2PY(goal.getMinY()) - scaler.m2PY(goal.getMaxY());
 
             g.drawRect(xMin, yMax, width, height);
         }
@@ -250,7 +271,7 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
             if (mouse != null) {
                 g.setColor(Color.RED);
 
-                double x = pX2m(mouse.getX()), y = pY2m(mouse.getY());
+                double x = scaler.pX2m(mouse.getX()), y = scaler.pY2m(mouse.getY());
                 String s = String.format("Mouse Position (%.3f,%.3f)", x, y);
 
                 g.drawString(s, 10, 10);
@@ -267,32 +288,6 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
             mouse = arg0.getPoint();
         }
 
-        private int m2PX(double x) {
-            return m2PX((float) x);
-        }
-
-        private int m2PX(float x) {
-            return (int) ((x + XSHIFTM) * scale);
-        }
-
-        private int m2PY(double y) {
-            return m2PY((float) y);
-        }
-
-        private int m2PY(float y) {
-            y = Globals.PITCH_HEIGHT - y;
-            return (int) ((y + YSHIFTM) * scale);
-        }
-
-        // Working backwards
-
-        private float pX2m(double x) {
-            return (((float) x) / scale) - XSHIFTM;
-        }
-
-        private float pY2m(double y) {
-            return YSHIFTM - (((float) y) / scale) + Globals.PITCH_HEIGHT;
-        }
     }
 
     private void redrawFPS() {
@@ -303,7 +298,7 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 
         double timePerFrame = 1000.0 / fpsCount;
         if ((fpsCount > 0) && (age < timePerFrame * 1.5)) {
-            fps.setForeground(Color.GREEN);
+            fps.setForeground(new Color(50, 150, 50));
             fpsWarning.setVisible(false);
         } else if ((fpsCount > 0) && (age < timePerFrame * 3)) {
             fps.setForeground(Color.ORANGE);

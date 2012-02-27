@@ -24,7 +24,6 @@ public class RectangularObjectTest {
 		 * Test with robot coordinates at the centre -> the test should return
 		 * false
 		 */
-		System.out.println(robot.getPosition());
 		assertTrue(robot.isNearWall(p));
 			
 		/*
@@ -41,14 +40,17 @@ public class RectangularObjectTest {
 	public void testIntersects() {
 		RectangularObject r = new RectangularObject(new Coord(1.2f,0.5f),new Velocity(new Coord(0,0),1),
 						new Orientation(0,true), 0.2, 0.2);
-		
-		Line line1, line2;
-		line1 = new Line(new Coord(0.1f,0.5f), new Coord(2f,0.5f));
-		line2 = new Line(new Coord(0.1f,0f), new Coord(2f,0f));
+		Line line1 = new Line(new Coord(0.1f,0.5f), new Coord(2f,0.5f));
 		
 		assertTrue(r.intersects(line1));
+	}
+
+	@Test
+	public void testDoesNotIntersects() {
+		RectangularObject r = new RectangularObject(new Coord(1.2f,0.5f),new Velocity(new Coord(0,0),1),
+				new Orientation(0,true), 0.2, 0.2);
+		Line line2 = new Line(new Coord(0.1f,0f), new Coord(2f,0f));
 		assertFalse(r.intersects(line2));
-		
 	}
 
 }

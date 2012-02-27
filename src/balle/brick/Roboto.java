@@ -117,8 +117,11 @@ public class Roboto {
      */
     public static void main(String[] args) {
 
-        TouchSensor touchRight = new TouchSensor(SensorPort.S1);
-        TouchSensor touchLeft = new TouchSensor(SensorPort.S2);
+        TouchSensor touchRight = new TouchSensor(SensorPort.S2);
+        TouchSensor touchLeft = new TouchSensor(SensorPort.S1);
+
+        TouchSensor touchBackRight = new TouchSensor(SensorPort.S4);
+        TouchSensor touchBackLeft = new TouchSensor(SensorPort.S3);
 
         while (true) {
             // Enter button click will halt the program
@@ -154,9 +157,21 @@ public class Roboto {
                 try {
                     // Check for sensors when idle
                     if (touchLeft.isPressed() || touchRight.isPressed()) {
-                        controller.backward(controller.getMaximumWheelSpeed());
+                        controller.setWheelSpeeds(
+                                -controller.getMaximumWheelSpeed(),
+                                -controller.getMaximumWheelSpeed());
                         drawMessage("Obstacle detected. Backing up");
-                        Thread.sleep(400);
+                        Thread.sleep(200);
+                        controller.stop();
+                    }
+
+                    // Check for back sensors as well
+                    if (touchBackLeft.isPressed() || touchBackRight.isPressed()) {
+                        controller.setWheelSpeeds(
+                                controller.getMaximumWheelSpeed(),
+                                controller.getMaximumWheelSpeed());
+                        drawMessage("Obstacle detected (back). Backing up");
+                        Thread.sleep(200);
                         controller.stop();
                     }
 

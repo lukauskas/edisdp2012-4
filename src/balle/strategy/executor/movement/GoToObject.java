@@ -1,6 +1,9 @@
 package balle.strategy.executor.movement;
 
+import java.util.ArrayList;
+
 import balle.controller.Controller;
+import balle.main.drawable.Drawable;
 import balle.strategy.executor.turning.RotateToOrientationExecutor;
 import balle.world.Coord;
 import balle.world.Orientation;
@@ -10,7 +13,7 @@ import balle.world.objects.StaticFieldObject;
 
 public class GoToObject implements MovementExecutor {
 
-    private final static double DISTANCE_TO_STOP_AT       = 0.2;
+    private double              stopDistance              = 0.2;
     private final static double EPSILON                   = 0.00001;
 
     protected StaticFieldObject target                    = null;
@@ -38,7 +41,7 @@ public class GoToObject implements MovementExecutor {
         if ((target == null) || (currentPosition == null)) {
             return false;
         }
-        return ((currentPosition.dist(target.getPosition()) - DISTANCE_TO_STOP_AT) < EPSILON);
+        return ((currentPosition.dist(target.getPosition()) - stopDistance) < EPSILON);
     }
 
     @Override
@@ -86,18 +89,15 @@ public class GoToObject implements MovementExecutor {
                 turningExecutor.step(controller);
                 return; // Continue
             } else {
-                Orientation orientationToTarget = targetCoord.sub(
-                        currentPosition).orientation();
+                Orientation orientationToTarget = targetCoord.sub(currentPosition).orientation();
                 turningExecutor.setTargetOrientation(orientationToTarget);
                 double turnAngle = turningExecutor.getAngleToTurn();
                 double dist = targetCoord.dist(robot.getPosition());
-                double distDiffFromTarget = Math
-                        .abs(Math.sin(turnAngle) * dist);
+                double distDiffFromTarget = Math.abs(Math.sin(turnAngle) * dist);
 
                 // sin(180) = sin(0) thus the check
                 if ((Math.abs(turnAngle) > Math.PI / 2)
-                        || (Math.abs(distDiffFromTarget) > DISTANCE_DIFF_TO_TURN_FOR
-                                * dist)) {
+                        || (Math.abs(distDiffFromTarget) > DISTANCE_DIFF_TO_TURN_FOR * dist)) {
 
                     if (isMoving) {
                         controller.stop();
@@ -133,5 +133,16 @@ public class GoToObject implements MovementExecutor {
         // Note that we do not want to just call controller.stop()
         // blindly in case there are some other executors using it. (even though
         // there shouldn't be)
+    }
+
+    @Override
+    public ArrayList<Drawable> getDrawables() {
+        return new ArrayList<Drawable>();
+    }
+
+    @Override
+    public void setStopDistance(double stopDistance) {
+        this.stopDistance = stopDistance;
+
     }
 }
