@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
 import balle.misc.Globals;
-import balle.strategy.executor.turning.FaceAngle;
+import balle.strategy.executor.turning.IncFaceAngle;
 import balle.strategy.executor.turning.RotateToOrientationExecutor;
 import balle.strategy.planner.AbstractPlanner;
 import balle.world.Coord;
@@ -33,10 +33,10 @@ public class Game extends AbstractPlanner {
 		// to a location that is say 0.2 m before the ball in correct direction
 		// and then, once the robot reaches it, pointing it to the ball itself
 		// so it reaches it.
-		goToBallStrategy = StrategyFactory.createClass("GoToBall");
+		goToBallStrategy = StrategyFactory.createClass("GoToBallPFN");
 		// TODO: UPDATE THIS
-		pickBallFromWallStrategy = StrategyFactory.createClass("DummyStrategy");
-		turningExecutor = new FaceAngle();
+		pickBallFromWallStrategy = StrategyFactory.createClass("BallNearWall");
+		turningExecutor = new IncFaceAngle();
 	}
 
 	@Override
@@ -53,6 +53,7 @@ public class Game extends AbstractPlanner {
 		defensiveStrategy.updateState(snapshot);
 		goToBallStrategy.updateState(snapshot);
 		turningExecutor.updateState(snapshot);
+		pickBallFromWallStrategy.updateState(snapshot);
 	}
 
 	@Override
@@ -89,7 +90,6 @@ public class Game extends AbstractPlanner {
 					// it has to be similar to FaceAngle executor but should not
 					// use the controller.rotate()
 					// command that is blocking.
-
 					LOG.error("robot facing wrong way, shouldnt shoot");
 				}
 			}
@@ -111,8 +111,8 @@ public class Game extends AbstractPlanner {
 			addDrawables(goToBallStrategy.getDrawables());
 		} else if (ball.isNearWall(pitch)) {
 			// TODO: Pick it
-			// pickBallFromWallStrategy.step(controller);
-			LOG.error("Pick ball from wall not implemented");
+			LOG.info("Picking the ball from wall");
+			pickBallFromWallStrategy.step(controller);
 		}
 
 	}
@@ -144,5 +144,6 @@ public class Game extends AbstractPlanner {
 				+ max.sub(o));
 
 		return max.sub(o);
+
 	}
 }
