@@ -9,7 +9,8 @@ import balle.world.Velocity;
 public class Robot extends RectangularObject {
 
     public Robot(Coord position, Velocity velocity, Orientation orientation) {
-        super(position, velocity, orientation, Globals.ROBOT_WIDTH, Globals.ROBOT_LENGTH);
+        super(position, velocity, orientation, Globals.ROBOT_WIDTH,
+                Globals.ROBOT_LENGTH);
     }
 
     /**
@@ -102,7 +103,8 @@ public class Robot extends RectangularObject {
      * @return true, if is in scoring position
      */
     public boolean isInScoringPosition(Ball ball, Goal goal, Robot otherRobot) {
-        return possessesBall(ball) && isFacingGoal(goal) && !otherRobot.intersects(getFacingLine());
+        return possessesBall(ball) && isFacingGoal(goal)
+                && !otherRobot.intersects(getFacingLine());
     }
 
     /**
@@ -212,4 +214,29 @@ public class Robot extends RectangularObject {
         return getAngleToTurn(targetCoord.sub(currentPosition).orientation());
     }
 
+    public Coord getFrontLeftCornerCoord() {
+        Coord leftSide = new Coord(getHeight() / 2, -getWidth() / 2);
+        leftSide = leftSide.rotate(getOrientation());
+        return getPosition().add(leftSide);
+    }
+
+    public Coord getFrontRightCornerCoord() {
+        Coord rightSide = new Coord(getHeight() / 2, getWidth() / 2);
+        rightSide = rightSide.rotate(getOrientation());
+        return getPosition().add(rightSide);
+    }
+
+    public boolean canReachTargetInStraightLine(StaticFieldObject target,
+            StaticFieldObject obstacle) {
+        Line pathToTarget1 = new Line(getPosition(), target.getPosition());
+        Line pathToTarget2 = new Line(getFrontLeftCornerCoord(),
+                target.getPosition());
+        Line pathToTarget3 = new Line(getFrontRightCornerCoord(),
+                target.getPosition());
+
+        // Check if it is blocking our path
+        return (!obstacle.intersects(pathToTarget1)
+                && !obstacle.intersects(pathToTarget2) && !obstacle
+                .intersects(pathToTarget3));
+    }
 }

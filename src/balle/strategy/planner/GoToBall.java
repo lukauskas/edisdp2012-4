@@ -11,7 +11,6 @@ import balle.controller.Controller;
 import balle.main.drawable.Dot;
 import balle.strategy.executor.movement.MovementExecutor;
 import balle.world.Coord;
-import balle.world.Line;
 import balle.world.Orientation;
 import balle.world.objects.Pitch;
 import balle.world.objects.Point;
@@ -259,18 +258,18 @@ public class GoToBall extends AbstractPlanner {
                 && (!isApproachingTargetFromCorrectSide(target))) {
             LOG.info("Approaching target from wrong side, calculating overshoot target");
             target = getOvershootTarget(target);
+            addDrawable(new Dot(target.getPosition(), Color.BLUE));
         }
 
         // If we see the opponent
         if (getSnapshot().getOpponent() != null) {
-            Line pathToTarget = new Line(
-                    getSnapshot().getBalle().getPosition(),
-                    target.getPosition());
             // Check if it is blocking our path
-            if (getSnapshot().getOpponent().intersects(pathToTarget)) {
+            if (!getSnapshot().getBalle().canReachTargetInStraightLine(target,
+                    getSnapshot().getOpponent())) {
                 // pick a new target then
                 LOG.info("Opponent is blocking the target, avoiding it");
                 target = getAvoidanceTarget();
+                addDrawable(new Dot(target.getPosition(), Color.MAGENTA));
             }
         }
 
