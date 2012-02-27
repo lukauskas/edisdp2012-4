@@ -270,7 +270,7 @@ public class GoToBall extends AbstractPlanner {
 		}
 
 		// If we see the opponent
-		if (getSnapshot().getOpponent() != null) {
+		if (getSnapshot().getOpponent().getPosition() != null) {
 			Line pathToTarget = new Line(
 					getSnapshot().getBalle().getPosition(),
 					target.getPosition());
