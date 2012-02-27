@@ -1,7 +1,6 @@
 package balle.world;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 
@@ -42,5 +41,16 @@ public class LineTest {
         assertFalse("l2 do contain point (0, 1.5)", l2.contains(new Coord(0, 1.5)));
         assertFalse("l3 does not contain point (1.5, 0.5)", l3.contains(new Coord(1.5, 0.5)));
 
+    }
+    
+    @Test
+    public void testGetIntersect() {
+    	Line l1 = new Line(0,0,10,10);
+    	Line l2 = new Line(0,10,10,0);
+    	Coord intersect = l1.getIntersect(l2);
+    	
+    	assertTrue("Intersection should not be null.", intersect!=null);
+    	assertEquals("X should equal 5", 5, intersect.getX(), 0.00001);
+    	assertEquals("Y should equal 5", 5, intersect.getY(), 0.00001);
     }
 }
