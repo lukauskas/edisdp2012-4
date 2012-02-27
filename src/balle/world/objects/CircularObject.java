@@ -60,7 +60,9 @@ public class CircularObject extends MovingPoint implements FieldObject {
     public boolean isNear(Robot r) {
         if ((getPosition() == null) || (r.getPosition() == null))
             return false;
-        return getPosition().dist(r.getPosition()) <= r.getWidth() + getRadius() + 0.05;
+        return getPosition().dist(r.getPosition()) <= Math.max(r.getHeight(),
+                r.getWidth())
+                + getRadius() + 0.1;
     }
 
     @Override
