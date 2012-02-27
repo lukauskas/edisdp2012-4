@@ -3,7 +3,7 @@ package balle.strategy.executor.movement;
 import java.util.ArrayList;
 
 import balle.controller.Controller;
-import balle.main.Drawable;
+import balle.main.drawable.Drawable;
 import balle.strategy.executor.turning.RotateToOrientationExecutor;
 import balle.world.Coord;
 import balle.world.Orientation;
@@ -13,139 +13,140 @@ import balle.world.objects.StaticFieldObject;
 
 public class GoToObject implements MovementExecutor {
 
-    private double              stopDistance              = 0.2;
-    private final static double EPSILON                   = 0.00001;
+	private double stopDistance = 0.2;
 
-    protected StaticFieldObject target                    = null;
-    protected Snapshot          currentState              = null;
-    private boolean             isMoving                  = false;
+	private final static double EPSILON = 0.00001;
 
-    private final static double DISTANCE_DIFF_TO_TURN_FOR = 0.3;
-    private final static int    MOVEMENT_SPEED            = 500;
+	protected StaticFieldObject target = null;
+	protected Snapshot currentState = null;
+	private boolean isMoving = false;
 
-    RotateToOrientationExecutor turningExecutor           = null;
+	private final static double DISTANCE_DIFF_TO_TURN_FOR = 0.3;
+	private final static int MOVEMENT_SPEED = 500;
 
-    public GoToObject(RotateToOrientationExecutor turningExecutor) {
-        this.turningExecutor = turningExecutor;
-    }
+	RotateToOrientationExecutor turningExecutor = null;
 
-    @Override
-    public void updateTarget(StaticFieldObject target) {
-        this.target = target;
-    }
+	public GoToObject(RotateToOrientationExecutor turningExecutor) {
+		this.turningExecutor = turningExecutor;
+	}
 
-    @Override
-    public boolean isFinished() {
-        Robot robot = currentState.getBalle();
-        Coord currentPosition = robot.getPosition();
-        if ((target == null) || (currentPosition == null)) {
-            return false;
-        }
-        return ((currentPosition.dist(target.getPosition()) - stopDistance) < EPSILON);
-    }
+	@Override
+	public void updateTarget(StaticFieldObject target) {
+		this.target = target;
+	}
 
-    @Override
-    public boolean isPossible() {
-        if (turningExecutor == null)
-            return false;
+	@Override
+	public boolean isFinished() {
+		Robot robot = currentState.getBalle();
+		Coord currentPosition = robot.getPosition();
+		if ((target == null) || (currentPosition == null)) {
+			return false;
+		}
+		return ((currentPosition.dist(target.getPosition()) - stopDistance) < EPSILON);
+	}
 
-        Robot robot = currentState.getBalle();
-        Coord currentPosition = robot.getPosition();
-        Orientation currentOrientation = robot.getOrientation();
-        Coord targetPosition = (target != null) ? target.getPosition() : null;
-        return ((currentOrientation != null) && (currentPosition != null) && (targetPosition != null));
-    }
+	@Override
+	public boolean isPossible() {
+		if (turningExecutor == null)
+			return false;
 
-    @Override
-    public void updateState(Snapshot snapshot) {
-        currentState = snapshot;
-    }
+		Robot robot = currentState.getBalle();
+		Coord currentPosition = robot.getPosition();
+		Orientation currentOrientation = robot.getOrientation();
+		Coord targetPosition = (target != null) ? target.getPosition() : null;
+		return ((currentOrientation != null) && (currentPosition != null) && (targetPosition != null));
+	}
 
-    @Override
-    public void step(Controller controller) {
-        // Fail quickly if state not set
-        if (currentState == null)
-            return;
+	@Override
+	public void updateState(Snapshot snapshot) {
+		currentState = snapshot;
+	}
 
-        Coord targetCoord = target.getPosition();
-        Robot robot = currentState.getBalle();
+	@Override
+	public void step(Controller controller) {
+		// Fail quickly if state not set
+		if (currentState == null)
+			return;
 
-        Coord currentPosition = robot.getPosition();
+		Coord targetCoord = target.getPosition();
+		Robot robot = currentState.getBalle();
 
-        if (isFinished()) {
-            stop(controller);
-            return;
-        } else {
-            // Fail quickly if not possible
-            if (!isPossible())
-                return;
-            turningExecutor.updateState(currentState);
-            if (turningExecutor.isFinished()) {
-                turningExecutor.stop(controller);
-            }
+		Coord currentPosition = robot.getPosition();
 
-            if (turningExecutor.isTurning()) // If we are still turning here
-            {
-                turningExecutor.step(controller);
-                return; // Continue
-            } else {
-                Orientation orientationToTarget = targetCoord.sub(
-                        currentPosition).orientation();
-                turningExecutor.setTargetOrientation(orientationToTarget);
-                double turnAngle = turningExecutor.getAngleToTurn();
-                double dist = targetCoord.dist(robot.getPosition());
-                double distDiffFromTarget = Math
-                        .abs(Math.sin(turnAngle) * dist);
+		if (isFinished()) {
+			stop(controller);
+			return;
+		} else {
+			// Fail quickly if not possible
+			if (!isPossible())
+				return;
+			turningExecutor.updateState(currentState);
+			if (turningExecutor.isFinished()) {
+				turningExecutor.stop(controller);
+			}
 
-                // sin(180) = sin(0) thus the check
-                if ((Math.abs(turnAngle) > Math.PI / 2)
-                        || (Math.abs(distDiffFromTarget) > DISTANCE_DIFF_TO_TURN_FOR
-                                * dist)) {
+			if (turningExecutor.isTurning()) // If we are still turning here
+			{
+				turningExecutor.step(controller);
+				return; // Continue
+			} else {
+				Orientation orientationToTarget = targetCoord.sub(
+						currentPosition).orientation();
+				turningExecutor.setTargetOrientation(orientationToTarget);
+				double turnAngle = turningExecutor.getAngleToTurn();
+				double dist = targetCoord.dist(robot.getPosition());
+				double distDiffFromTarget = Math
+						.abs(Math.sin(turnAngle) * dist);
 
-                    if (isMoving) {
-                        controller.stop();
-                        isMoving = false;
-                    }
+				// sin(180) = sin(0) thus the check
+				if ((Math.abs(turnAngle) > Math.PI / 2)
+						|| (Math.abs(distDiffFromTarget) > DISTANCE_DIFF_TO_TURN_FOR
+								* dist)) {
 
-                    turningExecutor.step(controller);
-                } else {
-                    if (!isMoving) {
-                        controller.forward(MOVEMENT_SPEED);
-                        isMoving = true;
-                    }
-                }
-            }
-        }
+					if (isMoving) {
+						controller.stop();
+						isMoving = false;
+					}
 
-    }
+					turningExecutor.step(controller);
+				} else {
+					if (!isMoving) {
+						controller.forward(MOVEMENT_SPEED);
+						isMoving = true;
+					}
+				}
+			}
+		}
 
-    @Override
-    public void stop(Controller controller) {
-        // If its doing anything, it will stop
-        if (isMoving)
-            controller.stop();
+	}
 
-        // Otherwise it will just make sure to clean up
-        isMoving = false;
+	@Override
+	public void stop(Controller controller) {
+		// If its doing anything, it will stop
+		if (isMoving)
+			controller.stop();
 
-        // Also make sure for turningExecutor to do the same
-        if (turningExecutor != null) {
-            turningExecutor.stop(controller);
-        }
+		// Otherwise it will just make sure to clean up
+		isMoving = false;
 
-        // Note that we do not want to just call controller.stop()
-        // blindly in case there are some other executors using it. (even though
-        // there shouldn't be)
-    }
+		// Also make sure for turningExecutor to do the same
+		if (turningExecutor != null) {
+			turningExecutor.stop(controller);
+		}
 
-    @Override
-    public ArrayList<Drawable> getDrawables() {
-        return new ArrayList<Drawable>();
-    }
+		// Note that we do not want to just call controller.stop()
+		// blindly in case there are some other executors using it. (even though
+		// there shouldn't be)
+	}
 
-    @Override
-    public void setStopDistance(double stopDistance) {
-        this.stopDistance = stopDistance;
+	@Override
+	public ArrayList<Drawable> getDrawables() {
+		return new ArrayList<Drawable>();
+	}
 
-    }
+	@Override
+	public void setStopDistance(double stopDistance) {
+		this.stopDistance = stopDistance;
+
+	}
 }

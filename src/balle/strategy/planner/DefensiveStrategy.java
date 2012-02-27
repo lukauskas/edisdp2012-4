@@ -4,10 +4,12 @@ import java.awt.Color;
 
 import org.apache.log4j.Logger;
 
+import balle.main.drawable.DrawableLine;
 import balle.strategy.executor.movement.MovementExecutor;
 import balle.world.Coord;
 import balle.world.Line;
 import balle.world.Snapshot;
+import balle.world.objects.Ball;
 import balle.world.objects.Goal;
 import balle.world.objects.Point;
 import balle.world.objects.Robot;
@@ -29,25 +31,44 @@ public class DefensiveStrategy extends GoToBall {
         Goal ownGoal = snapshot.getOwnGoal();
 
         Robot opponent = snapshot.getOpponent();
+        Ball ball = snapshot.getBall();
         Robot our = snapshot.getBalle();
+        if (our.getPosition() == null)
+            return null;
+        if (ball.getPosition() == null)
+            return null;
         if (opponent.getPosition() == null)
             return null;
 
-        Line defenceLine = new Line(opponent.getPosition(), ownGoal
-                .getGoalLine().midpoint());
+        Coord intersectionPoint = opponent.getBallKickLine(ball)
+                .getIntersect(ownGoal.getGoalLine());
 
-        // TODO: change this to point of intersection.
-        return defenceLine.midpoint();
+        if (intersectionPoint == null) {
+            LOG.debug("No intersection between getBallKickLine and getGoalLine");
+            intersectionPoint = opponent.getFacingLine().getIntersect(ownGoal.getGoalLine());
+            if (intersectionPoint == null) {
+                // TODO: fix this, this case should not be happening
+                LOG.error("Opponent is not even facing our goal. Defensive strategy should not be in play");
+                return null;
+            }
+
+        }
+
+        Line defenceLine = new Line(ball.getPosition(), intersectionPoint);
+        addDrawable(new DrawableLine(defenceLine, Color.WHITE));
+
+        return defenceLine.closestPoint(our.getPosition());
     }
 
     @Override
     protected StaticFieldObject getTarget() {
-        return new Point(calculateDefenceCoord());
+        Coord defenceCoord = calculateDefenceCoord();
+        return new Point(defenceCoord);
     }
 
     @Override
     protected Color getTargetColor() {
-        return Color.CYAN;
+        return Color.PINK;
     }
 
 }

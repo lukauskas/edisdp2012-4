@@ -1,7 +1,5 @@
 package balle.world.objects;
 
-import java.awt.geom.Line2D;
-
 import balle.misc.Globals;
 import balle.world.Coord;
 import balle.world.Line;
@@ -11,8 +9,7 @@ import balle.world.Velocity;
 public class Robot extends RectangularObject {
 
     public Robot(Coord position, Velocity velocity, Orientation orientation) {
-        super(position, velocity, orientation, Globals.ROBOT_WIDTH,
-                Globals.ROBOT_LENGTH);
+        super(position, velocity, orientation, Globals.ROBOT_WIDTH, Globals.ROBOT_LENGTH);
     }
 
     /**
@@ -29,7 +26,7 @@ public class Robot extends RectangularObject {
         possessVector = possessVector.rotate(getOrientation());
 
         Coord possessPosition = getPosition().add(possessVector);
-        
+
         double distance = ball.getPosition().dist(possessPosition);
         return distance <= Globals.ROBOT_POSSESS_DISTANCE + ball.getRadius();
     }
@@ -47,10 +44,49 @@ public class Robot extends RectangularObject {
         y0 = ball.getPosition().getY();
 
         Coord target = new Coord(Globals.ROBOT_MAX_KICK_DISTANCE, 0);
-        target.rotate(getOrientation());
+        target = target.rotate(getOrientation());
 
-        x1 = target.getX();
-        y1 = target.getY();
+        x1 = x0 + target.getX();
+        y1 = y0 + target.getY();
+
+        return new Line(x0, y0, x1, y1);
+    }
+
+    /**
+     * Returns that represents the robot's facing direction
+     * 
+     * @return the facing line
+     */
+    public Line getFacingLine() {
+        double x0, y0, x1, y1;
+        x0 = getPosition().getX();
+        y0 = getPosition().getY();
+
+        Coord target = new Coord(Globals.PITCH_WIDTH, 0);
+        target = target.rotate(getOrientation());
+
+        x1 = x0 + target.getX();
+        y1 = y0 + target.getY();
+
+        return new Line(x0, y0, x1, y1);
+    }
+
+    /**
+     * Gets the facing line of the robot. Similar to the getFacingLine but the
+     * line returned stretches both forward and backward from the robot.
+     * 
+     * @return the facing line both ways
+     */
+    public Line getFacingLineBothWays() {
+        double x0, y0, x1, y1;
+
+        Coord target = new Coord(Globals.PITCH_WIDTH, 0);
+        target = target.rotate(getOrientation());
+
+        x0 = getPosition().getX() - target.getX();
+        y0 = getPosition().getY() - target.getY();
+        x1 = getPosition().getX() + target.getX();
+        y1 = getPosition().getY() + target.getY();
 
         return new Line(x0, y0, x1, y1);
     }
@@ -66,20 +102,7 @@ public class Robot extends RectangularObject {
      * @return true, if is in scoring position
      */
     public boolean isInScoringPosition(Ball ball, Goal goal, Robot otherRobot) {
-        if (!possessesBall(ball))
-            return false;
-
-        double x1, y1, x2, y2, x3, y3, x4, y4;
-        x1 = goal.getLeftPostCoord().getX();
-        y1 = goal.getLeftPostCoord().getY();
-        x2 = goal.getRightPostCoord().getX();
-        y2 = goal.getRightPostCoord().getY();
-
-        Line ballKickLine = getBallKickLine(ball);
-
-        return Line2D.linesIntersect(x1, y1, x2, y2,
-                ballKickLine.getA().getX(), ballKickLine.getA().getY(),
-                ballKickLine.getB().getX(), ballKickLine.getB().getY());
+        return possessesBall(ball) && isFacingGoal(goal) && !otherRobot.intersects(getFacingLine());
     }
 
     /**
@@ -91,8 +114,102 @@ public class Robot extends RectangularObject {
      * @return
      */
     public boolean isFacingGoal(Goal goal) {
-        // TODO: finish
-        return true;
+
+        Line goalLine = goal.getGoalLine();
+        Line facingLine = getFacingLine();
+
+        return facingLine.intersects(goalLine);
+
+    }
+
+    /**
+     * TODO write test
+     * 
+     * @return True, if robot is facing left.
+     */
+    public boolean isFacingLeft() {
+        // TODO: Use orientation here!!!!!
+        // if orientation is (90;270) degrees return true
+        Line fl = this.getFacingLine();
+        return (fl.getB().getX() - fl.getA().getX()) < 0;
+    }
+
+    /**
+     * TODO write test
+     * 
+     * @return True, if the robot is facing right
+     */
+    public boolean isFacingRight() {
+        // TODO: Use orientation here!!!
+        // if orientation is (0;90) union (270;360) degrees return true;
+        Line fl = this.getFacingLine();
+        return (fl.getB().getX() - fl.getA().getX()) > 0;
+    }
+
+    /**
+     * Returns true if this robot is facing to the half of the pitch that this
+     * goal is present.
+     * 
+     * TODO write test
+     * 
+     * @param goal
+     * @return
+     */
+    public boolean isFacingGoalHalf(Goal goal) {
+        return isFacingLeft() == goal.isLeftGoal();
+    }
+
+    /**
+     * Returns the angle required to turn using atan2 style radians. Positive
+     * angle means to turn CCW this much radians, whereas negative means turning
+     * CW that amount of radians.
+     * 
+     * @param currentOrientation
+     *            current orientation of the robot
+     * @param targetOrientation
+     *            target orientation
+     * @return the angle to turn
+     */
+    public double getAngleToTurn(Orientation targetOrientation) {
+        Orientation currentOr = getOrientation();
+        if ((currentOr == null) || (targetOrientation == null))
+            return 0;
+
+        double angleToTarget = targetOrientation.atan2styleradians();
+        double currentOrientation = currentOr.atan2styleradians();
+
+        double turnLeftAngle, turnRightAngle;
+        if (angleToTarget > currentOrientation) {
+            turnLeftAngle = angleToTarget - currentOrientation;
+            turnRightAngle = currentOrientation + (2 * Math.PI - angleToTarget);
+        } else {
+            turnLeftAngle = (2 * Math.PI) - currentOrientation + angleToTarget;
+            turnRightAngle = currentOrientation - angleToTarget;
+        }
+
+        double turnAngle;
+
+        if (turnLeftAngle < turnRightAngle)
+            turnAngle = turnLeftAngle;
+        else
+            turnAngle = -turnRightAngle;
+
+        return turnAngle;
+    }
+
+    /**
+     * Returns the angle the robot has to turn to face the target coordinate
+     * 
+     * @param targetCoord
+     *            the target coordinate
+     * @return the angle to turn to target
+     */
+    public double getAngleToTurnToTarget(Coord targetCoord) {
+        Coord currentPosition = getPosition();
+        if ((currentPosition == null) || (targetCoord == null))
+            return 0;
+
+        return getAngleToTurn(targetCoord.sub(currentPosition).orientation());
     }
 
 }

@@ -24,27 +24,6 @@ public class PFPlanning {
     double                      opponentAlphaPower;
 
     /**
-     * Constructor for PFPlanning:
-     * 
-     * @param conf
-     *            Configuration parameters of the robot.
-     * @param opponentPower
-     *            Repulsive power for opponent
-     * @param opponentInf
-     *            Influence distance for opponent.
-     * @param targetPower
-     *            Power for goal position
-     */
-    public PFPlanning(RobotConf conf, double opponentPower, double opponentInf,
-            double targetPower) {
-        this.config = conf;
-        objects = new ArrayList<Object>();
-        this.opponentPower = opponentPower;
-        this.opponentInf = opponentInf;
-        this.ballPower = targetPower;
-    }
-
-    /**
      * Instantiates a new pF planning.
      * 
      * @param conf
@@ -58,8 +37,8 @@ public class PFPlanning {
      * @param alpha
      *            Orientation power
      */
-    public PFPlanning(RobotConf conf, double opponentPower, double opponentInf,
-            double targetPower, double alpha) {
+    public PFPlanning(RobotConf conf, double opponentPower, double opponentInf, double targetPower,
+            double alpha) {
         this.config = conf;
         objects = new ArrayList<Object>();
         this.opponentPower = opponentPower;
@@ -70,8 +49,8 @@ public class PFPlanning {
 
     private void init(Pos robot, Pos opponent, Point ball) {
         if (opponent != null) {
-            PointObject opponentObj = new PointObject(opponent.getLocation(),
-                    opponentPower, opponentInf, opponentAlphaPower);
+            PointObject opponentObj = new PointObject(opponent.getLocation(), opponentPower,
+                    opponentInf, opponentAlphaPower);
             this.opponent = opponentObj;
         } else
             this.opponent = null;
@@ -124,14 +103,14 @@ public class PFPlanning {
         if (this.opponent != null)
             complList.add(this.opponent);
 
-        Vector res = GoTo(complList, this.ball, robot.getLocation());
+        Vector res = GoTo(complList, this.ball, robot);
 
         return getVelocity(res, robot);
 
     }
 
     /** Adds static object in the arena to list of static obstacles. */
-    public void AddObjects(Object r) {
+    public void addObject(Object r) {
         objects.add(r);
     }
 
@@ -139,8 +118,7 @@ public class PFPlanning {
      * Actual function which computes the the next velocity vector to be applied
      * to the robot.
      */
-    public Vector GoTo(List<Object> obstacles, PointObject dest_obj,
-            Point start_point) {
+    public Vector GoTo(List<Object> obstacles, PointObject dest_obj, Point start_point) {
 
         Vector rep = new Vector(0, 0);
         // iterate through all obstacles and compute sum of all repulsive
@@ -167,8 +145,7 @@ public class PFPlanning {
      *            the start_point
      * @return the vector
      */
-    public Vector GoTo(List<Object> obstacles, PointObject dest_obj,
-            Pos start_point) {
+    public Vector GoTo(List<Object> obstacles, PointObject dest_obj, Pos start_point) {
 
         Vector rep = new Vector(0, 0);
         // iterate through all obstacles and compute sum of all repulsive

@@ -39,7 +39,15 @@ public class Coord {
     }
 
     public double abs() {
-        return Math.sqrt(x * x + y * y);
+        return Math.sqrt(sqrAbs());
+    }
+
+    public double sqrAbs() {
+        return x * x + y * y;
+    }
+
+    public double dot(Coord c) {
+        return x * c.getX() + y * c.getY();
     }
 
     public Coord sub(Coord c) {
@@ -87,8 +95,7 @@ public class Coord {
         if (this.getClass() != other.getClass())
             return false;
         Coord otherCoord = (Coord) other;
-        return (otherCoord.getX() == this.getX())
-                && (otherCoord.getY() == this.getY())
+        return (otherCoord.getX() == this.getX()) && (otherCoord.getY() == this.getY())
                 && (otherCoord.isEstimated() == this.isEstimated());
     }
 
@@ -100,8 +107,7 @@ public class Coord {
      *            the starting coordinate
      * @return true, if coordinate is reachable in straight line from another
      */
-    public boolean isReachableInStraightLineAndNotBlocked(Coord fromCoordinate,
-            Pitch pitch) {
+    public boolean isReachableInStraightLineAndNotBlocked(Coord fromCoordinate, Pitch pitch) {
         return pitch.containsCoord(this) && pitch.containsCoord(fromCoordinate);
     }
 
@@ -115,17 +121,20 @@ public class Coord {
      *            checks what could be the potential obstacle.
      * @return true, if coordinate is reachable in straight line from another
      */
-    public boolean isReachableInStraightLineAndNotBlocked(Coord fromCoordinate,
-            Pitch pitch, FieldObject potentialObstacle) {
+    public boolean isReachableInStraightLineAndNotBlocked(Coord fromCoordinate, Pitch pitch,
+            FieldObject potentialObstacle) {
         if (!this.isReachableInStraightLineAndNotBlocked(fromCoordinate, pitch))
             return false;
-        else
-            return true;
+
+        Line line = new Line(new Coord(this.getX(), this.getY()), new Coord(fromCoordinate.getX(),
+                fromCoordinate.getY()));
+
+        return !potentialObstacle.intersects(line);
     }
 
     /**
-     * Creates a new coord rotated counter-clockwise by an angle.
-     * around the origin
+     * Creates a new coord rotated counter-clockwise by an angle. around the
+     * origin
      * 
      * @param orientation
      */

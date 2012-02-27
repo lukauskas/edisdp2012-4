@@ -3,7 +3,7 @@ package balle.strategy.executor.dribbling;
 import java.util.ArrayList;
 
 import balle.controller.Controller;
-import balle.main.Drawable;
+import balle.main.drawable.Drawable;
 import balle.strategy.executor.Executor;
 import balle.world.Coord;
 import balle.world.Snapshot;
@@ -51,8 +51,7 @@ public class DribbleStraight implements Executor {
 
         double DISTANCE_THRESHOLD = 0.15;
         double EPSILON = 0.000001;
-        return currentState.getBalle().getPosition()
-                .dist(currentState.getBall().getPosition())
+        return currentState.getBalle().getPosition().dist(currentState.getBall().getPosition())
                 - DISTANCE_THRESHOLD <= EPSILON;
     }
 
@@ -77,18 +76,15 @@ public class DribbleStraight implements Executor {
                 controller.forward(INIT_SPEED);
                 isMoving = true;
             }
-            blockBall(controller, currentState.getBall().getPosition(),
-                    currentState.getBalle());
+            blockBall(controller, currentState.getBall().getPosition(), currentState.getBalle());
         } else {
             // Ball away from robot
             Coord target = currentState.getBall().getPosition();
             Robot robot = currentState.getBalle();
             Coord currentPosition = robot.getPosition();
-            double angleToTarget = target.sub(currentPosition).orientation()
-                    .atan2styleradians();
+            double angleToTarget = target.sub(currentPosition).orientation().atan2styleradians();
 
-            double currentOrientation = robot.getOrientation()
-                    .atan2styleradians();
+            double currentOrientation = robot.getOrientation().atan2styleradians();
 
             if ((speed <= 720) && (Math.abs(angleToTarget) <= 5)) {
                 speed = speed + 100;
@@ -99,11 +95,9 @@ public class DribbleStraight implements Executor {
 
                 if (angleToTarget > currentOrientation) {
                     turnLeftAngle = angleToTarget - currentOrientation;
-                    turnRightAngle = currentOrientation
-                            + (2 * Math.PI - angleToTarget);
+                    turnRightAngle = currentOrientation + (2 * Math.PI - angleToTarget);
                 } else {
-                    turnLeftAngle = (2 * Math.PI) - currentOrientation
-                            + angleToTarget;
+                    turnLeftAngle = (2 * Math.PI) - currentOrientation + angleToTarget;
                     turnRightAngle = currentOrientation - angleToTarget;
                 }
 
@@ -119,8 +113,7 @@ public class DribbleStraight implements Executor {
     }
 
     protected void blockBall(Controller controller, Coord target, Robot robot) {
-        double angleToTarget = target.sub(robot.getPosition()).orientation()
-                .atan2styleradians();
+        double angleToTarget = target.sub(robot.getPosition()).orientation().atan2styleradians();
         double currentOrientation = robot.getOrientation().atan2styleradians();
 
         double turnLeftAngle, turnRightAngle;
