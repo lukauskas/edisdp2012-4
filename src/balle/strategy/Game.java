@@ -3,7 +3,6 @@ package balle.strategy;
 import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
-import balle.strategy.executor.turning.FaceAngle;
 import balle.strategy.executor.turning.IncFaceAngle;
 import balle.strategy.executor.turning.RotateToOrientationExecutor;
 import balle.strategy.planner.AbstractPlanner;
@@ -97,7 +96,7 @@ public class Game extends AbstractPlanner {
             defensiveStrategy.step(controller);
             addDrawables(defensiveStrategy.getDrawables());
         } else if (ball.isNear(ourRobot)
-                && FaceAngle.getAngleToTurn(ourRobot.getOrientation(), targetOrientation) > (Math.PI / 4)) {
+                && ourRobot.getAngleToTurn(targetOrientation) > (Math.PI / 4)) {
             LOG.info("Ball is near our robot, turning to it");
             turningExecutor.setTargetOrientation(targetOrientation);
             turningExecutor.step(controller);
