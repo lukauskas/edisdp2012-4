@@ -174,9 +174,9 @@ public class Coord {
 
 		adbc = from.x * to.y - from.y * to.x;
 		if (adbc >= 0) {
-			out = new Orientation(-Math.acos(dotProduct), true);
-		} else {
 			out = new Orientation(Math.acos(dotProduct), true);
+		} else {
+			out = new Orientation(-Math.acos(dotProduct), true);
 		}
 
 		return out;
