@@ -91,7 +91,9 @@ public class KickFromWall extends GoToBall {
 			}
 		} else {
 			// LOG.info("Going to ball");
-			setExecutorStrategy(new GoToObject(new FaceAngle()));
+			MovementExecutor strategy = new GoToObject(new FaceAngle());
+			strategy.setStopDistance(0);
+			setExecutorStrategy(strategy);
 			return loc2;
 		}
 	}
@@ -104,10 +106,8 @@ public class KickFromWall extends GoToBall {
 
 	@Override
 	public void step(Controller controller) {
-		if (getSnapshot().getBalle().possessesBall(getSnapshot().getBall())) {
+		if (getSnapshot().getBall().isNear(getSnapshot().getBalle()))
 			controller.kick();
-		} else {
-			super.step(controller);
-		}
+		super.step(controller);
 	}
 }
