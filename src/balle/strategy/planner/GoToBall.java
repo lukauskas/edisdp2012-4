@@ -28,7 +28,7 @@ public class GoToBall extends AbstractPlanner {
     MovementExecutor              executorStrategy;
 
     private static final double   AVOIDANCE_GAP           = 0.5;                             // Meters
-    private static final double   OVERSHOOT_GAP           = 0.8;                             // Meters
+    private static final double   OVERSHOOT_GAP           = 0.7;                             // Meters
     private static final double   DIST_DIFF_THRESHOLD     = 0.2;                             // Meters
     private static final double   OVERSHOOT_ANGLE_EPSILON = 50;                              // Degrees
 
@@ -169,19 +169,29 @@ public class GoToBall extends AbstractPlanner {
                 belowBall);
 
         // If the point is in the pitch
-        if (pitch.containsCoord(overshootCoord))
-            // Return it as a new target
+        if (pitch.containsCoord(overshootCoord)) {
             return new Point(overshootCoord);
-        // If its not in the pitch, pick a new one
 
-        overshootCoord = calculateOvershootCoord(target, OVERSHOOT_GAP,
-                !belowBall);
-        if (pitch.containsCoord(overshootCoord))
-            return new Point(overshootCoord);
-        // If the target is *still* out of pitch, go to the original target at
+        }
+        // If its not in the pitch, pick a new one
+        // DOESN't really work :(
+
+        // overshootCoord = calculateOvershootCoord(target, OVERSHOOT_GAP,
+        // !belowBall);
+        // if (pitch.containsCoord(overshootCoord)) {
+        // // Check if it is suitable
+        // Coord overshootVector = overshootCoord.sub(target.getPosition());
+        // if ((getSnapshot().getOpponentsGoal().isLeftGoal() && overshootVector
+        // .orientation().isFacingLeft(0))
+        // || (getSnapshot().getOpponentsGoal().isRightGoal() && overshootVector
+        // .orientation().isFacingRight(0))) {
+        // // Return it as a new target
+        // return new Point(overshootCoord);
+        // }
+        // }
+        // If the target is *still* not suitable, go to the original target at
         // least
-        else
-            return target;
+        return target;
 
     }
 
