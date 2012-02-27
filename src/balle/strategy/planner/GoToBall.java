@@ -28,9 +28,9 @@ public class GoToBall extends AbstractPlanner {
     MovementExecutor              executorStrategy;
 
     private static final double   AVOIDANCE_GAP           = 0.5;                             // Meters
-    private static final double   OVERSHOOT_GAP           = 0.5;                             // Meters
+    private static final double   OVERSHOOT_GAP           = 0.8;                             // Meters
     private static final double   DIST_DIFF_THRESHOLD     = 0.2;                             // Meters
-    private static final double   OVERSHOOT_ANGLE_EPSILON = 30;                              // Degrees
+    private static final double   OVERSHOOT_ANGLE_EPSILON = 50;                              // Degrees
 
     private boolean               approachTargetFromCorrectSide;
 
