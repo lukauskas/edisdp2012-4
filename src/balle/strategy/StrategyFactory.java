@@ -7,11 +7,12 @@ import balle.strategy.planner.AbstractPlanner;
 import balle.strategy.planner.DefensiveStrategy;
 import balle.strategy.planner.DribbleMilestone2;
 import balle.strategy.planner.GoToBall;
+import balle.strategy.planner.GoToFaceBall;
 
 public class StrategyFactory {
     public static String[] availableDesignators() {
 
-        String[] designators = { "GoToBall", "GoToBallPFN", "Dribble", "Blocking", "PFNavigation",
+        String[] designators = { "GoToBall", "GoToFaceBall", "GoToBallPFN", "Dribble", "Blocking", "PFNavigation",
                 "DefensiveStrategy", "Game", "GameFromPenaltyKick", "GameFromPenaltyDefence" };
         return designators;
     }
@@ -20,6 +21,8 @@ public class StrategyFactory {
 
         if (designator.equals("GoToBall")) {
             return new GoToBall(new GoToObject(new FaceAngle()));
+        } else if (designator.equals("GoToFaceBall")) {
+        	return new GoToFaceBall(new GoToObject(new FaceAngle()), new FaceAngle());
         } else if (designator.equals("GoToBallPFN")) {
             return new GoToBall(new GoToObjectPFN(0.15f));
         } else if (designator.equals("DummyStrategy")) {

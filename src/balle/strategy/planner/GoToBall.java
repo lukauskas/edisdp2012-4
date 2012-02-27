@@ -23,7 +23,7 @@ import balle.world.objects.StaticFieldObject;
  */
 public class GoToBall extends AbstractPlanner {
 
-    private static final Logger LOG                 = Logger.getLogger(GoToBall.class);
+    protected static final Logger LOG                 = Logger.getLogger(GoToBall.class);
 
     MovementExecutor            executorStrategy;
 

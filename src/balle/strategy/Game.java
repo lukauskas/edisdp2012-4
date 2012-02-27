@@ -31,7 +31,7 @@ public class Game extends AbstractPlanner {
         // to a location that is say 0.2 m before the ball in correct direction
         // and then, once the robot reaches it, pointing it to the ball itself
         // so it reaches it.
-        goToBallStrategy = StrategyFactory.createClass("GoToBallPFN");
+        goToBallStrategy = StrategyFactory.createClass("GoToBall");
         // TODO: UPDATE THIS
         pickBallFromWallStrategy = StrategyFactory.createClass("DummyStrategy");
         turningExecutor = new IncFaceAngle();
