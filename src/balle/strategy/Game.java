@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
 import balle.strategy.executor.turning.FaceAngle;
+import balle.strategy.executor.turning.IncFaceAngle;
 import balle.strategy.executor.turning.RotateToOrientationExecutor;
 import balle.strategy.planner.AbstractPlanner;
 import balle.world.Orientation;
@@ -36,7 +37,7 @@ public class Game extends AbstractPlanner {
         pickBallFromWallStrategy = StrategyFactory.createClass("DummyStrategy");
         // TODO: Implement a new turning executor that does not use rotate()
         // command
-        turningExecutor = new FaceAngle();
+        turningExecutor = new IncFaceAngle();
     }
 
     @Override
