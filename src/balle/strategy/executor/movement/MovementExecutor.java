@@ -7,15 +7,17 @@ import balle.world.objects.StaticFieldObject;
 
 public interface MovementExecutor extends Executor {
 
-	/**
-	 * Update the current target we are to approach. This should allow to
-	 * quickly deal with changing locations of target without the loss of
-	 * momentum.
-	 * 
-	 * @param target
-	 *            FieldObject of the target we want to approach
-	 */
-	public void updateTarget(StaticFieldObject target);
+/**
+     * Update the current target we are to approach. This should allow to
+     * quickly deal with changing locations of target without the loss of
+     * momentum.
+     * 
+     * If fieldObject
+     * 
+     * @param target
+     *            StaticFieldObject of the target we want to approach
+     */
+    public void updateTarget(StaticFieldObject target);
 
 	@Override
 	public boolean isFinished();

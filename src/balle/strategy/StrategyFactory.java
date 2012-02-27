@@ -14,7 +14,7 @@ public class StrategyFactory {
 	public static String[] availableDesignators() {
 
         String[] designators = { "GoToBall", "GoToBallPFN", "Dribble",
-                "Blocking", "PFNavigation", "KickCapacityTest", "BallNearWall" };
+                "Blocking", "PFNavigation", "BallNearWall" };
         return designators;
     }
 

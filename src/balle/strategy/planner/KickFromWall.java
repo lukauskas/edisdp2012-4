@@ -43,19 +43,19 @@ public class KickFromWall extends AbstractPlanner {
 		if (snap.getOpponentsGoal().getPosition().getX() < snap.getPitch()
 				.getMaxX() / 2) {
 			if (snap.getBall().getPosition().getY() < snap.getPitch().getMaxY() / 2) {
-				targetX = snap.getBall().getPosition().getX() + 0.2;
-				targetY = snap.getBall().getPosition().getY() + 0.05;
+				targetX = snap.getBall().getPosition().getX() + 0.4;
+				targetY = snap.getBall().getPosition().getY() + 0.13;
 			} else {
-				targetX = snap.getBall().getPosition().getX() + 0.2;
-				targetY = snap.getBall().getPosition().getY() - 0.05;
+				targetX = snap.getBall().getPosition().getX() + 0.4;
+				targetY = snap.getBall().getPosition().getY() - 0.13;
 			}
 		} else {
 			if (snap.getBall().getPosition().getY() < snap.getPitch().getMaxY() / 2) {
-				targetX = snap.getBall().getPosition().getX() - 0.2;
-				targetY = snap.getBall().getPosition().getY() + 0.05;
+				targetX = snap.getBall().getPosition().getX() - 0.4;
+				targetY = snap.getBall().getPosition().getY() + 0.13;
 			} else {
-				targetX = snap.getBall().getPosition().getX() - 0.2;
-				targetY = snap.getBall().getPosition().getY() - 0.05;
+				targetX = snap.getBall().getPosition().getX() - 0.4;
+				targetY = snap.getBall().getPosition().getY() - 0.13;
 			}
 		}
 
