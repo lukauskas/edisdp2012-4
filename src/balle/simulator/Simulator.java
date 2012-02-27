@@ -32,7 +32,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 	// Increases sizes, but keeps real-world scale; jbox2d acts unrealistically
 	// at a small scale
 
-	public static boolean noisy;
+	private static boolean noisy;
 
 	protected final float scale = 10;
 
@@ -63,6 +63,10 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 	@Override
 	public String getTestName() {
 		return "Super Cool Simulator";
+	}
+
+	public boolean isNoisy(boolean noise) {
+		return noisy = noise;
 	}
 
 	private void addEdge(float x1, float y1, float x2, float y2) {

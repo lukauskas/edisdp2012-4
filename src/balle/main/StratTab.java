@@ -30,6 +30,7 @@ public class StratTab extends JPanel implements ActionListener {
 	private JButton randomButton;
 	private JButton resetButton;
 	private JButton noiseButton;
+	private JButton switchGoals;
 	private JComboBox menu;
 	private JLabel label;
 
@@ -78,7 +79,12 @@ public class StratTab extends JPanel implements ActionListener {
 		noiseButton.addActionListener(this);
 		noiseButton.setActionCommand("noise");
 
-		southPanel.add(BorderLayout.WEST, randomButton);
+		switchGoals = new JButton("Switch Goals");
+		switchGoals.addActionListener(this);
+		switchGoals.setActionCommand("goals");
+
+		southPanel.add(BorderLayout.WEST, switchGoals);
+		southPanel.add(BorderLayout.NORTH, randomButton);
 		southPanel.add(BorderLayout.SOUTH, resetButton);
 		southPanel.add(BorderLayout.EAST, noiseButton);
 
@@ -139,10 +145,16 @@ public class StratTab extends JPanel implements ActionListener {
 		} else if (event.getActionCommand().equals("noise")) {
 			if (noiseButton.getText().equals("Noise: Off")) {
 				noiseButton.setText("Noise: On");
-				simulator.noisy = true;
+				simulator.isNoisy(true);
 			} else {
 				noiseButton.setText("Noise: Off");
-				simulator.noisy = false;
+				simulator.isNoisy(false);
+			}
+		} else if (event.getActionCommand().equals("goals")) {
+			if (world.getGoalPosition()) {
+				world.setGoalPosition(false);
+			} else {
+				world.setGoalPosition(true);
 			}
 		}
 	}
