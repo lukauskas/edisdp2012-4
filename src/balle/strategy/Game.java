@@ -3,9 +3,11 @@ package balle.strategy;
 import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
+import balle.misc.Globals;
 import balle.strategy.executor.turning.IncFaceAngle;
 import balle.strategy.executor.turning.RotateToOrientationExecutor;
 import balle.strategy.planner.AbstractPlanner;
+import balle.world.Coord;
 import balle.world.Orientation;
 import balle.world.Snapshot;
 import balle.world.objects.Ball;
@@ -88,7 +90,7 @@ public class Game extends AbstractPlanner {
 					// it has to be similar to FaceAngle executor but should not
 					// use the controller.rotate()
 					// command that is blocking.
-					LOG.error("Unimplemented turn towards opponent's goal!");
+					LOG.error("robot facing wrong way, shouldnt shoot");
 				}
 			}
 		} else if ((opponent.possessesBall(ball))
@@ -108,9 +110,40 @@ public class Game extends AbstractPlanner {
 			goToBallStrategy.step(controller);
 			addDrawables(goToBallStrategy.getDrawables());
 		} else if (ball.isNearWall(pitch)) {
+			// TODO: Pick it
 			LOG.info("Picking the ball from wall");
 			pickBallFromWallStrategy.step(controller);
 		}
+
+	}
+
+	/**
+	 * TODO TEST!!!!!!
+	 * 
+	 * @param ourRobot
+	 * @param ball
+	 * @param cw
+	 *            Clock-wise rotation if true, CCW if false.
+	 * @return
+	 */
+	private Orientation findMaxRotationMaintaintingPossession(Robot ourRobot,
+			Ball ball, boolean cw) {
+		Coord fl = new Coord(10, 0);
+		fl = fl.rotate(ourRobot.getOrientation()).add(ourRobot.getPosition());
+		Orientation max, o = ourRobot.getPosition().angleBetween(fl,
+				ball.getPosition());
+
+		if (cw) {
+			max = (new Coord(0, 0)).angleBetween(new Coord(10, 0), new Coord(
+					Globals.ROBOT_LENGTH, Globals.ROBOT_WIDTH));
+		} else {
+			max = (new Coord(0, 0)).angleBetween(new Coord(10, 0), new Coord(
+					Globals.ROBOT_LENGTH, -Globals.ROBOT_WIDTH));
+		}
+		System.out.println("max = " + max + ",\to = " + o + ",\tm-o = "
+				+ max.sub(o));
+
+		return max.sub(o);
 
 	}
 }
