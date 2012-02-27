@@ -10,7 +10,7 @@ import joptsimple.OptionSet;
 import org.apache.log4j.Appender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
+import org.apache.log4j.PropertyConfigurator;
 
 import balle.bluetooth.Communicator;
 import balle.controller.BluetoothController;
@@ -68,8 +68,11 @@ public class Runner {
 		// Make sure to log strategy logs to the GUI as well
 		Logger strategyLogger = Logger.getLogger("balle.strategy");
 		Appender strategyAppender = new StrategyLogAppender(strategyLogPane);
-		strategyAppender.setLayout(new PatternLayout("%-5p %c %x - %m%n"));
 		strategyLogger.addAppender(strategyAppender);
+
+		// For all other Log messages. Throws error for some reason
+		// don't know if causing any real problems
+		PropertyConfigurator.configure("log4j.properties");
 	}
 
 	/**
