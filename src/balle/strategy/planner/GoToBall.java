@@ -267,18 +267,17 @@ public class GoToBall extends AbstractPlanner {
 				&& (!isApproachingTargetFromCorrectSide(target))) {
 			LOG.info("Approaching target from wrong side, calculating overshoot target");
 			target = getOvershootTarget(target);
-		}
+            addDrawable(new Dot(target.getPosition(), Color.BLUE));		
+        }
 
 		// If we see the opponent
 		if (getSnapshot().getOpponent().getPosition() != null) {
-			Line pathToTarget = new Line(
-					getSnapshot().getBalle().getPosition(),
-					target.getPosition());
-			// Check if it is blocking our path
-			if (getSnapshot().getOpponent().intersects(pathToTarget)) {
-				// pick a new target then
+			if (!getSnapshot().getBalle().canReachTargetInStraightLine(target,
+                    getSnapshot().getOpponent())) {
+                // pick a new target then
 				LOG.info("Opponent is blocking the target, avoiding it");
 				target = getAvoidanceTarget();
+                addDrawable(new Dot(target.getPosition(), Color.MAGENTA));
 			}
 		}
 

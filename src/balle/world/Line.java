@@ -30,8 +30,8 @@ public class Line {
             return false;
         }
 
-        return (((minX() <= a.getX()) && (maxX() >= a.getX())) && ((minY() <= a.getY()) && (maxY() >= a
-                .getY())));
+        return (((minX() <= a.getX()) && (maxX() >= a.getX())) && ((minY() <= a
+                .getY()) && (maxY() >= a.getY())));
 
     }
 
@@ -90,7 +90,7 @@ public class Line {
     }
 
     public boolean intersects(Line l) {
-        return getLine2DVersion().intersectsLine(l.getLine2DVersion());
+        return getIntersect(l) != null;
     }
 
     /**
@@ -138,7 +138,8 @@ public class Line {
 
         double t = AB.sqrAbs() / AP.dot(AB);
 
-        Coord closest = new Coord(getA().getX() + AB.getX() * t, getA().getY() + AB.getY() * t);
+        Coord closest = new Coord(getA().getX() + AB.getX() * t, getA().getY()
+                + AB.getY() * t);
         // Check if the closest point is in the segment
         if (this.contains(closest)) {
             return closest;
