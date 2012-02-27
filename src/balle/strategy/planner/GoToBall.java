@@ -10,10 +10,8 @@ import org.apache.log4j.Logger;
 import balle.controller.Controller;
 import balle.main.drawable.Dot;
 import balle.strategy.executor.movement.MovementExecutor;
-import balle.strategy.executor.turning.FaceAngle;
 import balle.world.Coord;
 import balle.world.Line;
-import balle.world.Orientation;
 import balle.world.objects.Pitch;
 import balle.world.objects.Point;
 import balle.world.objects.Robot;
@@ -30,7 +28,7 @@ public class GoToBall extends AbstractPlanner {
     MovementExecutor            executorStrategy;
 
     private static final double AVOIDANCE_GAP       = 0.5;
-    private static final double DIST_DIFF_THRESHOLD = 0.4;
+    private static final double DIST_DIFF_THRESHOLD = 0.2;
 
     /**
      * @param controller
@@ -100,13 +98,10 @@ public class GoToBall extends AbstractPlanner {
                 else
                     return new Point(pointBelow);
             } else {
-                Orientation targetOrientation = getTarget().getPosition().sub(currentPosition)
-                        .orientation();
-                // Else pick by orientation
-                double angleToTurnPointAbove = FaceAngle.getAngleToTurn(getSnapshot().getBalle()
-                        .getOrientation(), targetOrientation);
-                double angleToTurnPointBelow = FaceAngle.getAngleToTurn(getSnapshot().getBalle()
-                        .getOrientation(), targetOrientation);
+                double angleToTurnPointAbove = getSnapshot().getBalle().getAngleToTurnToTarget(
+                        pointAbove);
+                double angleToTurnPointBelow = getSnapshot().getBalle().getAngleToTurnToTarget(
+                        pointBelow);
 
                 if (Math.abs(angleToTurnPointAbove) < Math.abs(angleToTurnPointBelow)) {
                     return new Point(pointAbove);
