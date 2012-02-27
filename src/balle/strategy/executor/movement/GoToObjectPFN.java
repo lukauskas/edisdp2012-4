@@ -69,10 +69,10 @@ public class GoToObjectPFN implements MovementExecutor {
         RectObject bottomWall = new RectObject(new Point(0, 0), new Point(
                 Globals.PITCH_WIDTH, 0), wallPower, wallInfDist);
 
-        // plann.addObject(leftWall);
-        // plann.addObject(rightWall);
-        // plann.addObject(topWall);
-        // plann.addObject(bottomWall);
+        plann.addObject(leftWall);
+        plann.addObject(rightWall);
+        plann.addObject(topWall);
+        plann.addObject(bottomWall);
     }
 
     @Override
