@@ -35,8 +35,6 @@ public class Game extends AbstractPlanner {
         goToBallStrategy = StrategyFactory.createClass("GoToBallPFN");
         // TODO: UPDATE THIS
         pickBallFromWallStrategy = StrategyFactory.createClass("DummyStrategy");
-        // TODO: Implement a new turning executor that does not use rotate()
-        // command
         turningExecutor = new IncFaceAngle();
     }
 
