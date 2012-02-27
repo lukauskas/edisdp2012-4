@@ -23,148 +23,161 @@ import balle.world.objects.StaticFieldObject;
  */
 public class GoToBall extends AbstractPlanner {
 
-    protected static final Logger LOG                 = Logger.getLogger(GoToBall.class);
+	protected static final Logger LOG = Logger.getLogger(GoToBall.class);
 
-    MovementExecutor            executorStrategy;
+	MovementExecutor executorStrategy;
 
-    private static final double AVOIDANCE_GAP       = 0.5;
-    private static final double DIST_DIFF_THRESHOLD = 0.2;
+	public MovementExecutor getExecutorStrategy() {
+		return executorStrategy;
+	}
 
-    /**
-     * @param controller
-     * @param world
-     */
-    public GoToBall(MovementExecutor movementExecutor) {
-        executorStrategy = movementExecutor;
+	public void setExecutorStrategy(MovementExecutor executorStrategy) {
+		this.executorStrategy = executorStrategy;
+	}
 
-    }
+	private static final double AVOIDANCE_GAP = 0.5;
+	private static final double DIST_DIFF_THRESHOLD = 0.2;
 
-    protected StaticFieldObject getTarget() {
-        return getSnapshot().getBall();
-    }
+	/**
+	 * @param controller
+	 * @param world
+	 */
+	public GoToBall(MovementExecutor movementExecutor) {
+		executorStrategy = movementExecutor;
 
-    protected Color getTargetColor() {
-        return Color.CYAN;
-    }
+	}
 
-    protected Coord calculateAvoidanceCoord(double gap, boolean belowPoint) {
-        int side = 1;
-        if (belowPoint) {
-            side = -1;
-        }
+	protected StaticFieldObject getTarget() {
+		return getSnapshot().getBall();
+	}
 
-        Robot robot = getSnapshot().getBalle();
-        Coord point = getSnapshot().getOpponent().getPosition();
+	protected Color getTargetColor() {
+		return Color.CYAN;
+	}
 
-        // Gets the angle and distance between the robot and the ball
-        double robotObstacleAngle = point.sub(robot.getPosition()).orientation()
-                .atan2styleradians();
-        double robotObstacleDistance = point.dist(robot.getPosition());
-        // Calculate the distance between the robot and the destination point
-        double hyp = Math.sqrt((robotObstacleDistance * robotObstacleDistance) + (gap * gap));
+	protected Coord calculateAvoidanceCoord(double gap, boolean belowPoint) {
+		int side = 1;
+		if (belowPoint) {
+			side = -1;
+		}
 
-        // Calculate the angle between the robot and the destination point
-        double robotPointAngle = Math.asin(gap / hyp);
-        // Calculate the angle between the robot and the destination point.
-        // Side is -1 if robot is below the ball, so will get the angle needed
-        // for a point
-        // below the ball, whereas side = 1 will give a point above the ball
-        double angle = robotObstacleAngle + (side * robotPointAngle);
+		Robot robot = getSnapshot().getBalle();
+		Coord point = getSnapshot().getOpponent().getPosition();
 
-        // Offsets are in relation to the robot
-        double xOffset = hyp * Math.cos(angle);
-        double yOffset = hyp * Math.sin(angle);
+		// Gets the angle and distance between the robot and the ball
+		double robotObstacleAngle = point.sub(robot.getPosition())
+				.orientation().atan2styleradians();
+		double robotObstacleDistance = point.dist(robot.getPosition());
+		// Calculate the distance between the robot and the destination point
+		double hyp = Math.sqrt((robotObstacleDistance * robotObstacleDistance)
+				+ (gap * gap));
 
-        return new Coord(robot.getPosition().getX() + xOffset, robot.getPosition().getY() + yOffset);
-    }
+		// Calculate the angle between the robot and the destination point
+		double robotPointAngle = Math.asin(gap / hyp);
+		// Calculate the angle between the robot and the destination point.
+		// Side is -1 if robot is below the ball, so will get the angle needed
+		// for a point
+		// below the ball, whereas side = 1 will give a point above the ball
+		double angle = robotObstacleAngle + (side * robotPointAngle);
 
-    protected Point getAvoidanceTarget() {
-        Coord pointAbove = calculateAvoidanceCoord(AVOIDANCE_GAP, true);
-        Coord pointBelow = calculateAvoidanceCoord(AVOIDANCE_GAP, false);
-        Pitch pitch = getSnapshot().getPitch();
+		// Offsets are in relation to the robot
+		double xOffset = hyp * Math.cos(angle);
+		double yOffset = hyp * Math.sin(angle);
 
-        Coord currentPosition = getSnapshot().getBalle().getPosition();
-        if (pitch.containsCoord(pointAbove) && pitch.containsCoord(pointBelow)) {
-            // If both points happen to be in the pitch, return the closest one
-            double distToPointAbove = currentPosition.dist(pointAbove);
-            double distToPointBelow = currentPosition.dist(pointBelow);
-            double distDiff = Math.abs(distToPointAbove - distToPointBelow);
+		return new Coord(robot.getPosition().getX() + xOffset, robot
+				.getPosition().getY() + yOffset);
+	}
 
-            // If distances differ by much:
-            if (distDiff > DIST_DIFF_THRESHOLD) {
-                // Pick the shorter one
-                if (distToPointAbove < distToPointBelow)
-                    return new Point(pointAbove);
-                else
-                    return new Point(pointBelow);
-            } else {
-                double angleToTurnPointAbove = getSnapshot().getBalle().getAngleToTurnToTarget(
-                        pointAbove);
-                double angleToTurnPointBelow = getSnapshot().getBalle().getAngleToTurnToTarget(
-                        pointBelow);
+	protected Point getAvoidanceTarget() {
+		Coord pointAbove = calculateAvoidanceCoord(AVOIDANCE_GAP, true);
+		Coord pointBelow = calculateAvoidanceCoord(AVOIDANCE_GAP, false);
+		Pitch pitch = getSnapshot().getPitch();
 
-                if (Math.abs(angleToTurnPointAbove) < Math.abs(angleToTurnPointBelow)) {
-                    return new Point(pointAbove);
-                } else
-                    return new Point(pointBelow);
+		Coord currentPosition = getSnapshot().getBalle().getPosition();
+		if (pitch.containsCoord(pointAbove) && pitch.containsCoord(pointBelow)) {
+			// If both points happen to be in the pitch, return the closest one
+			double distToPointAbove = currentPosition.dist(pointAbove);
+			double distToPointBelow = currentPosition.dist(pointBelow);
+			double distDiff = Math.abs(distToPointAbove - distToPointBelow);
 
-            }
+			// If distances differ by much:
+			if (distDiff > DIST_DIFF_THRESHOLD) {
+				// Pick the shorter one
+				if (distToPointAbove < distToPointBelow)
+					return new Point(pointAbove);
+				else
+					return new Point(pointBelow);
+			} else {
+				double angleToTurnPointAbove = getSnapshot().getBalle()
+						.getAngleToTurnToTarget(pointAbove);
+				double angleToTurnPointBelow = getSnapshot().getBalle()
+						.getAngleToTurnToTarget(pointBelow);
 
-        } else if (pitch.containsCoord(pointAbove)) {
-            // Else if pitch contains only pointAbove, return it
-            return new Point(pointAbove);
-        } else
-            // if it doesn't contain pointAbove, it should contain pointBelow
-            return new Point(pointBelow);
-        // TODO: what happens if it does not contain both points?
-        // (it will return pointBelow now, but some other behaviour might be
-        // desired)
+				if (Math.abs(angleToTurnPointAbove) < Math
+						.abs(angleToTurnPointBelow)) {
+					return new Point(pointAbove);
+				} else
+					return new Point(pointBelow);
 
-    }
+			}
 
-    @Override
-    public void step(Controller controller) {
-        StaticFieldObject target = getTarget();
+		} else if (pitch.containsCoord(pointAbove)) {
+			// Else if pitch contains only pointAbove, return it
+			return new Point(pointAbove);
+		} else
+			// if it doesn't contain pointAbove, it should contain pointBelow
+			return new Point(pointBelow);
+		// TODO: what happens if it does not contain both points?
+		// (it will return pointBelow now, but some other behaviour might be
+		// desired)
 
-        if ((getSnapshot() == null) || (getSnapshot().getBalle().getPosition() == null)
-                || (target == null))
-            return;
+	}
 
-        // Update the current state of executor strategy
-        executorStrategy.updateState(getSnapshot());
+	@Override
+	public void step(Controller controller) {
+		StaticFieldObject target = getTarget();
 
-        // If we see the opponent
-        if (getSnapshot().getOpponent() != null) {
-            Line pathToTarget = new Line(getSnapshot().getBalle().getPosition(),
-                    target.getPosition());
-            // Check if it is blocking our path
-            if (getSnapshot().getOpponent().intersects(pathToTarget)) {
-                // pick a new target then
-                LOG.info("Opponent is blocking the target, avoiding it");
-                target = getAvoidanceTarget();
-            }
-        }
+		if ((getSnapshot() == null)
+				|| (getSnapshot().getBalle().getPosition() == null)
+				|| (target == null))
+			return;
 
-        // Update the target's location in executorStrategy (e.g. if target
-        // moved)
-        executorStrategy.updateTarget(target);
-        // Draw the target
-        if (target.getPosition() != null)
-            addDrawable(new Dot(target.getPosition(), getTargetColor()));
+		// Update the current state of executor strategy
+		executorStrategy.updateState(getSnapshot());
 
-        // If it says it is not finished, tell it to do something for a step.
-        if (!executorStrategy.isFinished()) {
-            executorStrategy.step(controller);
-        } else {
-            // Tell the strategy to stop doing whatever it was doing
-            executorStrategy.stop(controller);
-        }
-    }
+		// If we see the opponent
+		if (getSnapshot().getOpponent() != null) {
+			Line pathToTarget = new Line(
+					getSnapshot().getBalle().getPosition(),
+					target.getPosition());
+			// Check if it is blocking our path
+			if (getSnapshot().getOpponent().intersects(pathToTarget)) {
+				// pick a new target then
+				LOG.info("Opponent is blocking the target, avoiding it");
+				target = getAvoidanceTarget();
+			}
+		}
 
-    @Override
-    public void stop(Controller controller) {
-        if (!executorStrategy.isFinished())
-            executorStrategy.stop(controller);
+		// Update the target's location in executorStrategy (e.g. if target
+		// moved)
+		executorStrategy.updateTarget(target);
+		// Draw the target
+		if (target.getPosition() != null)
+			addDrawable(new Dot(target.getPosition(), getTargetColor()));
 
-    }
+		// If it says it is not finished, tell it to do something for a step.
+		if (!executorStrategy.isFinished()) {
+			executorStrategy.step(controller);
+		} else {
+			// Tell the strategy to stop doing whatever it was doing
+			executorStrategy.stop(controller);
+		}
+	}
+
+	@Override
+	public void stop(Controller controller) {
+		if (!executorStrategy.isFinished())
+			executorStrategy.stop(controller);
+
+	}
 }
