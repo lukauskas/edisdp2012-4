@@ -4,7 +4,6 @@ import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
 import balle.strategy.executor.movement.MovementExecutor;
-import balle.world.AbstractWorld;
 import balle.world.Coord;
 import balle.world.Snapshot;
 import balle.world.objects.Location;
@@ -17,21 +16,14 @@ public class KickFromWall extends AbstractPlanner {
 	boolean secondStep = false;
 	boolean kicked = false;
 
-	public KickFromWall(Controller controller, AbstractWorld world,
-			MovementExecutor movementStrategy) {
-		super(controller, world);
+	public KickFromWall(MovementExecutor movementStrategy) {
+		super();
 		this.movementStrategy = movementStrategy;
 		// TODO Auto-generated constructor stub
 	}
 
 	@Override
-	protected void aiStep() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	protected void aiMove(Controller controller) {
+	public void step(Controller controller) {
 		// TODO Auto-generated method stub
 
 		if (getSnapshot() == null)
