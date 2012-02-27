@@ -26,7 +26,7 @@ public abstract class AbstractWorld implements Listener {
 	// JEV: Scanner is final and can't be extended, makes it difficult for the
 	// simulator.
 	private final boolean balleIsBlue;
-	private final boolean goalIsLeft;
+	private boolean goalIsLeft;
 
 	private final Pitch pitch;
 
@@ -38,6 +38,14 @@ public abstract class AbstractWorld implements Listener {
 
 	public Pitch getPitch() {
 		return pitch;
+	}
+
+	public boolean getGoalPosition() {
+		return goalIsLeft;
+	}
+	
+	public boolean setGoalPosition(boolean goal) {
+		return goalIsLeft = goal;
 	}
 
 	/**
