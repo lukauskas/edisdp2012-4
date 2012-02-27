@@ -369,24 +369,24 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 
             long timestamp = getTimeStamp();
             
-            if (true) {
-	            // Simulate Height/Observed_Position distortion.
-	            Coord yCoord, bCoord, worldCenter;
-	            Vec2 worldVec = convPos(ground.getPosition());
-	            worldCenter = new Coord(worldVec.x, worldVec.y);
-	            yCoord = new Coord(yPosX, yPosY);
-	            bCoord = new Coord(bPosX, bPosY);
-	            
-	            double distortion = Globals.CAMERA_HEIGHT / (Globals.CAMERA_HEIGHT - Globals.ROBOT_HEIGHT);
-	            yCoord = yCoord.sub(worldCenter).mult(distortion).add(worldCenter);
-	            bCoord = bCoord.sub(worldCenter).mult(distortion).add(worldCenter);
-	            
-	            yPosX = (float) yCoord.getX();
-	            yPosY = (float) yCoord.getY();
-	            
-	            bPosX = (float) bCoord.getX();
-	            bPosY = (float) bCoord.getY();
-	        }
+//            if (true) {
+//	            // Simulate Height/Observed_Position distortion.
+//	            Coord yCoord, bCoord, worldCenter;
+//	            Vec2 worldVec = convPos(ground.getPosition());
+//	            worldCenter = new Coord(worldVec.x, worldVec.y);
+//	            yCoord = new Coord(yPosX, yPosY);
+//	            bCoord = new Coord(bPosX, bPosY);
+//	            
+//	            double distortion = Globals.CAMERA_HEIGHT / (Globals.CAMERA_HEIGHT - Globals.ROBOT_HEIGHT);
+//	            yCoord = yCoord.sub(worldCenter).mult(distortion).add(worldCenter);
+//	            bCoord = bCoord.sub(worldCenter).mult(distortion).add(worldCenter);
+//	            
+//	            yPosX = (float) yCoord.getX();
+//	            yPosY = (float) yCoord.getY();
+//	            
+//	            bPosX = (float) bCoord.getX();
+//	            bPosY = (float) bCoord.getY();
+//	        }
             
             if (noisy) {
                 // set standard deviations
