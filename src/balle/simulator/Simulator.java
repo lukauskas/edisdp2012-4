@@ -26,6 +26,7 @@ import balle.io.listener.Listener;
 import balle.io.reader.AbstractVisionReader;
 import balle.io.reader.Reader;
 import balle.misc.Globals;
+import balle.world.Coord;
 
 public class Simulator extends TestbedTest implements AbstractVisionReader {
 
@@ -367,7 +368,26 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
             ballPosY = ballPos.y;
 
             long timestamp = getTimeStamp();
-
+            
+            if (true) {
+	            // Simulate Height/Observed_Position distortion.
+	            Coord yCoord, bCoord, worldCenter;
+	            Vec2 worldVec = convPos(ground.getPosition());
+	            worldCenter = new Coord(worldVec.x, worldVec.y);
+	            yCoord = new Coord(yPosX, yPosY);
+	            bCoord = new Coord(bPosX, bPosY);
+	            
+	            double distortion = Globals.CAMERA_HEIGHT / (Globals.CAMERA_HEIGHT - Globals.ROBOT_HEIGHT);
+	            yCoord = yCoord.sub(worldCenter).mult(distortion).add(worldCenter);
+	            bCoord = bCoord.sub(worldCenter).mult(distortion).add(worldCenter);
+	            
+	            yPosX = (float) yCoord.getX();
+	            yPosY = (float) yCoord.getY();
+	            
+	            bPosX = (float) bCoord.getX();
+	            bPosY = (float) bCoord.getY();
+	        }
+            
             if (noisy) {
                 // set standard deviations
                 float posSd = Globals.VISION_COORD_NOISE_SD;

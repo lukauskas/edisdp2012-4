@@ -34,6 +34,10 @@ public class Globals {
     public static final float  SIMULATED_VISON_FRAMERATE = 25f;
 
     public static final int    MAXIMUM_MOTOR_SPEED       = 900;
+    
+    // Camera Info
+    public static final float CAMERA_HEIGHT = 2.0f;  // Meters
+    public static final float ROBOT_HEIGHT = 0.2f;   // Meters
 
     public static float powerToVelocity(float p) {
         if (p > MAXIMUM_MOTOR_SPEED)
