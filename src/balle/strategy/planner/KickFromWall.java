@@ -3,7 +3,9 @@ package balle.strategy.planner;
 import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
+import balle.strategy.executor.movement.GoToObject;
 import balle.strategy.executor.movement.MovementExecutor;
+import balle.strategy.executor.turning.FaceAngle;
 import balle.world.Coord;
 import balle.world.Snapshot;
 import balle.world.objects.Point;
@@ -89,6 +91,7 @@ public class KickFromWall extends GoToBall {
 			}
 		} else {
 			// LOG.info("Going to ball");
+			setExecutorStrategy(new GoToObject(new FaceAngle()));
 			return loc2;
 		}
 	}

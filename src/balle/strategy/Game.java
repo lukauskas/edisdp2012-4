@@ -51,6 +51,7 @@ public class Game extends AbstractPlanner {
 		defensiveStrategy.updateState(snapshot);
 		goToBallStrategy.updateState(snapshot);
 		turningExecutor.updateState(snapshot);
+		pickBallFromWallStrategy.updateState(snapshot);
 	}
 
 	@Override
