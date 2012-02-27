@@ -6,7 +6,7 @@ import balle.controller.Controller;
 import balle.strategy.executor.movement.GoToObject;
 import balle.strategy.executor.movement.GoToObjectPFN;
 import balle.strategy.executor.movement.MovementExecutor;
-import balle.strategy.executor.turning.IncFaceAngle;
+import balle.strategy.executor.turning.FaceAngle;
 import balle.world.Coord;
 import balle.world.Snapshot;
 import balle.world.objects.Point;
@@ -100,7 +100,7 @@ public class KickFromWall extends GoToBall {
 			if (snap.getBalle().getPosition()
 					.dist(snap.getBall().getPosition()) < 0.5) {
 				LOG.info("Going to ball normally");
-				strategy = new GoToObject(new IncFaceAngle());
+				strategy = new GoToObject(new FaceAngle());
 				strategy.setStopDistance(0);
 			} else {
 				LOG.info("Going to ball with PFN");
