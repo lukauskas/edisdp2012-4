@@ -3,7 +3,6 @@ package balle.strategy;
 import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
-import balle.misc.Globals;
 import balle.strategy.executor.turning.IncFaceAngle;
 import balle.strategy.executor.turning.RotateToOrientationExecutor;
 import balle.strategy.planner.AbstractPlanner;
@@ -90,7 +89,35 @@ public class Game extends AbstractPlanner {
 					// it has to be similar to FaceAngle executor but should not
 					// use the controller.rotate()
 					// command that is blocking.
-					LOG.error("robot facing wrong way, shouldnt shoot");
+
+					Coord r, b, g;
+					r = ourRobot.getPosition();
+					b = ball.getPosition();
+					g = ownGoal.getPosition();
+
+					if (r.angleBetween(g, b).atan2styleradians() < 0) {
+						// Clockwise.
+						Orientation orien = ourRobot
+								.findMaxRotationMaintaintingPossession(ball,
+										true);
+						System.out.println(orien);
+						turningExecutor.setTargetOrientation(orien);
+						turningExecutor.step(controller);
+						if (ourRobot.findMaxRotationMaintaintingPossession(
+								ball, true).degrees() < 10)
+							controller.kick();
+					} else {
+						// Anti-Clockwise
+						Orientation orien = ourRobot
+								.findMaxRotationMaintaintingPossession(ball,
+										false);
+						System.out.println(orien);
+						turningExecutor.setTargetOrientation(orien);
+						turningExecutor.step(controller);
+						if (ourRobot.findMaxRotationMaintaintingPossession(
+								ball, false).degrees() > -10)
+							controller.kick();
+					}
 				}
 			}
 		} else if ((opponent.possessesBall(ball))
@@ -114,36 +141,6 @@ public class Game extends AbstractPlanner {
 			LOG.info("Picking the ball from wall");
 			pickBallFromWallStrategy.step(controller);
 		}
-
-	}
-
-	/**
-	 * TODO TEST!!!!!!
-	 * 
-	 * @param ourRobot
-	 * @param ball
-	 * @param cw
-	 *            Clock-wise rotation if true, CCW if false.
-	 * @return
-	 */
-	private Orientation findMaxRotationMaintaintingPossession(Robot ourRobot,
-			Ball ball, boolean cw) {
-		Coord fl = new Coord(10, 0);
-		fl = fl.rotate(ourRobot.getOrientation()).add(ourRobot.getPosition());
-		Orientation max, o = ourRobot.getPosition().angleBetween(fl,
-				ball.getPosition());
-
-		if (cw) {
-			max = (new Coord(0, 0)).angleBetween(new Coord(10, 0), new Coord(
-					Globals.ROBOT_LENGTH, Globals.ROBOT_WIDTH));
-		} else {
-			max = (new Coord(0, 0)).angleBetween(new Coord(10, 0), new Coord(
-					Globals.ROBOT_LENGTH, -Globals.ROBOT_WIDTH));
-		}
-		System.out.println("max = " + max + ",\to = " + o + ",\tm-o = "
-				+ max.sub(o));
-
-		return max.sub(o);
 
 	}
 }
