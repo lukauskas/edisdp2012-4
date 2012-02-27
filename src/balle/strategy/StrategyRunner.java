@@ -46,7 +46,10 @@ public class StrategyRunner extends AbstractWorldProcessor {
 				currentStrategy.step(controller);
 			} catch (Exception e) {
 				LOG.error("Strategy raised exception" + e.toString());
-				LOG.debug(e.getStackTrace().toString());
+
+				for (StackTraceElement se : e.getStackTrace())
+					LOG.debug(se.toString());
+
 				controller.stop();
 			}
 			gui.setDrawables(currentStrategy.getDrawables());
