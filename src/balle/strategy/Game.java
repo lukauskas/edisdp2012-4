@@ -124,14 +124,16 @@ public class Game extends AbstractPlanner {
         } else if (ball.isNearWall(pitch)) {
             LOG.info("Picking the ball from wall");
             pickBallFromWallStrategy.step(controller);
-        } else if (ball.isNear(ourRobot)) {
+        } else if (ball.isNear(ourRobot)
+                && (ourRobot.isApproachingTargetFromCorrectSide(ball,
+                        getSnapshot().getOpponentsGoal()))) {
             if (Math.abs(ourRobot.getAngleToTurn(targetOrientation)) > (Math.PI / 4)) {
                 LOG.info("Ball is near our robot, turning to it");
                 turningExecutor.setTargetOrientation(targetOrientation);
                 turningExecutor.step(controller);
             } else {
                 // Go forward!
-                controller.setWheelSpeeds(200, 200);
+                controller.setWheelSpeeds(400, 400);
             }
         } else if (!ball.isNearWall(pitch)) {
             // LOG.info("Approaching ball");
