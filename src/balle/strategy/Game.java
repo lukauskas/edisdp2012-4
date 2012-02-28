@@ -132,14 +132,15 @@ public class Game extends AbstractPlanner {
             }
 
         } else if (!ball.isNearWall(pitch)) {
-            LOG.info("Approaching ball");
+            // LOG.info("Approaching ball");
             // Approach ball
             goToBallStrategy.step(controller);
             addDrawables(goToBallStrategy.getDrawables());
         } else if (ball.isNearWall(pitch)) {
-            // TODO: Pick it
             LOG.info("Picking the ball from wall");
             pickBallFromWallStrategy.step(controller);
+        } else {
+            LOG.warn("Don't know what to do!");
         }
 
     }
