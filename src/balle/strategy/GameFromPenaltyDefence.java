@@ -6,7 +6,7 @@ import balle.world.objects.Goal;
 import balle.world.objects.Robot;
 
 public class GameFromPenaltyDefence extends Game {
-	double lastknowngoalposstionx;
+	double lastknownxballpos;
 
 	public GameFromPenaltyDefence() throws UnknownDesignatorException {
 		super();
@@ -20,14 +20,15 @@ public class GameFromPenaltyDefence extends Game {
 	public boolean isStillInPenaltyDefence() {
 		Ball ball = getSnapshot().getBall();
 		Goal ownGoal = getSnapshot().getOwnGoal();
-		if (ball.intersects(ownGoal.getGoalLine())
-				|| (ball.getPosition().getX() > lastknowngoalposstionx && ownGoal
-						.isLeftGoal())
-				|| (ball.getPosition().getX() < lastknowngoalposstionx && ownGoal
-						.isRightGoal())) {
+		// Robot opponent = getSnapshot().getOpponent();
+		// fix if boolean expression for when penalty saved or scored
+		if (!ball.intersects(ownGoal.getGoalLine())
+				&& !(ball.getVelocity().getX() > 0 || ball.getVelocity().getY() > 0)) {
+			return true;
+		} else {
+
 			return false;
 		}
-		return true;
 	}
 
 	@Override
@@ -39,25 +40,42 @@ public class GameFromPenaltyDefence extends Game {
 			Ball ball = getSnapshot().getBall();
 			Goal ownGoal = getSnapshot().getOwnGoal();
 
-			lastknowngoalposstionx = ball.getPosition().getX();
-
-			double bcrosspointy = ourRobot.getFacingLineBothWays()
-					.getIntersect(opponent.getBallKickLine(ball)).getY();
-
 			double ourypossition = ourRobot.getPosition().getY();
 
-			double travely = (bcrosspointy - ourypossition);
-			if (bcrosspointy == ourRobot.getPosition().getY()) {
+			double bcrosspointy = ourypossition;
+			if (ourRobot.getFacingLineBothWays().intersects(
+					opponent.getBallKickLine(ball))) {
+				bcrosspointy = ourRobot.getFacingLineBothWays()
+						.getIntersect(opponent.getBallKickLine(ball)).getY();
+			}
+			double y = ourRobot.getFacingLineBothWays()
+					.getIntersect(opponent.getBallKickLine(ball)).getY();
+
+			double travely = (bcrosspointy * 10 - ourypossition * 10);
+
+			if (bcrosspointy >= ourRobot.getPosition().getY()
+					&& bcrosspointy <= ourRobot.getPosition().getY() + 0.02) {
 				controller.stop();
 			} else {
-				if (travely > 0) {
-					controller.forward(580);
+				if (y > ownGoal.getMinY() && y < ownGoal.getMaxY()) {
+					// add if robot betwee y of goal
+					if (travely > 0) {
+
+						controller.forward(580);
+
+					} else {
+
+						controller.backward(580);
+
+					}
 				} else {
-					controller.backward(580);
+					controller.stop();
 				}
+
 			}
+
 		} else {
-			controller.stop();
+			System.out.println("OUT");
 			super.step(controller);
 		}
 	}
