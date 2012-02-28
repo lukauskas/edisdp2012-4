@@ -282,7 +282,7 @@ public class GoToBall extends AbstractPlanner {
         if (shouldApproachTargetFromCorrectSide()
                 && (!isApproachingTargetFromCorrectSide(target))) {
             LOG.info("Approaching target from wrong side, calculating overshoot target");
-            target = getOvershootTarget(target);
+            target = getOvershootTarget(target, OVERSHOOT_GAP);
             addDrawable(new Dot(target.getPosition(), Color.BLUE));
         }
 
