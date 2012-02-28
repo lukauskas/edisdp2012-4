@@ -33,25 +33,25 @@ public class GameFromPenaltyDefence extends Game {
 
 	@Override
 	public void step(Controller controller) {
-
+		double ourypossition = 0, bcrosspointy = 0, y = 0, travely = 0;
 		if (isStillInPenaltyDefence()) {
 			Robot ourRobot = getSnapshot().getBalle();
 			Robot opponent = getSnapshot().getOpponent();
 			Ball ball = getSnapshot().getBall();
 			Goal ownGoal = getSnapshot().getOwnGoal();
 
-			double ourypossition = ourRobot.getPosition().getY();
+			ourypossition = ourRobot.getPosition().getY();
 
-			double bcrosspointy = ourypossition;
+			bcrosspointy = ourypossition;
 			if (ourRobot.getFacingLineBothWays().intersects(
 					opponent.getBallKickLine(ball))) {
 				bcrosspointy = ourRobot.getFacingLineBothWays()
 						.getIntersect(opponent.getBallKickLine(ball)).getY();
 			}
-			double y = ourRobot.getFacingLineBothWays()
+			y = ourRobot.getFacingLineBothWays()
 					.getIntersect(opponent.getBallKickLine(ball)).getY();
 
-			double travely = (bcrosspointy * 10 - ourypossition * 10);
+			travely = (bcrosspointy * 10 - ourypossition * 10);
 
 			if (bcrosspointy >= ourRobot.getPosition().getY()
 					&& bcrosspointy <= ourRobot.getPosition().getY() + 0.02) {
@@ -75,7 +75,6 @@ public class GameFromPenaltyDefence extends Game {
 			}
 
 		} else {
-			System.out.println("OUT");
 			super.step(controller);
 		}
 	}
