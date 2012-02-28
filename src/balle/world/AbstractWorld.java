@@ -2,10 +2,9 @@ package balle.world;
 
 import java.util.ArrayList;
 
-import org.jbox2d.dynamics.Filter;
-
 import balle.io.listener.Listener;
 import balle.misc.Globals;
+import balle.world.filter.Filter;
 import balle.world.objects.Goal;
 import balle.world.objects.MovingPoint;
 import balle.world.objects.Pitch;
@@ -248,7 +247,9 @@ public abstract class AbstractWorld implements Listener {
 	}
 
 	public Snapshot filter(Snapshot s) {
+		Snapshot out = s;
 		for (Filter each : filters)
-			s = each.filter(s);
+			out = each.filter(out);
+		return out;
 	}
 }
