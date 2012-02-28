@@ -1,5 +1,6 @@
 package balle.strategy;
 
+import balle.strategy.bezierNav.BezierNav;
 import balle.strategy.executor.movement.GoToObject;
 import balle.strategy.executor.movement.GoToObjectAvoidOpponentPurePF;
 import balle.strategy.executor.movement.GoToObjectPFN;
@@ -16,7 +17,7 @@ import balle.strategy.planner.SimpleGoToBall;
 public class StrategyFactory {
 	public static String[] availableDesignators() {
 
-		String[] designators = { "GoToObjectAvoidOpponentPurePF",
+		String[] designators = { "BezierNav", "GoToObjectAvoidOpponentPurePF",
 				"GoToBallPFOnly", "GoToBall", "GoToFaceBall", "GoToBallPFN",
 				"Dribble", "Blocking", "PFNavigation", "DefensiveStrategy",
 				"Game", "GameFromPenaltyKick", "GameFromPenaltyDefence",
@@ -31,6 +32,8 @@ public class StrategyFactory {
 			return new SimpleGoToBall(new GoToObjectAvoidOpponentPurePF());
 		} else if (designator.equals("GoToBallPFOnly")) {
 			return new SimpleGoToBall(new GoToObjectPurePF());
+		} else if (designator.equals("BezierNav")) {
+			return new SimpleGoToBall(new BezierNav());
 		} else if (designator.equals("GoToBall")) {
 			return new GoToBall(new GoToObject(new FaceAngle()), true);
 		} else if (designator.equals("GoToFaceBall")) {

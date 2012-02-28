@@ -50,7 +50,6 @@ public class SimpleGoToBall extends AbstractPlanner {
 				|| (getSnapshot().getBalle().getPosition() == null)
 				|| (target == null))
 			return;
-
 		// Update the current state of executor strategy
 		executorStrategy.updateState(getSnapshot());
 
@@ -58,6 +57,7 @@ public class SimpleGoToBall extends AbstractPlanner {
 		// moved)
 		executorStrategy.updateTarget(target);
 		// Draw the target
+		addDrawables(executorStrategy.getDrawables());
 		if (target.getPosition() != null)
 			addDrawable(new Dot(target.getPosition(), getTargetColor()));
 
