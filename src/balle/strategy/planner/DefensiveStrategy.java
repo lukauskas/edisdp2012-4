@@ -20,55 +20,58 @@ import balle.world.objects.StaticFieldObject;
  * opponent and our own goal and stays there.
  */
 public class DefensiveStrategy extends GoToBall {
-    private final static Logger LOG = Logger.getLogger(DefensiveStrategy.class);
 
-    public DefensiveStrategy(MovementExecutor movementExecutor) {
-        super(movementExecutor);
-    }
+	private final static Logger LOG = Logger.getLogger(DefensiveStrategy.class);
 
-    protected Coord calculateDefenceCoord() {
-        Snapshot snapshot = getSnapshot();
-        Goal ownGoal = snapshot.getOwnGoal();
+	public DefensiveStrategy(MovementExecutor movementExecutor) {
+		super(movementExecutor);
+	}
 
-        Robot opponent = snapshot.getOpponent();
-        Ball ball = snapshot.getBall();
-        Robot our = snapshot.getBalle();
-        if (our.getPosition() == null)
-            return null;
-        if (ball.getPosition() == null)
-            return null;
-        if (opponent.getPosition() == null)
-            return null;
+	protected Coord calculateDefenceCoord() {
+		Snapshot snapshot = getSnapshot();
+		Goal ownGoal = snapshot.getOwnGoal();
 
-        Coord intersectionPoint = opponent.getBallKickLine(ball)
-                .getIntersect(ownGoal.getGoalLine());
+		Robot opponent = snapshot.getOpponent();
+		Ball ball = snapshot.getBall();
+		Robot our = snapshot.getBalle();
+		if (our.getPosition() == null)
+			return null;
+		if (ball.getPosition() == null)
+			return null;
+		if (opponent.getPosition() == null)
+			return null;
 
-        if (intersectionPoint == null) {
-            LOG.debug("No intersection between getBallKickLine and getGoalLine");
-            intersectionPoint = opponent.getFacingLine().getIntersect(ownGoal.getGoalLine());
-            if (intersectionPoint == null) {
-                // TODO: fix this, this case should not be happening
-                LOG.error("Opponent is not even facing our goal. Defensive strategy should not be in play");
-                return null;
-            }
+		Coord intersectionPoint = opponent.getBallKickLine(ball).getIntersect(
+				ownGoal.getGoalLine());
 
-        }
+		if (intersectionPoint == null) {
+			LOG.debug("No intersection between getBallKickLine and getGoalLine");
+			intersectionPoint = opponent.getFacingLine().getIntersect(
+					ownGoal.getGoalLine());
+			if (intersectionPoint == null) {
+				// TODO: fix this, this case should not be happening
+				LOG.error("Opponent is not even facing our goal. Defensive strategy should not be in play");
+				return null;
+			}
 
-        Line defenceLine = new Line(ball.getPosition(), intersectionPoint);
-        addDrawable(new DrawableLine(defenceLine, Color.WHITE));
+		}
 
-        return defenceLine.closestPoint(our.getPosition());
-    }
+		Line defenceLine = new Line(ball.getPosition(), intersectionPoint);
+		addDrawable(new DrawableLine(defenceLine, Color.WHITE));
 
-    @Override
-    protected StaticFieldObject getTarget() {
-        Coord defenceCoord = calculateDefenceCoord();
-        return new Point(defenceCoord);
-    }
+		// return defenceLine.closestPoint(our.getPosition());
+		return defenceLine.midpoint();
+	}
 
-    @Override
-    protected Color getTargetColor() {
-        return Color.PINK;
-    }
+	@Override
+	protected StaticFieldObject getTarget() {
+		Coord defenceCoord = calculateDefenceCoord();
+		return new Point(defenceCoord);
+	}
+
+	@Override
+	protected Color getTargetColor() {
+		return Color.PINK;
+	}
 
 }
