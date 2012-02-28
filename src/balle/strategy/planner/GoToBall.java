@@ -28,9 +28,9 @@ public class GoToBall extends AbstractPlanner {
     MovementExecutor              executorStrategy;
 
     private static final double   AVOIDANCE_GAP           = 0.5;                             // Meters
-    private static final double   OVERSHOOT_GAP           = 0.5;                             // Meters
+    private static final double   OVERSHOOT_GAP           = 0.7;                             // Meters
     private static final double   DIST_DIFF_THRESHOLD     = 0.2;                             // Meters
-    private static final double   OVERSHOOT_ANGLE_EPSILON = 30;                              // Degrees
+    private static final double   OVERSHOOT_ANGLE_EPSILON = 50;                              // Degrees
 
     private boolean               approachTargetFromCorrectSide;
 
@@ -151,9 +151,16 @@ public class GoToBall extends AbstractPlanner {
      * 
      * @param target
      *            the target
+     * @param overshootGap
+     *            the overshoot gap
      * @return the overshoot target
      */
-    protected StaticFieldObject getOvershootTarget(StaticFieldObject target) {
+    protected StaticFieldObject getOvershootTarget(StaticFieldObject target,
+            double overshootGap) {
+        // End case for recursive search for overshoot target
+        if (overshootGap < 0.1)
+            return target;
+
         boolean belowBall = true;
         Robot robot = getSnapshot().getBalle();
         Pitch pitch = getSnapshot().getPitch();
@@ -165,24 +172,34 @@ public class GoToBall extends AbstractPlanner {
         if (getSnapshot().getOpponentsGoal().isRightGoal())
             belowBall = !belowBall;
 
-        Coord overshootCoord = calculateOvershootCoord(target, OVERSHOOT_GAP,
+        Coord overshootCoord = calculateOvershootCoord(target, overshootGap,
                 belowBall);
 
         // If the point is in the pitch
-        if (pitch.containsCoord(overshootCoord))
-            // Return it as a new target
+        if (pitch.containsCoord(overshootCoord)) {
             return new Point(overshootCoord);
+
+        }
         // If its not in the pitch, pick a new one
+        // DOESN't really work :(
 
-        overshootCoord = calculateOvershootCoord(target, OVERSHOOT_GAP,
-                !belowBall);
-        if (pitch.containsCoord(overshootCoord))
-            return new Point(overshootCoord);
-        // If the target is *still* out of pitch, go to the original target at
+        // overshootCoord = calculateOvershootCoord(target, OVERSHOOT_GAP,
+        // !belowBall);
+        // if (pitch.containsCoord(overshootCoord)) {
+        // // Check if it is suitable
+        // Coord overshootVector = overshootCoord.sub(target.getPosition());
+        // if ((getSnapshot().getOpponentsGoal().isLeftGoal() && overshootVector
+        // .orientation().isFacingLeft(0))
+        // || (getSnapshot().getOpponentsGoal().isRightGoal() && overshootVector
+        // .orientation().isFacingRight(0))) {
+        // // Return it as a new target
+        // return new Point(overshootCoord);
+        // }
+        // }
+        // If the target is *still* not suitable, go to the original target at
         // least
-        else
-            return target;
-
+        // Recurse with smaller gap
+        return getOvershootTarget(target, overshootGap / 2.0);
     }
 
     protected boolean isApproachingTargetFromCorrectSide(
@@ -265,7 +282,7 @@ public class GoToBall extends AbstractPlanner {
         if (shouldApproachTargetFromCorrectSide()
                 && (!isApproachingTargetFromCorrectSide(target))) {
             LOG.info("Approaching target from wrong side, calculating overshoot target");
-            target = getOvershootTarget(target);
+            target = getOvershootTarget(target, OVERSHOOT_GAP);
             addDrawable(new Dot(target.getPosition(), Color.BLUE));
         }
 

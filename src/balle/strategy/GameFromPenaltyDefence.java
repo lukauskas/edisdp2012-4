@@ -1,46 +1,108 @@
 package balle.strategy;
 
+import org.apache.log4j.Logger;
+
 import balle.controller.Controller;
-import balle.world.objects.Ball;
-import balle.world.objects.Goal;
-import balle.world.objects.Robot;
+import balle.world.Orientation;
+import balle.world.Snapshot;
 
 public class GameFromPenaltyDefence extends Game {
 
-    public GameFromPenaltyDefence() throws UnknownDesignatorException {
-        super();
-    }
+	private static Logger LOG = Logger.getLogger(GameFromPenaltyDefence.class);
 
-    /**
-     * Checks if robot is is still defending the penalty;
-     * 
-     * @return
-     */
-    public boolean isStillInPenaltyDefence() {
-        // TODO: implement
-        // Probably worth checking the distance of the ball to the goal line
-        // here
-        return true;
-    }
+	private Snapshot firstSnapshot = null;
+	String robotState = "Center";
+	int rotateSpeed = 0;
 
-    @Override
-    public void step(Controller controller) {
+	public GameFromPenaltyDefence() throws UnknownDesignatorException {
+		super();
+	}
 
-        if (isStillInPenaltyDefence()) {
-            Robot ourRobot = getSnapshot().getBalle();
-            Robot opponent = getSnapshot().getOpponent();
-            Ball ball = getSnapshot().getBall();
-            Goal ownGoal = getSnapshot().getOwnGoal();
+	public boolean isStillInPenaltyDefence() {
 
-            // TODO: Do Penalty defence here
-            // Try using ourRobot.getFacingLineBothWays() and
-            // opponent.getBallKickLine(ball)
-            // And finding their intersection and then moving to that point.
-            // (Youll have to manually
-            // set wheel speeds to positive or negative values here.
-        } else {
-            super.step(controller);
-        }
-    }
+		if (firstSnapshot == null)
+			return true;
+
+		double ball_x = firstSnapshot.getBall().getPosition().getX();
+		double ball_y = firstSnapshot.getBall().getPosition().getY();
+
+		double aball_x = getSnapshot().getBall().getPosition().getX();
+		double aball_y = getSnapshot().getBall().getPosition().getY();
+
+		double distance = Math.sqrt(Math.pow(aball_x - ball_x, 2)
+				+ Math.pow(aball_y - ball_y, 2));
+
+		if (distance > 1) {
+			return false;
+		}
+
+		return true;
+	}
+
+	@Override
+	public void step(Controller controller) {
+
+		if ((firstSnapshot == null)
+				&& (getSnapshot().getBall().getPosition() != null))
+			firstSnapshot = getSnapshot();
+
+		Orientation opponentAngle = getSnapshot().getOpponent()
+				.getOrientation();
+		double threshold = Math.toRadians(20);
+		Boolean isLeftGoal = getSnapshot().getOwnGoal().isLeftGoal();
+
+		if (getSnapshot().getOwnGoal().getMaxY() <= getSnapshot().getBalle()
+				.getPosition().getY() + 0.2) {
+			robotState = "Up";
+		} else if (getSnapshot().getOwnGoal().getMinY() >= getSnapshot()
+				.getBalle().getPosition().getY() - 0.2) {
+			robotState = "Down";
+		} else {
+			robotState = "Center";
+		}
+
+		LOG.debug("robotState: " + robotState);
+
+		if (isLeftGoal == true) {
+			// opponent shooting left
+			if (opponentAngle.atan2styleradians() > Math.PI - threshold)
+				moveTo("Up", controller);
+			else if (opponentAngle.atan2styleradians() < -Math.PI + threshold)
+				moveTo("Down", controller);
+			else
+				moveTo("Center", controller);
+
+		} else {
+			// opponent shooting right
+			if (opponentAngle.atan2styleradians() > threshold)
+				moveTo("Up", controller);
+			else if (opponentAngle.atan2styleradians() < -threshold)
+				moveTo("Down", controller);
+			else
+				moveTo("Center", controller);
+		}
+
+	}
+
+	private void moveTo(String moveTo, Controller controller) {
+
+		rotateSpeed = 0;
+		LOG.debug("moveTo: " + moveTo);
+
+		if (robotState.equals("Center") && moveTo.equals("Up"))
+			rotateSpeed = 500;
+		if (robotState.equals("Center") && moveTo.equals("Down"))
+			rotateSpeed = -700;
+		if (robotState.equals("Up") && moveTo.equals("Center"))
+			rotateSpeed = -700;
+		if (robotState.equals("Up") && moveTo.equals("Down"))
+			rotateSpeed = -500;
+		if (robotState.equals("Down") && moveTo.equals("Center"))
+			rotateSpeed = 500;
+		if (robotState.equals("Down") && moveTo.equals("Up"))
+			rotateSpeed = 700;
+
+		controller.setWheelSpeeds(rotateSpeed, rotateSpeed);
+	}
 
 }

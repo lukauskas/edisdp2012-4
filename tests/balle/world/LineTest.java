@@ -19,6 +19,7 @@ public class LineTest {
 		Line l1 = new Line(0, 0, 1, 0);
 		Line l2 = new Line(0, 0, 0, 1);
 		Line l3 = new Line(0, 0, 1, 1);
+		Line l4 = new Line(2.65, 0.3, 2.65, 0.9);
 
 		assertTrue("l1 does not contain point (0.5, 0)",
 				l1.contains(new Coord(0.5, 0)));
@@ -26,6 +27,10 @@ public class LineTest {
 				l2.contains(new Coord(0, 0.5)));
 		assertTrue("l3 does not contain point (0.5, 0.5)",
 				l3.contains(new Coord(0.5, 0.5)));
+
+		assertTrue(
+				"l4 does not contain (2.6499999999999995, 0.46083784792155075)",
+				l4.contains(new Coord(2.6499999999999995, 0.46083784792155075)));
 
 		// Check endpoints for l1
 		assertTrue("l1 does not contain point (0, 0)",
@@ -65,14 +70,14 @@ public class LineTest {
 	}
 
 	@Test
-	public void testGetIntersectBug() {
+	public void testGetIntersect2() {
 		Line l1 = new Line(1.4055631160736084, 0.5229264497756958,
 				2.9036996161479287, 0.44818003083093333);
 		Line l2 = new Line(2.65, 0.3, 2.65, 0.9);
 		Coord intersect = l1.getIntersect(l2);
 		assertTrue("Intersection should not be null.", intersect != null);
 		assertEquals("X should equal 2.65", 2.65, intersect.getX(), 0.00001);
-		// assertEquals("Y should equal 0.273779", 0.273779, intersect.getY(),
-		// 0.00001);
+		assertEquals("Y should equal 0.460838", 0.460838, intersect.getY(),
+				0.00001);
 	}
 }

@@ -62,7 +62,7 @@ public class CircularObject extends MovingPoint implements FieldObject {
             return false;
         return getPosition().dist(r.getPosition()) <= Math.max(r.getHeight(),
                 r.getWidth())
-                + getRadius() + 0.1;
+                + getRadius() + 0.05;
     }
 
     @Override

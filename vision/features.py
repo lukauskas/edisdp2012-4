@@ -13,7 +13,7 @@ class Features:
     #       'dirmarker' : (3,  12, 3,  12),
     #     }
 
-    Sizes = { 'ball'     : (20, 100),
+    Sizes = { 'ball'     : (20, 300),
           'T'         : (100, 800),
         }
 

@@ -26,6 +26,7 @@ import balle.strategy.StrategyRunner;
 import balle.world.AbstractWorld;
 import balle.world.BasicWorld;
 import balle.world.SimpleWorldGUI;
+import balle.world.filter.HeightFilter;
 
 /**
  * This is where the main executable code for 4s lies. It is responsible of
@@ -60,6 +61,11 @@ public class Runner {
 
 	public static void initialiseLogging(StrategyLogPane strategyLogPane,
 			boolean verbose) {
+
+		// For all other Log messages. Throws error for some reason
+		// don't know if causing any real problems
+		PropertyConfigurator.configure("log4j.properties");
+
 		if (verbose) {
 			Logger.getRootLogger().setLevel(Level.TRACE);
 		} else {
@@ -70,9 +76,6 @@ public class Runner {
 		Appender strategyAppender = new StrategyLogAppender(strategyLogPane);
 		strategyLogger.addAppender(strategyAppender);
 
-		// For all other Log messages. Throws error for some reason
-		// don't know if causing any real problems
-		PropertyConfigurator.configure("log4j.properties");
 	}
 
 	/**
@@ -159,6 +162,8 @@ public class Runner {
 
 		// Initialise world
 		world = new BasicWorld(balleIsBlue, goalIsLeft, Globals.getPitch());
+		world.addFilter(new HeightFilter(world.getPitch().getPosition(),
+				Globals.P0_CAMERA_HEIGHT));
 
 		// Moving this forward so we do not start a GUI until controller is
 		// initialised

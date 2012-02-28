@@ -2,11 +2,7 @@ package balle.world;
 
 import java.awt.geom.Line2D;
 
-import org.apache.log4j.Logger;
-
 public class Line {
-
-	private static final Logger LOG = Logger.getLogger(Line.class);
 
 	private final Coord a, b;
 
@@ -34,8 +30,8 @@ public class Line {
 			return false;
 		}
 
-		return (((minX() <= a.getX()) && (maxX() >= a.getX())) && ((minY() <= a
-				.getY()) && (maxY() >= a.getY())));
+		return (((minX() - a.getX() < 0.00001) && (maxX() - a.getX()) > -0.00001) && ((minY()
+				- a.getY() < 0.00001) && (maxY() - a.getY() > -0.00001)));
 
 	}
 
@@ -80,7 +76,6 @@ public class Line {
 			double x = (b2 * c1 - b1 * c2) / det;
 			double y = (a1 * c2 - a2 * c1) / det;
 			Coord p = new Coord(x, y);
-			// LOG.debug(p);
 			if (contains(p) && l.contains(p)) {
 				return p;
 			} else {

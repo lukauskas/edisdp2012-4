@@ -71,53 +71,48 @@ public class Game extends AbstractPlanner {
 
         if (ourRobot.possessesBall(ball)) {
             // Kick if we are facing opponents goal
-            if (ourRobot.isFacingGoal(opponentsGoal)) {
+            if (!ourRobot.isFacingGoalHalf(ownGoal)) {
                 LOG.info("Kicking the ball");
-                controller.stop();
                 controller.kick();
+                // Slowly move forward as well in case we're not so close
+                controller.setWheelSpeeds(200, 200);
             } else {
-                if (!ourRobot.isFacingGoalHalf(ownGoal)) {
-                    // Just try moving the ball forward
-                    controller.kick();
+
+                // TODO: turn the robot slightly so we face away from our
+                // own goal.
+                // Implement a turning executor that would use
+                // setWheelSpeeds to some arbitrary low
+                // number (say -300,300 and 300,-300) to turn to correct
+                // direction and use it here.
+                // it has to be similar to FaceAngle executor but should not
+                // use the controller.rotate()
+                // command that is blocking.
+
+                Coord r, b, g;
+                r = ourRobot.getPosition();
+                b = ball.getPosition();
+                g = ownGoal.getPosition();
+
+                if (r.angleBetween(g, b).atan2styleradians() < 0) {
+                    // Clockwise.
+                    Orientation orien = ourRobot
+                            .findMaxRotationMaintaintingPossession(ball, true);
+                    System.out.println(orien);
+                    turningExecutor.setTargetOrientation(orien);
+                    turningExecutor.step(controller);
+                    if (ourRobot.findMaxRotationMaintaintingPossession(ball,
+                            true).degrees() < 10)
+                        controller.kick();
                 } else {
-                    // TODO: turn the robot slightly so we face away from our
-                    // own goal.
-                    // Implement a turning executor that would use
-                    // setWheelSpeeds to some arbitrary low
-                    // number (say -300,300 and 300,-300) to turn to correct
-                    // direction and use it here.
-                    // it has to be similar to FaceAngle executor but should not
-                    // use the controller.rotate()
-                    // command that is blocking.
-
-                    Coord r, b, g;
-                    r = ourRobot.getPosition();
-                    b = ball.getPosition();
-                    g = ownGoal.getPosition();
-
-                    if (r.angleBetween(g, b).atan2styleradians() < 0) {
-                        // Clockwise.
-                        Orientation orien = ourRobot
-                                .findMaxRotationMaintaintingPossession(ball,
-                                        true);
-                        System.out.println(orien);
-                        turningExecutor.setTargetOrientation(orien);
-                        turningExecutor.step(controller);
-                        if (ourRobot.findMaxRotationMaintaintingPossession(
-                                ball, true).degrees() < 10)
-                            controller.kick();
-                    } else {
-                        // Anti-Clockwise
-                        Orientation orien = ourRobot
-                                .findMaxRotationMaintaintingPossession(ball,
-                                        false);
-                        System.out.println(orien);
-                        turningExecutor.setTargetOrientation(orien);
-                        turningExecutor.step(controller);
-                        if (ourRobot.findMaxRotationMaintaintingPossession(
-                                ball, false).degrees() > -10)
-                            controller.kick();
-                    }
+                    // Anti-Clockwise
+                    Orientation orien = ourRobot
+                            .findMaxRotationMaintaintingPossession(ball, false);
+                    System.out.println(orien);
+                    turningExecutor.setTargetOrientation(orien);
+                    turningExecutor.step(controller);
+                    if (ourRobot.findMaxRotationMaintaintingPossession(ball,
+                            false).degrees() > -10)
+                        controller.kick();
                 }
             }
         } else if ((opponent.possessesBall(ball))
@@ -126,20 +121,26 @@ public class Game extends AbstractPlanner {
             // Let defensiveStrategy deal with it!
             defensiveStrategy.step(controller);
             addDrawables(defensiveStrategy.getDrawables());
-        } else if (ball.isNear(ourRobot)
-                && Math.abs(ourRobot.getAngleToTurn(targetOrientation)) > (Math.PI / 4)) {
-            LOG.info("Ball is near our robot, turning to it");
-            turningExecutor.setTargetOrientation(targetOrientation);
-            turningExecutor.step(controller);
+        } else if (ball.isNearWall(pitch)) {
+            LOG.info("Picking the ball from wall");
+            pickBallFromWallStrategy.step(controller);
+        } else if (ball.isNear(ourRobot)) {
+            if (Math.abs(ourRobot.getAngleToTurn(targetOrientation)) > (Math.PI / 4)) {
+                LOG.info("Ball is near our robot, turning to it");
+                turningExecutor.setTargetOrientation(targetOrientation);
+                turningExecutor.step(controller);
+            } else {
+                // Go forward!
+                controller.setWheelSpeeds(200, 200);
+            }
         } else if (!ball.isNearWall(pitch)) {
-            LOG.info("Approaching ball");
+            // LOG.info("Approaching ball");
             // Approach ball
             goToBallStrategy.step(controller);
             addDrawables(goToBallStrategy.getDrawables());
-        } else if (ball.isNearWall(pitch)) {
-            // TODO: Pick it
-            LOG.info("Picking the ball from wall");
-            pickBallFromWallStrategy.step(controller);
+
+        } else {
+            LOG.warn("Don't know what to do!");
         }
 
     }
