@@ -39,7 +39,7 @@ public class Globals {
 	public static final float P1_CAMERA_HEIGHT = 2.386f; // Meters
 	public static final float P0_CAMERA_HEIGHT = 2.421f; // Meters
 
-	public static final float ROBOT_HEIGHT = 0.2f; // Meters
+	public static final float ROBOT_HEIGHT = 0.18f; // Meters
 
 	public static float powerToVelocity(float p) {
 		if (p > MAXIMUM_MOTOR_SPEED)
