@@ -1,6 +1,9 @@
 package balle.world.filter;
 
+import balle.misc.Globals;
 import balle.world.Coord;
+import balle.world.Snapshot;
+import balle.world.objects.Robot;
 
 /**
  * Class for filtering input from world to account for height differences
@@ -8,7 +11,7 @@ import balle.world.Coord;
  * 
  * @author s0952880
  */
-public class HeightFilter {
+public class HeightFilter implements Filter {
 
 	/**
 	 * Point directly below camera.
@@ -33,7 +36,24 @@ public class HeightFilter {
 		this.cameraHeight = cameraHeight;
 	}
 
-	public Coord filter(Coord in, double height) {
+	@Override
+	public Snapshot filter(Snapshot s) {
+		Robot nBalle = new Robot(filter(s.getBalle().getPosition(),
+				Globals.ROBOT_HEIGHT), s.getBalle().getVelocity(), s.getBalle()
+				.getOrientation());
+
+		Robot nOpp = new Robot(filter(s.getOpponent().getPosition(),
+				Globals.ROBOT_HEIGHT), s.getOpponent().getVelocity(), s
+				.getOpponent().getOrientation());
+
+		return new Snapshot(nOpp, nBalle, s.getBall(), s.getOpponentsGoal(),
+				s.getOwnGoal(), s.getPitch(), s.getTimestamp());
+	}
+
+	private Coord filter(Coord in, double height) {
+		if (in == null)
+			return null;
+
 		Coord d = in.sub(worldCenter);
 
 		double ratio = height / cameraHeight;
