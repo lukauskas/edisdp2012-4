@@ -1,7 +1,7 @@
 package balle.world.objects;
 
-import java.awt.Point;
-import java.awt.Rectangle;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
