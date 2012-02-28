@@ -1,5 +1,6 @@
 package balle.world;
 
+
 public class Orientation {
 
 	private final double angleInRadians;
@@ -86,5 +87,9 @@ public class Orientation {
 
 	public Orientation getOpposite() {
 		return new Orientation(-radians(), true);
+	}
+
+	public Coord getUnitCoord() {
+		return (new Coord(1, 0)).rotate(this);
 	}
 }

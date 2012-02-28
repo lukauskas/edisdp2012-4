@@ -21,7 +21,7 @@ public class GoToObjectAvoidOpponentPurePF implements MovementExecutor {
 	private Snapshot currentState;
 
 	private double stopDistance = 0;
-	private final double ZERO_TH = Math.PI / 5;
+	private final double ZERO_TH = Math.PI / 2;
 
 	@Override
 	public void stop(Controller controller) {
@@ -86,7 +86,7 @@ public class GoToObjectAvoidOpponentPurePF implements MovementExecutor {
 						1, 1),
 				// opponent
 				new PullPointPurePFObject(currentState.getOpponent()
-						.getPosition(), -0.3, 2),
+						.getPosition(), -0.2, 2),
 				// walls
 				new WallPurePFObject(new Coord(0, Globals.PITCH_HEIGHT),
 						new Orientation(-Math.PI / 2, true), 0.1, 2),

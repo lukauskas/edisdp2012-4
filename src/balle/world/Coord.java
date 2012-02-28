@@ -166,4 +166,8 @@ public class Coord {
 	public Coord opposite() {
 		return new Coord(-getX(), -getY());
 	}
+
+	public Coord getUnitCoord() {
+		return mult(1 / abs());
+	}
 }
