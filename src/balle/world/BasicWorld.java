@@ -127,10 +127,11 @@ public class BasicWorld extends AbstractWorld {
 		ours = new Robot(ourPosition, oursVel, ourOrientation);
 		ball = new Ball(ballPosition, ballVel);
 
+		// pack into a snapshot
+		Snapshot nextSnapshot = filter(new Snapshot(them, ours, ball,
+				getOpponentsGoal(), getOwnGoal(), getPitch(), timestamp));
 		synchronized (this) {
-			// pack into a snapshot
-			this.prev = new Snapshot(them, ours, ball, getOpponentsGoal(),
-					getOwnGoal(), getPitch(), timestamp);
+			this.prev = nextSnapshot;
 		}
 	}
 
