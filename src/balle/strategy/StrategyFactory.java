@@ -1,6 +1,7 @@
 package balle.strategy;
 
 import balle.strategy.executor.movement.GoToObject;
+import balle.strategy.executor.movement.GoToObjectAvoidOpponentPurePF;
 import balle.strategy.executor.movement.GoToObjectPFN;
 import balle.strategy.executor.movement.GoToObjectPurePF;
 import balle.strategy.executor.turning.FaceAngle;
@@ -15,25 +16,28 @@ import balle.strategy.planner.SimpleGoToBall;
 public class StrategyFactory {
 	public static String[] availableDesignators() {
 
-		String[] designators = { "GoToBallPFOnly", "GoToBall", "GoToFaceBall",
-				"GoToBallPFN", "Dribble", "Blocking", "PFNavigation",
-				"DefensiveStrategy", "Game", "GameFromPenaltyKick",
-				"GameFromPenaltyDefence", "BallNearWall" };
+		String[] designators = { "GoToObjectAvoidOpponentPurePF",
+				"GoToBallPFOnly", "GoToBall", "GoToFaceBall", "GoToBallPFN",
+				"Dribble", "Blocking", "PFNavigation", "DefensiveStrategy",
+				"Game", "GameFromPenaltyKick", "GameFromPenaltyDefence",
+				"BallNearWall" };
 		return designators;
 	}
 
 	public static AbstractPlanner createClass(String designator)
 			throws UnknownDesignatorException {
 
-		if (designator.equals("GoToBall")) {
+		if (designator.equals("GoToObjectAvoidOpponentPurePF")) {
+			return new SimpleGoToBall(new GoToObjectAvoidOpponentPurePF());
+		} else if (designator.equals("GoToBallPFOnly")) {
+			return new SimpleGoToBall(new GoToObjectPurePF());
+		} else if (designator.equals("GoToBall")) {
 			return new GoToBall(new GoToObject(new FaceAngle()), true);
 		} else if (designator.equals("GoToFaceBall")) {
 			return new GoToFaceBall(new GoToObject(new FaceAngle()),
 					new FaceAngle());
 		} else if (designator.equals("GoToBallPFN")) {
 			return new GoToBall(new GoToObjectPFN(0.15f), true);
-		} else if (designator.equals("GoToBallPFOnly")) {
-			return new SimpleGoToBall(new GoToObjectPurePF());
 		} else if (designator.equals("DummyStrategy")) {
 			return new DummyStrategy();
 		} else if (designator.equals("Blocking")) {

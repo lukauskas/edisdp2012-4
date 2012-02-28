@@ -13,6 +13,16 @@ public abstract class PFObject {
 		myO = orient;
 	}
 
+	public PFObject(Coord pos) {
+		myP = pos;
+		myO = new Orientation(0, true);
+	}
+
+	public PFObject(Orientation orient) {
+		myP = new Coord(0, 0);
+		myO = orient;
+	}
+
 	public PFObject() {
 		myP = new Coord(0, 0);
 		myO = new Orientation(0, true);
@@ -43,10 +53,21 @@ public abstract class PFObject {
 	 */
 	public Coord getForce(Coord pos) {
 		Coord posR = pos.sub(myP);
-		posR.rotate(myO.getOpposite());
+		posR = posR.rotate(myO.getOpposite());
 		Coord relForce = relativePosToForce(posR);
-		relForce = relForce.rotate(myO).add(myP);
+		relForce = relForce.rotate(myO);
 		return relForce;
+	}
+
+	/**
+	 * get relative force for an object at pos and with orientation orient
+	 * 
+	 * @param pos
+	 * @return
+	 */
+	public Coord getRelativeForce(Coord pos, Orientation orient) {
+		Coord absForce = getForce(pos);
+		return absForce.rotate(orient.getOpposite());
 	}
 
 	/**

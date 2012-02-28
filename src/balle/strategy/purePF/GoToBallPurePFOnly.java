@@ -8,13 +8,13 @@ import balle.world.Orientation;
 import balle.world.Snapshot;
 import balle.world.objects.Ball;
 
-public class GoToBallPFOnly extends AbstractPlanner {
+public class GoToBallPurePFOnly extends AbstractPlanner {
 
 	private final double ZERO_TH = Math.PI / 5;
 
 	private GoalDirectedPointPFObject ball;
 
-	public GoToBallPFOnly() {
+	public GoToBallPurePFOnly() {
 		ball = new GoalDirectedPointPFObject();
 	}
 
