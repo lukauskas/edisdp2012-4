@@ -13,9 +13,10 @@ import balle.strategy.planner.KickFromWall;
 public class StrategyFactory {
     public static String[] availableDesignators() {
 
-        String[] designators = { "GoToBall", "GoToFaceBall", "GoToBallPFN",
+        String[] designators = { "Game", "GameFromPenaltyKick",
+                "GameFromPenaltyDefence", "GoToBall", "GoToFaceBall",
+                "GoToBallPFN",
                 "Dribble", "Blocking", "PFNavigation", "DefensiveStrategy",
-                "Game", "GameFromPenaltyKick", "GameFromPenaltyDefence",
                 "BallNearWall" };
         return designators;
     }
