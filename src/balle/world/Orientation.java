@@ -83,4 +83,22 @@ public class Orientation {
         return new Orientation(this.radians() - targetOrientation.radians(),
                 true);
     }
+
+    public Orientation add(Orientation targetOrientation) {
+        return new Orientation(this.angleInRadians
+                + targetOrientation.angleInRadians, true);
+    }
+
+    @Override
+    public String toString() {
+        return degrees() + "deg";
+    }
+
+    public boolean isFacingLeft(double epsilon) {
+        return (degrees() > 90 + epsilon) && (degrees() < 270 - epsilon);
+    }
+
+    public boolean isFacingRight(double epsilon) {
+        return (degrees() < 90 - epsilon) && (degrees() > 270 + epsilon);
+    }
 }

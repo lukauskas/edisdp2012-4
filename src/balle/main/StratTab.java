@@ -115,10 +115,11 @@ public class StratTab extends JPanel implements ActionListener {
 					return;
 				}
 				button.setText("Stop");
-
+				switchGoals.setEnabled(false);
 			} else {
 				button.setText("Start");
 				strategyRunner.stopStrategy();
+				switchGoals.setEnabled(true);
 			}
 		} else if (event.getActionCommand().equals("randomise")) {
 			try {
