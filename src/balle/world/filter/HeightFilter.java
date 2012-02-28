@@ -50,15 +50,15 @@ public class HeightFilter implements Filter {
 				s.getOwnGoal(), s.getPitch(), s.getTimestamp());
 	}
 
-	private Coord filter(Coord in, double height) {
+	public Coord filter(Coord in, double height) {
 		if (in == null)
 			return null;
 
 		Coord d = in.sub(worldCenter);
 
-		double ratio = height / cameraHeight;
-		d.mult(ratio);
-		d.add(worldCenter);
+		double ratio = (cameraHeight - height) / cameraHeight;
+		d = d.mult(ratio);
+		d = d.add(worldCenter);
 
 		return d;
 	}
