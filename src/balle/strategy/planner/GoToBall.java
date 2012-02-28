@@ -151,9 +151,16 @@ public class GoToBall extends AbstractPlanner {
      * 
      * @param target
      *            the target
+     * @param overshootGap
+     *            the overshoot gap
      * @return the overshoot target
      */
-    protected StaticFieldObject getOvershootTarget(StaticFieldObject target) {
+    protected StaticFieldObject getOvershootTarget(StaticFieldObject target,
+            double overshootGap) {
+        // End case for recursive search for overshoot target
+        if (overshootGap < 0.1)
+            return target;
+
         boolean belowBall = true;
         Robot robot = getSnapshot().getBalle();
         Pitch pitch = getSnapshot().getPitch();
@@ -165,7 +172,7 @@ public class GoToBall extends AbstractPlanner {
         if (getSnapshot().getOpponentsGoal().isRightGoal())
             belowBall = !belowBall;
 
-        Coord overshootCoord = calculateOvershootCoord(target, OVERSHOOT_GAP,
+        Coord overshootCoord = calculateOvershootCoord(target, overshootGap,
                 belowBall);
 
         // If the point is in the pitch
@@ -191,8 +198,8 @@ public class GoToBall extends AbstractPlanner {
         // }
         // If the target is *still* not suitable, go to the original target at
         // least
-        return target;
-
+        // Recurse with smaller gap
+        return getOvershootTarget(target, overshootGap / 2.0);
     }
 
     protected boolean isApproachingTargetFromCorrectSide(
