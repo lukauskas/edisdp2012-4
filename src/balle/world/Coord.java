@@ -148,15 +148,38 @@ public class Coord {
 		return new Coord(nX, nY);
 	}
 
-	public Point getPoint() {
-		Point out = new Point();
-		out.setLocation(x, y);
-		return out;
-	}
+	/**
+	 * Calculates the angle from one coordinate to another from this point.
+	 * 
+	 * TODO write test
+	 * 
+	 * @param from
+	 *            First coordinate.
+	 * @param to
+	 *            Second coordinate.
+	 * @return Angle between from and to from this reference point.
+	 */
+	public Orientation angleBetween(Coord from, Coord to) {
+		Orientation out;
 
-	@Override
-	public String toString() {
-		return "(" + x + "," + y + ")";
+		Coord dFrom, dTo;
+		dFrom = from.sub(this);
+		dTo = to.sub(this);
+
+		double dotProduct, dX, dY, mulAbs, adbc;
+		dX = (dFrom.x * dTo.x);
+		dY = (dFrom.y * dTo.y);
+		mulAbs = dFrom.abs() * dTo.abs();
+		dotProduct = (dX + dY) / mulAbs;
+
+		adbc = from.x * to.y - from.y * to.x;
+		if (adbc >= 0) {
+			out = new Orientation(Math.acos(dotProduct), true);
+		} else {
+			out = new Orientation(-Math.acos(dotProduct), true);
+		}
+
+		return out;
 	}
 
 	public Orientation getOrientation() {
@@ -169,5 +192,16 @@ public class Coord {
 
 	public Coord getUnitCoord() {
 		return mult(1 / abs());
+	}
+
+	public Point getPoint() {
+		Point out = new Point();
+		out.setLocation(x, y);
+		return out;
+	}
+
+	@Override
+	public String toString() {
+		return "(" + x + "," + y + ")";
 	}
 }

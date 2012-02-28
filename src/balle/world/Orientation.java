@@ -1,6 +1,5 @@
 package balle.world;
 
-
 public class Orientation {
 
 	private final double angleInRadians;
@@ -85,11 +84,29 @@ public class Orientation {
 				true);
 	}
 
+	public Orientation add(Orientation targetOrientation) {
+		return new Orientation(this.angleInRadians
+				+ targetOrientation.angleInRadians, true);
+	}
+
+	public boolean isFacingLeft(double epsilon) {
+		return (degrees() > 90 + epsilon) && (degrees() < 270 - epsilon);
+	}
+
+	public boolean isFacingRight(double epsilon) {
+		return (degrees() < 90 - epsilon) && (degrees() > 270 + epsilon);
+	}
+
 	public Orientation getOpposite() {
 		return new Orientation(-radians(), true);
 	}
 
 	public Coord getUnitCoord() {
 		return (new Coord(1, 0)).rotate(this);
+	}
+
+	@Override
+	public String toString() {
+		return degrees() + "deg";
 	}
 }

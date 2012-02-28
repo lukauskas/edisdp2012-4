@@ -30,9 +30,8 @@ public class Line {
 			return false;
 		}
 
-		return (((minX() <= a.getX()) && (maxX() >= a.getX())) && ((minY() <= a
-				.getY()) && (maxY() >= a.getY())));
-
+		return (((minX() - a.getX() < 0.00001) && (maxX() - a.getX()) > -0.00001) && ((minY()
+				- a.getY() < 0.00001) && (maxY() - a.getY() > -0.00001)));
 	}
 
 	/**
@@ -90,7 +89,7 @@ public class Line {
 	}
 
 	public boolean intersects(Line l) {
-		return getLine2DVersion().intersectsLine(l.getLine2DVersion());
+		return getIntersect(l) != null;
 	}
 
 	/**

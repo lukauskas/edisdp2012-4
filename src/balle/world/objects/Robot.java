@@ -9,7 +9,8 @@ import balle.world.Velocity;
 public class Robot extends RectangularObject {
 
     public Robot(Coord position, Velocity velocity, Orientation orientation) {
-        super(position, velocity, orientation, Globals.ROBOT_WIDTH, Globals.ROBOT_LENGTH);
+        super(position, velocity, orientation, Globals.ROBOT_WIDTH,
+                Globals.ROBOT_LENGTH);
     }
 
     /**
@@ -20,7 +21,7 @@ public class Robot extends RectangularObject {
      * @return true, if robot is in possession of the ball
      */
     public boolean possessesBall(Ball ball) {
-        if (ball.getPosition() == null)
+        if ((ball.getPosition() == null) || (getPosition() == null))
             return false;
         Coord possessVector = new Coord(this.getHeight() / 2.0, 0);
         possessVector = possessVector.rotate(getOrientation());
@@ -102,7 +103,8 @@ public class Robot extends RectangularObject {
      * @return true, if is in scoring position
      */
     public boolean isInScoringPosition(Ball ball, Goal goal, Robot otherRobot) {
-        return possessesBall(ball) && isFacingGoal(goal) && !otherRobot.intersects(getFacingLine());
+        return possessesBall(ball) && isFacingGoal(goal)
+                && !otherRobot.intersects(getFacingLine());
     }
 
     /**
@@ -114,6 +116,9 @@ public class Robot extends RectangularObject {
      * @return
      */
     public boolean isFacingGoal(Goal goal) {
+
+        if (getPosition() == null)
+            return false;
 
         Line goalLine = goal.getGoalLine();
         Line facingLine = getFacingLine();
@@ -128,10 +133,11 @@ public class Robot extends RectangularObject {
      * @return True, if robot is facing left.
      */
     public boolean isFacingLeft() {
-        // TODO: Use orientation here!!!!!
-        // if orientation is (90;270) degrees return true
-        Line fl = this.getFacingLine();
-        return (fl.getB().getX() - fl.getA().getX()) < 0;
+        if (getOrientation() == null)
+            return false;
+
+        return (getOrientation().degrees() > 90)
+                && (getOrientation().degrees() < 270);
     }
 
     /**
@@ -140,10 +146,11 @@ public class Robot extends RectangularObject {
      * @return True, if the robot is facing right
      */
     public boolean isFacingRight() {
-        // TODO: Use orientation here!!!
-        // if orientation is (0;90) union (270;360) degrees return true;
-        Line fl = this.getFacingLine();
-        return (fl.getB().getX() - fl.getA().getX()) > 0;
+        if (getOrientation() == null)
+            return false;
+
+        return (getOrientation().degrees() < 90)
+                || (getOrientation().degrees() > 270);
     }
 
     /**
@@ -212,4 +219,61 @@ public class Robot extends RectangularObject {
         return getAngleToTurn(targetCoord.sub(currentPosition).orientation());
     }
 
+    public Coord getFrontLeftCornerCoord() {
+        Coord leftSide = new Coord(getHeight() / 2, -getWidth() / 2);
+        leftSide = leftSide.rotate(getOrientation());
+        return getPosition().add(leftSide);
+    }
+
+    public Coord getFrontRightCornerCoord() {
+        Coord rightSide = new Coord(getHeight() / 2, getWidth() / 2);
+        rightSide = rightSide.rotate(getOrientation());
+        return getPosition().add(rightSide);
+    }
+
+    public boolean canReachTargetInStraightLine(StaticFieldObject target,
+            StaticFieldObject obstacle) {
+        if (getPosition() == null)
+            return false;
+
+        Line pathToTarget1 = new Line(getPosition(), target.getPosition());
+        Line pathToTarget2 = new Line(getFrontLeftCornerCoord(),
+                target.getPosition());
+        Line pathToTarget3 = new Line(getFrontRightCornerCoord(),
+                target.getPosition());
+
+        // Check if it is blocking our path
+        return (!obstacle.intersects(pathToTarget1)
+                && !obstacle.intersects(pathToTarget2) && !obstacle
+                .intersects(pathToTarget3));
+    }
+
+    /**
+     * TODO TEST!!!!!!
+     * 
+     * @param ourRobot
+     * @param ball
+     * @param cw
+     *            Clock-wise rotation if true, CCW if false.
+     * @return
+     */
+    public Orientation findMaxRotationMaintaintingPossession(Ball ball,
+            boolean cw) {
+        Coord fl = new Coord(10, 0);
+        fl = fl.rotate(getOrientation()).add(getPosition());
+        Orientation max, o = getPosition().angleBetween(fl, ball.getPosition());
+
+        if (cw) {
+            max = (new Coord(0, 0)).angleBetween(new Coord(10, 0), new Coord(
+                    Globals.ROBOT_LENGTH, Globals.ROBOT_WIDTH));
+        } else {
+            max = (new Coord(0, 0)).angleBetween(new Coord(10, 0), new Coord(
+                    Globals.ROBOT_LENGTH, -Globals.ROBOT_WIDTH));
+        }
+        System.out.println("max = " + max + ",\to = " + o + ",\tm-o = "
+                + max.sub(o));
+
+        return max.sub(o);
+
+    }
 }
