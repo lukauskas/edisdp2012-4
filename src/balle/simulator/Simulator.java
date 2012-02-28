@@ -410,12 +410,29 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 				float angSd = Globals.VISION_ANGLE_NOISE_SD;
 
 				// add noise to positions
-				yPosX = genRand(posSd, yPosX);
-				yPosY = genRand(posSd, yPosY);
-				bPosX = genRand(posSd, bPosX);
-				bPosY = genRand(posSd, bPosY);
-				ballPosX = genRand(posSd, ballPosX);
-				ballPosY = genRand(posSd, ballPosY);
+				if (rand.nextDouble() < 0.02) {
+					yPosX = -1;
+					yPosY = -1;
+				} else {
+					yPosX = genRand(posSd, yPosX);
+					yPosY = genRand(posSd, yPosY);
+				}
+
+				if (rand.nextDouble() < 0.02) {
+					bPosX = -1;
+					bPosY = -1;
+				} else {
+					bPosX = genRand(posSd, bPosX);
+					bPosY = genRand(posSd, bPosY);
+				}
+
+				if (rand.nextDouble() < 0.02) {
+					ballPosX = -1;
+					ballPosY = -1;
+				} else {
+					ballPosX = genRand(posSd, ballPosX);
+					ballPosY = genRand(posSd, ballPosY);
+				}
 
 				// add noise to angles
 				yRad = genRandDeg(angSd, yRad);

@@ -121,6 +121,9 @@ public class Game extends AbstractPlanner {
             // Let defensiveStrategy deal with it!
             defensiveStrategy.step(controller);
             addDrawables(defensiveStrategy.getDrawables());
+        } else if (ball.isNearWall(pitch)) {
+            LOG.info("Picking the ball from wall");
+            pickBallFromWallStrategy.step(controller);
         } else if (ball.isNear(ourRobot)) {
             if (Math.abs(ourRobot.getAngleToTurn(targetOrientation)) > (Math.PI / 4)) {
                 LOG.info("Ball is near our robot, turning to it");
@@ -130,16 +133,14 @@ public class Game extends AbstractPlanner {
                 // Go forward!
                 controller.setWheelSpeeds(200, 200);
             }
-
         } else if (!ball.isNearWall(pitch)) {
-            LOG.info("Approaching ball");
+            // LOG.info("Approaching ball");
             // Approach ball
             goToBallStrategy.step(controller);
             addDrawables(goToBallStrategy.getDrawables());
-        } else if (ball.isNearWall(pitch)) {
-            // TODO: Pick it
-            LOG.info("Picking the ball from wall");
-            pickBallFromWallStrategy.step(controller);
+
+        } else {
+            LOG.warn("Don't know what to do!");
         }
 
     }
