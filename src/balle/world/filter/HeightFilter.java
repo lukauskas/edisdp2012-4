@@ -1,4 +1,4 @@
-package balle.world.processing;
+package balle.world.filter;
 
 import balle.world.Coord;
 
