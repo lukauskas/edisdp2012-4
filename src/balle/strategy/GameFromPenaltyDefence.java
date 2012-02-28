@@ -52,10 +52,10 @@ public class GameFromPenaltyDefence extends Game {
 		Boolean isLeftGoal = getSnapshot().getOwnGoal().isLeftGoal();
 
 		if (getSnapshot().getOwnGoal().getMaxY() <= getSnapshot().getBalle()
-				.getPosition().getY() + 0.2) {
+				.getPosition().getY() + 0.22) {
 			robotState = "Up";
 		} else if (getSnapshot().getOwnGoal().getMinY() >= getSnapshot()
-				.getBalle().getPosition().getY() - 0.2) {
+				.getBalle().getPosition().getY() - 0.18) {
 			robotState = "Down";
 		} else {
 			robotState = "Center";
@@ -90,17 +90,17 @@ public class GameFromPenaltyDefence extends Game {
 		LOG.debug("moveTo: " + moveTo);
 
 		if (robotState.equals("Center") && moveTo.equals("Up"))
-			rotateSpeed = 500;
+			rotateSpeed = 200;
 		if (robotState.equals("Center") && moveTo.equals("Down"))
-			rotateSpeed = -700;
+			rotateSpeed = -200;
 		if (robotState.equals("Up") && moveTo.equals("Center"))
-			rotateSpeed = -700;
+			rotateSpeed = -200;
 		if (robotState.equals("Up") && moveTo.equals("Down"))
-			rotateSpeed = -500;
+			rotateSpeed = -100;
 		if (robotState.equals("Down") && moveTo.equals("Center"))
-			rotateSpeed = 500;
+			rotateSpeed = 200;
 		if (robotState.equals("Down") && moveTo.equals("Up"))
-			rotateSpeed = 700;
+			rotateSpeed = 200;
 
 		controller.setWheelSpeeds(rotateSpeed, rotateSpeed);
 	}
