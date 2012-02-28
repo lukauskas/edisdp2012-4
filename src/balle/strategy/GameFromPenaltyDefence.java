@@ -8,101 +8,101 @@ import balle.world.Snapshot;
 
 public class GameFromPenaltyDefence extends Game {
 
-	private static Logger LOG = Logger.getLogger(GameFromPenaltyDefence.class);
+    private static Logger LOG           = Logger.getLogger(GameFromPenaltyDefence.class);
 
-	private Snapshot firstSnapshot = null;
-	String robotState = "Center";
-	int rotateSpeed = 0;
+    private Snapshot      firstSnapshot = null;
+    String                robotState    = "Center";
+    int                   rotateSpeed   = 0;
 
-	public GameFromPenaltyDefence() throws UnknownDesignatorException {
-		super();
-	}
+    public GameFromPenaltyDefence() throws UnknownDesignatorException {
+        super();
+    }
 
-	public boolean isStillInPenaltyDefence() {
+    public boolean isStillInPenaltyDefence() {
 
-		if (firstSnapshot == null)
-			return true;
+        if (firstSnapshot == null)
+            return true;
 
-		double ball_x = firstSnapshot.getBall().getPosition().getX();
-		double ball_y = firstSnapshot.getBall().getPosition().getY();
+        double ball_x = firstSnapshot.getBall().getPosition().getX();
+        double ball_y = firstSnapshot.getBall().getPosition().getY();
 
-		double aball_x = getSnapshot().getBall().getPosition().getX();
-		double aball_y = getSnapshot().getBall().getPosition().getY();
+        double aball_x = getSnapshot().getBall().getPosition().getX();
+        double aball_y = getSnapshot().getBall().getPosition().getY();
 
-		double distance = Math.sqrt(Math.pow(aball_x - ball_x, 2)
-				+ Math.pow(aball_y - ball_y, 2));
+        double distance = Math.sqrt(Math.pow(aball_x - ball_x, 2)
+                + Math.pow(aball_y - ball_y, 2));
 
-		if (distance > 1) {
-			return false;
-		}
+        if (distance > 1) {
+            return false;
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	@Override
-	public void step(Controller controller) {
+    @Override
+    public void step(Controller controller) {
 
-		if ((firstSnapshot == null)
-				&& (getSnapshot().getBall().getPosition() != null))
-			firstSnapshot = getSnapshot();
+        if ((firstSnapshot == null)
+                && (getSnapshot().getBall().getPosition() != null))
+            firstSnapshot = getSnapshot();
 
-		Orientation opponentAngle = getSnapshot().getOpponent()
-				.getOrientation();
-		double threshold = Math.toRadians(20);
-		Boolean isLeftGoal = getSnapshot().getOwnGoal().isLeftGoal();
+        Orientation opponentAngle = getSnapshot().getOpponent()
+                .getOrientation();
+        double threshold = Math.toRadians(20);
+        Boolean isLeftGoal = getSnapshot().getOwnGoal().isLeftGoal();
 
-		if (getSnapshot().getOwnGoal().getMaxY() <= getSnapshot().getBalle()
-				.getPosition().getY() + 0.2) {
-			robotState = "Up";
-		} else if (getSnapshot().getOwnGoal().getMinY() >= getSnapshot()
-				.getBalle().getPosition().getY() - 0.2) {
-			robotState = "Down";
-		} else {
-			robotState = "Center";
-		}
+        if (getSnapshot().getOwnGoal().getMaxY() <= getSnapshot().getBalle()
+                .getPosition().getY() + 0.2) {
+            robotState = "Up";
+        } else if (getSnapshot().getOwnGoal().getMinY() >= getSnapshot()
+                .getBalle().getPosition().getY() - 0.2) {
+            robotState = "Down";
+        } else {
+            robotState = "Center";
+        }
 
-		LOG.debug("robotState: " + robotState);
+        LOG.debug("robotState: " + robotState);
 
-		if (isLeftGoal == true) {
-			// opponent shooting left
-			if (opponentAngle.atan2styleradians() > Math.PI - threshold)
-				moveTo("Up", controller);
-			else if (opponentAngle.atan2styleradians() < -Math.PI + threshold)
-				moveTo("Down", controller);
-			else
-				moveTo("Center", controller);
+        if (isLeftGoal == true) {
+            // opponent shooting left
+            if (opponentAngle.atan2styleradians() > Math.PI - threshold)
+                moveTo("Up", controller);
+            else if (opponentAngle.atan2styleradians() < -Math.PI + threshold)
+                moveTo("Down", controller);
+            else
+                moveTo("Center", controller);
 
-		} else {
-			// opponent shooting right
-			if (opponentAngle.atan2styleradians() > threshold)
-				moveTo("Up", controller);
-			else if (opponentAngle.atan2styleradians() < -threshold)
-				moveTo("Down", controller);
-			else
-				moveTo("Center", controller);
-		}
+        } else {
+            // opponent shooting right
+            if (opponentAngle.atan2styleradians() > threshold)
+                moveTo("Up", controller);
+            else if (opponentAngle.atan2styleradians() < -threshold)
+                moveTo("Down", controller);
+            else
+                moveTo("Center", controller);
+        }
 
-	}
+    }
 
-	private void moveTo(String moveTo, Controller controller) {
+    private void moveTo(String moveTo, Controller controller) {
 
-		rotateSpeed = 0;
-		LOG.debug("moveTo: " + moveTo);
+        rotateSpeed = 0;
+        LOG.debug("moveTo: " + moveTo);
 
-		if (robotState.equals("Center") && moveTo.equals("Up"))
-			rotateSpeed = 500;
-		if (robotState.equals("Center") && moveTo.equals("Down"))
-			rotateSpeed = -700;
-		if (robotState.equals("Up") && moveTo.equals("Center"))
-			rotateSpeed = -700;
-		if (robotState.equals("Up") && moveTo.equals("Down"))
-			rotateSpeed = -500;
-		if (robotState.equals("Down") && moveTo.equals("Center"))
-			rotateSpeed = 500;
-		if (robotState.equals("Down") && moveTo.equals("Up"))
-			rotateSpeed = 700;
+        if (robotState.equals("Center") && moveTo.equals("Up"))
+            rotateSpeed = 150;
+        if (robotState.equals("Center") && moveTo.equals("Down"))
+            rotateSpeed = -300;
+        if (robotState.equals("Up") && moveTo.equals("Center"))
+            rotateSpeed = -300;
+        if (robotState.equals("Up") && moveTo.equals("Down"))
+            rotateSpeed = -150;
+        if (robotState.equals("Down") && moveTo.equals("Center"))
+            rotateSpeed = 150;
+        if (robotState.equals("Down") && moveTo.equals("Up"))
+            rotateSpeed = 300;
 
-		controller.setWheelSpeeds(rotateSpeed, rotateSpeed);
-	}
+        controller.setWheelSpeeds(rotateSpeed, rotateSpeed);
+    }
 
 }
