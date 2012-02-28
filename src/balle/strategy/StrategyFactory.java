@@ -2,6 +2,7 @@ package balle.strategy;
 
 import balle.strategy.executor.movement.GoToObject;
 import balle.strategy.executor.movement.GoToObjectPFN;
+import balle.strategy.executor.movement.GoToObjectPurePF;
 import balle.strategy.executor.turning.FaceAngle;
 import balle.strategy.planner.AbstractPlanner;
 import balle.strategy.planner.DefensiveStrategy;
@@ -9,7 +10,7 @@ import balle.strategy.planner.DribbleMilestone2;
 import balle.strategy.planner.GoToBall;
 import balle.strategy.planner.GoToFaceBall;
 import balle.strategy.planner.KickFromWall;
-import balle.strategy.purePF.GoToBallPFOnly;
+import balle.strategy.planner.SimpleGoToBall;
 
 public class StrategyFactory {
 	public static String[] availableDesignators() {
@@ -32,7 +33,7 @@ public class StrategyFactory {
 		} else if (designator.equals("GoToBallPFN")) {
 			return new GoToBall(new GoToObjectPFN(0.15f), true);
 		} else if (designator.equals("GoToBallPFOnly")) {
-			return new GoToBallPFOnly();
+			return new SimpleGoToBall(new GoToObjectPurePF());
 		} else if (designator.equals("DummyStrategy")) {
 			return new DummyStrategy();
 		} else if (designator.equals("Blocking")) {
