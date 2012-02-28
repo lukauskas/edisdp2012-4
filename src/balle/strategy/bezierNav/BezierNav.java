@@ -17,7 +17,7 @@ public class BezierNav implements MovementExecutor {
 
 	private StaticFieldObject target;
 	private Snapshot state;
-	private double stopDistance = 0;
+	private double stopDistance = 0.02;
 
 	private Coord p0, p1, p2, p3;
 
@@ -33,7 +33,10 @@ public class BezierNav implements MovementExecutor {
 			return l;
 		}
 		for (double t = -0.1; t < 1.1; t += 0.05) {
-			l.add(new Dot(pos(t), Color.ORANGE));
+			Color c = Color.ORANGE;
+			if (t < 0 || t > 1)
+				c = Color.GRAY;
+			l.add(new Dot(pos(t), c));
 		}
 		Coord center = getCenterOfRotation(0);
 		l.add(new Dot(center, Color.BLACK));
@@ -49,7 +52,8 @@ public class BezierNav implements MovementExecutor {
 
 	@Override
 	public boolean isFinished() {
-		return state.getBalle().getPosition().dist(target.getPosition()) <= stopDistance;
+		return state.getBalle().getPosition()
+				.dist(target.getPosition().add(new Coord(0, 0.16))) <= stopDistance;
 	}
 
 	@Override
@@ -64,25 +68,27 @@ public class BezierNav implements MovementExecutor {
 
 	@Override
 	public void step(Controller controller) {
-
+		if (isFinished()) {
+			stop(controller);
+			return;
+		}
 		// calculate bezier points 0 to 3
-		Coord rP = state.getBalle().getPosition(), tP = target.getPosition();
+		Coord rP = state.getBalle().getPosition(), tP = target.getPosition()
+				.add(new Coord(0, 0.15));
 		double distS = rP.dist(tP) / 2;
 
 		p0 = rP;
 		p1 = rP.add(state.getBalle().getOrientation().getUnitCoord()
-				.mult(distS));
+				.mult(distS / 4));
 		p2 = tP.add(new Coord(0, 1).mult(distS));
 		p3 = tP;
 
 		System.out.println("----");
-		for (double i = 0; i <= 1; i += 0.1) {
-			System.out.print(pos(i) + ",");
-		}
 		System.out.println("----");
 		System.out.println(pos(0));
 		System.out.println(vel(0));
 		System.out.println(accel(0));
+		System.out.println("----");
 		// calculate turning radius
 		Coord a = accel(0);
 		Coord turnCenter = getCenterOfRotation(0);
@@ -97,6 +103,7 @@ public class BezierNav implements MovementExecutor {
 		double r = turnCenter.dist(pos(0));
 		System.out.println("r: " + r);
 		System.out.println((isLeft ? "left" : "right"));
+		System.out.println("center\t\t" + turnCenter);
 		// calcualte wheel speeds/powers
 		double max = Globals.powerToVelocity(Globals.MAXIMUM_MOTOR_SPEED);
 		int v1, v2;
@@ -148,9 +155,9 @@ public class BezierNav implements MovementExecutor {
 		g11 = accel(t).getY();
 		return new Coord(
 				f
-						- ((((f1 * f1) + (g1 * g1)) * g1) / ((f1 * g11) - (f11 - g1))),
+						- ((((f1 * f1) + (g1 * g1)) * g1) / ((f1 * g11) - (f11 * g1))),
 				g
-						- ((((f1 * f1) + (g1 * g1)) * f1) / ((f1 * g11) - (f11 - g1))));
+						+ ((((f1 * f1) + (g1 * g1)) * f1) / ((f1 * g11) - (f11 * g1))));
 	}
 
 	private double getMinVelocityRato(double radius) {
