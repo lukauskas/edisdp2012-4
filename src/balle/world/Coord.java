@@ -159,26 +159,26 @@ public class Coord {
 	 * @return Angle between from and to from this reference point.
 	 */
 	public Orientation angleBetween(Coord from, Coord to) {
-		Orientation out;
+		Coord a = from.sub(this);
+		Coord b = to.sub(this);
 
-		Coord dFrom, dTo;
-		dFrom = from.sub(this);
-		dTo = to.sub(this);
+		return b.getOrientation().sub(a.getOrientation());
 
-		double dotProduct, dX, dY, mulAbs, adbc;
-		dX = (dFrom.x * dTo.x);
-		dY = (dFrom.y * dTo.y);
-		mulAbs = dFrom.abs() * dTo.abs();
-		dotProduct = (dX + dY) / mulAbs;
-
-		adbc = from.x * to.y - from.y * to.x;
-		if (adbc >= 0) {
-			out = new Orientation(Math.acos(dotProduct), true);
-		} else {
-			out = new Orientation(-Math.acos(dotProduct), true);
-		}
-
-		return out;
+		/*
+		 * Orientation out;
+		 * 
+		 * Coord dFrom, dTo; dFrom = from.sub(this); dTo = to.sub(this);
+		 * 
+		 * double dotProduct, dX, dY, mulAbs, adbc; dX = (dFrom.x * dTo.x); dY =
+		 * (dFrom.y * dTo.y); mulAbs = dFrom.abs() * dTo.abs(); dotProduct = (dX
+		 * + dY) / mulAbs;
+		 * 
+		 * adbc = from.x * to.y - from.y * to.x; if (adbc >= 0) { out = new
+		 * Orientation(Math.acos(dotProduct), true); } else { out = new
+		 * Orientation(-Math.acos(dotProduct), true); }
+		 * 
+		 * return out;
+		 */
 	}
 
 	public Orientation getOrientation() {

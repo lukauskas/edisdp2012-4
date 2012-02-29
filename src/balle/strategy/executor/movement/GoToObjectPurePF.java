@@ -1,8 +1,10 @@
 package balle.strategy.executor.movement;
 
+import java.awt.Color;
 import java.util.ArrayList;
 
 import balle.controller.Controller;
+import balle.main.drawable.Dot;
 import balle.main.drawable.Drawable;
 import balle.misc.Globals;
 import balle.world.Coord;
@@ -18,7 +20,7 @@ public class GoToObjectPurePF implements MovementExecutor {
 	private Snapshot currentState;
 
 	private double stopDistance = 0;
-	private final double ZERO_TH = Math.PI / 5;
+	private final double ZERO_TH = Math.PI / 2;
 
 	@Override
 	public void stop(Controller controller) {
@@ -27,7 +29,10 @@ public class GoToObjectPurePF implements MovementExecutor {
 
 	@Override
 	public ArrayList<Drawable> getDrawables() {
-		return new ArrayList<Drawable>();
+		ArrayList<Drawable> l = new ArrayList<Drawable>();
+		l.add(new Dot(1, 0, Color.gray));
+		l.add(new Dot(1, 1, Color.gray));
+		return l;
 	}
 
 	@Override
@@ -64,14 +69,15 @@ public class GoToObjectPurePF implements MovementExecutor {
 
 	@Override
 	public void step(Controller controller) {
-		Coord rToB = target.getPosition().sub(
-				currentState.getBalle().getPosition());
-		Orientation rO = currentState.getBalle().getOrientation();
-		double rFO = rToB.rotate(rO.getOpposite()).getOrientation()
-				.atan2styleradians();
+		Robot r = currentState.getBalle();
+		Orientation rO = r.getOrientation();
+		Coord rP = r.getPosition();
+		double rFO = rP.angleBetween(rP.add(rO.getUnitCoord()),
+				target.getPosition()).atan2styleradians();
 		int pR = (int) Math.round(getRightWheelSpeed(rFO));
 		int pL = (int) Math.round(getLeftWheelSpeed(rFO));
 		controller.setWheelSpeeds(pL, pR);
+		System.out.println(rFO);
 	}
 
 	/**

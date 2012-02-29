@@ -15,9 +15,13 @@ public class Orientation {
 
 		if (useRadians) {
 			angle = angle % (2 * Math.PI);
+			if (angle < 0)
+				angle += (2 * Math.PI);
 			angleInRadians = angle;
 		} else {
 			angle = angle % 360;
+			if (angle < 0)
+				angle += 360;
 			angleInRadians = (angle * Math.PI) / 180;
 		}
 
@@ -43,6 +47,7 @@ public class Orientation {
 	}
 
 	public double atan2styleradians() {
+		System.out.println("aaa: " + radians());
 		if (radians() <= Math.PI)
 			return radians();
 		else

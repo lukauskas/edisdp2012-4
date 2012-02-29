@@ -28,14 +28,14 @@ public class StrategyFactory {
 
 	public static AbstractPlanner createClass(String designator)
 			throws UnknownDesignatorException {
-
+		if (designator.equals("BezierNav")) {
+			return new SimpleGoToBallFaceGoal(new BezierNav(
+					new GoToObjectPurePF()));
+		} else
 		if (designator.equals("GoToObjectAvoidOpponentPurePF")) {
 			return new SimpleGoToBall(new GoToObjectAvoidOpponentPurePF());
 		} else if (designator.equals("GoToBallPFOnly")) {
 			return new SimpleGoToBall(new GoToObjectPurePF());
-		} else if (designator.equals("BezierNav")) {
-			return new SimpleGoToBallFaceGoal(new BezierNav(
-					new GoToObjectPFN(0)));
 		} else if (designator.equals("GoToBall")) {
 			return new GoToBall(new GoToObject(new FaceAngle()), true);
 		} else if (designator.equals("GoToFaceBall")) {

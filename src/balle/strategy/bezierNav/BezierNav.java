@@ -64,7 +64,7 @@ public class BezierNav implements OrientedMovementExecutor {
 		l.add(new Circle(center, center.dist(state.getBalle().getPosition()),
 				Color.yellow));
 
-		l.add(new Dot(pos(stepDist), Color.RED));
+		l.add(new Dot(pos(stepDist), Color.CYAN));
 //		Orientation rO = p1.sub(p0).getOrientation();
 //		Coord lwpos = new Coord(Globals.ROBOT_LEFT_WHEEL_POS.x,
 //				Globals.ROBOT_LEFT_WHEEL_POS.y).rotate(rO);

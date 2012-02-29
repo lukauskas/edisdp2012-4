@@ -82,12 +82,35 @@ public class CoordTests {
 		c = new Coord(3, 3);
 
 		out = a.angleBetween(c, b);
-		assertEquals(-45, out.degrees(), 0.001);
+		assertEquals(-45, out.atan2styledegrees(), 0.001);
 
 		out = a.angleBetween(b, c);
-		assertEquals(45, out.degrees(), 0.001);
+		assertEquals(45, out.atan2styledegrees(), 0.001);
 
 		out = b.angleBetween(c, a);
-		assertEquals(90, out.degrees(), 0.001);
+		assertEquals(90, out.atan2styledegrees(), 0.001);
+	}
+
+	/**
+	 * Given lines: (0,0) -> (1,0); (0,0) -> (0, 1); (0,0) -> (1,1) Lines should
+	 * contain points (0.5,0), (0,0.5), (0.5,0.5) respectively.
+	 * 
+	 * All lines should also contain their end points
+	 */
+	@Test
+	public void testAngleBetween2() {
+		Coord ref = new Coord(1, 0);
+		Coord from = new Coord(1, 1);
+		Coord to = new Coord(0, 1);
+		assertEquals(Math.PI / 4, ref.angleBetween(from, to).radians(), 0.0001);
+		assertEquals(Math.PI / 4, ref.angleBetween(new Coord(1, 100), to)
+				.radians(), 0.0001);
+	}
+
+	@Test
+	public void testOrientationConstructor() {
+		for (double t = -2 * Math.PI; t < 2 * Math.PI; t += 0.1) {
+			assertTrue(new Orientation(t).radians() >= 0);
+		}
 	}
 }
