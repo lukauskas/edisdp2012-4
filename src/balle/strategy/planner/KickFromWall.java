@@ -1,9 +1,12 @@
 package balle.strategy.planner;
 
+import java.awt.Color;
+
 import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
 import balle.strategy.executor.movement.GoToObject;
+import balle.strategy.executor.movement.GoToObjectPFN;
 import balle.strategy.executor.movement.MovementExecutor;
 import balle.strategy.executor.turning.FaceAngle;
 import balle.world.Coord;
@@ -18,6 +21,7 @@ public class KickFromWall extends GoToBall {
 	boolean secondStep = false;
 	boolean additionalStep = false;
 	boolean kicked = false;
+	boolean goingToBall = false;
 
 	public KickFromWall(MovementExecutor movementStrategy) {
 		super(movementStrategy);
@@ -79,7 +83,7 @@ public class KickFromWall extends GoToBall {
 		}
 
 		if (!secondStep) {
-			// LOG.info("Going to location");
+            LOG.info("Getting closer to the wall");
 
 			if (Math.abs(snap.getBalle().getPosition().getY()
 					- snap.getBall().getPosition().getY()) < 0.3
@@ -90,9 +94,20 @@ public class KickFromWall extends GoToBall {
 				return loc;
 			}
 		} else {
-			// LOG.info("Going to ball");
-			MovementExecutor strategy = new GoToObject(new FaceAngle());
-			strategy.setStopDistance(0);
+
+			goingToBall = true;
+
+			MovementExecutor strategy;
+
+			if (snap.getBalle().getPosition()
+					.dist(snap.getBall().getPosition()) < 0.5) {
+                LOG.info("Approaching the ball gently");
+				strategy = new GoToObject(new FaceAngle());
+				strategy.setStopDistance(0);
+			} else {
+                LOG.info("Approaching the ball with PFN");
+				strategy = new GoToObjectPFN(0);
+			}
 			setExecutorStrategy(strategy);
 			return loc2;
 		}
@@ -106,8 +121,15 @@ public class KickFromWall extends GoToBall {
 
 	@Override
 	public void step(Controller controller) {
-		if (getSnapshot().getBall().isNear(getSnapshot().getBalle()))
+		if (getSnapshot().getBall().isNear(getSnapshot().getBalle())
+				&& goingToBall)
 			controller.kick();
 		super.step(controller);
 	}
+
+    @Override
+    protected Color getTargetColor() {
+        return Color.WHITE;
+    }
+
 }

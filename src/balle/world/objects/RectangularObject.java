@@ -12,9 +12,9 @@ public class RectangularObject extends MovingPoint implements FieldObject {
 
     private static final Logger LOG = Logger.getLogger(RectangularObject.class);
 
-    private final double        width;
-    private final double        height;
-    private final Orientation   orientation;
+    private final double width;
+    private final double height;
+    private final Orientation orientation;
 
     public RectangularObject(Coord position, Velocity velocity,
             Orientation orientation, double width, double height) {
@@ -38,6 +38,9 @@ public class RectangularObject extends MovingPoint implements FieldObject {
 
     @Override
     public boolean containsCoord(Coord point) {
+        if (getPosition() == null)
+            return false;
+
         Coord dPoint = new Coord(point.getX() - getPosition().getX(),
                 point.getY() - getPosition().getY());
 
@@ -142,6 +145,9 @@ public class RectangularObject extends MovingPoint implements FieldObject {
 
     @Override
     public boolean intersects(Line line) {
+        if (line == null)
+            return false;
+
         if (containsCoord(line.getA()) || containsCoord(line.getB()))
             return true;
 

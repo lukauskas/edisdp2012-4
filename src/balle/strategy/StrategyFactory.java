@@ -17,7 +17,6 @@ import balle.strategy.planner.SimpleGoToBallFaceGoal;
 
 public class StrategyFactory {
 	public static String[] availableDesignators() {
-
 		String[] designators = { "BezierNav", "GoToObjectAvoidOpponentPurePF",
 				"GoToBallPFOnly", "GoToBall", "GoToFaceBall", "GoToBallPFN",
 				"Dribble", "Blocking", "PFNavigation", "DefensiveStrategy",
@@ -25,6 +24,7 @@ public class StrategyFactory {
 				"BallNearWall" };
 		return designators;
 	}
+
 
 	public static AbstractPlanner createClass(String designator)
 			throws UnknownDesignatorException {

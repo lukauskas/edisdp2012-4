@@ -19,9 +19,9 @@ public class Game extends AbstractPlanner {
     private static final Logger LOG = Logger.getLogger(Game.class);
     // Strategies that we will need make sure to updateState() for each of them
     // and stop() each of them
-    Strategy                    defensiveStrategy;
-    Strategy                    goToBallStrategy;
-    Strategy                    pickBallFromWallStrategy;
+    Strategy defensiveStrategy;
+    Strategy goToBallStrategy;
+    Strategy pickBallFromWallStrategy;
     RotateToOrientationExecutor turningExecutor;
 
     public Game() throws UnknownDesignatorException {
@@ -122,25 +122,24 @@ public class Game extends AbstractPlanner {
             defensiveStrategy.step(controller);
             addDrawables(defensiveStrategy.getDrawables());
         } else if (ball.isNearWall(pitch)) {
-            LOG.info("Picking the ball from wall");
             pickBallFromWallStrategy.step(controller);
-        } else if (ball.isNear(ourRobot)) {
+            addDrawables(pickBallFromWallStrategy.getDrawables());
+        } else if (ball.isNear(ourRobot)
+                && (ourRobot.isApproachingTargetFromCorrectSide(ball,
+                        getSnapshot().getOpponentsGoal()))) {
             if (Math.abs(ourRobot.getAngleToTurn(targetOrientation)) > (Math.PI / 4)) {
                 LOG.info("Ball is near our robot, turning to it");
                 turningExecutor.setTargetOrientation(targetOrientation);
                 turningExecutor.step(controller);
             } else {
                 // Go forward!
-                controller.setWheelSpeeds(200, 200);
+                controller.setWheelSpeeds(400, 400);
             }
-        } else if (!ball.isNearWall(pitch)) {
-            // LOG.info("Approaching ball");
+        } else {
             // Approach ball
             goToBallStrategy.step(controller);
             addDrawables(goToBallStrategy.getDrawables());
 
-        } else {
-            LOG.warn("Don't know what to do!");
         }
 
     }
