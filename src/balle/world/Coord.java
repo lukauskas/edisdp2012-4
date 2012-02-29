@@ -1,9 +1,8 @@
 package balle.world;
 
-import java.awt.Point;
-
 import balle.world.objects.FieldObject;
 import balle.world.objects.Pitch;
+import balle.world.objects.Point;
 
 public class Coord {
 
@@ -195,9 +194,7 @@ public class Coord {
 	}
 
 	public Point getPoint() {
-		Point out = new Point();
-		out.setLocation(x, y);
-		return out;
+		return new Point(this);
 	}
 
 	@Override

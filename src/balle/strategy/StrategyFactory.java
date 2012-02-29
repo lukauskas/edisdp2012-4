@@ -35,7 +35,7 @@ public class StrategyFactory {
 			return new SimpleGoToBall(new GoToObjectPurePF());
 		} else if (designator.equals("BezierNav")) {
 			return new SimpleGoToBallFaceGoal(new BezierNav(
-					new GoToObjectPurePF()));
+					new GoToObjectPFN(0)));
 		} else if (designator.equals("GoToBall")) {
 			return new GoToBall(new GoToObject(new FaceAngle()), true);
 		} else if (designator.equals("GoToFaceBall")) {

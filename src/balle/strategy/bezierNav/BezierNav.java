@@ -7,12 +7,10 @@ import balle.controller.Controller;
 import balle.main.drawable.Circle;
 import balle.main.drawable.Dot;
 import balle.main.drawable.Drawable;
-import balle.main.drawable.DrawableLine;
 import balle.misc.Globals;
 import balle.strategy.executor.movement.MovementExecutor;
 import balle.strategy.executor.movement.OrientedMovementExecutor;
 import balle.world.Coord;
-import balle.world.Line;
 import balle.world.Orientation;
 import balle.world.Snapshot;
 import balle.world.objects.StaticFieldObject;
@@ -25,6 +23,8 @@ public class BezierNav implements OrientedMovementExecutor {
 	private StaticFieldObject target;
 	private Snapshot state;
 	private double stopDistance = 0.017;
+
+	private float stepDist = 0.5f;
 
 	private Coord p0, p1, p2, p3;
 	private Orientation orient;
@@ -64,15 +64,16 @@ public class BezierNav implements OrientedMovementExecutor {
 		l.add(new Circle(center, center.dist(state.getBalle().getPosition()),
 				Color.yellow));
 
-		Orientation rO = p1.sub(p0).getOrientation();
-		Coord lwpos = new Coord(Globals.ROBOT_LEFT_WHEEL_POS.x,
-				Globals.ROBOT_LEFT_WHEEL_POS.y).rotate(rO);
-		l.add(new DrawableLine(new Line(p0.add(lwpos), p0.add(lwpos).add(
-				p1.getUnitCoord().mult(lwv / 1000))), Color.BLACK));
-		Coord rwpos = new Coord(Globals.ROBOT_RIGHT_WHEEL_POS.x,
-				Globals.ROBOT_RIGHT_WHEEL_POS.y).rotate(rO);
-		l.add(new DrawableLine(new Line(p0.add(rwpos), p0.add(rwpos).add(
-				p1.getUnitCoord().mult(rwv / 1000))), Color.BLACK));
+		l.add(new Dot(pos(stepDist), Color.RED));
+//		Orientation rO = p1.sub(p0).getOrientation();
+//		Coord lwpos = new Coord(Globals.ROBOT_LEFT_WHEEL_POS.x,
+//				Globals.ROBOT_LEFT_WHEEL_POS.y).rotate(rO);
+//		l.add(new DrawableLine(new Line(p0.add(lwpos), p0.add(lwpos).add(
+//				p1.getUnitCoord().mult(lwv / 1000))), Color.BLACK));
+//		Coord rwpos = new Coord(Globals.ROBOT_RIGHT_WHEEL_POS.x,
+//				Globals.ROBOT_RIGHT_WHEEL_POS.y).rotate(rO);
+//		l.add(new DrawableLine(new Line(p0.add(rwpos), p0.add(rwpos).add(
+//				p1.getUnitCoord().mult(rwv / 1000))), Color.BLACK));
 		return l;
 	}
 
@@ -151,15 +152,19 @@ public class BezierNav implements OrientedMovementExecutor {
 		// + (isLeft ? v2 : v1));
 		// apply wheel speeds
 		if (true) {
-			if (isLeft) {
-				controller.setWheelSpeeds(v1, v2);
-				lwv = v1;
-				lwv = v2;
-			} else {
-				controller.setWheelSpeeds(v2, v1);
-				lwv = v2;
-				lwv = v1;
-			}
+			// if (isLeft) {
+			// controller.setWheelSpeeds(v1, v2);
+			// lwv = v1;
+			// lwv = v2;
+			// } else {
+			// controller.setWheelSpeeds(v2, v1);
+			// lwv = v2;
+			// lwv = v1;
+			// }
+
+			movementExecutor.updateState(state);
+			movementExecutor.updateTarget(pos(stepDist).getPoint());
+			movementExecutor.step(controller);
 		}
 
 	}
