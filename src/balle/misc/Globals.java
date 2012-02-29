@@ -29,10 +29,10 @@ public class Globals {
 	public static final float MAX_ROBOT_ANG_ACCEL = 0.0007f; // r/s^2
 	public static final float MAX_MOTOR_POWER_ACCEL = 5000f; // p/s^2
 
-	public static final float ROBOT_MAX_KICK_DISTANCE = 1.5f; // Meters
-																// TODO
-																// CHECK
-																// THIS
+	public static final float ROBOT_MAX_KICK_DISTANCE = Globals.PITCH_WIDTH; // Meters
+	// TODO
+	// CHECK
+	// THIS
 
 	// For defining near corner, and near wall areas.
 	public final static double DISTANCE_TO_WALL = 0.1;
@@ -55,8 +55,10 @@ public class Globals {
 	public static final int MAXIMUM_MOTOR_SPEED = 900;
 
 	// Camera Info
-	public static final float CAMERA_HEIGHT = 2.0f; // Meters
-	public static final float ROBOT_HEIGHT = 0.2f; // Meters
+	public static final float P1_CAMERA_HEIGHT = 2.386f; // Meters
+	public static final float P0_CAMERA_HEIGHT = 2.421f; // Meters
+
+	public static final float ROBOT_HEIGHT = 0.18f; // Meters
 
 	public static float powerToVelocity(float p) {
 		if (p > MAXIMUM_MOTOR_SPEED)
