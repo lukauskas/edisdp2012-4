@@ -11,7 +11,6 @@ import balle.controller.Controller;
 import balle.main.drawable.Dot;
 import balle.strategy.executor.movement.MovementExecutor;
 import balle.world.Coord;
-import balle.world.Orientation;
 import balle.world.objects.Pitch;
 import balle.world.objects.Point;
 import balle.world.objects.Robot;
@@ -23,16 +22,15 @@ import balle.world.objects.StaticFieldObject;
  */
 public class GoToBall extends AbstractPlanner {
 
-    protected static final Logger LOG                     = Logger.getLogger(GoToBall.class);
+    protected static final Logger LOG = Logger.getLogger(GoToBall.class);
 
-    MovementExecutor              executorStrategy;
+    MovementExecutor executorStrategy;
 
-    private static final double   AVOIDANCE_GAP           = 0.5;                             // Meters
-    private static final double   OVERSHOOT_GAP           = 0.7;                             // Meters
-    private static final double   DIST_DIFF_THRESHOLD     = 0.2;                             // Meters
-    private static final double   OVERSHOOT_ANGLE_EPSILON = 50;                              // Degrees
+    private static final double AVOIDANCE_GAP = 0.5; // Meters
+    private static final double OVERSHOOT_GAP = 0.7; // Meters
+    private static final double DIST_DIFF_THRESHOLD = 0.2; // Meters
 
-    private boolean               approachTargetFromCorrectSide;
+    private boolean approachTargetFromCorrectSide;
 
     public GoToBall(MovementExecutor movementExecutor) {
         executorStrategy = movementExecutor;
@@ -202,26 +200,6 @@ public class GoToBall extends AbstractPlanner {
         return getOvershootTarget(target, overshootGap / 2.0);
     }
 
-    protected boolean isApproachingTargetFromCorrectSide(
-            StaticFieldObject target) {
-        Robot robot = getSnapshot().getBalle();
-
-        Orientation robotToTargetOrientation = target.getPosition()
-                .sub(robot.getPosition()).orientation();
-
-        if ((getSnapshot().getOpponentsGoal().isLeftGoal())
-                && (robotToTargetOrientation.degrees() > 90 + OVERSHOOT_ANGLE_EPSILON)
-                && (robotToTargetOrientation.degrees() < 270 - OVERSHOOT_ANGLE_EPSILON)) {
-            return true;
-        } else if ((getSnapshot().getOpponentsGoal().isRightGoal())
-                && ((robotToTargetOrientation.degrees() < 90 - OVERSHOOT_ANGLE_EPSILON) || (robotToTargetOrientation
-                        .degrees() > 270 + OVERSHOOT_ANGLE_EPSILON))) {
-            return true;
-        } else
-            return false;
-
-    }
-
     protected Point getAvoidanceTarget() {
         Coord pointAbove = calculateAvoidanceCoord(AVOIDANCE_GAP, true);
         Coord pointBelow = calculateAvoidanceCoord(AVOIDANCE_GAP, false);
@@ -280,7 +258,9 @@ public class GoToBall extends AbstractPlanner {
         executorStrategy.updateState(getSnapshot());
 
         if (shouldApproachTargetFromCorrectSide()
-                && (!isApproachingTargetFromCorrectSide(target))) {
+                && (!getSnapshot().getBalle()
+                        .isApproachingTargetFromCorrectSide(target,
+                                getSnapshot().getOpponentsGoal()))) {
             LOG.info("Approaching target from wrong side, calculating overshoot target");
             target = getOvershootTarget(target, OVERSHOOT_GAP);
             addDrawable(new Dot(target.getPosition(), Color.BLUE));

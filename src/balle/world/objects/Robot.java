@@ -248,6 +248,29 @@ public class Robot extends RectangularObject {
                 .intersects(pathToTarget3));
     }
 
+    public boolean isApproachingTargetFromCorrectSide(StaticFieldObject target,
+            Goal opponentsGoal) {
+        if (getPosition() == null)
+            return false;
+        if (target.getPosition() == null)
+            return true;
+
+        Orientation robotToTargetOrientation = target.getPosition()
+                .sub(getPosition()).orientation();
+
+        if (opponentsGoal.isLeftGoal()
+                && (robotToTargetOrientation.degrees() > 90 + Globals.OVERSHOOT_ANGLE_EPSILON)
+                && (robotToTargetOrientation.degrees() < 270 - Globals.OVERSHOOT_ANGLE_EPSILON)) {
+            return true;
+        } else if ((opponentsGoal.isRightGoal())
+                && ((robotToTargetOrientation.degrees() < 90 - Globals.OVERSHOOT_ANGLE_EPSILON) || (robotToTargetOrientation
+                        .degrees() > 270 + Globals.OVERSHOOT_ANGLE_EPSILON))) {
+            return true;
+        } else
+            return false;
+
+    }
+
     /**
      * TODO TEST!!!!!!
      * 
