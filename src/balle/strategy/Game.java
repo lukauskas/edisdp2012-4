@@ -122,8 +122,8 @@ public class Game extends AbstractPlanner {
             defensiveStrategy.step(controller);
             addDrawables(defensiveStrategy.getDrawables());
         } else if (ball.isNearWall(pitch)) {
-            LOG.info("Picking the ball from wall");
             pickBallFromWallStrategy.step(controller);
+            addDrawables(pickBallFromWallStrategy.getDrawables());
         } else if (ball.isNear(ourRobot)
                 && (ourRobot.isApproachingTargetFromCorrectSide(ball,
                         getSnapshot().getOpponentsGoal()))) {
@@ -135,14 +135,11 @@ public class Game extends AbstractPlanner {
                 // Go forward!
                 controller.setWheelSpeeds(400, 400);
             }
-        } else if (!ball.isNearWall(pitch)) {
-            // LOG.info("Approaching ball");
+        } else {
             // Approach ball
             goToBallStrategy.step(controller);
             addDrawables(goToBallStrategy.getDrawables());
 
-        } else {
-            LOG.warn("Don't know what to do!");
         }
 
     }

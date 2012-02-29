@@ -1,5 +1,7 @@
 package balle.strategy.planner;
 
+import java.awt.Color;
+
 import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
@@ -81,7 +83,7 @@ public class KickFromWall extends GoToBall {
 		}
 
 		if (!secondStep) {
-			LOG.info("Going to location");
+            LOG.info("Getting closer to the wall");
 
 			if (Math.abs(snap.getBalle().getPosition().getY()
 					- snap.getBall().getPosition().getY()) < 0.3
@@ -99,11 +101,11 @@ public class KickFromWall extends GoToBall {
 
 			if (snap.getBalle().getPosition()
 					.dist(snap.getBall().getPosition()) < 0.5) {
-				LOG.info("Going to ball normally");
+                LOG.info("Approaching the ball gently");
 				strategy = new GoToObject(new FaceAngle());
 				strategy.setStopDistance(0);
 			} else {
-				LOG.info("Going to ball with PFN");
+                LOG.info("Approaching the ball with PFN");
 				strategy = new GoToObjectPFN(0);
 			}
 			setExecutorStrategy(strategy);
@@ -124,4 +126,10 @@ public class KickFromWall extends GoToBall {
 			controller.kick();
 		super.step(controller);
 	}
+
+    @Override
+    protected Color getTargetColor() {
+        return Color.WHITE;
+    }
+
 }
