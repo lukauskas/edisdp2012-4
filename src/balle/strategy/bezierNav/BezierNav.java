@@ -88,19 +88,21 @@ public class BezierNav implements OrientedMovementExecutor {
 				.add(new Coord(-TARGET_PERIMETER, 0).rotate(orient));
 		System.out.println(state.getOpponentsGoal().getPosition());
 		double distS = rP.dist(tP) / 2;
-
+		if (rP == null || tP == null) {
+			return;
+		}
 		p0 = rP;
 		p1 = rP.add(state.getBalle().getOrientation().getUnitCoord()
 				.mult(distS / 4));
 		p2 = tP.add(orient.getOpposite().getUnitCoord().mult(distS));
 		p3 = tP;
 
-		System.out.println("----");
-		System.out.println("----");
-		System.out.println(pos(0));
-		System.out.println(vel(0));
-		System.out.println(accel(0));
-		System.out.println("----");
+		// System.out.println("----");
+		// System.out.println("----");
+		// System.out.println(pos(0));
+		// System.out.println(vel(0));
+		// System.out.println(accel(0));
+		// System.out.println("----");
 		// calculate turning radius
 		Coord a = accel(0);
 		Coord turnCenter = getCenterOfRotation(0);
@@ -118,6 +120,7 @@ public class BezierNav implements OrientedMovementExecutor {
 		System.out.println("center\t\t" + turnCenter);
 		// calcualte wheel speeds/powers
 		double max = Globals.powerToVelocity(Globals.MAXIMUM_MOTOR_SPEED);
+		// !!!!!!!!!!!double dd = p0.angleBetween(p1.sub(p0),
 		int v1, v2;
 		v1 = (int) Globals
 				.velocityToPower((float) (max * getMinVelocityRato(r)));
@@ -174,10 +177,7 @@ public class BezierNav implements OrientedMovementExecutor {
 
 	private double getMinVelocityRato(double radius) {
 		double rtw = Globals.ROBOT_TRACK_WIDTH / 2;
-		if (radius <= Globals.ROBOT_TRACK_WIDTH)
-			return 0;
-		else
-			return (radius - rtw) / (radius + rtw);
+		return (radius - rtw) / (radius + rtw);
 	}
 
 }

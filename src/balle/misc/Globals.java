@@ -31,7 +31,7 @@ public class Globals {
 																				// meters
 	public static final float VISION_ANGLE_NOISE_SD = 1.53f; // in
 																// degrees
-	public static final float SIMULATED_VISON_FRAMERATE = 5f;
+	public static final float SIMULATED_VISON_FRAMERATE = 25f;
 
 	public static final int MAXIMUM_MOTOR_SPEED = 900;
 
