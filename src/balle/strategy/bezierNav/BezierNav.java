@@ -9,6 +9,7 @@ import balle.main.drawable.Dot;
 import balle.main.drawable.Drawable;
 import balle.main.drawable.DrawableLine;
 import balle.misc.Globals;
+import balle.strategy.executor.movement.MovementExecutor;
 import balle.strategy.executor.movement.OrientedMovementExecutor;
 import balle.world.Coord;
 import balle.world.Line;
@@ -30,6 +31,12 @@ public class BezierNav implements OrientedMovementExecutor {
 
 	private float lwv;
 	private float rwv;
+
+	private MovementExecutor movementExecutor;
+
+	public BezierNav(MovementExecutor me) {
+		this.movementExecutor = me;
+	}
 
 	@Override
 	public void stop(Controller controller) {
