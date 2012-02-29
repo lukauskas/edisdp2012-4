@@ -130,7 +130,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 		resetBallPosition();
 
 		// create robots at either end of pitch
-		resetRobotPositions();
+		resetRobotPositions(true);
 
 		// Send the size of the pitch to the world
 		this.reader.propagatePitchSize();
@@ -548,25 +548,35 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 		w.createJoint(ballFriction);
 	}
 
-	public void resetRobotPositions() {
+	public void resetRobotPositions(boolean robot) {
 		World w = getWorld();
 
 		// If called when simulator is first created, just makes robots
 		// else, destroys old robots and makes new ones
+
 		if (blue != null) {
 			w.destroyBody(blue.getBody());
 			w.destroyBody(blue.kicker);
 		}
-		blue = new Robot(new Vec2((0.1f * scale), (float) (0.61 * scale)), 0f);
-		blueSoft.setBody(blue.getBody());
 
 		if (yellow != null) {
 			w.destroyBody(yellow.getBody());
 			w.destroyBody(yellow.kicker);
 		}
-		yellow = new Robot(new Vec2((float) (2.34 * scale),
-				(float) (0.61 * scale)), 180f);
+
+		if (robot) {
+			blue = new Robot(new Vec2((0.1f * scale), (float) (0.61 * scale)),
+					0f);
+			yellow = new Robot(new Vec2((float) (2.34 * scale),
+					(float) (0.61 * scale)), 180f);
+		} else {
+			blue = new Robot(new Vec2((float) (2.34 * scale),
+					(float) (0.61 * scale)), 180f);
+			yellow = new Robot(
+					new Vec2((0.1f * scale), (float) (0.61 * scale)), 0f);
+		}
+
+		blueSoft.setBody(blue.getBody());
 		yellowSoft.setBody(yellow.getBody());
 	}
-
 }

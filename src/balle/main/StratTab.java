@@ -26,16 +26,19 @@ public class StratTab extends JPanel implements ActionListener {
 	// GUI
 	private JPanel top;
 	private JPanel southPanel;
+	private JPanel mainPanel;
 	private JButton button;
 	private JButton randomButton;
 	private JButton resetButton;
 	private JButton noiseButton;
 	private JButton switchGoals;
+	private JButton switchRobot;
 	private JComboBox menu;
 	private JLabel label;
 
 	private ArrayList<String> stratTabs;
 	private String[] strings = new String[0];
+	private boolean toggle = false;
 
 	private StrategyRunner strategyRunner;
 	private Controller controller;
@@ -56,8 +59,10 @@ public class StratTab extends JPanel implements ActionListener {
 		// Class Variables
 		top = new JPanel();
 		southPanel = new JPanel();
+		mainPanel = new JPanel();
 		top.setLayout(new BorderLayout());
 		southPanel.setLayout(new BorderLayout());
+		mainPanel.setLayout(new BorderLayout());
 
 		stratTabs = new ArrayList<String>();
 
@@ -83,10 +88,18 @@ public class StratTab extends JPanel implements ActionListener {
 		switchGoals.addActionListener(this);
 		switchGoals.setActionCommand("goals");
 
+		switchRobot = new JButton("Switch Robot");
+		switchRobot.addActionListener(this);
+		switchRobot.setActionCommand("robot");
+
+		// mainPanel.add(BorderLayout.NORTH, top);
+		// mainPanel.add(BorderLayout.SOUTH, southPanel);
+
 		southPanel.add(BorderLayout.WEST, switchGoals);
-		southPanel.add(BorderLayout.NORTH, randomButton);
-		southPanel.add(BorderLayout.SOUTH, resetButton);
+		southPanel.add(BorderLayout.SOUTH, randomButton);
+		southPanel.add(BorderLayout.NORTH, resetButton);
 		southPanel.add(BorderLayout.EAST, noiseButton);
+		southPanel.add(BorderLayout.CENTER, switchRobot);
 
 		menu = new JComboBox(strings);
 
@@ -116,10 +129,12 @@ public class StratTab extends JPanel implements ActionListener {
 				}
 				button.setText("Stop");
 				switchGoals.setEnabled(false);
+				switchRobot.setEnabled(false);
 			} else {
 				button.setText("Start");
 				strategyRunner.stopStrategy();
 				switchGoals.setEnabled(true);
+				switchRobot.setEnabled(true);
 			}
 		} else if (event.getActionCommand().equals("randomise")) {
 			try {
@@ -157,6 +172,17 @@ public class StratTab extends JPanel implements ActionListener {
 			} else {
 				world.setGoalPosition(true);
 			}
+		} else if (event.getActionCommand().equals("robot")) {
+			simulator.resetBallPosition();
+			if (toggle) {
+				simulator.resetRobotPositions(true);
+				world.setGoalPosition(false);
+				toggle = false;
+			} else {
+				simulator.resetRobotPositions(false);
+				world.setGoalPosition(true);
+				toggle = true;
+			}
 		}
 	}
 
@@ -190,7 +216,7 @@ public class StratTab extends JPanel implements ActionListener {
 	}
 
 	public void resetRobots(Simulator s) {
-		s.resetRobotPositions();
+		s.resetRobotPositions(true);
 	}
 
 }
