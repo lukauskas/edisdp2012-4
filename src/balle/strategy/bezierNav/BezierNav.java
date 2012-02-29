@@ -78,7 +78,7 @@ public class BezierNav implements OrientedMovementExecutor {
 
 	@Override
 	public void step(Controller controller) {
-		controller.kick();
+		// controller.kick();
 		if (isFinished()) {
 			stop(controller);
 			return;
@@ -174,7 +174,10 @@ public class BezierNav implements OrientedMovementExecutor {
 
 	private double getMinVelocityRato(double radius) {
 		double rtw = Globals.ROBOT_TRACK_WIDTH / 2;
-		return (radius - rtw) / (radius + rtw);
+		if (radius <= Globals.ROBOT_TRACK_WIDTH)
+			return 0;
+		else
+			return (radius - rtw) / (radius + rtw);
 	}
 
 }
