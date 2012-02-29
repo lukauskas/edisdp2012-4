@@ -98,7 +98,7 @@ public class Orientation {
 	}
 
 	public Orientation getOpposite() {
-		return new Orientation(-radians(), true);
+		return new Orientation(radians() - Math.PI, true);
 	}
 
 	public Coord getUnitCoord() {

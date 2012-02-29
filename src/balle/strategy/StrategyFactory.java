@@ -13,6 +13,7 @@ import balle.strategy.planner.GoToBall;
 import balle.strategy.planner.GoToFaceBall;
 import balle.strategy.planner.KickFromWall;
 import balle.strategy.planner.SimpleGoToBall;
+import balle.strategy.planner.SimpleGoToBallFaceGoal;
 
 public class StrategyFactory {
 	public static String[] availableDesignators() {
@@ -33,7 +34,7 @@ public class StrategyFactory {
 		} else if (designator.equals("GoToBallPFOnly")) {
 			return new SimpleGoToBall(new GoToObjectPurePF());
 		} else if (designator.equals("BezierNav")) {
-			return new SimpleGoToBall(new BezierNav());
+			return new SimpleGoToBallFaceGoal(new BezierNav());
 		} else if (designator.equals("GoToBall")) {
 			return new GoToBall(new GoToObject(new FaceAngle()), true);
 		} else if (designator.equals("GoToFaceBall")) {

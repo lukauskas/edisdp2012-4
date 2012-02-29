@@ -8,18 +8,23 @@ import balle.main.drawable.Circle;
 import balle.main.drawable.Dot;
 import balle.main.drawable.Drawable;
 import balle.misc.Globals;
-import balle.strategy.executor.movement.MovementExecutor;
+import balle.strategy.executor.movement.OrientedMovementExecutor;
 import balle.world.Coord;
+import balle.world.Orientation;
 import balle.world.Snapshot;
 import balle.world.objects.StaticFieldObject;
 
-public class BezierNav implements MovementExecutor {
+public class BezierNav implements OrientedMovementExecutor {
+
+	private final double TARGET_PERIMETER = Math.sqrt(Math.pow(
+			Globals.ROBOT_LENGTH, 2) + Math.pow(Globals.ROBOT_WIDTH, 2)) / 2;
 
 	private StaticFieldObject target;
 	private Snapshot state;
-	private double stopDistance = 0.02;
+	private double stopDistance = 0.017;
 
 	private Coord p0, p1, p2, p3;
+	private Orientation orient;
 
 	@Override
 	public void stop(Controller controller) {
@@ -38,6 +43,10 @@ public class BezierNav implements MovementExecutor {
 				c = Color.GRAY;
 			l.add(new Dot(pos(t), c));
 		}
+		l.add(new Circle(p0, 0.05, Color.pink));
+		l.add(new Circle(p1, 0.05, Color.black));
+		l.add(new Circle(p2, 0.05, Color.black));
+		l.add(new Circle(p3, 0.05, Color.pink));
 		Coord center = getCenterOfRotation(0);
 		l.add(new Dot(center, Color.BLACK));
 		l.add(new Circle(center, center.dist(state.getBalle().getPosition()),
@@ -46,8 +55,9 @@ public class BezierNav implements MovementExecutor {
 	}
 
 	@Override
-	public void updateTarget(StaticFieldObject target) {
+	public void updateTarget(StaticFieldObject target, Orientation o) {
 		this.target = target;
+		this.orient = o;
 	}
 
 	@Override
@@ -68,19 +78,21 @@ public class BezierNav implements MovementExecutor {
 
 	@Override
 	public void step(Controller controller) {
+		controller.kick();
 		if (isFinished()) {
 			stop(controller);
 			return;
 		}
 		// calculate bezier points 0 to 3
 		Coord rP = state.getBalle().getPosition(), tP = target.getPosition()
-				.add(new Coord(0, 0.15));
+				.add(new Coord(-TARGET_PERIMETER, 0).rotate(orient));
+		System.out.println(state.getOpponentsGoal().getPosition());
 		double distS = rP.dist(tP) / 2;
 
 		p0 = rP;
 		p1 = rP.add(state.getBalle().getOrientation().getUnitCoord()
 				.mult(distS / 4));
-		p2 = tP.add(new Coord(0, 1).mult(distS));
+		p2 = tP.add(orient.getOpposite().getUnitCoord().mult(distS));
 		p3 = tP;
 
 		System.out.println("----");
