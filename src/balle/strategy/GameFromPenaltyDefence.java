@@ -3,6 +3,7 @@ package balle.strategy;
 import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
+import balle.world.Coord;
 
 public class GameFromPenaltyDefence extends Game {
 
@@ -21,12 +22,18 @@ public class GameFromPenaltyDefence extends Game {
 
 	public boolean isStillInPenaltyDefence() {
 
-		if ((getSnapshot().getBall().getPosition().getY() < getSnapshot()
-				.getOwnGoal().getMaxY())
-				&& (getSnapshot().getBall().getPosition().getY() > getSnapshot()
-						.getOwnGoal().getMinY())
-				&& (getSnapshot().getBall().getPosition().getX() > 0)
-				&& (getSnapshot().getBall().getPosition().getX() < 0.6)) {
+		Coord ball = getSnapshot().getBall().getPosition();
+		double minX = 0;
+		double maxX = 0.75;
+		if (!getSnapshot().getOwnGoal().isLeftGoal()) {
+			maxX = getSnapshot().getPitch().getMaxX();
+			minX = maxX - 0.75;
+		}
+
+		if (ball.isEstimated()
+				|| (ball.getY() < getSnapshot().getOwnGoal().getMaxY())
+				&& (ball.getY() > getSnapshot().getOwnGoal().getMinY())
+				&& (ball.getX() > minX) && (ball.getX() < maxX)) {
 
 			return true;
 		}
@@ -72,9 +79,9 @@ public class GameFromPenaltyDefence extends Game {
 			First = false;
 		}
 
-		if (robot > top - 0.1)
+		if (robot > top - 0.2)
 			controller.setWheelSpeeds(-400, -400);
-		if (robot < bottom + 0.1)
+		if (robot < bottom + 0.2)
 			controller.setWheelSpeeds(400, 400);
 
 		/*
