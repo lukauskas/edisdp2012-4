@@ -12,11 +12,11 @@ public class Globals {
     public static final float ROBOT_TRACK_WIDTH = 0.155f; // Meters
     public static final float ROBOT_WHEEL_DIAMETER = 0.0816f; // Meters
 
-	public static final Vec2 ROBOT_LEFT_WHEEL_POS = new Vec2(
-			-ROBOT_TRACK_WIDTH / 2, 0);
+	public static final Vec2 ROBOT_LEFT_WHEEL_POS = new Vec2(0,
+			-ROBOT_TRACK_WIDTH / 2);
 
-	public static final Vec2 ROBOT_RIGHT_WHEEL_POS = new Vec2(
-			ROBOT_TRACK_WIDTH / 2, 0);
+	public static final Vec2 ROBOT_RIGHT_WHEEL_POS = new Vec2(0,
+			ROBOT_TRACK_WIDTH / 2);
 
     public static final float ROBOT_MAX_KICK_DISTANCE = Globals.PITCH_WIDTH; // Meters
     // TODO
