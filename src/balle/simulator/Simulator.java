@@ -46,6 +46,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 	private final SoftBot yellowSoft = new SoftBot();
 
 	private long startTime;
+	private long lastStepTime;
 
 	private CircleShape ballShape;
 	private final Random rand = new Random();
@@ -87,7 +88,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 	@Override
 	public void initTest(boolean arg0) {
 
-		startTime = System.currentTimeMillis();
+		lastStepTime = startTime = System.currentTimeMillis();
 
 		// centre the camera
 		setCamera(new Vec2(1.22f * scale, 1.22f * scale),
@@ -143,8 +144,9 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 
 	@Override
 	public void update() {
-		blue.updateRobot(blueSoft);
-		yellow.updateRobot(yellowSoft);
+		long dt = System.currentTimeMillis() - lastStepTime;
+		blue.updateRobot(blueSoft, dt);
+		yellow.updateRobot(yellowSoft, dt);
 		super.update();
 
 		// Update world with new information, throtteling the frame rate
@@ -201,7 +203,6 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 		private final Body kicker;
 
 		private final Body robot;
-
 		private final float robotWidth = Globals.ROBOT_WIDTH * scale / 2;
 		private final float robotLength = Globals.ROBOT_LENGTH * scale / 2;
 
@@ -211,6 +212,9 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 		private Vec2 kickPos = new Vec2((robotLength + kickerLength), 0);
 		private final PolygonShape kickerShape;
 		private static final float kickForce = 20f;
+
+		private float lastRPower;
+		private float lastLPower;
 
 		// wheel power (-1 for lock and 0 for float and (0,100] for power )
 
@@ -273,7 +277,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 					kicker.getTransform());
 		}
 
-		public void updateRobot(SoftBot bot) {
+		public void updateRobot(SoftBot bot, long dt) {
 
 			double blueAng = robot.getAngle();
 
@@ -291,8 +295,8 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 				}
 			}
 
-			float vl = linearVelocity(bot) * scale; // linear velocity
-			float va = angularVelocityRadians(bot); // angular velocity
+			float vl = linearVelocity(bot, dt) * scale; // linear velocity
+			float va = angularVelocityRadians(bot, dt); // angular velocity
 			robot.setLinearVelocity(new Vec2((float) (vl * Math.cos(blueAng)),
 					(float) (vl * Math.sin(blueAng))));
 			;
@@ -313,17 +317,108 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 			return robot;
 		}
 
-		private float angularVelocityRadians(SoftBot bot) {
-			float vl = Globals.powerToVelocity(bot.getLeftWheelSpeed());
-			float vr = Globals.powerToVelocity(bot.getRightWheelSpeed());
-			float w = Globals.ROBOT_TRACK_WIDTH;
-			return (vr - vl) / w;
+		private float getSlipableWheelVelocity(SoftBot bot,
+				float nonSlipVelocity, Vec2 wheelPos, long dt) {
+			// current velocity of wheel
+			Vec2 unitForward = new Vec2((float) Math.cos(bot.getBody()
+					.getAngle()), (float) Math.sin(bot.getBody().getAngle()));
+			float vi = Vec2.dot(
+					bot.getBody().getLinearVelocityFromLocalPoint(wheelPos),
+					unitForward) / scale;
+
+			// no-slip velocity
+			float vf = nonSlipVelocity;
+
+			// find acceleration of wheel
+			// NOTE: must convert dt to seconds (td/1000)
+			float dts = dt / 1000f;
+			float a = (vf - vi) / dts;
+			// Account for slip
+			// if above maximum (Globals.MaxWheelAccel)
+			if (Math.abs(a) > Globals.MaxWheelAccel) {
+				// use Globals.WheelSlipAccel to calculate velocities
+				float slipAccel = Globals.SlipWheelAccel;
+				if (a < 0)
+					slipAccel = -slipAccel;
+				vf = vi + (dts * slipAccel);
+			}
+
+			return vf;
 		}
 
-		private float linearVelocity(SoftBot bot) {
-			float vl = Globals.powerToVelocity(bot.getLeftWheelSpeed());
-			float vr = Globals.powerToVelocity(bot.getRightWheelSpeed());
-			return (vl + vr) / 2f;
+		private float getLeftWheelVelocity(SoftBot bot, long dt) {
+			float p = bot.getLeftWheelSpeed();
+			float a = (p - lastLPower) / dt;
+			float maxA = Globals.MAX_MOTOR_POWER_ACCEL;
+			// System.out.println("lw a:" + a + "lw p: " + p);
+			if (Math.abs(a) > maxA) {
+				if (a > 0) {
+					p = lastLPower + (maxA * dt);
+				} else {
+					p = lastLPower - (maxA * dt);
+				}
+			}
+			return getSlipableWheelVelocity(bot, Globals.powerToVelocity(p),
+					Globals.ROBOT_RIGHT_WHEEL_POS, dt);
+		}
+
+		private float getRightWheelVelocity(SoftBot bot, long dt) {
+			float p = bot.getRightWheelSpeed();
+			float a = (p - lastRPower) / dt;
+			float maxA = Globals.MAX_MOTOR_POWER_ACCEL;
+			if (Math.abs(a) > maxA) {
+				if (a > 0) {
+					p = lastRPower + (maxA * dt);
+				} else {
+					p = lastRPower - (maxA * dt);
+				}
+			}
+			return getSlipableWheelVelocity(bot, Globals.powerToVelocity(p),
+					Globals.ROBOT_RIGHT_WHEEL_POS, dt);
+		}
+
+		private float angularVelocityRadians(SoftBot bot, long dt) {
+			float vl = getLeftWheelVelocity(bot, dt);
+			float vr = getRightWheelVelocity(bot, dt);
+			float w = Globals.ROBOT_TRACK_WIDTH;
+			float avf = (vr - vl) / w; // final (new) angualar velocity
+			// cap accleration
+			float maxA = Globals.MAX_ROBOT_ANG_ACCEL;
+			float avi = bot.getBody().getAngularVelocity(); // current angular
+															// velocity
+			float a = (avf - avi) / dt; // angular acceleration
+			// if (Math.abs(a) > Globals.MAX_ROBOT_ANG_ACCEL
+			// && (Math.abs(avi) > Math.abs(avf))) {
+			// System.out.println("Ang Accel above max. Accel: " + a);
+			// if (a > 0) {
+			// avf = avi + (maxA * dt);
+			// } else {
+			// avf = avi - (maxA * dt);
+			// }
+			// }
+			return avf;
+		}
+
+		private float linearVelocity(SoftBot bot, long dt) {
+			float vl = getLeftWheelVelocity(bot, dt);
+			float vr = getRightWheelVelocity(bot, dt);
+			float vlf = (vl + vr) / 2f;
+			// cap accleration
+			float maxA = Globals.MAX_ROBOT_ANG_ACCEL;
+			float vli = bot.getBody().getAngularVelocity(); // current angular
+															// velocity
+															// float a = (vlf -
+															// vli) / dt; //
+															// angular
+															// acceleration
+			// if (Math.abs(a) > Globals.MAX_ROBOT_LINEAR_ACCEL) {
+			// if (a > 0) {
+			// vlf = vli + (maxA * dt);
+			// } else {
+			// vlf = vli - (maxA * dt);
+			// }
+			// }
+			return vlf;
 		}
 	}
 

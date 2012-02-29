@@ -1,14 +1,33 @@
 package balle.misc;
 
+import org.jbox2d.common.Vec2;
+
 import balle.world.objects.Pitch;
 
 public class Globals {
 
+	public static final float ROBOT_WHEEL_DIAMETER = 0.0816f; // Meters public
+																// static final
+																// Vec2
+																// ROBOT_LEFT_WHEEL_POS
+																// = new
+																// Vec2(-ROBOT_TRACK_WIDTH/2,
+																// 0);
+
 	public static final float BALL_RADIUS = 0.02135f;
 	public static final float ROBOT_WIDTH = 0.15f;
 	public static final float ROBOT_LENGTH = 0.2f;
-	public static final float ROBOT_TRACK_WIDTH = 0.155f; // Meters
-	public static final float ROBOT_WHEEL_DIAMETER = 0.0816f; // Meters
+	public static final float ROBOT_TRACK_WIDTH = 0.15f; // TODO CHECK THIS
+	public static final Vec2 ROBOT_LEFT_WHEEL_POS = new Vec2(
+			-ROBOT_TRACK_WIDTH / 2, 0);
+	public static final Vec2 ROBOT_RIGHT_WHEEL_POS = new Vec2(
+			ROBOT_TRACK_WIDTH / 2, 0);
+	public static final float MaxWheelAccel = 0.019f; // m/s^2 good value around
+														// 0.005 ish
+	public static final float SlipWheelAccel = MaxWheelAccel * 0.6f;
+	public static final float MAX_ROBOT_LINEAR_ACCEL = 0.4f; // m/s^2
+	public static final float MAX_ROBOT_ANG_ACCEL = 0.0007f; // r/s^2
+	public static final float MAX_MOTOR_POWER_ACCEL = 5000f; // p/s^2
 
 	public static final float ROBOT_MAX_KICK_DISTANCE = 1.5f; // Meters
 																// TODO

@@ -7,9 +7,11 @@ import balle.controller.Controller;
 import balle.main.drawable.Circle;
 import balle.main.drawable.Dot;
 import balle.main.drawable.Drawable;
+import balle.main.drawable.DrawableLine;
 import balle.misc.Globals;
 import balle.strategy.executor.movement.OrientedMovementExecutor;
 import balle.world.Coord;
+import balle.world.Line;
 import balle.world.Orientation;
 import balle.world.Snapshot;
 import balle.world.objects.StaticFieldObject;
@@ -25,6 +27,9 @@ public class BezierNav implements OrientedMovementExecutor {
 
 	private Coord p0, p1, p2, p3;
 	private Orientation orient;
+
+	private float lwv;
+	private float rwv;
 
 	@Override
 	public void stop(Controller controller) {
@@ -51,6 +56,17 @@ public class BezierNav implements OrientedMovementExecutor {
 		l.add(new Dot(center, Color.BLACK));
 		l.add(new Circle(center, center.dist(state.getBalle().getPosition()),
 				Color.yellow));
+
+		Coord lwpos = new Coord(Globals.ROBOT_LEFT_WHEEL_POS.x,
+				Globals.ROBOT_LEFT_WHEEL_POS.y).rotate(p1.sub(p0)
+				.getOrientation());
+		Coord rwpos = new Coord(Globals.ROBOT_RIGHT_WHEEL_POS.x,
+				Globals.ROBOT_RIGHT_WHEEL_POS.y).rotate(p1.sub(p0)
+				.getOrientation());
+		l.add(new DrawableLine(new Line(p0.add(lwpos), p0.add(lwpos).add(
+				p1.getUnitCoord().mult(lwv))), Color.CYAN));
+		l.add(new DrawableLine(new Line(p0.add(rwpos), p0.add(rwpos).add(
+				p1.getUnitCoord().mult(rwv))), Color.CYAN));
 		return l;
 	}
 
@@ -86,7 +102,6 @@ public class BezierNav implements OrientedMovementExecutor {
 		// calculate bezier points 0 to 3
 		Coord rP = state.getBalle().getPosition(), tP = target.getPosition()
 				.add(new Coord(-TARGET_PERIMETER, 0).rotate(orient));
-		System.out.println(state.getOpponentsGoal().getPosition());
 		double distS = rP.dist(tP) / 2;
 		if (rP == null || tP == null) {
 			return;
@@ -115,9 +130,9 @@ public class BezierNav implements OrientedMovementExecutor {
 				state.getBalle().getOrientation().getUnitCoord(), a)
 				.atan2styleradians() > 0;
 		double r = turnCenter.dist(pos(0));
-		System.out.println("r: " + r);
-		System.out.println((isLeft ? "left" : "right"));
-		System.out.println("center\t\t" + turnCenter);
+		// System.out.println("r: " + r);
+		// System.out.println((isLeft ? "left" : "right"));
+		// System.out.println("center\t\t" + turnCenter);
 		// calcualte wheel speeds/powers
 		double max = Globals.powerToVelocity(Globals.MAXIMUM_MOTOR_SPEED);
 		// !!!!!!!!!!!double dd = p0.angleBetween(p1.sub(p0),
@@ -126,13 +141,19 @@ public class BezierNav implements OrientedMovementExecutor {
 				.velocityToPower((float) (max * getMinVelocityRato(r)));
 		v2 = (int) Globals.velocityToPower((float) max);
 
-		System.out.println("v1,v2\t\t" + v1 + "\t" + v2);
+		// System.out.println("l, r\t\t" + (isLeft ? v1 : v2) + "\t"
+		// + (isLeft ? v2 : v1));
 		// apply wheel speeds
 		if (true) {
-			if (isLeft)
+			if (isLeft) {
 				controller.setWheelSpeeds(v1, v2);
-			else
+				lwv = v1 / 10;
+				lwv = v2 / 10;
+			} else {
 				controller.setWheelSpeeds(v2, v1);
+				lwv = v2 / 10;
+				lwv = v1 / 10;
+			}
 		}
 
 	}
@@ -177,7 +198,7 @@ public class BezierNav implements OrientedMovementExecutor {
 
 	private double getMinVelocityRato(double radius) {
 		double rtw = Globals.ROBOT_TRACK_WIDTH / 2;
-		return (radius - rtw) / (radius + rtw);
+		return ((radius - rtw) / (radius + rtw)) / 8;
 	}
 
 }
