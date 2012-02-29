@@ -57,16 +57,15 @@ public class BezierNav implements OrientedMovementExecutor {
 		l.add(new Circle(center, center.dist(state.getBalle().getPosition()),
 				Color.yellow));
 
+		Orientation rO = p1.sub(p0).getOrientation();
 		Coord lwpos = new Coord(Globals.ROBOT_LEFT_WHEEL_POS.x,
-				Globals.ROBOT_LEFT_WHEEL_POS.y).rotate(p1.sub(p0)
-				.getOrientation());
-		Coord rwpos = new Coord(Globals.ROBOT_RIGHT_WHEEL_POS.x,
-				Globals.ROBOT_RIGHT_WHEEL_POS.y).rotate(p1.sub(p0)
-				.getOrientation());
+				Globals.ROBOT_LEFT_WHEEL_POS.y).rotate(rO);
 		l.add(new DrawableLine(new Line(p0.add(lwpos), p0.add(lwpos).add(
-				p1.getUnitCoord().mult(lwv))), Color.CYAN));
+				p1.getUnitCoord().mult(lwv / 1000))), Color.BLACK));
+		Coord rwpos = new Coord(Globals.ROBOT_RIGHT_WHEEL_POS.x,
+				Globals.ROBOT_RIGHT_WHEEL_POS.y).rotate(rO);
 		l.add(new DrawableLine(new Line(p0.add(rwpos), p0.add(rwpos).add(
-				p1.getUnitCoord().mult(rwv))), Color.CYAN));
+				p1.getUnitCoord().mult(rwv / 1000))), Color.BLACK));
 		return l;
 	}
 
@@ -147,12 +146,12 @@ public class BezierNav implements OrientedMovementExecutor {
 		if (true) {
 			if (isLeft) {
 				controller.setWheelSpeeds(v1, v2);
-				lwv = v1 / 10;
-				lwv = v2 / 10;
+				lwv = v1;
+				lwv = v2;
 			} else {
 				controller.setWheelSpeeds(v2, v1);
-				lwv = v2 / 10;
-				lwv = v1 / 10;
+				lwv = v2;
+				lwv = v1;
 			}
 		}
 
@@ -198,7 +197,7 @@ public class BezierNav implements OrientedMovementExecutor {
 
 	private double getMinVelocityRato(double radius) {
 		double rtw = Globals.ROBOT_TRACK_WIDTH / 2;
-		return ((radius - rtw) / (radius + rtw)) / 8;
+		return ((radius - rtw) / (radius + rtw));
 	}
 
 }
