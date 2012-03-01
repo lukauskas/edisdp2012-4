@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import balle.controller.Controller;
 import balle.main.drawable.Drawable;
 import balle.misc.Globals;
-import balle.strategy.curve.Bezier4;
 import balle.strategy.curve.Curve;
+import balle.strategy.curve.Interpolator;
 import balle.strategy.executor.movement.MovementExecutor;
 import balle.strategy.executor.movement.OrientedMovementExecutor;
 import balle.world.Coord;
@@ -27,9 +27,10 @@ public class CurveNav implements OrientedMovementExecutor {
 	private Curve curve;
 	private Orientation orient;
 
+	private Interpolator interpolator;
 	private MovementExecutor movementExecutor;
 
-	public CurveNav(MovementExecutor me) {
+	public CurveNav(Interpolator interpolator, MovementExecutor me) {
 		this.movementExecutor = me;
 	}
 
@@ -112,6 +113,6 @@ public class CurveNav implements OrientedMovementExecutor {
 				tP.add(orient.getOpposite().getUnitCoord().mult(distS)), tP,
 		};
 
-		return new Bezier4(controls);
+		return interpolator.getCurve(controls);
 	}
 }
