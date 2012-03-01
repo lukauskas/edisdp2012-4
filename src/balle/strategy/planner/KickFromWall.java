@@ -28,65 +28,67 @@ public class KickFromWall extends GoToBall {
 		// TODO Auto-generated constructor stub
 	}
 
-	public Coord calculateNearWallCoord() {
+	public Coord calculateNearWallCoord(Snapshot snapshot) {
 		// TODO Auto-generated method stub
 
-		if (getSnapshot() == null)
+		if (snapshot == null)
 			return null;
-		Snapshot snap = getSnapshot();
 
 		double targetX, targetY;
 		boolean isBottom;
 
-		if (snap.getOpponentsGoal().getPosition().getX() < snap.getPitch()
+		if (snapshot.getOpponentsGoal().getPosition().getX() < snapshot
+				.getPitch()
 				.getMaxX() / 2) {
-			if (snap.getBall().getPosition().getY() < snap.getPitch().getMaxY() / 2) {
-				targetX = snap.getBall().getPosition().getX() + 0.4;
-				targetY = snap.getBall().getPosition().getY() + 0.13;
+			if (snapshot.getBall().getPosition().getY() < snapshot.getPitch()
+					.getMaxY() / 2) {
+				targetX = snapshot.getBall().getPosition().getX() + 0.4;
+				targetY = snapshot.getBall().getPosition().getY() + 0.13;
 				isBottom = true;
 			} else {
-				targetX = snap.getBall().getPosition().getX() + 0.4;
-				targetY = snap.getBall().getPosition().getY() - 0.13;
+				targetX = snapshot.getBall().getPosition().getX() + 0.4;
+				targetY = snapshot.getBall().getPosition().getY() - 0.13;
 				isBottom = false;
 			}
 		} else {
-			if (snap.getBall().getPosition().getY() < snap.getPitch().getMaxY() / 2) {
-				targetX = snap.getBall().getPosition().getX() - 0.4;
-				targetY = snap.getBall().getPosition().getY() + 0.13;
+			if (snapshot.getBall().getPosition().getY() < snapshot.getPitch()
+					.getMaxY() / 2) {
+				targetX = snapshot.getBall().getPosition().getX() - 0.4;
+				targetY = snapshot.getBall().getPosition().getY() + 0.13;
 				isBottom = true;
 			} else {
-				targetX = snap.getBall().getPosition().getX() - 0.4;
-				targetY = snap.getBall().getPosition().getY() - 0.13;
+				targetX = snapshot.getBall().getPosition().getX() - 0.4;
+				targetY = snapshot.getBall().getPosition().getY() - 0.13;
 				isBottom = false;
 			}
 		}
 
 		Coord loc = new Coord(targetX, targetY);
-		Coord loc2 = snap.getBall().getPosition();
+		Coord loc2 = snapshot.getBall().getPosition();
 		Coord loc3;
 
 		if (isBottom) {
-			loc3 = new Coord(snap.getBall().getPosition().getX(), snap
+			loc3 = new Coord(snapshot.getBall().getPosition().getX(), snapshot
 					.getBall().getPosition().getY() + 0.3);
 		} else {
-			loc3 = new Coord(snap.getBall().getPosition().getX(), snap
+			loc3 = new Coord(snapshot.getBall().getPosition().getX(), snapshot
 					.getBall().getPosition().getY() - 0.3);
 		}
 
-		LOG.trace(snap.getBalle().getPosition().dist(loc3));
+		LOG.trace(snapshot.getBalle().getPosition().dist(loc3));
 
-		if (snap.getBalle().getPosition().dist(loc3) < 0.15)
+		if (snapshot.getBalle().getPosition().dist(loc3) < 0.15)
 			additionalStep = true;
 
-		if (snap.getBalle().getPosition().dist(loc) < 0.15) {
+		if (snapshot.getBalle().getPosition().dist(loc) < 0.15) {
 			secondStep = true;
 		}
 
 		if (!secondStep) {
             LOG.info("Getting closer to the wall");
 
-			if (Math.abs(snap.getBalle().getPosition().getY()
-					- snap.getBall().getPosition().getY()) < 0.3
+			if (Math.abs(snapshot.getBalle().getPosition().getY()
+					- snapshot.getBall().getPosition().getY()) < 0.3
 					&& !additionalStep) {
 				return loc3;
 			} else {
@@ -99,8 +101,8 @@ public class KickFromWall extends GoToBall {
 
 			MovementExecutor strategy;
 
-			if (snap.getBalle().getPosition()
-					.dist(snap.getBall().getPosition()) < 0.5) {
+			if (snapshot.getBalle().getPosition()
+					.dist(snapshot.getBall().getPosition()) < 0.5) {
                 LOG.info("Approaching the ball gently");
 				strategy = new GoToObject(new FaceAngle());
 				strategy.setStopDistance(0);
@@ -114,17 +116,17 @@ public class KickFromWall extends GoToBall {
 	}
 
 	@Override
-	protected StaticFieldObject getTarget() {
-		Coord nearWallCoord = calculateNearWallCoord();
+	protected StaticFieldObject getTarget(Snapshot snapshot) {
+		Coord nearWallCoord = calculateNearWallCoord(snapshot);
 		return new Point(nearWallCoord);
 	}
 
 	@Override
-	public void step(Controller controller) {
-		if (getSnapshot().getBall().isNear(getSnapshot().getBalle())
+	public void step(Controller controller, Snapshot snapshot) {
+		if (snapshot.getBall().isNear(snapshot.getBalle())
 				&& goingToBall)
 			controller.kick();
-		super.step(controller);
+		super.step(controller, snapshot);
 	}
 
     @Override

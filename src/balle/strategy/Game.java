@@ -56,9 +56,8 @@ public class Game extends AbstractPlanner {
     }
 
     @Override
-    public void step(Controller controller) {
+    public void step(Controller controller, Snapshot snapshot) {
 
-        Snapshot snapshot = getSnapshot();
         Robot ourRobot = snapshot.getBalle();
         Robot opponent = snapshot.getOpponent();
         Ball ball = snapshot.getBall();
@@ -99,7 +98,7 @@ public class Game extends AbstractPlanner {
                             .findMaxRotationMaintaintingPossession(ball, true);
                     System.out.println(orien);
                     turningExecutor.setTargetOrientation(orien);
-                    turningExecutor.step(controller);
+					turningExecutor.step(controller, snapshot);
                     if (ourRobot.findMaxRotationMaintaintingPossession(ball,
                             true).degrees() < 10)
                         controller.kick();
@@ -109,7 +108,7 @@ public class Game extends AbstractPlanner {
                             .findMaxRotationMaintaintingPossession(ball, false);
                     System.out.println(orien);
                     turningExecutor.setTargetOrientation(orien);
-                    turningExecutor.step(controller);
+					turningExecutor.step(controller, snapshot);
                     if (ourRobot.findMaxRotationMaintaintingPossession(ball,
                             false).degrees() > -10)
                         controller.kick();
@@ -119,25 +118,25 @@ public class Game extends AbstractPlanner {
                 && (opponent.isFacingGoal(ownGoal))) {
             LOG.info("Defending");
             // Let defensiveStrategy deal with it!
-            defensiveStrategy.step(controller);
+			defensiveStrategy.step(controller, snapshot);
             addDrawables(defensiveStrategy.getDrawables());
         } else if (ball.isNearWall(pitch)) {
-            pickBallFromWallStrategy.step(controller);
+			pickBallFromWallStrategy.step(controller, snapshot);
             addDrawables(pickBallFromWallStrategy.getDrawables());
         } else if (ball.isNear(ourRobot)
                 && (ourRobot.isApproachingTargetFromCorrectSide(ball,
-                        getSnapshot().getOpponentsGoal()))) {
+						snapshot.getOpponentsGoal()))) {
             if (Math.abs(ourRobot.getAngleToTurn(targetOrientation)) > (Math.PI / 4)) {
                 LOG.info("Ball is near our robot, turning to it");
                 turningExecutor.setTargetOrientation(targetOrientation);
-                turningExecutor.step(controller);
+				turningExecutor.step(controller, snapshot);
             } else {
                 // Go forward!
                 controller.setWheelSpeeds(400, 400);
             }
         } else {
             // Approach ball
-            goToBallStrategy.step(controller);
+			goToBallStrategy.step(controller, snapshot);
             addDrawables(goToBallStrategy.getDrawables());
 
         }

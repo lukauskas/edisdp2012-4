@@ -3,6 +3,7 @@ package balle.strategy;
 import balle.controller.Controller;
 import balle.strategy.planner.AbstractPlanner;
 import balle.world.Coord;
+import balle.world.Snapshot;
 import balle.world.objects.FieldObject;
 import balle.world.objects.Robot;
 
@@ -13,16 +14,16 @@ public class Blocking extends AbstractPlanner {
     private boolean goingBackward = false;
 
     @Override
-    public void step(Controller controller) {
-        if (getSnapshot() == null) {
+    public void step(Controller controller, Snapshot snapshot) {
+		if (snapshot == null) {
             System.out.println("No Snapshot");
             return;
         }
 
-        FieldObject ball = getSnapshot().getBall();
+		FieldObject ball = snapshot.getBall();
         Coord target = (ball != null) ? ball.getPosition() : null;
 
-        Robot robot = getSnapshot().getBalle();
+		Robot robot = snapshot.getBalle();
         Coord currentPosition = robot != null ? robot.getPosition() : null;
 
         double angleToTarget = target.sub(robot.getPosition()).orientation()

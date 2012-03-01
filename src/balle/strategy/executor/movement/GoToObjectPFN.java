@@ -112,7 +112,7 @@ public class GoToObjectPFN implements MovementExecutor {
     }
 
     @Override
-    public void step(Controller controller) {
+    public void step(Controller controller, Snapshot snapshot) {
         if (!isPossible())
             return;
 

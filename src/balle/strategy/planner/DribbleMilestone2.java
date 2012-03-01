@@ -21,8 +21,7 @@ public class DribbleMilestone2 extends AbstractPlanner {
     }
 
     @Override
-    public void step(Controller controller) {
-        Snapshot snapshot = getSnapshot();
+    public void step(Controller controller, Snapshot snapshot) {
         executor.updateState(snapshot);
 
         if (startingCoordinate == null) {
@@ -42,7 +41,7 @@ public class DribbleMilestone2 extends AbstractPlanner {
                 return;
 
             if (currentCoordinate.dist(startingCoordinate) < DISTANCE_TO_TRAVEL) {
-                executor.step(controller);
+				executor.step(controller, snapshot);
             } else {
                 LOG.info("Distance travelled. Finishing");
                 executor.stop(controller);

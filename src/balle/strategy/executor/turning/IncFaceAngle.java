@@ -2,6 +2,7 @@ package balle.strategy.executor.turning;
 
 import balle.controller.Controller;
 import balle.world.Orientation;
+import balle.world.Snapshot;
 
 /**
  * Incremental FaceAngle, Turns in increments.
@@ -45,7 +46,7 @@ public class IncFaceAngle extends FaceAngle {
     }
 
     @Override
-    public void step(Controller controller) {
+    public void step(Controller controller, Snapshot snapshot) {
         if (!isPossible() || !isTurning())
             return;
 

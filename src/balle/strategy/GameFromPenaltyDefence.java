@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
 import balle.world.Coord;
+import balle.world.Snapshot;
 
 public class GameFromPenaltyDefence extends Game {
 
@@ -20,19 +21,19 @@ public class GameFromPenaltyDefence extends Game {
 		super();
 	}
 
-	public boolean isStillInPenaltyDefence() {
+	public boolean isStillInPenaltyDefence(Snapshot snapshot) {
 
-		Coord ball = getSnapshot().getBall().getPosition();
+		Coord ball = snapshot.getBall().getPosition();
 		double minX = 0;
 		double maxX = 0.75;
-		if (!getSnapshot().getOwnGoal().isLeftGoal()) {
-			maxX = getSnapshot().getPitch().getMaxX();
+		if (!snapshot.getOwnGoal().isLeftGoal()) {
+			maxX = snapshot.getPitch().getMaxX();
 			minX = maxX - 0.75;
 		}
 
 		if (ball.isEstimated()
-				|| (ball.getY() < getSnapshot().getOwnGoal().getMaxY())
-				&& (ball.getY() > getSnapshot().getOwnGoal().getMinY())
+				|| (ball.getY() < snapshot.getOwnGoal().getMaxY())
+				&& (ball.getY() > snapshot.getOwnGoal().getMinY())
 				&& (ball.getX() > minX) && (ball.getX() < maxX)) {
 
 			return true;
@@ -58,16 +59,16 @@ public class GameFromPenaltyDefence extends Game {
 	}
 
 	@Override
-	public void step(Controller controller) {
+	public void step(Controller controller, Snapshot snapshot) {
 
-		if (finished || !isStillInPenaltyDefence()) {
-			super.step(controller);
+		if (finished || !isStillInPenaltyDefence(snapshot)) {
+			super.step(controller, snapshot);
 			return;
 		}
 
-		double top = getSnapshot().getOwnGoal().getMaxY();
-		double bottom = getSnapshot().getOwnGoal().getMinY();
-		double robot = getSnapshot().getBalle().getPosition().getY();
+		double top = snapshot.getOwnGoal().getMaxY();
+		double bottom = snapshot.getOwnGoal().getMinY();
+		double robot = snapshot.getBalle().getPosition().getY();
 
 		if (First) {
 			if (Math.random() < 0.5) {

@@ -61,7 +61,7 @@ public class DribbleStraight implements Executor {
     }
 
     @Override
-    public void step(Controller controller) {
+    public void step(Controller controller, Snapshot snapshot) {
 
         if (currentState == null) {
             return;

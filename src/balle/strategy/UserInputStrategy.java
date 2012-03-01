@@ -11,6 +11,7 @@ import javax.swing.event.MouseInputListener;
 
 import balle.controller.Controller;
 import balle.strategy.planner.AbstractPlanner;
+import balle.world.Snapshot;
 
 public class UserInputStrategy extends AbstractPlanner {
 
@@ -46,7 +47,7 @@ public class UserInputStrategy extends AbstractPlanner {
 
     @Override
     // TODO Change to rely on and react to JPanel thing
-    public void step(Controller controller) {
+    public void step(Controller controller, Snapshot snapshot) {
         System.out.println(leftWheelPower + " " + rightWheelPower);
         controller.setWheelSpeeds(Math.round(leftWheelPower),
                 Math.round(rightWheelPower));

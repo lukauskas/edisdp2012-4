@@ -124,7 +124,7 @@ public class FaceAngle implements Executor, RotateToOrientationExecutor {
     }
 
     @Override
-    public void step(Controller controller) {
+    public void step(Controller controller, Snapshot snapshot) {
         if (!isPossible())
             return;
 
@@ -133,7 +133,7 @@ public class FaceAngle implements Executor, RotateToOrientationExecutor {
         }
         if (needStop) {
             stop(controller);
-            step(controller);
+            step(controller, snapshot);
         } else if (isTurning())
             return; // If we're still turning, continue.
         else {

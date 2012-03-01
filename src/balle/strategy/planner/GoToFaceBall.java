@@ -7,6 +7,7 @@ import balle.strategy.executor.turning.RotateToOrientationExecutor;
 import balle.world.Coord;
 import balle.world.Line;
 import balle.world.Orientation;
+import balle.world.Snapshot;
 import balle.world.objects.Point;
 import balle.world.objects.StaticFieldObject;
 
@@ -37,35 +38,36 @@ public class GoToFaceBall extends GoToBall {
 	}
 	
 	@Override
-	protected StaticFieldObject getTarget() {
+	protected StaticFieldObject getTarget(Snapshot snapshot) {
 		Coord ballPos, desPos;
-		ballPos = getSnapshot().getBall().getPosition();
+		ballPos = snapshot.getBall().getPosition();
 		desPos = new Coord (-getReserveDistance(), 0);
 		desPos = desPos.rotate(orientation);
 		return new Point(ballPos.add(desPos));
 	}
 	
 	@Override
-    public void step(Controller controller) {
-        StaticFieldObject target = getTarget();
+    public void step(Controller controller, Snapshot snapshot) {
+		StaticFieldObject target = getTarget(snapshot);
 
-        if ((getSnapshot() == null) || (getSnapshot().getBalle().getPosition() == null)
+		if ((snapshot == null)
+				|| (snapshot.getBalle().getPosition() == null)
                 || (target == null))
             return;
 
         // Update the current state of executor strategy
-        executorStrategy.updateState(getSnapshot());
-        rotateStrategy.updateState(getSnapshot());
+		executorStrategy.updateState(snapshot);
+		rotateStrategy.updateState(snapshot);
 
         // If we see the opponent
-        if (getSnapshot().getOpponent() != null) {
-            Line pathToTarget = new Line(getSnapshot().getBalle().getPosition(),
+		if (snapshot.getOpponent() != null) {
+			Line pathToTarget = new Line(snapshot.getBalle().getPosition(),
                     target.getPosition());
             // Check if it is blocking our path
-            if (getSnapshot().getOpponent().intersects(pathToTarget)) {
+			if (snapshot.getOpponent().intersects(pathToTarget)) {
                 // pick a new target then
                 LOG.info("Opponent is blocking the target, avoiding it");
-                target = getAvoidanceTarget();
+				target = getAvoidanceTarget(snapshot);
             }
         }
 
@@ -79,10 +81,10 @@ public class GoToFaceBall extends GoToBall {
 
         // If it says it is not finished, tell it to do something for a step.
         if (!executorStrategy.isFinished()) {
-            executorStrategy.step(controller);
+			executorStrategy.step(controller, snapshot);
         } else if (!rotateStrategy.isFinished()) {
         	executorStrategy.stop(controller);
-        	rotateStrategy.step(controller);
+			rotateStrategy.step(controller, snapshot);
         } else {
             // Tell the strategy to stop doing whatever it was doing
             executorStrategy.stop(controller);

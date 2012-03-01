@@ -29,7 +29,7 @@ public interface MovementExecutor extends Executor {
 	public void updateState(Snapshot snapshot);
 
 	@Override
-	public void step(Controller controller);
+	public void step(Controller controller, Snapshot snapshot);
 
     public void setStopDistance(double stopDistance);
 

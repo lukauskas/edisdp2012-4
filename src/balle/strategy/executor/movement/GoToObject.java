@@ -63,7 +63,7 @@ public class GoToObject implements MovementExecutor {
 	}
 
 	@Override
-	public void step(Controller controller) {
+	public void step(Controller controller, Snapshot snapshot) {
 		// Fail quickly if state not set
 		if (currentState == null)
 			return;
@@ -87,7 +87,7 @@ public class GoToObject implements MovementExecutor {
 
 			if (turningExecutor.isTurning()) // If we are still turning here
 			{
-				turningExecutor.step(controller);
+				turningExecutor.step(controller, snapshot);
 				return; // Continue
 			} else {
 				Orientation orientationToTarget = targetCoord.sub(
@@ -108,7 +108,7 @@ public class GoToObject implements MovementExecutor {
 						isMoving = false;
 					}
 
-					turningExecutor.step(controller);
+					turningExecutor.step(controller, snapshot);
 				} else {
 					if (!isMoving) {
 						controller.forward(MOVEMENT_SPEED);

@@ -2,6 +2,7 @@ package balle.strategy;
 
 import balle.controller.Controller;
 import balle.strategy.planner.AbstractPlanner;
+import balle.world.Snapshot;
 
 /**
  * A Dummy strategy for the robot, the robot will go forward for 50 aiSteps()
@@ -17,7 +18,7 @@ public class DummyStrategy extends AbstractPlanner {
     boolean        goingForward = false;
 
     @Override
-    public void step(Controller controller) {
+    public void step(Controller controller, Snapshot snapshot) {
         long t = System.currentTimeMillis();
         long dt = t - timer;
         if (dt > 0) {

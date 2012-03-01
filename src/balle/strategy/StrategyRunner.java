@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import balle.controller.Controller;
 import balle.world.AbstractWorld;
 import balle.world.SimpleWorldGUI;
+import balle.world.Snapshot;
 import balle.world.processing.AbstractWorldProcessor;
 
 public class StrategyRunner extends AbstractWorldProcessor {
@@ -41,9 +42,11 @@ public class StrategyRunner extends AbstractWorldProcessor {
 	@Override
 	protected void actionOnChange() {
 		if (currentStrategy != null) {
-			currentStrategy.updateState(getSnapshot());
+
+			Snapshot snapshot = getSnapshot();
+			currentStrategy.updateState(snapshot);
 			try {
-				currentStrategy.step(controller);
+				currentStrategy.step(controller, snapshot);
 			} catch (Exception e) {
 				LOG.error("Strategy raised exception" + e.toString());
 
