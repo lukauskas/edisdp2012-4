@@ -3,7 +3,7 @@ package balle.strategy.curve;
 import static java.lang.Math.pow;
 import balle.world.Coord;
 
-public class Bezier4 extends Curve {
+public class Bezier4 extends SimpleCurve {
 
 	public Bezier4(Coord[] coords) {
 		super(coords);
