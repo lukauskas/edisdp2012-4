@@ -32,6 +32,7 @@ public class CurveNav implements OrientedMovementExecutor {
 
 	public CurveNav(Interpolator interpolator, MovementExecutor me) {
 		this.movementExecutor = me;
+		this.interpolator = interpolator;
 	}
 
 	@Override

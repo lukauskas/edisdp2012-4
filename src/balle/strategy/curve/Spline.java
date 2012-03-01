@@ -13,9 +13,13 @@ public class Spline implements Curve {
 		this.splines = splines;
 	}
 
+	protected double div() {
+		return 1.0 / ((double) splines.length);
+	}
+
 	@Override
 	public Coord pos(double t) {
-		return null;
+		return splines[(int) Math.floor(t / div())].pos((t % div()) / div());
 	}
 
 	@Override

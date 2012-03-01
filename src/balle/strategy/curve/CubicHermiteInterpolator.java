@@ -23,14 +23,18 @@ public class CubicHermiteInterpolator implements Interpolator {
 		// };
 
 		Curve[] curves = new Curve[controlPoints.length - 1];
-		for (int i = 1; i < controlPoints.length - 2; i++) {
+		curves[0] = new Bezier3(new Coord[] { controlPoints[0],
+				m(true, controlPoints[0], controlPoints[1], controlPoints[2]),
+				controlPoints[1], });
+
+		for (int i = 1; i < controlPoints.length - 1; i++) {
 			Coord m0 = null, m1 = null;
 
 			if (i == 0) {
 				m1 = m(true, controlPoints[i], controlPoints[i + 1],
 						controlPoints[i + 2]);
 				m0 = m1;
-			} else if (i + 1 == controlPoints.length) {
+			} else if (i + 2 == controlPoints.length) {
 				m0 = m(false, controlPoints[i - 1], controlPoints[i],
 						controlPoints[i + 1]);
 				m1 = m0;
