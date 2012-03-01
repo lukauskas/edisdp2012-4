@@ -5,10 +5,8 @@ import balle.world.Coord;
 
 public class Bezier4 extends Curve {
 
-	private Coord[] p;
-
 	public Bezier4(Coord[] coords) {
-		this.p = coords;
+		super(coords);
 	}
 
 	@Override

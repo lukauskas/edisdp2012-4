@@ -10,6 +10,15 @@ import balle.world.Scaler;
 
 public abstract class Curve implements Drawable {
 
+	/**
+	 * Control points.
+	 */
+	protected Coord[] p;
+
+	protected Curve(Coord[] p) {
+		this.p = p;
+	}
+
 	// Abstract Method \\
 
 	public abstract Coord pos(double t);
