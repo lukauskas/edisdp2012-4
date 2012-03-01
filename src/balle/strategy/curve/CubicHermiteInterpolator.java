@@ -1,6 +1,6 @@
 package balle.strategy.curve;
 
-public class CubicHermiteInterpolation {
+public class CubicHermiteInterpolator {
 
 	public Curve getCurve() {
 
