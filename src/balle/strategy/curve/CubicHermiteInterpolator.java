@@ -2,8 +2,9 @@ package balle.strategy.curve;
 
 import balle.world.Coord;
 
-public class CubicHermiteInterpolator {
+public class CubicHermiteInterpolator implements Interpolator {
 
+	@Override
 	public Curve getCurve(Coord[] controlPoints) {
 		Curve[] curves = new Curve[controlPoints.length - 1];
 		for (int i = 1; i < controlPoints.length - 2; i++) {
