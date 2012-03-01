@@ -7,22 +7,23 @@ public class CubicHermiteInterpolator {
 
 	public Curve getCurve(Coord[] controlPoints) {
 		Curve[] curves = new Curve[controlPoints.length - 1];
-		for (int i = 0; i < controlPoints.length - 1; i++)
-			curves[i] = getCurve(controlPoints[i], controlPoints[i + 1]);
+		for (int i = 0; i < controlPoints.length - 1; i++) {
+
+			Coord[] out = new Coord[] { pts[i], m0(pts, i), m1(pts, i),
+					pts[i + 1], };
+
+			curves[i] = out;
+		}
 		return new Spline(curves);
 	}
 
 	protected Curve getCurve(Coord[] pts, int i) {
-		Coord[] out = new Coord[] { pts[i], m0(pts, i), m1(pts, i), pts[i + 1], };
+
 		return new Bezier4(pts);
 	}
 
-	protected Coord m0(Coord[] pts, int i) {
-		return null;
-	}
-
-	protected Coord m1(Coord[] pts, int i) {
-		return null;
+	protected double finiteDifference(Coord prev, Coord curr, Coord next) {
+		return 0;
 	}
 
 	// Unused helper functions.
