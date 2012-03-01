@@ -114,15 +114,24 @@ public class BasicWorld extends AbstractWorld {
 		themVel = themDPos != null ? new Velocity(themDPos, deltaT) : null;
 		ballVel = ballDPos != null ? new Velocity(ballDPos, deltaT) : null;
 
+		if (ourOrientation == null) {
+			ourOrientation = prev.getBalle().getOrientation();
+		}
+
+		if (theirsOrientation == null) {
+			theirsOrientation = prev.getOpponent().getOrientation();
+		}
+
 		// put it all together (almost)
 		them = new Robot(theirsPosition, themVel, theirsOrientation);
 		ours = new Robot(ourPosition, oursVel, ourOrientation);
 		ball = new Ball(ballPosition, ballVel);
 
+		// pack into a snapshot
+		Snapshot nextSnapshot = filter(new Snapshot(them, ours, ball,
+				getOpponentsGoal(), getOwnGoal(), getPitch(), timestamp));
 		synchronized (this) {
-			// pack into a snapshot
-			this.prev = new Snapshot(them, ours, ball, getOpponentsGoal(),
-					getOwnGoal(), getPitch(), timestamp);
+			this.prev = nextSnapshot;
 		}
 	}
 
@@ -134,4 +143,5 @@ public class BasicWorld extends AbstractWorld {
 					getPitch());
 		}
 	}
+
 }

@@ -1,7 +1,10 @@
 package balle.world;
 
+import java.util.ArrayList;
+
 import balle.io.listener.Listener;
 import balle.misc.Globals;
+import balle.world.filter.Filter;
 import balle.world.objects.Goal;
 import balle.world.objects.MovingPoint;
 import balle.world.objects.Pitch;
@@ -25,8 +28,8 @@ public abstract class AbstractWorld implements Listener {
 
 	// JEV: Scanner is final and can't be extended, makes it difficult for the
 	// simulator.
-	private final boolean balleIsBlue;
-	private final boolean goalIsLeft;
+	private boolean balleIsBlue;
+	private boolean goalIsLeft;
 
 	private final Pitch pitch;
 
@@ -38,6 +41,22 @@ public abstract class AbstractWorld implements Listener {
 
 	public Pitch getPitch() {
 		return pitch;
+	}
+
+	public boolean getGoalPosition() {
+		return goalIsLeft;
+	}
+
+	public boolean setGoalPosition(boolean goal) {
+		return goalIsLeft = goal;
+	}
+
+	public boolean getIsBlue() {
+		return balleIsBlue;
+	}
+
+	public boolean setIsBlue(boolean robot) {
+		return balleIsBlue = robot;
 	}
 
 	/**
@@ -182,6 +201,63 @@ public abstract class AbstractWorld implements Listener {
 			return left;
 		else
 			return right;
+
 	}
 
+	// Filters
+
+	/**
+	 * All connected filters, in order.
+	 */
+	protected ArrayList<Filter> filters = new ArrayList<Filter>();
+
+	/**
+	 * Add a new filter to be added to end of the filters.
+	 * 
+	 * @param f
+	 */
+	public void addFilter(Filter f) {
+		if (!filters.contains(f))
+			filters.add(f);
+	}
+
+	/**
+	 * Remove a filter if present.
+	 * 
+	 * @param f
+	 */
+	public void remFilter(Filter f) {
+		filters.remove(f);
+	}
+
+	/**
+	 * Check whether this world has a filter.
+	 * 
+	 * @param f
+	 * @return Whether filter is present.
+	 */
+	public boolean hasFilter(Filter f) {
+		return filters.contains(f);
+	}
+
+	/**
+	 * Check if this world has a filter of this class.
+	 * 
+	 * @param filter
+	 * @return
+	 */
+	@SuppressWarnings("rawtypes")
+	public boolean hasFilter(Class filter) {
+		for (Filter each : filters)
+			if (each.getClass() == filter)
+				return true;
+		return false;
+	}
+
+	public Snapshot filter(Snapshot s) {
+		Snapshot out = s;
+		for (Filter each : filters)
+			out = each.filter(out);
+		return out;
+	}
 }

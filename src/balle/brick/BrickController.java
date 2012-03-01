@@ -16,19 +16,19 @@ import balle.misc.Globals;
  * @author sauliusl
  */
 public class BrickController implements Controller {
-    TachoPilot              pilot;
-    public int              maxPilotSpeed       = 600;                         // 20
-                                                                                // for
-                                                                                // friendlies
+    TachoPilot pilot;
+    public int maxPilotSpeed = 600; // 20
+                                    // for
+                                    // friendlies
 
-    public final Motor      LEFT_WHEEL          = Motor.B;
-    public final Motor      RIGHT_WHEEL         = Motor.C;
-    public final Motor      KICKER              = Motor.A;
+    public final Motor LEFT_WHEEL = Motor.B;
+    public final Motor RIGHT_WHEEL = Motor.C;
+    public final Motor KICKER = Motor.A;
 
-    public final boolean    INVERSE_WHEELS      = true;
+    public final boolean INVERSE_WHEELS = true;
 
-    public final float      WHEEL_DIAMETER      = Globals.ROBOT_WHEEL_DIAMETER; // metres
-    public final float      TRACK_WIDTH         = Globals.ROBOT_TRACK_WIDTH;   // metres
+    public final float WHEEL_DIAMETER = Globals.ROBOT_WHEEL_DIAMETER; // metres
+    public final float TRACK_WIDTH = Globals.ROBOT_TRACK_WIDTH; // metres
 
     public static final int MAXIMUM_MOTOR_SPEED = Globals.MAXIMUM_MOTOR_SPEED;
 
@@ -82,7 +82,14 @@ public class BrickController implements Controller {
             Thread.sleep(80);
         } catch (InterruptedException e) {
         }
-        KICKER.rotateTo(1);
+        KICKER.rotateTo(0);
+    }
+
+    public void gentleKick(int speed, int angle) {
+        KICKER.setSpeed(speed);
+        KICKER.resetTachoCount();
+        KICKER.rotateTo(angle);
+        KICKER.rotateTo(0);
     }
 
     public float getTravelDistance() {
@@ -148,7 +155,7 @@ public class BrickController implements Controller {
 
     @Override
     public void penaltyKick() {
-        int turnAmount = 28;
+        int turnAmount = 25;
         if (Math.random() <= 0.5)
             turnAmount *= -1;
         rotate(turnAmount, 180);

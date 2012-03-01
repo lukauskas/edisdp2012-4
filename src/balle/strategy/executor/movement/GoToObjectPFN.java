@@ -52,18 +52,22 @@ public class GoToObjectPFN implements MovementExecutor {
         RobotConf conf = new RobotConf(ROBOT_TRACK_WIDTH, WHEEL_RADIUS);
         // plann = new PFPlanning(conf, 0, 1, 12, 0.5); // No opponent avoidance
         // Avoids opponent:
-        plann = new PFPlanning(conf, 0.05, 0.4, 20, 32);
+        plann = new PFPlanning(conf, 0, 0.6, 20, 15);
 
         // Add walls
-        double wallPower = 0.01;
-        RectObject leftWall = new RectObject(new Point(0, Globals.PITCH_HEIGHT), new Point(0, 0),
-                wallPower, Double.MAX_VALUE);
-        RectObject rightWall = new RectObject(new Point(Globals.PITCH_WIDTH, Globals.PITCH_HEIGHT),
-                new Point(Globals.PITCH_WIDTH, 0), wallPower, Double.MAX_VALUE);
-        RectObject topWall = new RectObject(new Point(0, Globals.PITCH_HEIGHT), new Point(
-                Globals.PITCH_WIDTH, Globals.PITCH_HEIGHT), wallPower, Double.MAX_VALUE);
-        RectObject bottomWall = new RectObject(new Point(0, 0), new Point(Globals.PITCH_WIDTH, 0),
-                wallPower, Double.MAX_VALUE);
+        double wallPower = 0.05;
+        double wallInfDist = 0.3;
+        RectObject leftWall = new RectObject(
+                new Point(0, Globals.PITCH_HEIGHT), new Point(0, 0), wallPower,
+                wallInfDist);
+        RectObject rightWall = new RectObject(new Point(Globals.PITCH_WIDTH,
+                Globals.PITCH_HEIGHT), new Point(Globals.PITCH_WIDTH, 0),
+                wallPower, wallInfDist);
+        RectObject topWall = new RectObject(new Point(0, Globals.PITCH_HEIGHT),
+                new Point(Globals.PITCH_WIDTH, Globals.PITCH_HEIGHT),
+                wallPower, wallInfDist);
+        RectObject bottomWall = new RectObject(new Point(0, 0), new Point(
+                Globals.PITCH_WIDTH, 0), wallPower, wallInfDist);
 
         plann.addObject(leftWall);
         plann.addObject(rightWall);
@@ -85,7 +89,8 @@ public class GoToObjectPFN implements MovementExecutor {
 
     @Override
     public boolean isFinished() {
-        if ((snapshot == null) || (target == null) || (target.getPosition() == null)
+        if ((snapshot == null) || (target == null)
+                || (target.getPosition() == null)
                 || (snapshot.getBalle().getPosition() == null))
             return false;
         return target.getPosition().dist(snapshot.getBalle().getPosition()) <= getStopDistance();
@@ -94,9 +99,10 @@ public class GoToObjectPFN implements MovementExecutor {
 
     @Override
     public boolean isPossible() {
-        return ((snapshot != null) && (target != null) && (target.getPosition() != null)
-                && (snapshot.getBalle().getPosition() != null) && (snapshot.getBalle()
-                .getOrientation() != null));
+        return ((snapshot != null) && (target != null)
+                && (target.getPosition() != null)
+                && (snapshot.getBalle().getPosition() != null) && (snapshot
+                .getBalle().getOrientation() != null));
     }
 
     @Override
@@ -114,20 +120,22 @@ public class GoToObjectPFN implements MovementExecutor {
         if (snapshot.getOpponent().getOrientation() == null)
             opponent = null;
         else
-            opponent = new Pos(new Point(snapshot.getOpponent().getPosition().getX(), snapshot
-                    .getOpponent().getPosition().getY()), snapshot.getOpponent().getOrientation()
-                    .radians());
+            opponent = new Pos(new Point(snapshot.getOpponent().getPosition()
+                    .getX(), snapshot.getOpponent().getPosition().getY()),
+                    snapshot.getOpponent().getOrientation().radians());
 
         // Our pos
-        Pos initPos = new Pos(new Point(snapshot.getBalle().getPosition().getX(), snapshot
-                .getBalle().getPosition().getY()), snapshot.getBalle().getOrientation().radians());
+        Pos initPos = new Pos(new Point(snapshot.getBalle().getPosition()
+                .getX(), snapshot.getBalle().getPosition().getY()), snapshot
+                .getBalle().getOrientation().radians());
 
         // Target pos
-        Point targetLoc = new Point(target.getPosition().getX(), target.getPosition().getY());
+        Point targetLoc = new Point(target.getPosition().getX(), target
+                .getPosition().getY());
 
         VelocityVec res = plann.update(initPos, opponent, targetLoc);
-        LOG.trace("UNSCALED Left speed: " + Math.toDegrees(res.getLeft()) + " right speed: "
-                + Math.toDegrees(res.getRight()));
+        LOG.trace("UNSCALED Left speed: " + Math.toDegrees(res.getLeft())
+                + " right speed: " + Math.toDegrees(res.getRight()));
         double left, right;
 
         res = res.scale();

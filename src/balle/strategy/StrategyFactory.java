@@ -7,21 +7,30 @@ import balle.strategy.planner.AbstractPlanner;
 import balle.strategy.planner.DefensiveStrategy;
 import balle.strategy.planner.DribbleMilestone2;
 import balle.strategy.planner.GoToBall;
+import balle.strategy.planner.GoToFaceBall;
+import balle.strategy.planner.KickFromWall;
 
 public class StrategyFactory {
     public static String[] availableDesignators() {
 
-        String[] designators = { "GoToBall", "GoToBallPFN", "Dribble", "Blocking", "PFNavigation",
-                "DefensiveStrategy", "Game", "GameFromPenaltyKick", "GameFromPenaltyDefence" };
+        String[] designators = { "Game", "GameFromPenaltyKick",
+                "GameFromPenaltyDefence", "GoToBall", "GoToFaceBall",
+                "GoToBallPFN",
+                "Dribble", "Blocking", "PFNavigation", "DefensiveStrategy",
+                "BallNearWall" };
         return designators;
     }
 
-    public static AbstractPlanner createClass(String designator) throws UnknownDesignatorException {
+    public static AbstractPlanner createClass(String designator)
+            throws UnknownDesignatorException {
 
         if (designator.equals("GoToBall")) {
-            return new GoToBall(new GoToObject(new FaceAngle()));
+            return new GoToBall(new GoToObject(new FaceAngle()), true);
+        } else if (designator.equals("GoToFaceBall")) {
+            return new GoToFaceBall(new GoToObject(new FaceAngle()),
+                    new FaceAngle());
         } else if (designator.equals("GoToBallPFN")) {
-            return new GoToBall(new GoToObjectPFN(0.15f));
+            return new GoToBall(new GoToObjectPFN(0.15f), true);
         } else if (designator.equals("DummyStrategy")) {
             return new DummyStrategy();
         } else if (designator.equals("Blocking")) {
@@ -30,6 +39,8 @@ public class StrategyFactory {
             return new DribbleMilestone2();
         } else if (designator.equals("PFNavigation")) {
             return new PFNavigation();
+        } else if (designator.equals("BallNearWall")) {
+            return new KickFromWall(new GoToObjectPFN(0.15f));
         } else if (designator.equals("DefensiveStrategy")) {
             return new DefensiveStrategy(new GoToObjectPFN(0.1f));
         } else if (designator.equals("Game")) {
@@ -39,6 +50,7 @@ public class StrategyFactory {
         } else if (designator.equals("GameFromPenaltyDefence")) {
             return new GameFromPenaltyDefence();
         } else
-            throw new UnknownDesignatorException("Don't know strategy \"" + designator + "\"");
+            throw new UnknownDesignatorException("Don't know strategy \""
+                    + designator + "\"");
     }
 }

@@ -1,46 +1,133 @@
 package balle.strategy;
 
+import org.apache.log4j.Logger;
+
 import balle.controller.Controller;
-import balle.world.objects.Ball;
-import balle.world.objects.Goal;
-import balle.world.objects.Robot;
+import balle.world.Coord;
 
 public class GameFromPenaltyDefence extends Game {
 
-    public GameFromPenaltyDefence() throws UnknownDesignatorException {
-        super();
-    }
+	private static Logger LOG = Logger.getLogger(GameFromPenaltyDefence.class);
 
-    /**
-     * Checks if robot is is still defending the penalty;
-     * 
-     * @return
-     */
-    public boolean isStillInPenaltyDefence() {
-        // TODO: implement
-        // Probably worth checking the distance of the ball to the goal line
-        // here
-        return true;
-    }
+	// private Snapshot firstSnapshot = null;
+	// String robotState = "Center";
+	// int rotateSpeed = 0;
+	private boolean First = true;
 
-    @Override
-    public void step(Controller controller) {
+	private boolean finished = false;
 
-        if (isStillInPenaltyDefence()) {
-            Robot ourRobot = getSnapshot().getBalle();
-            Robot opponent = getSnapshot().getOpponent();
-            Ball ball = getSnapshot().getBall();
-            Goal ownGoal = getSnapshot().getOwnGoal();
+	public GameFromPenaltyDefence() throws UnknownDesignatorException {
+		super();
+	}
 
-            // TODO: Do Penalty defence here
-            // Try using ourRobot.getFacingLineBothWays() and
-            // opponent.getBallKickLine(ball)
-            // And finding their intersection and then moving to that point.
-            // (Youll have to manually
-            // set wheel speeds to positive or negative values here.
-        } else {
-            super.step(controller);
-        }
-    }
+	public boolean isStillInPenaltyDefence() {
 
+		Coord ball = getSnapshot().getBall().getPosition();
+		double minX = 0;
+		double maxX = 0.75;
+		if (!getSnapshot().getOwnGoal().isLeftGoal()) {
+			maxX = getSnapshot().getPitch().getMaxX();
+			minX = maxX - 0.75;
+		}
+
+		if (ball.isEstimated()
+				|| (ball.getY() < getSnapshot().getOwnGoal().getMaxY())
+				&& (ball.getY() > getSnapshot().getOwnGoal().getMinY())
+				&& (ball.getX() > minX) && (ball.getX() < maxX)) {
+
+			return true;
+		}
+
+		/*
+		 * if (firstSnapshot == null) return true;
+		 * 
+		 * double ball_x = firstSnapshot.getBall().getPosition().getX(); double
+		 * ball_y = firstSnapshot.getBall().getPosition().getY();
+		 * 
+		 * double aball_x = getSnapshot().getBall().getPosition().getX(); double
+		 * aball_y = getSnapshot().getBall().getPosition().getY();
+		 * 
+		 * double distance = Math.sqrt(Math.pow(aball_x - ball_x, 2) +
+		 * Math.pow(aball_y - ball_y, 2));
+		 * 
+		 * if (distance > 1) { return false; }
+		 */
+
+		finished = true;
+		return false;
+	}
+
+	@Override
+	public void step(Controller controller) {
+
+		if (finished || !isStillInPenaltyDefence()) {
+			super.step(controller);
+			return;
+		}
+
+		double top = getSnapshot().getOwnGoal().getMaxY();
+		double bottom = getSnapshot().getOwnGoal().getMinY();
+		double robot = getSnapshot().getBalle().getPosition().getY();
+
+		if (First) {
+			if (Math.random() < 0.5) {
+				controller.setWheelSpeeds(-400, -400);
+			} else {
+				controller.setWheelSpeeds(400, 400);
+			}
+
+			First = false;
+		}
+
+		if (robot > top - 0.2)
+			controller.setWheelSpeeds(-400, -400);
+		if (robot < bottom + 0.2)
+			controller.setWheelSpeeds(400, 400);
+
+		/*
+		 * if ((firstSnapshot == null) && (getSnapshot().getBall().getPosition()
+		 * != null)) firstSnapshot = getSnapshot();
+		 * 
+		 * Orientation opponentAngle = getSnapshot().getOpponent()
+		 * .getOrientation(); double threshold = Math.toRadians(15); Boolean
+		 * isLeftGoal = getSnapshot().getOwnGoal().isLeftGoal();
+		 * 
+		 * if (getSnapshot().getOwnGoal().getMaxY() <= getSnapshot().getBalle()
+		 * .getPosition().getY() + 0.15) { robotState = "Up"; } else if
+		 * (getSnapshot().getOwnGoal().getMinY() >= getSnapshot()
+		 * .getBalle().getPosition().getY() - 0.15) { robotState = "Down"; }
+		 * else { robotState = "Center"; }
+		 * 
+		 * LOG.debug("robotState: " + robotState);
+		 * 
+		 * if (isLeftGoal == true) { // opponent shooting left if
+		 * (opponentAngle.atan2styleradians() > Math.PI - threshold)
+		 * moveTo("Up", controller); else if (opponentAngle.atan2styleradians()
+		 * < -Math.PI + threshold) moveTo("Down", controller); else
+		 * moveTo("Center", controller);
+		 * 
+		 * } else { // opponent shooting right if
+		 * (opponentAngle.atan2styleradians() > threshold) moveTo("Up",
+		 * controller); else if (opponentAngle.atan2styleradians() < -threshold)
+		 * moveTo("Down", controller); else moveTo("Center", controller); }
+		 * 
+		 * }
+		 * 
+		 * private void moveTo(String moveTo, Controller controller) {
+		 * 
+		 * rotateSpeed = 0; LOG.debug("moveTo: " + moveTo);
+		 * 
+		 * if (robotState.equals("Center") && moveTo.equals("Up")) rotateSpeed =
+		 * 200; if (robotState.equals("Center") && moveTo.equals("Down"))
+		 * rotateSpeed = -200; if (robotState.equals("Up") &&
+		 * moveTo.equals("Center")) rotateSpeed = -200; if
+		 * (robotState.equals("Up") && moveTo.equals("Down")) rotateSpeed =
+		 * -100; if (robotState.equals("Down") && moveTo.equals("Center"))
+		 * rotateSpeed = 200; if (robotState.equals("Down") &&
+		 * moveTo.equals("Up")) rotateSpeed = 200;
+		 * 
+		 * 
+		 * controller.setWheelSpeeds(rotateSpeed, rotateSpeed);
+		 */
+	}
 }
