@@ -148,6 +148,19 @@ public class Coord {
 	}
 
 	/**
+	 * Calculates the angle from this coordinate to another from (0,0).
+	 * 
+	 * TODO write test
+	 * 
+	 * @param to
+	 *            coordinate to.
+	 * @return Angle between this and to to using (0,0) as a reference point.
+	 */
+	public Orientation angleBetween(Coord to) {
+		return new Coord(0, 0).angleBetween(this, to);
+	}
+
+	/**
 	 * Calculates the angle from one coordinate to another from this point.
 	 * 
 	 * TODO write test
