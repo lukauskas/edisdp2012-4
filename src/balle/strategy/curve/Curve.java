@@ -1,4 +1,4 @@
-package balle.strategy.bezierNav;
+package balle.strategy.curve;
 
 import java.awt.Color;
 import java.awt.Graphics;

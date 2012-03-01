@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import balle.controller.Controller;
 import balle.main.drawable.Drawable;
 import balle.misc.Globals;
+import balle.strategy.curve.Bezier4;
+import balle.strategy.curve.Curve;
 import balle.strategy.executor.movement.MovementExecutor;
 import balle.strategy.executor.movement.OrientedMovementExecutor;
 import balle.world.Coord;

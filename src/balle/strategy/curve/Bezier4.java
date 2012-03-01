@@ -1,4 +1,4 @@
-package balle.strategy.bezierNav;
+package balle.strategy.curve;
 
 import static java.lang.Math.pow;
 import balle.world.Coord;
