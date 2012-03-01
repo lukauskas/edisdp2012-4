@@ -26,12 +26,25 @@ public abstract class SimpleCurve implements Curve {
 		for (double t = 0.0; t <= 1.0; t += 0.01)
 			coords.add(pos(t));
 
-		for (Coord c : coords) {
-			int x, y, w = 2;
+		for (int i = 0; i + 1 < coords.size(); i++) {
+			Coord c1 = coords.get(i), c2 = coords.get(i + 1);
+
+			int x1, y1, x2, y2;
+			x1 = (int) (s.m2PX(c1.getX()));
+			y1 = (int) (s.m2PY(c1.getY()));
+			x2 = (int) (s.m2PX(c2.getX()));
+			y2 = (int) (s.m2PY(c2.getY()));
+			g.drawLine(x1, y1, x2, y2);
+		}
+
+		g.setColor(Color.RED);
+		for (Coord c : p) {
+			int x, y, w = 4;
 			x = (int) (s.m2PX(c.getX()) - (w / 2));
 			y = (int) (s.m2PY(c.getY()) - (w / 2));
-			g.fillOval(x, y, w, w);
+			g.fillRect(x, y, w, w);
 		}
+
 	}
 
 }

@@ -61,6 +61,10 @@ public class Coord {
 		return new Coord(x * scalar, y * scalar, estimated);
 	}
 
+	public Coord div(double scalar) {
+		return new Coord(x / scalar, y / scalar, estimated);
+	}
+
 	public double dist(Coord c) {
 		return c.sub(this).abs();
 	}
