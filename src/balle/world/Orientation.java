@@ -109,6 +109,10 @@ public class Orientation {
 		return (new Coord(1, 0)).rotate(this);
 	}
 
+	public double angleToatan2Radians(Orientation to) {
+		return to.sub(this).atan2styleradians();
+	}
+
 	@Override
 	public String toString() {
 		return degrees() + "deg";
