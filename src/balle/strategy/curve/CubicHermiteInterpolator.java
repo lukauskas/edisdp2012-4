@@ -6,18 +6,34 @@ public class CubicHermiteInterpolator implements Interpolator {
 
 	@Override
 	public Curve getCurve(Coord[] controlPoints) {
+		// Coord rP = state.getBalle().getPosition(), tP = target.getPosition()
+		// .add(new Coord(-TARGET_PERIMETER, 0).rotate(orient));
+		// double distS = rP.dist(tP) / 2;
+		//
+		// // Null test
+		// if (rP == null || tP == null)
+		// return null;
+		//
+		// // Compile the test.
+		// Coord[] controls = new Coord[] {
+		// rP,
+		// rP.add(state.getBalle().getOrientation().getUnitCoord()
+		// .mult(distS / 4)),
+		// tP.add(orient.getOpposite().getUnitCoord().mult(distS)), tP,
+		// };
+
 		Curve[] curves = new Curve[controlPoints.length - 1];
 		for (int i = 1; i < controlPoints.length - 2; i++) {
 			Coord m0 = null, m1 = null;
 
 			if (i == 0) {
-				// m0 is special case.
 				m1 = m(true, controlPoints[i], controlPoints[i + 1],
 						controlPoints[i + 2]);
+				m0 = m1;
 			} else if (i + 1 == controlPoints.length) {
 				m0 = m(false, controlPoints[i - 1], controlPoints[i],
 						controlPoints[i + 1]);
-				// m1 is special case.
+				m1 = m0;
 			} else {
 				m0 = m(false, controlPoints[i - 1], controlPoints[i],
 						controlPoints[i + 1]);
