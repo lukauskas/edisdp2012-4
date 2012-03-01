@@ -13,75 +13,58 @@ import balle.strategy.executor.movement.OrientedMovementExecutor;
 import balle.world.Coord;
 import balle.world.Orientation;
 import balle.world.Snapshot;
+import balle.world.objects.Robot;
 import balle.world.objects.StaticFieldObject;
 
 public class BezierNav implements OrientedMovementExecutor {
 
-	private final double TARGET_PERIMETER = Math.sqrt(Math.pow(
-			Globals.ROBOT_LENGTH, 2) + Math.pow(Globals.ROBOT_WIDTH, 2)) / 2;
+	// this is how far away from the target that the robot (center) should land
+	// the default causes the robot to stop just in front of the target.
+	// If this was 0 and the target was the ball, the robot would be prone
+	// to crashing into the ball b4 obtainning the correct orientation
+	private final double TARGET_PERIMETER = (Math.sqrt(Math.pow(
+			Globals.ROBOT_LENGTH, 2) + Math.pow(Globals.ROBOT_WIDTH, 2)) / 2) + 0.01;
+
+	private final double TARGET_OFF_CENTER_TOLERANCE = 0.01; // (ROBOTWIDTH/2)-
+														// TARGET_OFF_CENTER_TOLERANCE
+														// = max arrival
+														// distance of the
+														// target from the
+														// center front of the
+														// robot
+	private final double MIN_SAFE_RADIUS = 0.3; // the smallest turning radius
+												// where moving at maximum speed
+												// is ok
+	private final double SAFER_SPEED_RATIO = 0.2; // ratio of (max
+													// speed)/((minimum)safe
+													// speed). when making sharp
+													// turns the speed will be
+													// slowed toward max/this
+	private final double MAX_VELOCITY = Globals
+			.powerToVelocity(Globals.MAXIMUM_MOTOR_SPEED); // the maximum wheel
+															// velocity to use
+
+	// these 2 must moth be satisfied before this movement is finished
+	private double stopDistance = 0.03; // distance to target (centre of robot
+										// to adjusted p3)
+	private double stopAngle = Math.PI / 32; // angle of robot vs desired final
+												// angle (orient)
+
+
+	private float stepDist = 0.5f;
+	private MovementExecutor movementExecutor;
 
 	private StaticFieldObject target;
 	private Snapshot state;
-	private double stopDistance = 0.017;
 
-	private float stepDist = 0.5f;
-
-	private Coord p0, p1, p2, p3;
 	private Orientation orient;
+	private Coord p0, p1, p2, p3;
 
-	private float lwv;
-	private float rwv;
-
-	private MovementExecutor movementExecutor;
 
 	public BezierNav(MovementExecutor me) {
 		this.movementExecutor = me;
 	}
 
-	@Override
-	public void stop(Controller controller) {
-		controller.stop();
-	}
-
-	@Override
-	public ArrayList<Drawable> getDrawables() {
-		ArrayList<Drawable> l = new ArrayList<Drawable>();
-		if (p0 == null) {
-			return l;
-		}
-		for (double t = -0.1; t < 1.1; t += 0.01) {
-			Color c = Color.ORANGE;
-			if (t < 0 || t > 1)
-				c = Color.GRAY;
-			l.add(new Dot(pos(t), c));
-		}
-		l.add(new Circle(p0, 0.05, Color.pink));
-		l.add(new Circle(p1, 0.05, Color.black));
-		l.add(new Circle(p2, 0.05, Color.black));
-		l.add(new Circle(p3, 0.05, Color.pink));
-		Coord center = getCenterOfRotation(0);
-		l.add(new Dot(center, Color.BLACK));
-		l.add(new Circle(center, center.dist(state.getBalle().getPosition()),
-				Color.yellow));
-
-		l.add(new Dot(pos(stepDist), Color.CYAN));
-//		Orientation rO = p1.sub(p0).getOrientation();
-//		Coord lwpos = new Coord(Globals.ROBOT_LEFT_WHEEL_POS.x,
-//				Globals.ROBOT_LEFT_WHEEL_POS.y).rotate(rO);
-//		l.add(new DrawableLine(new Line(p0.add(lwpos), p0.add(lwpos).add(
-//				p1.getUnitCoord().mult(lwv / 1000))), Color.BLACK));
-//		Coord rwpos = new Coord(Globals.ROBOT_RIGHT_WHEEL_POS.x,
-//				Globals.ROBOT_RIGHT_WHEEL_POS.y).rotate(rO);
-//		l.add(new DrawableLine(new Line(p0.add(rwpos), p0.add(rwpos).add(
-//				p1.getUnitCoord().mult(rwv / 1000))), Color.BLACK));
-		return l;
-	}
-
-	@Override
-	public void updateTarget(StaticFieldObject target, Orientation o) {
-		this.target = target;
-		this.orient = o;
-	}
 
 	@Override
 	public boolean isFinished() {
@@ -89,7 +72,12 @@ public class BezierNav implements OrientedMovementExecutor {
 			// haven't even started
 			return false;
 		}
-		return p0.dist(p3) <= stopDistance;
+		return state.getBalle().getPosition().dist(getAdjustedP3()) <= stopDistance
+				&& Math.abs(state.getBalle().getOrientation()
+						.angleToatan2Radians(orient)) <= stopAngle;
+		// return p0.add(
+		// new Coord(0, Globals.ROBOT_LENGTH / 2).rotate(state.getBalle()
+		// .getOrientation())).dist(target.getPosition()) <= stopDistance;
 	}
 
 	@Override
@@ -110,67 +98,123 @@ public class BezierNav implements OrientedMovementExecutor {
 			return;
 		}
 		// calculate bezier points 0 to 3
-		Coord rP = state.getBalle().getPosition(), tP = target.getPosition()
-				.add(new Coord(-TARGET_PERIMETER, 0).rotate(orient));
+		Robot robot = state.getBalle();
+		Coord rP = robot.getPosition(), tP = getAdjustedP3();
 		double distS = rP.dist(tP) / 2;
 		if (rP == null || tP == null) {
 			return;
 		}
+
 		p0 = rP;
-		p1 = rP.add(state.getBalle().getOrientation().getUnitCoord()
-				.mult(distS / 4));
-		p2 = tP.add(orient.getOpposite().getUnitCoord().mult(distS));
 		p3 = tP;
 
-		// System.out.println("----");
-		// System.out.println("----");
-		// System.out.println(pos(0));
-		// System.out.println(vel(0));
-		// System.out.println(accel(0));
-		// System.out.println("----");
+		
+		// if we are close to the target and facing the correct orientation
+		// (orient)
+		// just go strait to ball
+		Coord n = robot.getOrientation().getUnitCoord()
+				.rotate(new Orientation(Math.PI / 2));
+		double da = Math
+				.abs(robot.getOrientation()
+				.angleToatan2Radians(orient));
+		double dd = Math.abs(n.dot(target.getPosition().sub(p0)));
+		if ((da <= Math.PI / 2 && dd < (Globals.ROBOT_HEIGHT / 2)
+				- TARGET_OFF_CENTER_TOLERANCE)) {
+			p3 = target.getPosition();
+		}
+
+		p1 = rP.add(robot.getOrientation().getUnitCoord().mult(distS / 2));
+		p2 = tP.add(orient.getOpposite().getUnitCoord().mult(distS));
+		
+		
 		// calculate turning radius
 		Coord a = accel(0);
-		Coord turnCenter = getCenterOfRotation(0);
-		// System.out.println(a);
-		// if (k == 0) {
-		// controller.forward(Globals.MAXIMUM_MOTOR_SPEED);
-		// return;
-		// }
 		boolean isLeft = new Coord(0, 0).angleBetween(
-				state.getBalle().getOrientation().getUnitCoord(), a)
+				robot.getOrientation().getUnitCoord(), a)
 				.atan2styleradians() > 0;
-		double r = turnCenter.dist(pos(0));
-		// System.out.println("r: " + r);
-		// System.out.println((isLeft ? "left" : "right"));
-		// System.out.println("center\t\t" + turnCenter);
-		// calcualte wheel speeds/powers
-		double max = Globals.powerToVelocity(Globals.MAXIMUM_MOTOR_SPEED);
-		// !!!!!!!!!!!double dd = p0.angleBetween(p1.sub(p0),
+		double r = radius(0);
+		System.out.println(r);
+
+		// throttle speed (slow when doing sharp turns)
+		double max = MAX_VELOCITY;
+		// // maximum speed is ok
+		if (r < MIN_SAFE_RADIUS) {
+			double min = max * SAFER_SPEED_RATIO;
+			max = min + ((r / MIN_SAFE_RADIUS) * (max - min));
+		}
+
+		// calculate wheel speeds/powers
 		int v1, v2;
 		v1 = (int) Globals
 				.velocityToPower((float) (max * getMinVelocityRato(r)));
 		v2 = (int) Globals.velocityToPower((float) max);
+		System.out.println(v2);
 		controller.setWheelSpeeds(isLeft ? v1 : v2, isLeft ? v2 : v1);
 
-		// System.out.println("l, r\t\t" + (isLeft ? v1 : v2) + "\t"
-		// + (isLeft ? v2 : v1));
-		// apply wheel speeds
-		if (false) {
-			// if (isLeft) {
-			// controller.setWheelSpeeds(v1, v2);
-			// lwv = v1;
-			// lwv = v2;
-			// } else {
-			// controller.setWheelSpeeds(v2, v1);
-			// lwv = v2;
-			// lwv = v1;
-			// }
+		// apply wheel speeds using sum movement executer
+		// if (false) {
+		// movementExecutor.updateState(state);
+		// movementExecutor.updateTarget(pos(stepDist).getPoint());
+		// movementExecutor.step(controller);
+		// }
 
-			movementExecutor.updateState(state);
-			movementExecutor.updateTarget(pos(stepDist).getPoint());
-			movementExecutor.step(controller);
+	}
+
+	@Override
+	public ArrayList<Drawable> getDrawables() {
+		ArrayList<Drawable> l = new ArrayList<Drawable>();
+		if (p0 == null) {
+			return l;
 		}
+		for (double t = -0.1; t < 1.1; t += 0.01) {
+			Color c = Color.ORANGE;
+			if (t < 0 || t > 1)
+				c = Color.GRAY;
+			l.add(new Dot(pos(t), c));
+		}
+		l.add(new Circle(p0, 0.03, Color.pink));
+		l.add(new Circle(p1, 0.03, Color.black));
+		l.add(new Circle(p2, 0.03, Color.black));
+		l.add(new Circle(p3, 0.03, Color.pink));
+		Coord center = getCenterOfRotation(0);
+		l.add(new Dot(center, Color.BLACK));
+		l.add(new Circle(center, center.dist(state.getBalle().getPosition()),
+				Color.yellow));
 
+		l.add(new Dot(pos(stepDist), Color.CYAN));
+		return l;
+	}
+
+
+	/**
+	 * P3 (target) must be adjusted so that the front of the robot doesn't bump
+	 * into the actual target
+	 * @return
+	 */
+	private Coord getAdjustedP3() {
+		return target.getPosition().add(
+				new Coord(-TARGET_PERIMETER, 0).rotate(orient));
+	}
+
+	private double approxAvgRadius(double ti, double tf) {
+		if (ti > tf) {
+			double tmp = tf;
+			tf = ti;
+			ti = tmp;
+		}
+		double r = 0;
+		double dt = (tf - ti) / 20;
+		int sections = 0;
+		for (double i = ti; i <= tf; i += dt) {
+			r += radius(i);
+			sections++;
+		}
+		r /= sections;
+		return r;
+	}
+
+	private double radius(double i) {
+		return getCenterOfRotation(0).dist(pos(0));
 	}
 
 	@Override
@@ -216,4 +260,15 @@ public class BezierNav implements OrientedMovementExecutor {
 		return ((radius - rtw) / (radius + rtw));
 	}
 
+	@Override
+	public void stop(Controller controller) {
+		// controller.kick();
+		controller.stop();
+	}
+
+	@Override
+	public void updateTarget(StaticFieldObject target, Orientation o) {
+		this.target = target;
+		this.orient = o;
+	}
 }
