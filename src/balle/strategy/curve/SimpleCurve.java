@@ -23,7 +23,7 @@ public abstract class SimpleCurve implements Curve {
 		g.setColor(Color.WHITE);
 
 		ArrayList<Coord> coords = new ArrayList<Coord>();
-		for (double t = -0.1; t < 1.1; t += 0.01)
+		for (double t = 0.0; t <= 1.0; t += 0.01)
 			coords.add(pos(t));
 
 		for (Coord c : coords) {
