@@ -1,10 +1,13 @@
 package balle.strategy;
 
 import balle.strategy.bezierNav.BezierNav;
+import balle.strategy.bezierNav.CurveNav;
+import balle.strategy.curve.CubicHermiteInterpolator;
 import balle.strategy.executor.movement.GoToObject;
 import balle.strategy.executor.movement.GoToObjectAvoidOpponentPurePF;
 import balle.strategy.executor.movement.GoToObjectPFN;
 import balle.strategy.executor.movement.GoToObjectPurePF;
+import balle.strategy.executor.movement.OrientedMovementExecutor;
 import balle.strategy.executor.turning.FaceAngle;
 import balle.strategy.planner.AbstractPlanner;
 import balle.strategy.planner.DefensiveStrategy;
@@ -17,7 +20,7 @@ import balle.strategy.planner.SimpleGoToBallFaceGoal;
 
 public class StrategyFactory {
 	public static String[] availableDesignators() {
-		String[] designators = { "BezierNav", "GoToBallPurePFOnly",
+		String[] designators = { "BezierNav", "CurveNav", "GoToBallPurePFOnly",
 				"GoToObjectAvoidOpponentPurePF", "GoToBall", "GoToFaceBall",
 				"GoToBallPFN",
 				"Dribble", "Blocking", "PFNavigation", "DefensiveStrategy",
@@ -32,8 +35,12 @@ public class StrategyFactory {
 		if (designator.equals("BezierNav")) {
 			return new SimpleGoToBallFaceGoal(new BezierNav(
 					new GoToObjectPurePF()));
-		} else
-		if (designator.equals("GoToObjectAvoidOpponentPurePF")) {
+		} else if (designator.equals("CurveNav")) {
+			return new SimpleGoToBallFaceGoal(
+					(OrientedMovementExecutor) new CurveNav(
+							new CubicHermiteInterpolator(),
+					new GoToObjectPurePF()));
+		} else if (designator.equals("GoToObjectAvoidOpponentPurePF")) {
 			return new SimpleGoToBall(new GoToObjectAvoidOpponentPurePF());
 		} else if (designator.equals("GoToBallPurePFOnly")) {
 			return new SimpleGoToBall(new GoToObjectPurePF());
