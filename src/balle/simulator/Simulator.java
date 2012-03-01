@@ -1,5 +1,6 @@
 package balle.simulator;
 
+import java.util.LinkedList;
 import java.util.Random;
 
 import javax.swing.JFrame;
@@ -150,9 +151,10 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 		super.update();
 
 		// Update world with new information, throtteling the frame rate
+		reader.update();
 		if (System.currentTimeMillis() - lastFrameTime > 1000f / Globals.SIMULATED_VISON_FRAMERATE) {
 			lastFrameTime = System.currentTimeMillis();
-			this.reader.update();
+			reader.propagate();
 		}
 	}
 
@@ -429,6 +431,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 	 * here.
 	 */
 	class SimulatorReader extends Reader {
+		LinkedList<VisionPackage> history = new LinkedList<VisionPackage>();
 
 		private long getTimeStamp() {
 			return System.currentTimeMillis() - startTime;
@@ -458,6 +461,35 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 					+ getTimeStamp();
 		}
 
+		/**
+		 * propagate using the history and the vision delay
+		 */
+		public void propagate() {
+			long targetTs = getTimeStamp();
+			if (noisy) {
+				targetTs -= Globals.SIMULATED_VISON_DELAY;
+			}
+			VisionPackage vp, next;
+			do {
+				vp = history.poll();
+				next = history.peek();
+			} while (vp != null && next != null
+					&& next.getTimestamp() < targetTs);
+
+			// default package
+			if (vp == null) {
+				vp = new VisionPackage(-1, -1, -1, -1, -1, -1, -1, -1, targetTs);
+				System.out.println("waiting for vision delay.");
+			}
+
+			super.propagate(vp.getYPosX(), vp.getYPosY(), vp.getYRad(),
+					vp.getBPosX(), vp.getBPosY(), vp.getBRad(),
+					vp.getBallPosX(), vp.getBallPosY(), vp.getTimestamp());
+		}
+
+		/**
+		 * update the reader with the latest info
+		 */
 		public void update() {
 			float yPosX, yPosY, yRad, bPosX, bPosY, bRad, ballPosX, ballPosY;
 
@@ -534,8 +566,9 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 				bRad = genRandDeg(angSd, bRad);
 			}
 
-			super.propagate(yPosX, yPosY, yRad, bPosX, bPosY, bRad, ballPosX,
-					ballPosY, timestamp);
+			VisionPackage vp = new VisionPackage(yPosX, yPosY, yRad, bPosX,
+					bPosY, bRad, ballPosX, ballPosY, timestamp);
+			history.add(vp);
 		}
 
 		private float genRand(float sd, float mean) {

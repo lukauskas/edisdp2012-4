@@ -17,8 +17,9 @@ import balle.strategy.planner.SimpleGoToBallFaceGoal;
 
 public class StrategyFactory {
 	public static String[] availableDesignators() {
-		String[] designators = { "BezierNav", "GoToObjectAvoidOpponentPurePF",
-				"GoToBallPFOnly", "GoToBall", "GoToFaceBall", "GoToBallPFN",
+		String[] designators = { "BezierNav", "GoToBallPurePFOnly",
+				"GoToObjectAvoidOpponentPurePF", "GoToBall", "GoToFaceBall",
+				"GoToBallPFN",
 				"Dribble", "Blocking", "PFNavigation", "DefensiveStrategy",
 				"Game", "GameFromPenaltyKick", "GameFromPenaltyDefence",
 				"BallNearWall" };
@@ -34,7 +35,7 @@ public class StrategyFactory {
 		} else
 		if (designator.equals("GoToObjectAvoidOpponentPurePF")) {
 			return new SimpleGoToBall(new GoToObjectAvoidOpponentPurePF());
-		} else if (designator.equals("GoToBallPFOnly")) {
+		} else if (designator.equals("GoToBallPurePFOnly")) {
 			return new SimpleGoToBall(new GoToObjectPurePF());
 		} else if (designator.equals("GoToBall")) {
 			return new GoToBall(new GoToObject(new FaceAngle()), true);

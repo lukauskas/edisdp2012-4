@@ -20,7 +20,7 @@ public class GoToObjectPurePF implements MovementExecutor {
 	private Snapshot currentState;
 
 	private double stopDistance = 0;
-	private final double ZERO_TH = Math.PI / 2;
+	private static final double ZERO_TH = Math.PI * 0.01;
 
 	@Override
 	public void stop(Controller controller) {
@@ -43,6 +43,8 @@ public class GoToObjectPurePF implements MovementExecutor {
 
 	@Override
 	public boolean isFinished() {
+		if (true)
+			return false;
 		Robot robot = currentState.getBalle();
 		Coord currentPosition = robot.getPosition();
 		if ((target == null) || (currentPosition == null)) {
@@ -76,8 +78,28 @@ public class GoToObjectPurePF implements MovementExecutor {
 				target.getPosition()).atan2styleradians();
 		int pR = (int) Math.round(getRightWheelSpeed(rFO));
 		int pL = (int) Math.round(getLeftWheelSpeed(rFO));
+
+		double dif = Math.abs(pR - pL);
+		// slow down rotations
+		double min = 0.3;
+		double exp = 0.1;
+		double rotSlowdown = (1 - ((double) Math.pow(dif, exp) / Math
+.pow(
+				(2 * Globals.MAXIMUM_MOTOR_SPEED), exp)));
+		rotSlowdown = (rotSlowdown * (1 - min)) + min;
+		pR *= rotSlowdown;
+		pL *= rotSlowdown;
+		// slowdown forward movement if near target and not facing it;
+		double dist = r.getPosition().dist(target.getPosition());
+		// double odSlowdown = (1/)
+
+		// boolean left = Math.abs(pR) > Math.abs(pL);
+		// if (left) {
+		// pR = (pR + pL) / 2;
+		// } else {
+		// pL = (pR + pL) / 2;
+		// }
 		controller.setWheelSpeeds(pL, pR);
-		System.out.println(rFO);
 	}
 
 	/**
@@ -98,7 +120,7 @@ public class GoToObjectPurePF implements MovementExecutor {
 		return getWheelSpeedHelper(-a);
 	}
 
-	private double getWheelSpeedHelper(double a) {
+	private static double getWheelSpeedHelper(double a) {
 		int max = Globals.MAXIMUM_MOTOR_SPEED;
 		if (a < 0) {
 			return max;

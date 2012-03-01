@@ -49,7 +49,7 @@ public class BezierNav implements OrientedMovementExecutor {
 		if (p0 == null) {
 			return l;
 		}
-		for (double t = -0.1; t < 1.1; t += 0.05) {
+		for (double t = -0.1; t < 1.1; t += 0.01) {
 			Color c = Color.ORANGE;
 			if (t < 0 || t > 1)
 				c = Color.GRAY;
@@ -85,8 +85,11 @@ public class BezierNav implements OrientedMovementExecutor {
 
 	@Override
 	public boolean isFinished() {
-		return state.getBalle().getPosition()
-				.dist(target.getPosition().add(new Coord(0, 0.16))) <= stopDistance;
+		if (p0 == null || p3 == null) {
+			// haven't even started
+			return false;
+		}
+		return p0.dist(p3) <= stopDistance;
 	}
 
 	@Override
@@ -147,11 +150,12 @@ public class BezierNav implements OrientedMovementExecutor {
 		v1 = (int) Globals
 				.velocityToPower((float) (max * getMinVelocityRato(r)));
 		v2 = (int) Globals.velocityToPower((float) max);
+		controller.setWheelSpeeds(isLeft ? v1 : v2, isLeft ? v2 : v1);
 
 		// System.out.println("l, r\t\t" + (isLeft ? v1 : v2) + "\t"
 		// + (isLeft ? v2 : v1));
 		// apply wheel speeds
-		if (true) {
+		if (false) {
 			// if (isLeft) {
 			// controller.setWheelSpeeds(v1, v2);
 			// lwv = v1;

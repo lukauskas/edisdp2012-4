@@ -47,7 +47,6 @@ public class Orientation {
 	}
 
 	public double atan2styleradians() {
-		System.out.println("aaa: " + radians());
 		if (radians() <= Math.PI)
 			return radians();
 		else
