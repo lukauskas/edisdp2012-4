@@ -11,7 +11,7 @@ public class CubicHermiteInterpolator implements Interpolator {
 		double div = 1.0 / ((double) curves.length);
 		curves[0] = new Bezier3(new Coord[] { controlPoints[0],
 				controlPoints[0].add(m(controlPoints[0], 0, controlPoints[1],
-						div, controlPoints[2], div * 2).mult(1 / 3)),
+						div, controlPoints[2], div * 2).div(3)),
 				controlPoints[1], });
 
 		for (int i = 1; i < controlPoints.length - 1; i++) {
@@ -35,8 +35,8 @@ public class CubicHermiteInterpolator implements Interpolator {
 
 			Coord[] out = new Coord[] { 
 					controlPoints[i], 
-					controlPoints[i].add(m0.mult(1 / 3)),
-					controlPoints[i + 1].sub(m1.mult(1 / 3)),
+					controlPoints[i].add(m0.div(3)),
+					controlPoints[i + 1].sub(m1.div(3)),
 					controlPoints[i + 1], };
 
 			curves[i] = new Bezier4(out);
