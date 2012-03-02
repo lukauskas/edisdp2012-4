@@ -80,7 +80,7 @@ public class GoToBallM3 extends GoToBall {
         {
             LOG.info("Going to the ball");
             MovementExecutor strategy = new GoToObject(new FaceAngle());
-            strategy.setStopDistance(0.05);
+			strategy.setStopDistance(0.00);
             setExecutorStrategy(strategy);
         }
     }
@@ -98,11 +98,12 @@ public class GoToBallM3 extends GoToBall {
             setAppropriateMovementStrategy();
         }
         if (stage == 2) {
-            if (ourRobot.possessesBall(snapshot.getBall())
-                    && ourRobot.getFacingLine().intersects(
-                            snapshot.getOpponentsGoal().getGoalLine())) {
+			if (ourRobot.getPosition().dist(snapshot.getBall().getPosition()) < (Globals.ROBOT_LENGTH + 0.05)
+					&& ourRobot.getFacingLine().intersects(
+							snapshot.getOpponentsGoal().getGoalLine())) {
                 LOG.info("Kicking");
                 controller.kick();
+				controller.setWheelSpeeds(200, 200);
                 return;
             }
         }
@@ -119,13 +120,14 @@ public class GoToBallM3 extends GoToBall {
             Coord targetCoord = getTarget().getPosition();
 
             turnExecutor.updateState(getSnapshot());
-            turnExecutor.setTargetOrientation(targetCoord.sub(
-                    ourRobot.getPosition()).orientation());
+
 
             double angleToFaceTarget = ourRobot
                     .getAngleToTurnToTarget(targetCoord);
             
             if (Math.abs(angleToFaceTarget) > Math.PI / 8) {
+				turnExecutor.setTargetOrientation(targetCoord.sub(
+						ourRobot.getPosition()).orientation());
                 LOG.info("Turning to target");
                 turnExecutor.step(controller);
             } else {
