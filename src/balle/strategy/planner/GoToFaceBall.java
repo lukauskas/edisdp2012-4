@@ -47,17 +47,13 @@ public class GoToFaceBall extends GoToBall {
 	}
 	
 	@Override
-    public void step(Controller controller, Snapshot snapshot) {
+    public void onStep(Controller controller, Snapshot snapshot) {
 		StaticFieldObject target = getTarget(snapshot);
 
 		if ((snapshot == null)
 				|| (snapshot.getBalle().getPosition() == null)
                 || (target == null))
             return;
-
-        // Update the current state of executor strategy
-		executorStrategy.updateState(snapshot);
-		rotateStrategy.updateState(snapshot);
 
         // If we see the opponent
 		if (snapshot.getOpponent() != null) {
@@ -80,9 +76,9 @@ public class GoToFaceBall extends GoToBall {
             addDrawable(new Dot(target.getPosition(), getTargetColor()));
 
         // If it says it is not finished, tell it to do something for a step.
-        if (!executorStrategy.isFinished()) {
+        if (!executorStrategy.isFinished(snapshot)) {
 			executorStrategy.step(controller, snapshot);
-        } else if (!rotateStrategy.isFinished()) {
+        } else if (!rotateStrategy.isFinished(snapshot)) {
         	executorStrategy.stop(controller);
 			rotateStrategy.step(controller, snapshot);
         } else {

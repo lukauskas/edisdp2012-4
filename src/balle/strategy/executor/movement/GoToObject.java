@@ -18,7 +18,6 @@ public class GoToObject implements MovementExecutor {
 	private final static double EPSILON = 0.00001;
 
 	protected StaticFieldObject target = null;
-	protected Snapshot currentState = null;
 	private boolean isMoving = false;
 
 	private final static double DISTANCE_DIFF_TO_TURN_FOR = 0.3;
@@ -36,8 +35,8 @@ public class GoToObject implements MovementExecutor {
 	}
 
 	@Override
-	public boolean isFinished() {
-		Robot robot = currentState.getBalle();
+	public boolean isFinished(Snapshot snapshot) {
+		Robot robot = snapshot.getBalle();
 		Coord currentPosition = robot.getPosition();
 		if ((target == null) || (currentPosition == null)) {
 			return false;
@@ -46,11 +45,11 @@ public class GoToObject implements MovementExecutor {
 	}
 
 	@Override
-	public boolean isPossible() {
+	public boolean isPossible(Snapshot snapshot) {
 		if (turningExecutor == null)
 			return false;
 
-		Robot robot = currentState.getBalle();
+		Robot robot = snapshot.getBalle();
 		Coord currentPosition = robot.getPosition();
 		Orientation currentOrientation = robot.getOrientation();
 		Coord targetPosition = (target != null) ? target.getPosition() : null;
@@ -58,30 +57,24 @@ public class GoToObject implements MovementExecutor {
 	}
 
 	@Override
-	public void updateState(Snapshot snapshot) {
-		currentState = snapshot;
-	}
-
-	@Override
 	public void step(Controller controller, Snapshot snapshot) {
 		// Fail quickly if state not set
-		if (currentState == null)
+		if (snapshot == null)
 			return;
 
 		Coord targetCoord = target.getPosition();
-		Robot robot = currentState.getBalle();
+		Robot robot = snapshot.getBalle();
 
 		Coord currentPosition = robot.getPosition();
 
-		if (isFinished()) {
+		if (isFinished(snapshot)) {
 			stop(controller);
 			return;
 		} else {
 			// Fail quickly if not possible
-			if (!isPossible())
+			if (!isPossible(snapshot))
 				return;
-			turningExecutor.updateState(currentState);
-			if (turningExecutor.isFinished()) {
+			if (turningExecutor.isFinished(snapshot)) {
 				turningExecutor.stop(controller);
 			}
 
@@ -93,7 +86,7 @@ public class GoToObject implements MovementExecutor {
 				Orientation orientationToTarget = targetCoord.sub(
 						currentPosition).orientation();
 				turningExecutor.setTargetOrientation(orientationToTarget);
-				double turnAngle = turningExecutor.getAngleToTurn();
+				double turnAngle = turningExecutor.getAngleToTurn(snapshot);
 				double dist = targetCoord.dist(robot.getPosition());
 				double distDiffFromTarget = Math
 						.abs(Math.sin(turnAngle) * dist);

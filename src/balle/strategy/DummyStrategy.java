@@ -18,7 +18,7 @@ public class DummyStrategy extends AbstractPlanner {
     boolean        goingForward = false;
 
     @Override
-    public void step(Controller controller, Snapshot snapshot) {
+    public void onStep(Controller controller, Snapshot snapshot) {
         long t = System.currentTimeMillis();
         long dt = t - timer;
         if (dt > 0) {

@@ -59,10 +59,10 @@ public class GameFromPenaltyDefence extends Game {
 	}
 
 	@Override
-	public void step(Controller controller, Snapshot snapshot) {
+	public void onStep(Controller controller, Snapshot snapshot) {
 
 		if (finished || !isStillInPenaltyDefence(snapshot)) {
-			super.step(controller, snapshot);
+			super.onStep(controller, snapshot);
 			return;
 		}
 

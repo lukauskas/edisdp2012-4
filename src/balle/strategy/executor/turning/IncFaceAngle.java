@@ -46,13 +46,13 @@ public class IncFaceAngle extends FaceAngle {
     }
 
     @Override
-    public void step(Controller controller, Snapshot snapshot) {
-        if (!isPossible() || !isTurning())
+	public void step(Controller controller, Snapshot snapshot) {
+        if (!isPossible(snapshot) || !isTurning())
             return;
 
-        double angleToTurn = getAngleToTurn();
+        double angleToTurn = getAngleToTurn(snapshot);
 
-        if (Math.abs(getAngleToTurn()) < ACCURACY) {
+        if (Math.abs(getAngleToTurn(snapshot)) < ACCURACY) {
             this.stop(controller);
         } else {
             this.turn(controller, angleToTurn);

@@ -18,7 +18,7 @@ public class GameFromPenaltyKick extends Game {
 	}
 
 	@Override
-	public void step(Controller controller, Snapshot snapshot) {
+	public void onStep(Controller controller, Snapshot snapshot) {
 		if (timeToKick == 0) {
 			timeToKick = System.currentTimeMillis() + 1000;
 		} else if ((timeToKick <= System.currentTimeMillis())
@@ -28,7 +28,7 @@ public class GameFromPenaltyKick extends Game {
 			controller.penaltyKick();
 		} else if ((timeToGame != 0)
 				&& (timeToGame <= System.currentTimeMillis())) {
-			super.step(controller, snapshot);
+			super.onStep(controller, snapshot);
 		}
 
 	}

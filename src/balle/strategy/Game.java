@@ -45,24 +45,12 @@ public class Game extends AbstractPlanner {
     }
 
     @Override
-    public void updateState(Snapshot snapshot) {
-        // Update the state for ourselves
-        super.updateState(snapshot);
-        // Propagate the state to our strategies
-        defensiveStrategy.updateState(snapshot);
-        goToBallStrategy.updateState(snapshot);
-        turningExecutor.updateState(snapshot);
-        pickBallFromWallStrategy.updateState(snapshot);
-    }
-
-    @Override
-    public void step(Controller controller, Snapshot snapshot) {
+    public void onStep(Controller controller, Snapshot snapshot) {
 
         Robot ourRobot = snapshot.getBalle();
         Robot opponent = snapshot.getOpponent();
         Ball ball = snapshot.getBall();
         Goal ownGoal = snapshot.getOwnGoal();
-        Goal opponentsGoal = snapshot.getOpponentsGoal();
         Pitch pitch = snapshot.getPitch();
 
         Orientation targetOrientation = ball.getPosition()

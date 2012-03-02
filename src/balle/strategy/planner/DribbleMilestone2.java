@@ -21,11 +21,10 @@ public class DribbleMilestone2 extends AbstractPlanner {
     }
 
     @Override
-    public void step(Controller controller, Snapshot snapshot) {
-        executor.updateState(snapshot);
+    public void onStep(Controller controller, Snapshot snapshot) {
 
         if (startingCoordinate == null) {
-            if (executor.isPossible()) {
+            if (executor.isPossible(snapshot)) {
                 startingCoordinate = snapshot.getBalle().getPosition(); // Set
                                                                         // the
                                                                         // starting

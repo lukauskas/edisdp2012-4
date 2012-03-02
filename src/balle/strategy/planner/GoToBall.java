@@ -250,15 +250,12 @@ public class GoToBall extends AbstractPlanner {
     }
 
     @Override
-    public void step(Controller controller, Snapshot snapshot) {
+    public void onStep(Controller controller, Snapshot snapshot) {
 		StaticFieldObject target = getTarget(snapshot);
 
 		if ((snapshot == null) || (snapshot.getBalle().getPosition() == null)
                 || (target == null))
             return;
-
-        // Update the current state of executor strategy
-		executorStrategy.updateState(snapshot);
 
         if (shouldApproachTargetFromCorrectSide()
                 && (!snapshot.getBalle()
@@ -288,7 +285,7 @@ public class GoToBall extends AbstractPlanner {
             addDrawable(new Dot(target.getPosition(), getTargetColor()));
 
         // If it says it is not finished, tell it to do something for a step.
-        if (!executorStrategy.isFinished()) {
+        if (!executorStrategy.isFinished(snapshot)) {
 			executorStrategy.step(controller, snapshot);
         } else {
             // Tell the strategy to stop doing whatever it was doing
@@ -298,8 +295,9 @@ public class GoToBall extends AbstractPlanner {
 
     @Override
     public void stop(Controller controller) {
-        if (!executorStrategy.isFinished())
-            executorStrategy.stop(controller);
+		// TODO: do we really need to check this?
+		// if (!executorStrategy.isFinished(snapshot))
+		executorStrategy.stop(controller);
 
     }
 }

@@ -12,7 +12,6 @@ public class FaceAngle implements Executor, RotateToOrientationExecutor {
     protected final static double DEFAULT_ACCURACY        = Math.PI / 16;
     protected final double        ACCURACY;
 
-    Snapshot                      currentState            = null;
     Orientation                   targetOrientation       = null;
 
     private int                   timeToTurn              = 0;
@@ -59,13 +58,13 @@ public class FaceAngle implements Executor, RotateToOrientationExecutor {
      * Returns true if the robot is already facing the correct angle.
      */
     @Override
-    public boolean isFinished() {
-        if (currentState == null)
+    public boolean isFinished(Snapshot snapshot) {
+		if (snapshot == null)
             return false;
         else if (targetOrientation == null)
             return true;
         else {
-            double current = currentState.getBalle().getOrientation().radians();
+			double current = snapshot.getBalle().getOrientation().radians();
             double target = targetOrientation.radians();
             if (Math.abs(current - target) <= ACCURACY)
                 return true;
@@ -75,13 +74,8 @@ public class FaceAngle implements Executor, RotateToOrientationExecutor {
     }
 
     @Override
-    public boolean isPossible() {
-        return ((currentState != null) && (currentState.getBalle() != null));
-    }
-
-    @Override
-    public void updateState(Snapshot snapshot) {
-        currentState = snapshot;
+    public boolean isPossible(Snapshot snapshot) {
+		return ((snapshot != null) && (snapshot.getBalle() != null));
     }
 
     private int calculateTimeToTurn(double radiansToTurn) {
@@ -116,29 +110,29 @@ public class FaceAngle implements Executor, RotateToOrientationExecutor {
      * ()
      */
     @Override
-    public double getAngleToTurn() {
-        if (!isPossible())
+	public double getAngleToTurn(Snapshot snapshot) {
+        if (!isPossible(snapshot))
             return 0;
 
-        return currentState.getBalle().getAngleToTurn(targetOrientation);
+		return snapshot.getBalle().getAngleToTurn(targetOrientation);
     }
 
     @Override
-    public void step(Controller controller, Snapshot snapshot) {
-        if (!isPossible())
+	public void step(Controller controller, Snapshot snapshot) {
+        if (!isPossible(snapshot))
             return;
 
-        if (isFinished()) {
+        if (isFinished(snapshot)) {
             stop(controller);
         }
         if (needStop) {
             stop(controller);
-            step(controller, snapshot);
+			step(controller, snapshot);
         } else if (isTurning())
             return; // If we're still turning, continue.
         else {
             // Else start turning
-            initiateTurn(controller, getAngleToTurn());
+            initiateTurn(controller, getAngleToTurn(snapshot));
         }
 
     }

@@ -17,8 +17,10 @@ public abstract class AbstractPlanner implements Strategy {
      * @param snapshot
      */
     @Override
-	public void updateState(Snapshot snapshot) {
+	public final void step(Controller controller, Snapshot snapshot) {
         clearDrawables();
+        
+        onStep(controller, snapshot);
     }
 
     @Override
@@ -52,5 +54,7 @@ public abstract class AbstractPlanner implements Strategy {
     protected void addDrawables(ArrayList<Drawable> drawables) {
         this.drawables.addAll(drawables);
     }
+
+	protected abstract void onStep(Controller controller, Snapshot snapshot);
 
 }

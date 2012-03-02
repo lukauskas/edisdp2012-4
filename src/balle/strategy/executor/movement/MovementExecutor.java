@@ -20,13 +20,10 @@ public interface MovementExecutor extends Executor {
     public void updateTarget(StaticFieldObject target);
 
 	@Override
-	public boolean isFinished();
+	public boolean isFinished(Snapshot snapshot);
 
 	@Override
-	public boolean isPossible();
-
-	@Override
-	public void updateState(Snapshot snapshot);
+	public boolean isPossible(Snapshot snapshot);
 
 	@Override
 	public void step(Controller controller, Snapshot snapshot);

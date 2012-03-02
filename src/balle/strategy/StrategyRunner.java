@@ -44,7 +44,6 @@ public class StrategyRunner extends AbstractWorldProcessor {
 		if (currentStrategy != null) {
 
 			Snapshot snapshot = getSnapshot();
-			currentStrategy.updateState(snapshot);
 			try {
 				currentStrategy.step(controller, snapshot);
 			} catch (Exception e) {

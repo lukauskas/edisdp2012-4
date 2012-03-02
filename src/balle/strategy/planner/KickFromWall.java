@@ -122,11 +122,11 @@ public class KickFromWall extends GoToBall {
 	}
 
 	@Override
-	public void step(Controller controller, Snapshot snapshot) {
+	public void onStep(Controller controller, Snapshot snapshot) {
 		if (snapshot.getBall().isNear(snapshot.getBalle())
 				&& goingToBall)
 			controller.kick();
-		super.step(controller, snapshot);
+		super.onStep(controller, snapshot);
 	}
 
     @Override
