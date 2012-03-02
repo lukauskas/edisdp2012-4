@@ -21,7 +21,7 @@ public class BezierNav implements OrientedMovementExecutor {
 	// this is how far away from the target that the robot (center) should land
 	// the default causes the robot to stop just in front of the target.
 	// If this was 0 and the target was the ball, the robot would be prone
-	// to crashing into the ball b4 obtainning the correct orientation
+	// to crashing into the ball b4 obtainning the correct orientation.
 	private final double TARGET_PERIMETER = (Math.sqrt(Math.pow(
 			Globals.ROBOT_LENGTH, 2) + Math.pow(Globals.ROBOT_WIDTH, 2)) / 2) + 0.01;
 
