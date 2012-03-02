@@ -103,10 +103,10 @@ public class CurveNav implements OrientedMovementExecutor {
 		double distS = rP.dist(tP) / 2;
 
 		// Null test
-		// if (rP == null || tP == null)
-		// return null;
-		//
-		// // Compile the test.
+		if (rP == null || tP == null)
+			return null;
+
+		// Compile the test.
 		// Coord[] controls = new Coord[] { rP,
 		// tP.add(orient.getOpposite().getUnitCoord().mult(distS)), tP, };
 
