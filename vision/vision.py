@@ -52,20 +52,28 @@ class Vision:
         eventHandler = self.gui.getEventHandler()
         eventHandler.addListener('q', self.quit)
 
-        if not self.stdout:
-            self.connect()
+        while self.running:
+            try:
+                if not self.stdout:
+                    self.connect()
 
-        if self.preprocessor.hasPitchSize:
-            self.outputPitchSize()
-            self.gui.setShowMouse(False)
-        else:
-            eventHandler.setClickListener(self.setNextPitchCorner)
-            
-        self.doStuff()
+                if self.preprocessor.hasPitchSize:
+                    self.outputPitchSize()
+                    self.gui.setShowMouse(False)
+                else:
+                    eventHandler.setClickListener(self.setNextPitchCorner)
+
+                self.doStuff()
+            except socket.error:
+                # If the rest of the system is not up yet/gets quit,
+                # just wait for it to come available.
+                time.sleep(1)
         
     def connect(self):
+        print("Attempting to connect...")
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect( (HOST, PORT) )
+        connected = True
 
     def quit(self):
         self.running = False
@@ -73,7 +81,6 @@ class Vision:
     def doStuff(self):
         while self.running:
             if self.cap.getCameraMatrix is None:
-                # No calibration matrices for pitch 0 atm
                 frame = self.cap.getImage()
             else:
                 frame = self.cap.getImageUndistort()
