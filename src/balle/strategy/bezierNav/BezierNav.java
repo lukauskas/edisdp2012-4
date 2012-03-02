@@ -2,6 +2,7 @@ package balle.strategy.bezierNav;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import balle.controller.Controller;
 import balle.main.drawable.Circle;
@@ -20,12 +21,14 @@ import balle.world.objects.StaticFieldObject;
 
 public class BezierNav implements OrientedMovementExecutor {
 
+
 	// this is how far away from the target that the robot (center) should land
 	// the default causes the robot to stop just in front of the target.
 	// If this was 0 and the target was the ball, the robot would be prone
 	// to crashing into the ball b4 obtainning the correct orientation.
 	private final double TARGET_PERIMETER = (Math.sqrt(Math.pow(
 			Globals.ROBOT_LENGTH, 2) + Math.pow(Globals.ROBOT_WIDTH, 2)) / 2) + 0.01;
+
 
 	private final double TARGET_OFF_CENTER_TOLERANCE = 0.01; // (ROBOTWIDTH/2)-
 														// TARGET_OFF_CENTER_TOLERANCE
@@ -46,6 +49,13 @@ public class BezierNav implements OrientedMovementExecutor {
 			.powerToVelocity(Globals.MAXIMUM_MOTOR_SPEED); // the maximum wheel
 															// velocity to use
 
+	private static final double SUBTARGET_RADIUS = 0.05; // how close the robot
+															// has
+														// to be to intermitent
+														// points befor it try
+														// to get to the next
+														// point
+
 	// these 2 must moth be satisfied before this movement is finished
 	private double stopDistance = 0.03; // distance to target (centre of robot
 										// to adjusted p3)
@@ -53,6 +63,15 @@ public class BezierNav implements OrientedMovementExecutor {
 												// angle (orient)
 
 
+
+	private ArrayList<Coord> targetPoints = new ArrayList<Coord>(
+			Arrays.asList(new Coord[] {
+ new Coord(0.5, 0.3), new Coord(1, 1),
+					new Coord(0.2, 0.4), new Coord(0.5, 0.3),
+
+			}));
+	
+	
 	private Interpolator interpolator;
 	private Curve c;
 
@@ -107,7 +126,20 @@ public class BezierNav implements OrientedMovementExecutor {
 		p0 = rP;
 		p3 = tP;
 
-		c = interpolator.getCurve(new Coord[] { p0, new Coord(0.5, 0.3), p3 },
+		// remove current target point if close
+		if (targetPoints.size() > 0
+				&& p0.dist(targetPoints.get(0)) <= SUBTARGET_RADIUS) {
+			targetPoints.remove(0);
+		}
+
+		Coord[] tpa = new Coord[targetPoints.size() + 2];
+		tpa[0] = p0;
+		tpa[tpa.length - 1] = p3;
+		for (int i = 0; i < targetPoints.size(); i++) {
+			tpa[i + 1] = targetPoints.get(i);
+		}
+
+		c = interpolator.getCurve(tpa,
 				robot.getOrientation(), orient);
 
 		// if we are close to the target and facing the correct orientation
@@ -168,12 +200,12 @@ public class BezierNav implements OrientedMovementExecutor {
 		if (c instanceof Spline) {
 			l.add((Spline) c);
 		}
-		l.add(new Circle(p0, 0.03, Color.pink));
-		l.add(new Circle(p3, 0.03, Color.pink));
 		Coord center = c.cor(0);
 		l.add(new Dot(center, Color.BLACK));
 		l.add(new Circle(center, center.dist(state.getBalle().getPosition()),
 				Color.yellow));
+		l.add(new Circle(p0, 0.03, Color.pink));
+		l.add(new Circle(p3, 0.03, Color.pink));
 
 		return l;
 	}
