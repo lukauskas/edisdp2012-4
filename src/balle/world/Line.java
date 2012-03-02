@@ -154,5 +154,56 @@ public class Line {
 		return new Coord((getA().getX() + getB().getX()) / 2,
 				(getA().getY() + getB().getY()) / 2);
 	}
+	/**
+	 * Get the angle of the line from the horizontal (going from A to B).
+	 * 
+	 * @return The angle
+	 */
+	public Orientation angle() {
+		return new Orientation(Math.atan2(b.getY() - a.getY(),
+				b.getX() - a.getX()));
+	}
+
+	public Line extend(double ballSafeGap) {
+		
+		Coord point = new Coord(ballSafeGap, 0);
+		Coord rotated = point.rotate(angle());
+
+		double newX = b.getX() + rotated.getX();
+		double newY = b.getY() + rotated.getY();
+
+		return new Line(a, new Coord(newX, newY));
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+
+		if (obj == null) {
+			return false;
+		}
+
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof Line)) {
+			return false;
+		}
+
+		Line other = (Line) obj;
+
+		return a.equals(other.a) && b.equals(other.b);
+	}
+
+	@Override
+	public int hashCode() {
+		// TODO Auto-generated method stub
+		return super.hashCode();
+	}
+
+	@Override
+	public String toString() {
+		return "(" + a.toString() + ", " + b.toString() + ")";
+	}
 
 }

@@ -126,21 +126,6 @@ public class BezierNav implements OrientedMovementExecutor {
 		p0 = rP;
 		p3 = tP;
 
-		// remove current target point if close
-		if (targetPoints.size() > 0
-				&& p0.dist(targetPoints.get(0)) <= SUBTARGET_RADIUS) {
-			targetPoints.remove(0);
-		}
-
-		Coord[] tpa = new Coord[targetPoints.size() + 2];
-		tpa[0] = p0;
-		tpa[tpa.length - 1] = p3;
-		for (int i = 0; i < targetPoints.size(); i++) {
-			tpa[i + 1] = targetPoints.get(i);
-		}
-
-		c = interpolator.getCurve(tpa,
-				robot.getOrientation(), orient);
 
 		// if we are close to the target and facing the correct orientation
 		// (orient)
@@ -156,6 +141,20 @@ public class BezierNav implements OrientedMovementExecutor {
 			p3 = target.getPosition();
 		}
 
+		// remove current target point if close
+		if (targetPoints.size() > 0
+				&& p0.dist(targetPoints.get(0)) <= SUBTARGET_RADIUS) {
+			targetPoints.remove(0);
+		}
+
+		Coord[] tpa = new Coord[targetPoints.size() + 2];
+		tpa[0] = p0;
+		tpa[tpa.length - 1] = p3;
+		for (int i = 0; i < targetPoints.size(); i++) {
+			tpa[i + 1] = targetPoints.get(i);
+		}
+
+		c = interpolator.getCurve(tpa, robot.getOrientation(), orient);
 		
 		
 		// calculate turning radius

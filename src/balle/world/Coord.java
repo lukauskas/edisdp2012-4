@@ -98,9 +98,10 @@ public class Coord {
 		if (this.getClass() != other.getClass())
 			return false;
 		Coord otherCoord = (Coord) other;
-		return (otherCoord.getX() == this.getX())
-				&& (otherCoord.getY() == this.getY())
-				&& (otherCoord.isEstimated() == this.isEstimated());
+
+		return Math.abs(otherCoord.x - this.x) < 0.00001
+				&& Math.abs(otherCoord.y - this.y) < 0.00001
+				&& otherCoord.isEstimated() == this.isEstimated();
 	}
 
 	/**
@@ -216,6 +217,6 @@ public class Coord {
 
 	@Override
 	public String toString() {
-		return "(" + x + "," + y + ")";
+		return "(" + x + ", " + y + ")";
 	}
 }
