@@ -12,19 +12,33 @@ public class CustomCHI extends CubicHermiteInterpolator {
 	public ArrayList<Bezier4> getCurves(Stack<Coord> controlPoints,
 			Orientation start,
 			Orientation end) {
-		int cpLength = controlPoints.size();
-
 		ArrayList<Bezier4> curves = new ArrayList<Bezier4>();
 
-		double div = 1.0 / ((double) cpLength - 1);
+		Orientation inc = null;
 
 		while (controlPoints.size() >= 2) {
-			Coord[] coords = new Coord[4];
-			coords[3] = controlPoints.pop();
-			coords[0] = controlPoints.peek();
+			Coord[] p = new Coord[4];
 
+			p[3] = controlPoints.pop();
+			p[0] = controlPoints.peek();
 
-			curves.add(0, new Bezier4(coords));
+			double distS = p[0].dist(p[3]) / 4;
+
+			// Calculate p0.
+			if (inc == null)
+				p[2] = p[3].add(end.getOpposite().getUnitCoord().mult(distS));
+			else
+				p[2] = p[3].add(inc.getOpposite().getUnitCoord().mult(distS));
+
+			// Choose a value for inc.
+
+			// Calculate p1.
+			if (inc == null)
+				p[1] = p[0].add(start.getUnitCoord().mult(distS));
+			else
+				p[1] = p[0].add(inc.getUnitCoord().mult(distS));
+
+			curves.add(0, new Bezier4(p));
 		}
 
 		return curves;
