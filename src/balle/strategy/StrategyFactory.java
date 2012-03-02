@@ -2,7 +2,7 @@ package balle.strategy;
 
 import balle.strategy.bezierNav.BezierNav;
 import balle.strategy.bezierNav.CurveNav;
-import balle.strategy.curve.CubicHermiteInterpolator;
+import balle.strategy.curve.FiniteDifferenceCHI;
 import balle.strategy.executor.movement.GoToObject;
 import balle.strategy.executor.movement.GoToObjectAvoidOpponentPurePF;
 import balle.strategy.executor.movement.GoToObjectPFN;
@@ -34,11 +34,11 @@ public class StrategyFactory {
 			throws UnknownDesignatorException {
 		if (designator.equals("BezierNav")) {
 			return new SimpleGoToBallFaceGoal(new BezierNav(
-					new CubicHermiteInterpolator()));
+					new FiniteDifferenceCHI()));
 		} else if (designator.equals("CurveNav")) {
 			return new SimpleGoToBallFaceGoal(
 					(OrientedMovementExecutor) new CurveNav(
-							new CubicHermiteInterpolator(),
+							new FiniteDifferenceCHI(),
 					new GoToObjectPurePF()));
 		} else if (designator.equals("GoToObjectAvoidOpponentPurePF")) {
 			return new SimpleGoToBall(new GoToObjectAvoidOpponentPurePF());
