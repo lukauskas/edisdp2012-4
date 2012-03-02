@@ -3,8 +3,8 @@ package balle.strategy;
 import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
+import balle.main.SimpleWorldGUI;
 import balle.world.AbstractWorld;
-import balle.world.SimpleWorldGUI;
 import balle.world.Snapshot;
 import balle.world.processing.AbstractWorldProcessor;
 

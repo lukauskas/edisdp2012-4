@@ -26,7 +26,6 @@ public class StratTab extends JPanel implements ActionListener {
 	// GUI
 	private JPanel top;
 	private JPanel southPanel;
-	private JPanel mainPanel;
 	private JButton button;
 	private JButton randomButton;
 	private JButton resetButton;
@@ -35,10 +34,10 @@ public class StratTab extends JPanel implements ActionListener {
 	private JButton switchRobot;
 	private JComboBox menu;
 	private JLabel label;
+	private boolean isBlue;
 
 	private ArrayList<String> stratTabs;
 	private String[] strings = new String[0];
-	private boolean toggle = false;
 
 	private StrategyRunner strategyRunner;
 	private Controller controller;
@@ -59,10 +58,8 @@ public class StratTab extends JPanel implements ActionListener {
 		// Class Variables
 		top = new JPanel();
 		southPanel = new JPanel();
-		mainPanel = new JPanel();
 		top.setLayout(new BorderLayout());
 		southPanel.setLayout(new BorderLayout());
-		mainPanel.setLayout(new BorderLayout());
 
 		stratTabs = new ArrayList<String>();
 
@@ -80,7 +77,7 @@ public class StratTab extends JPanel implements ActionListener {
 		resetButton.setEnabled(simulator != null);
 		resetButton.setActionCommand("reset");
 
-		noiseButton = new JButton("Noise: Off");
+		noiseButton = new JButton("Noise: On");
 		noiseButton.addActionListener(this);
 		noiseButton.setActionCommand("noise");
 
@@ -88,12 +85,16 @@ public class StratTab extends JPanel implements ActionListener {
 		switchGoals.addActionListener(this);
 		switchGoals.setActionCommand("goals");
 
-		switchRobot = new JButton("Switch Robot");
+		isBlue = world.isBlue();
+
+		if (isBlue) {
+			switchRobot = new JButton("Robot: Blue");
+		} else {
+			switchRobot = new JButton("Robot: Yellow");
+		}
+
 		switchRobot.addActionListener(this);
 		switchRobot.setActionCommand("robot");
-
-		// mainPanel.add(BorderLayout.NORTH, top);
-		// mainPanel.add(BorderLayout.SOUTH, southPanel);
 
 		southPanel.add(BorderLayout.WEST, switchGoals);
 		southPanel.add(BorderLayout.SOUTH, randomButton);
@@ -174,14 +175,12 @@ public class StratTab extends JPanel implements ActionListener {
 			}
 		} else if (event.getActionCommand().equals("robot")) {
 			simulator.resetBallPosition();
-			if (toggle) {
-				simulator.resetRobotPositions(true);
-				world.setGoalPosition(false);
-				toggle = false;
+			if (switchRobot.getText().equals("Robot: Blue")) {
+				switchRobot.setText("Robot: Yellow");
+				world.setIsBlue(false);
 			} else {
-				simulator.resetRobotPositions(false);
-				world.setGoalPosition(true);
-				toggle = true;
+				switchRobot.setText("Robot: Blue");
+				world.setIsBlue(true);
 			}
 		}
 	}
@@ -216,7 +215,7 @@ public class StratTab extends JPanel implements ActionListener {
 	}
 
 	public void resetRobots(Simulator s) {
-		s.resetRobotPositions(true);
+		s.resetRobotPositions();
 	}
 
 }

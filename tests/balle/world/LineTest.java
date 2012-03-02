@@ -80,4 +80,28 @@ public class LineTest {
 		assertEquals("Y should equal 0.460838", 0.460838, intersect.getY(),
 				0.00001);
 	}
+
+	@Test
+	public void testAngle() {
+		Line l1 = new Line(0, 0, 5.23, 9.124);
+		
+		assertEquals("Incorrect line angle", 1.05031, l1.angle().radians(), 0.0001);
+	}
+
+	@Test
+	public void testExtend() {
+		Line l1 = new Line(2, 3, 4, 5);
+		Line l2 = new Line(2, 3, 4.7071068, 5.7071068);
+		Line l3 = new Line(2, 3, 7.5355339, 8.5355339);
+		
+		assertEquals("Line should end at (4.7071068, 5.7071068)", l2,
+				l1.extend(1));
+		assertEquals("Line should end at (7.5355339, 8.5355339)", l3,
+				l1.extend(5));
+
+		Line l4 = new Line(0, 0, 5, 0);
+		Line l5 = new Line(0, 0, 7.6, 0);
+
+		assertEquals("Line should end at (7, 0)", l5, l4.extend(2.6));
+	}
 }

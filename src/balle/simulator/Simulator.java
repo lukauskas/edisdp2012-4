@@ -32,7 +32,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 	// Increases sizes, but keeps real-world scale; jbox2d acts unrealistically
 	// at a small scale
 
-	private static boolean noisy;
+	private static boolean noisy = true;
 
 	protected final float scale = 10;
 
@@ -130,7 +130,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 		resetBallPosition();
 
 		// create robots at either end of pitch
-		resetRobotPositions(true);
+		resetRobotPositions();
 
 		// Send the size of the pitch to the world
 		this.reader.propagatePitchSize();
@@ -548,7 +548,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 		w.createJoint(ballFriction);
 	}
 
-	public void resetRobotPositions(boolean robot) {
+	public void resetRobotPositions() {
 		World w = getWorld();
 
 		// If called when simulator is first created, just makes robots
@@ -564,17 +564,9 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 			w.destroyBody(yellow.kicker);
 		}
 
-		if (robot) {
-			blue = new Robot(new Vec2((0.1f * scale), (float) (0.61 * scale)),
-					0f);
-			yellow = new Robot(new Vec2((float) (2.34 * scale),
-					(float) (0.61 * scale)), 180f);
-		} else {
-			blue = new Robot(new Vec2((float) (2.34 * scale),
-					(float) (0.61 * scale)), 180f);
-			yellow = new Robot(
-					new Vec2((0.1f * scale), (float) (0.61 * scale)), 0f);
-		}
+		blue = new Robot(new Vec2((0.1f * scale), (float) (0.61 * scale)), 0f);
+		yellow = new Robot(new Vec2((float) (2.34 * scale),
+				(float) (0.61 * scale)), 180f);
 
 		blueSoft.setBody(blue.getBody());
 		yellowSoft.setBody(yellow.getBody());
