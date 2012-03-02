@@ -19,6 +19,27 @@ public abstract class SimpleCurve implements Curve {
 	}
 
 	@Override
+	public Coord cor(double t) {
+		double f, f1, f11, g, g1, g11;
+		f = pos(t).getX();
+		f1 = vel(t).getX();
+		f11 = acc(t).getX();
+		g = pos(t).getY();
+		g1 = vel(t).getY();
+		g11 = acc(t).getY();
+		return new Coord(
+				f
+						- ((((f1 * f1) + (g1 * g1)) * g1) / ((f1 * g11) - (f11 * g1))),
+				g
+						+ ((((f1 * f1) + (g1 * g1)) * f1) / ((f1 * g11) - (f11 * g1))));
+	}
+
+	@Override
+	public double rad(double t) {
+		return cor(t).dist(pos(t));
+	}
+
+	@Override
 	public void draw(Graphics g, Scaler s) {
 		g.setColor(Color.WHITE);
 

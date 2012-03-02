@@ -24,12 +24,33 @@ public class Spline implements Curve {
 
 	@Override
 	public Coord vel(double t) {
-		return null;
+		return splines[(int) Math.floor(t / div())].vel((t % div()) / div());
 	}
 
 	@Override
 	public Coord acc(double t) {
-		return null;
+		return splines[(int) Math.floor(t / div())].acc((t % div()) / div());
+	}
+
+	@Override
+	public Coord cor(double t) {
+		double f, f1, f11, g, g1, g11;
+		f = pos(t).getX();
+		f1 = vel(t).getX();
+		f11 = acc(t).getX();
+		g = pos(t).getY();
+		g1 = vel(t).getY();
+		g11 = acc(t).getY();
+		return new Coord(
+				f
+						- ((((f1 * f1) + (g1 * g1)) * g1) / ((f1 * g11) - (f11 * g1))),
+				g
+						+ ((((f1 * f1) + (g1 * g1)) * f1) / ((f1 * g11) - (f11 * g1))));
+	}
+
+	@Override
+	public double rad(double t) {
+		return cor(t).dist(pos(t));
 	}
 
 	@Override

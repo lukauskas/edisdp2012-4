@@ -14,6 +14,9 @@ import balle.world.Orientation;
 import balle.world.Snapshot;
 import balle.world.objects.StaticFieldObject;
 
+/**
+ * Uses the movement executor to follow the given curve towards the target.
+ */
 public class CurveNav implements OrientedMovementExecutor {
 
 	private final double TARGET_PERIMETER = Math.sqrt(Math.pow(
@@ -97,22 +100,21 @@ public class CurveNav implements OrientedMovementExecutor {
 	}
 
 	public Curve getCurve() {
-		// calculate bezier points 0 to 3
 		Coord rP = state.getBalle().getPosition(), tP = target.getPosition()
 				.add(new Coord(-TARGET_PERIMETER, 0).rotate(orient));
 		double distS = rP.dist(tP) / 2;
 
 		// Null test
-		// if (rP == null || tP == null)
-		// return null;
-		//
-		// // Compile the test.
+		if (rP == null || tP == null)
+			return null;
+
+		// Compile the test.
 		// Coord[] controls = new Coord[] { rP,
 		// tP.add(orient.getOpposite().getUnitCoord().mult(distS)), tP, };
 
 		Coord[] controls = new Coord[] { new Coord(0, 0), new Coord(0.5, 0.5),
 				new Coord(1, 0.1), new Coord(1.5, 0.5), new Coord(2, 0) };
 
-		return interpolator.getCurve(controls);
+		return interpolator.getCurve(controls, null, null);
 	}
 }

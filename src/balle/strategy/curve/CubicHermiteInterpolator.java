@@ -1,30 +1,34 @@
 package balle.strategy.curve;
 
 import balle.world.Coord;
+import balle.world.Orientation;
 
 public class CubicHermiteInterpolator implements Interpolator {
 
 	@Override
-	public Curve getCurve(Coord[] controlPoints) {
+	public Curve getCurve(Coord[] controlPoints, Orientation start,
+			Orientation end) {
+		int cpLength = controlPoints.length;
 
-		Curve[] curves = new Curve[controlPoints.length - 1];
+		Curve[] curves = new Curve[cpLength - 1];
 		double div = 1.0 / ((double) curves.length);
-		curves[0] = new Bezier3(new Coord[] { controlPoints[0],
-				controlPoints[0].add(m(controlPoints[0], 0, controlPoints[1],
-						div, controlPoints[2], div * 2).div(3)),
-				controlPoints[1], });
 
-		for (int i = 1; i < controlPoints.length - 1; i++) {
+
+		for (int i = 0; i < controlPoints.length - 1; i++) {
 			Coord m0 = null, m1 = null;
 
 			if (i == 0) {
+				m0 = new Coord(controlPoints[0].dist(controlPoints[1]) / 4, 0)
+						.rotate(start);
 				m1 = m(controlPoints[i], div * i, controlPoints[i + 1], div
 						* (i + 1), controlPoints[i + 2], div * (i + 2));
-				m0 = m1;
 			} else if (i + 2 == controlPoints.length) {
 				m0 = m(controlPoints[i - 1], div * (i - 1), controlPoints[i],
 						div * i, controlPoints[i + 1], div * (i + 1));
-				m1 = m0;
+				m1 = new Coord(
+						-controlPoints[cpLength - 2]
+								.dist(controlPoints[cpLength - 1]) / 4,
+						0).rotate(end);
 			} else {
 				m0 = m(controlPoints[i - 1], div * (i - 1), controlPoints[i],
 						div * i, controlPoints[i + 1], div * (i + 1));
