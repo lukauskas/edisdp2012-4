@@ -24,12 +24,12 @@ public class Spline implements Curve {
 
 	@Override
 	public Coord vel(double t) {
-		return null;
+		return splines[(int) Math.floor(t / div())].vel((t % div()) / div());
 	}
 
 	@Override
 	public Coord acc(double t) {
-		return null;
+		return splines[(int) Math.floor(t / div())].acc((t % div()) / div());
 	}
 
 	@Override
