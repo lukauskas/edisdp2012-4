@@ -9,12 +9,9 @@ import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
 import balle.main.drawable.Dot;
-import balle.main.drawable.DrawableLine;
 import balle.strategy.executor.movement.MovementExecutor;
 import balle.world.Coord;
-import balle.world.Line;
 import balle.world.objects.Ball;
-import balle.world.objects.Goal;
 import balle.world.objects.Pitch;
 import balle.world.objects.Point;
 import balle.world.objects.Robot;
@@ -33,16 +30,17 @@ public class GoToBall extends AbstractPlanner {
     private static final double AVOIDANCE_GAP = 0.5; // Meters
     private static final double OVERSHOOT_GAP = 0.7; // Meters
 	private static final double DIST_DIFF_THRESHOLD = 0.2; // Meters
-	private static final double BALL_SAFE_GAP = 0.4; // Meters
 
     private boolean approachTargetFromCorrectSide;
 
     public GoToBall(MovementExecutor movementExecutor) {
         executorStrategy = movementExecutor;
         approachTargetFromCorrectSide = false;
-		movementExecutor.setStopDistance(0);
     }
 
+    public void setStopDistance(double distance) {
+        executorStrategy.setStopDistance(distance);
+    }
     public MovementExecutor getExecutorStrategy() {
         return executorStrategy;
     }
@@ -77,14 +75,7 @@ public class GoToBall extends AbstractPlanner {
     protected StaticFieldObject getTarget() {
 
 		Ball ball = getSnapshot().getBall();
-		Goal targetGoal = getSnapshot().getOpponentsGoal();
-
-		Line targetLine = new Line(targetGoal.getPosition(), ball.getPosition())
-				.extend(BALL_SAFE_GAP);
-		
-		addDrawable(new DrawableLine(targetLine, Color.BLUE));
-
-		return new Point(targetLine.getB());
+        return ball;
     }
 
     protected Color getTargetColor() {

@@ -7,6 +7,7 @@ import balle.strategy.planner.AbstractPlanner;
 import balle.strategy.planner.DefensiveStrategy;
 import balle.strategy.planner.DribbleMilestone2;
 import balle.strategy.planner.GoToBall;
+import balle.strategy.planner.GoToBallM3;
 import balle.strategy.planner.GoToFaceBall;
 import balle.strategy.planner.KickFromWall;
 
@@ -17,7 +18,7 @@ public class StrategyFactory {
                 "GameFromPenaltyDefence", "GoToBall", "GoToFaceBall",
                 "GoToBallPFN",
                 "Dribble", "Blocking", "PFNavigation", "DefensiveStrategy",
-                "BallNearWall" };
+ "BallNearWall", "GoToBallM3" };
         return designators;
     }
 
@@ -49,6 +50,8 @@ public class StrategyFactory {
             return new GameFromPenaltyKick();
         } else if (designator.equals("GameFromPenaltyDefence")) {
             return new GameFromPenaltyDefence();
+        } else if (designator.equals("GoToBallM3")) {
+            return new GoToBallM3();
         } else
             throw new UnknownDesignatorException("Don't know strategy \""
                     + designator + "\"");

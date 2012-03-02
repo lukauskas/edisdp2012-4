@@ -39,7 +39,7 @@ public class StrategyRunner extends AbstractWorldProcessor {
 	}
 
 	@Override
-	protected void actionOnChange() {
+    protected synchronized void actionOnChange() {
 		if (currentStrategy != null) {
 			currentStrategy.updateState(getSnapshot());
 			try {
@@ -60,7 +60,7 @@ public class StrategyRunner extends AbstractWorldProcessor {
 	/**
 	 * Stops the current running strategy
 	 */
-	public void stopStrategy() {
+    public synchronized void stopStrategy() {
 		if (currentStrategy != null) {
 			LOG.info("Stopping " + currentStrategy.getClass().getName());
 			currentStrategy.stop(controller);
@@ -74,7 +74,7 @@ public class StrategyRunner extends AbstractWorldProcessor {
 	 * @param strategy
 	 *            the strategy
 	 */
-	public void startStrategy(Strategy strategy) {
+    public synchronized void startStrategy(Strategy strategy) {
 		// Stop the old strategy
 		if (currentStrategy != null)
 			stopStrategy();
