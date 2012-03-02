@@ -9,8 +9,12 @@ import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
 import balle.main.drawable.Dot;
+import balle.main.drawable.DrawableLine;
 import balle.strategy.executor.movement.MovementExecutor;
 import balle.world.Coord;
+import balle.world.Line;
+import balle.world.objects.Ball;
+import balle.world.objects.Goal;
 import balle.world.objects.Pitch;
 import balle.world.objects.Point;
 import balle.world.objects.Robot;
@@ -28,13 +32,15 @@ public class GoToBall extends AbstractPlanner {
 
     private static final double AVOIDANCE_GAP = 0.5; // Meters
     private static final double OVERSHOOT_GAP = 0.7; // Meters
-    private static final double DIST_DIFF_THRESHOLD = 0.2; // Meters
+	private static final double DIST_DIFF_THRESHOLD = 0.2; // Meters
+	private static final double BALL_SAFE_GAP = 0.4; // Meters
 
     private boolean approachTargetFromCorrectSide;
 
     public GoToBall(MovementExecutor movementExecutor) {
         executorStrategy = movementExecutor;
         approachTargetFromCorrectSide = false;
+		movementExecutor.setStopDistance(0);
     }
 
     public MovementExecutor getExecutorStrategy() {
@@ -51,7 +57,7 @@ public class GoToBall extends AbstractPlanner {
      * @param movementExecutor
      *            the movement executor
      * @param approachTargetFromCorrectSide
-     *            whether to always appraoch target from correct side
+     *            whether to always approach target from correct side
      */
     public GoToBall(MovementExecutor movementExecutor,
             boolean approachTargetFromCorrectSide) {
@@ -69,7 +75,16 @@ public class GoToBall extends AbstractPlanner {
     }
 
     protected StaticFieldObject getTarget() {
-        return getSnapshot().getBall();
+
+		Ball ball = getSnapshot().getBall();
+		Goal targetGoal = getSnapshot().getOpponentsGoal();
+
+		Line targetLine = new Line(targetGoal.getPosition(), ball.getPosition())
+				.extend(BALL_SAFE_GAP);
+		
+		addDrawable(new DrawableLine(targetLine, Color.BLUE));
+
+		return new Point(targetLine.getB());
     }
 
     protected Color getTargetColor() {
@@ -261,21 +276,22 @@ public class GoToBall extends AbstractPlanner {
                 && (!getSnapshot().getBalle()
                         .isApproachingTargetFromCorrectSide(target,
                                 getSnapshot().getOpponentsGoal()))) {
+
             LOG.info("Approaching target from wrong side, calculating overshoot target");
             target = getOvershootTarget(target, OVERSHOOT_GAP);
             addDrawable(new Dot(target.getPosition(), Color.BLUE));
         }
 
-        // If we see the opponent
-        if (getSnapshot().getOpponent().getPosition() != null) {
-            if (!getSnapshot().getBalle().canReachTargetInStraightLine(target,
-                    getSnapshot().getOpponent())) {
-                // pick a new target then
-                LOG.info("Opponent is blocking the target, avoiding it");
-                target = getAvoidanceTarget();
-                addDrawable(new Dot(target.getPosition(), Color.MAGENTA));
-            }
-        }
+		// If we see the opponent
+		if (getSnapshot().getOpponent().getPosition() != null) {
+			if (!getSnapshot().getBalle().canReachTargetInStraightLine(target,
+					getSnapshot().getOpponent())) {
+				// pick a new target then
+				LOG.info("Opponent is blocking the target, avoiding it");
+				target = getAvoidanceTarget();
+				addDrawable(new Dot(target.getPosition(), Color.MAGENTA));
+			}
+		}
 
         // Update the target's location in executorStrategy (e.g. if target
         // moved)
