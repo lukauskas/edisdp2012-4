@@ -1,6 +1,7 @@
 package balle.strategy.curve;
 
 import java.util.ArrayList;
+import java.util.Stack;
 
 import balle.world.Coord;
 import balle.world.Orientation;
@@ -8,43 +9,24 @@ import balle.world.Orientation;
 public class CustomCHI extends CubicHermiteInterpolator {
 
 	@Override
-	public ArrayList<Bezier4> getCurves(Coord[] controlPoints,
+	public ArrayList<Bezier4> getCurves(Stack<Coord> controlPoints,
 			Orientation start,
 			Orientation end) {
-		int cpLength = controlPoints.length;
+		int cpLength = controlPoints.size();
 
-		Bezier4[] curves = new Bezier4[cpLength - 1];
-		double div = 1.0 / ((double) curves.length);
+		ArrayList<Bezier4> curves = new ArrayList<Bezier4>();
 
-		for (int i = 0; i < controlPoints.length - 1; i++) {
-			Coord m0 = null, m1 = null;
+		double div = 1.0 / ((double) cpLength - 1);
 
-			if (i == 0) {
-				m0 = new Coord(controlPoints[0].dist(controlPoints[1]) / 4, 0)
-						.rotate(start);
-			} else {
-				m0 = m(controlPoints[i - 1], div * (i - 1), controlPoints[i],
-						div * i, controlPoints[i + 1], div * (i + 1));
-			}
+		while (controlPoints.size() >= 2) {
+			Coord[] coords = new Coord[4];
+			coords[3] = controlPoints.pop();
+			coords[0] = controlPoints.peek();
 
-			if (i + 2 == controlPoints.length) {
-				m1 = new Coord(
-						-controlPoints[cpLength - 2]
-								.dist(controlPoints[cpLength - 1]) / 4,
-						0).rotate(end);
-			} else {
-				m1 = m(controlPoints[i], div * i, controlPoints[i + 1], div
-						* (i + 1), controlPoints[i + 2], div * (i + 2));
-			}
 
-			System.out.println(m0 + " " + m1);
-
-			Coord[] out = new Coord[] { controlPoints[i],
-					controlPoints[i].add(m0.div(3)),
-					controlPoints[i + 1].sub(m1.div(3)), controlPoints[i + 1], };
-
-			curves[i] = new Bezier4(out);
+			curves.add(0, new Bezier4(coords));
 		}
+
 		return curves;
 	}
 
