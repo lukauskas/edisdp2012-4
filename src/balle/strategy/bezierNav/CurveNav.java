@@ -115,6 +115,6 @@ public class CurveNav implements OrientedMovementExecutor {
 		Coord[] controls = new Coord[] { new Coord(0, 0), new Coord(0.5, 0.5),
 				new Coord(1, 0.1), new Coord(1.5, 0.5), new Coord(2, 0) };
 
-		return interpolator.getCurve(controls);
+		return interpolator.getCurve(controls, null, null);
 	}
 }

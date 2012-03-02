@@ -1,11 +1,13 @@
 package balle.strategy.curve;
 
 import balle.world.Coord;
+import balle.world.Orientation;
 
 public class CubicHermiteInterpolator implements Interpolator {
 
 	@Override
-	public Curve getCurve(Coord[] controlPoints) {
+	public Curve getCurve(Coord[] controlPoints, Orientation start,
+			Orientation end) {
 
 		Curve[] curves = new Curve[controlPoints.length - 1];
 		double div = 1.0 / ((double) curves.length);
