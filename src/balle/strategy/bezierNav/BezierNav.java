@@ -8,7 +8,10 @@ import balle.main.drawable.Circle;
 import balle.main.drawable.Dot;
 import balle.main.drawable.Drawable;
 import balle.misc.Globals;
-import balle.strategy.executor.movement.MovementExecutor;
+import balle.strategy.curve.CubicHermiteInterpolator;
+import balle.strategy.curve.Curve;
+import balle.strategy.curve.Interpolator;
+import balle.strategy.curve.Spline;
 import balle.strategy.executor.movement.OrientedMovementExecutor;
 import balle.world.Coord;
 import balle.world.Orientation;
@@ -51,19 +54,14 @@ public class BezierNav implements OrientedMovementExecutor {
 												// angle (orient)
 
 
-	private float stepDist = 0.5f;
-	private MovementExecutor movementExecutor;
+	private Interpolator interpolator = new CubicHermiteInterpolator();
+	private Curve c;
 
 	private StaticFieldObject target;
 	private Snapshot state;
 
 	private Orientation orient;
-	private Coord p0, p1, p2, p3;
-
-
-	public BezierNav(MovementExecutor me) {
-		this.movementExecutor = me;
-	}
+	private Coord p0, p3;
 
 
 	@Override
@@ -100,15 +98,14 @@ public class BezierNav implements OrientedMovementExecutor {
 		// calculate bezier points 0 to 3
 		Robot robot = state.getBalle();
 		Coord rP = robot.getPosition(), tP = getAdjustedP3();
-		double distS = rP.dist(tP) / 2;
 		if (rP == null || tP == null) {
 			return;
 		}
-
 		p0 = rP;
 		p3 = tP;
 
-		
+		c = interpolator.getCurve(new Coord[] { p0, new Coord(0.5, 0.3), p3 });
+
 		// if we are close to the target and facing the correct orientation
 		// (orient)
 		// just go strait to ball
@@ -123,16 +120,14 @@ public class BezierNav implements OrientedMovementExecutor {
 			p3 = target.getPosition();
 		}
 
-		p1 = rP.add(robot.getOrientation().getUnitCoord().mult(distS / 2));
-		p2 = tP.add(orient.getOpposite().getUnitCoord().mult(distS));
 		
 		
 		// calculate turning radius
-		Coord a = accel(0);
+		Coord a = c.acc(0);
 		boolean isLeft = new Coord(0, 0).angleBetween(
 				robot.getOrientation().getUnitCoord(), a)
 				.atan2styleradians() > 0;
-		double r = radius(0);
+		double r = c.radius(0);
 		System.out.println(r);
 
 		// throttle speed (slow when doing sharp turns)
@@ -166,22 +161,16 @@ public class BezierNav implements OrientedMovementExecutor {
 		if (p0 == null) {
 			return l;
 		}
-		for (double t = -0.1; t < 1.1; t += 0.01) {
-			Color c = Color.ORANGE;
-			if (t < 0 || t > 1)
-				c = Color.GRAY;
-			l.add(new Dot(pos(t), c));
+		if (c instanceof Spline) {
+			l.add((Spline) c);
 		}
 		l.add(new Circle(p0, 0.03, Color.pink));
-		l.add(new Circle(p1, 0.03, Color.black));
-		l.add(new Circle(p2, 0.03, Color.black));
 		l.add(new Circle(p3, 0.03, Color.pink));
-		Coord center = getCenterOfRotation(0);
+		Coord center = c.getCenterOfRotation(0);
 		l.add(new Dot(center, Color.BLACK));
 		l.add(new Circle(center, center.dist(state.getBalle().getPosition()),
 				Color.yellow));
 
-		l.add(new Dot(pos(stepDist), Color.CYAN));
 		return l;
 	}
 
@@ -196,63 +185,9 @@ public class BezierNav implements OrientedMovementExecutor {
 				new Coord(-TARGET_PERIMETER, 0).rotate(orient));
 	}
 
-	private double approxAvgRadius(double ti, double tf) {
-		if (ti > tf) {
-			double tmp = tf;
-			tf = ti;
-			ti = tmp;
-		}
-		double r = 0;
-		double dt = (tf - ti) / 20;
-		int sections = 0;
-		for (double i = ti; i <= tf; i += dt) {
-			r += radius(i);
-			sections++;
-		}
-		r /= sections;
-		return r;
-	}
-
-	private double radius(double i) {
-		return getCenterOfRotation(0).dist(pos(0));
-	}
-
 	@Override
 	public void setStopDistance(double stopDistance) {
 		this.stopDistance = stopDistance;
-	}
-
-	private Coord pos(double t) {
-		return p0.mult(Math.pow((1 - t), 3))
-				.add(p1.mult(3 * Math.pow(1 - t, 2) * t))
-				.add(p2.mult(3 * (1 - t) * t * t)).add(p3.mult(Math.pow(t, 3)));
-	}
-
-	private Coord vel(double t) {
-		return p0.mult(-3 + (6 * t) - (3 * t * t))
-				.add(p1.mult(3 * (1 - (4 * t) + (3 * t * t))))
-				.add(p2.mult(3 * ((2 * t) - (3 * t * t))))
-				.add(p3.mult(3 * t * t));
-	}
-
-	private Coord accel(double t) {
-		return p0.mult(6 - (6 * t)).add(p1.mult(3 * (-4 + (6 * t))))
-				.add(p2.mult(3 * (2 - (6 * t)))).add(p3.mult(6 * t));
-	}
-
-	private Coord getCenterOfRotation(double t) {
-		double f, f1, f11, g, g1, g11;
-		f = pos(t).getX();
-		f1 = vel(t).getX();
-		f11 = accel(t).getX();
-		g = pos(t).getY();
-		g1 = vel(t).getY();
-		g11 = accel(t).getY();
-		return new Coord(
-				f
-						- ((((f1 * f1) + (g1 * g1)) * g1) / ((f1 * g11) - (f11 * g1))),
-				g
-						+ ((((f1 * f1) + (g1 * g1)) * f1) / ((f1 * g11) - (f11 * g1))));
 	}
 
 	private double getMinVelocityRato(double radius) {
