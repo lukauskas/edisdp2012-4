@@ -1,12 +1,14 @@
 package balle.strategy.curve;
 
+import java.util.Stack;
+
 import balle.world.Coord;
 import balle.world.Orientation;
 
 public class FiniteDifferenceCHI extends CubicHermiteInterpolator {
 
 	@Override
-	public Bezier4[] getCurves(Coord[] controlPoints, Orientation start,
+	public Bezier4[] getCurves(Stack<Coord> controlPoints, Orientation start,
 			Orientation end) {
 		int cpLength = controlPoints.length;
 

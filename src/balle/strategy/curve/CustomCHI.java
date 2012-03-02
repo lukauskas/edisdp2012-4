@@ -1,12 +1,15 @@
 package balle.strategy.curve;
 
+import java.util.ArrayList;
+
 import balle.world.Coord;
 import balle.world.Orientation;
 
 public class CustomCHI extends CubicHermiteInterpolator {
 
 	@Override
-	public Bezier4[] getCurves(Coord[] controlPoints, Orientation start,
+	public ArrayList<Bezier4> getCurves(Coord[] controlPoints,
+			Orientation start,
 			Orientation end) {
 		int cpLength = controlPoints.length;
 
