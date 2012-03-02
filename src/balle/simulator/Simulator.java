@@ -300,12 +300,12 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 			// System.out.println(va);
 
 			if (bot.isKicking() && ballInRange()) {
+                bot.stopKicking();
 				// Kick
 				float xF, yF;
 				xF = (float) (kickForce * Math.cos(blueAng));
 				yF = (float) (kickForce * Math.sin(blueAng));
 				ball.applyForce(new Vec2(xF, yF), ball.getWorldCenter());
-				bot.stopKicking();
 			}
 		}
 
