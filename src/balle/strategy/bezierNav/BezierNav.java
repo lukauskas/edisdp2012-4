@@ -8,7 +8,6 @@ import balle.main.drawable.Circle;
 import balle.main.drawable.Dot;
 import balle.main.drawable.Drawable;
 import balle.misc.Globals;
-import balle.strategy.curve.CubicHermiteInterpolator;
 import balle.strategy.curve.Curve;
 import balle.strategy.curve.Interpolator;
 import balle.strategy.curve.Spline;
@@ -54,7 +53,7 @@ public class BezierNav implements OrientedMovementExecutor {
 												// angle (orient)
 
 
-	private Interpolator interpolator = new CubicHermiteInterpolator();
+	private Interpolator interpolator;
 	private Curve c;
 
 	private StaticFieldObject target;
@@ -63,6 +62,10 @@ public class BezierNav implements OrientedMovementExecutor {
 	private Orientation orient;
 	private Coord p0, p3;
 
+
+	public BezierNav(Interpolator interpolator) {
+		this.interpolator = interpolator;
+	}
 
 	@Override
 	public boolean isFinished() {
@@ -104,7 +107,8 @@ public class BezierNav implements OrientedMovementExecutor {
 		p0 = rP;
 		p3 = tP;
 
-		c = interpolator.getCurve(new Coord[] { p0, new Coord(0.5, 0.3), p3 });
+		c = interpolator.getCurve(new Coord[] { p0, new Coord(0.5, 0.3), p3 },
+				robot.getOrientation(), orient);
 
 		// if we are close to the target and facing the correct orientation
 		// (orient)
@@ -127,7 +131,7 @@ public class BezierNav implements OrientedMovementExecutor {
 		boolean isLeft = new Coord(0, 0).angleBetween(
 				robot.getOrientation().getUnitCoord(), a)
 				.atan2styleradians() > 0;
-		double r = c.radius(0);
+		double r = c.rad(0);
 		System.out.println(r);
 
 		// throttle speed (slow when doing sharp turns)
@@ -166,7 +170,7 @@ public class BezierNav implements OrientedMovementExecutor {
 		}
 		l.add(new Circle(p0, 0.03, Color.pink));
 		l.add(new Circle(p3, 0.03, Color.pink));
-		Coord center = c.getCenterOfRotation(0);
+		Coord center = c.cor(0);
 		l.add(new Dot(center, Color.BLACK));
 		l.add(new Circle(center, center.dist(state.getBalle().getPosition()),
 				Color.yellow));

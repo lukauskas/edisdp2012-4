@@ -33,7 +33,8 @@ public class StrategyFactory {
 	public static AbstractPlanner createClass(String designator)
 			throws UnknownDesignatorException {
 		if (designator.equals("BezierNav")) {
-			return new SimpleGoToBallFaceGoal(new BezierNav());
+			return new SimpleGoToBallFaceGoal(new BezierNav(
+					new CubicHermiteInterpolator()));
 		} else if (designator.equals("CurveNav")) {
 			return new SimpleGoToBallFaceGoal(
 					(OrientedMovementExecutor) new CurveNav(
