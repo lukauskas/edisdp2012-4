@@ -28,7 +28,7 @@ public abstract class AbstractWorld implements Listener {
 
 	// JEV: Scanner is final and can't be extended, makes it difficult for the
 	// simulator.
-	private final boolean balleIsBlue;
+	private boolean balleIsBlue;
 	private boolean goalIsLeft;
 
 	private final Pitch pitch;
@@ -51,12 +51,16 @@ public abstract class AbstractWorld implements Listener {
 		return goalIsLeft = goal;
 	}
 
+	public boolean setIsBlue(boolean robot) {
+		return balleIsBlue = robot;
+	}
+
 	/**
 	 * Returns whether our robot is blue or not
 	 * 
 	 * @return true if our robot is the blue one, false otherwise
 	 */
-	protected boolean isBlue() {
+	public boolean isBlue() {
 		return balleIsBlue;
 	}
 

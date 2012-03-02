@@ -43,7 +43,7 @@ public class Goal implements StaticFieldObject {
 
     @Override
     public Coord getPosition() {
-        return new Coord((minX + maxX) / 2, (minY + maxY / 2));
+		return new Coord((minX + maxX) / 2, (minY + maxY) / 2);
     }
 
     @Override

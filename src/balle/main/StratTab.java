@@ -31,8 +31,10 @@ public class StratTab extends JPanel implements ActionListener {
 	private JButton resetButton;
 	private JButton noiseButton;
 	private JButton switchGoals;
+	private JButton switchRobot;
 	private JComboBox menu;
 	private JLabel label;
+	private boolean isBlue;
 
 	private ArrayList<String> stratTabs;
 	private String[] strings = new String[0];
@@ -75,7 +77,7 @@ public class StratTab extends JPanel implements ActionListener {
 		resetButton.setEnabled(simulator != null);
 		resetButton.setActionCommand("reset");
 
-		noiseButton = new JButton("Noise: Off");
+		noiseButton = new JButton("Noise: On");
 		noiseButton.addActionListener(this);
 		noiseButton.setActionCommand("noise");
 
@@ -83,10 +85,22 @@ public class StratTab extends JPanel implements ActionListener {
 		switchGoals.addActionListener(this);
 		switchGoals.setActionCommand("goals");
 
+		isBlue = world.isBlue();
+
+		if (isBlue) {
+			switchRobot = new JButton("Robot: Blue");
+		} else {
+			switchRobot = new JButton("Robot: Yellow");
+		}
+
+		switchRobot.addActionListener(this);
+		switchRobot.setActionCommand("robot");
+
 		southPanel.add(BorderLayout.WEST, switchGoals);
-		southPanel.add(BorderLayout.NORTH, randomButton);
-		southPanel.add(BorderLayout.SOUTH, resetButton);
+		southPanel.add(BorderLayout.SOUTH, randomButton);
+		southPanel.add(BorderLayout.NORTH, resetButton);
 		southPanel.add(BorderLayout.EAST, noiseButton);
+		southPanel.add(BorderLayout.CENTER, switchRobot);
 
 		menu = new JComboBox(strings);
 
@@ -116,10 +130,12 @@ public class StratTab extends JPanel implements ActionListener {
 				}
 				button.setText("Stop");
 				switchGoals.setEnabled(false);
+				switchRobot.setEnabled(false);
 			} else {
 				button.setText("Start");
 				strategyRunner.stopStrategy();
 				switchGoals.setEnabled(true);
+				switchRobot.setEnabled(true);
 			}
 		} else if (event.getActionCommand().equals("randomise")) {
 			try {
@@ -156,6 +172,15 @@ public class StratTab extends JPanel implements ActionListener {
 				world.setGoalPosition(false);
 			} else {
 				world.setGoalPosition(true);
+			}
+		} else if (event.getActionCommand().equals("robot")) {
+			simulator.resetBallPosition();
+			if (switchRobot.getText().equals("Robot: Blue")) {
+				switchRobot.setText("Robot: Yellow");
+				world.setIsBlue(false);
+			} else {
+				switchRobot.setText("Robot: Blue");
+				world.setIsBlue(true);
 			}
 		}
 	}
