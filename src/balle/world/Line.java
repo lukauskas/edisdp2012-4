@@ -161,9 +161,9 @@ public class Line {
 				b.getX() - a.getX()));
 	}
 
-	public Line extend(int howMuch) {
+	public Line extend(double ballSafeGap) {
 		
-		Coord point = new Coord(howMuch, 0);
+		Coord point = new Coord(ballSafeGap, 0);
 		Coord rotated = point.rotate(angle());
 
 		double newX = b.getX() + rotated.getX();

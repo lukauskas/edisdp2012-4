@@ -100,8 +100,8 @@ public class LineTest {
 				l1.extend(5));
 
 		Line l4 = new Line(0, 0, 5, 0);
-		Line l5 = new Line(0, 0, 7, 0);
+		Line l5 = new Line(0, 0, 7.6, 0);
 
-		assertEquals("Line should end at (7, 0)", l5, l4.extend(2));
+		assertEquals("Line should end at (7, 0)", l5, l4.extend(2.6));
 	}
 }
