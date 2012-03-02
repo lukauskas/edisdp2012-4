@@ -20,21 +20,21 @@ public class CubicHermiteInterpolator implements Interpolator {
 			if (i == 0) {
 				m0 = new Coord(controlPoints[0].dist(controlPoints[1]) / 4, 0)
 						.rotate(start);
-				m1 = m(controlPoints[i], div * i, controlPoints[i + 1], div
-						* (i + 1), controlPoints[i + 2], div * (i + 2));
-			} else if (i + 2 == controlPoints.length) {
+			} else {
 				m0 = m(controlPoints[i - 1], div * (i - 1), controlPoints[i],
 						div * i, controlPoints[i + 1], div * (i + 1));
+			}
+
+			if (i + 2 == controlPoints.length) {
 				m1 = new Coord(
 						-controlPoints[cpLength - 2]
 								.dist(controlPoints[cpLength - 1]) / 4,
 						0).rotate(end);
 			} else {
-				m0 = m(controlPoints[i - 1], div * (i - 1), controlPoints[i],
-						div * i, controlPoints[i + 1], div * (i + 1));
 				m1 = m(controlPoints[i], div * i, controlPoints[i + 1], div
 						* (i + 1), controlPoints[i + 2], div * (i + 2));
 			}
+
 			System.out.println(m0 + " " + m1);
 
 			Coord[] out = new Coord[] { 
@@ -51,7 +51,7 @@ public class CubicHermiteInterpolator implements Interpolator {
 	/**
 	 * Calculates the
 	 * 
-	 * @param prev
+	 * @param prevm
 	 *            Previous control coordinate.
 	 * @param curr
 	 *            Current control coordinate.
@@ -61,8 +61,10 @@ public class CubicHermiteInterpolator implements Interpolator {
 	 */
 	protected Coord m(Coord prev, double tPrev, Coord curr, double tCurr,
 			Coord next, double tNext) {
-		return next.sub(curr).mult(1 / (2 * (tNext - tCurr)))
-				.add(curr.sub(prev).mult(1 / (2 * (tCurr - tPrev))));
+		return (next.sub(curr).mult(1 / (2 * (tNext - tCurr)))
+.add(curr.sub(
+				prev).mult(1 / (2 * (tCurr - tPrev))))).getUnitCoord().mult(
+				prev.dist(curr));
 	}
 
 	protected double t(double x, double xk, double xl) {
