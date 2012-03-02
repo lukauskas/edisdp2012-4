@@ -25,7 +25,6 @@ import balle.strategy.StrategyFactory;
 import balle.strategy.StrategyRunner;
 import balle.world.AbstractWorld;
 import balle.world.BasicWorld;
-import balle.world.SimpleWorldGUI;
 import balle.world.filter.HeightFilter;
 
 /**
