@@ -31,7 +31,14 @@ public class Bezier4 extends SimpleCurve {
 
 	@Override
 	public Coord closestPoint(Coord c) {
-		// TODO Auto-generated method stub
-		return null;
+		// TODO re-do this code, it is very crude
+
+		Coord closest = null;
+		for (double i = 0; i <= 1; i += 0.1) {
+			Coord testing = pos(i);
+			if (closest == null || c.dist(testing) < c.dist(closest))
+				closest = testing;
+		}
+		return closest;
 	}
 }
