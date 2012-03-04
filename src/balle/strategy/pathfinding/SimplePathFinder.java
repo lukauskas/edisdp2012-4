@@ -79,12 +79,13 @@ public class SimplePathFinder implements PathFinder {
 
 	protected Robot isClear(Line curve, Snapshot s) {
 		Robot r = s.getOpponent();
-		Coord rr = r.getPosition();
 
-		double birth = 0.3;
-		Line other = new Line(new Coord(birth, 0).rotate(r.getOrientation())
-				.add(rr), new Coord(-birth, 0).rotate(r.getOrientation()).add(
-				rr));
+		// Make line
+		double birth = 10;
+		Line other = new Line(new Coord(birth, 0), new Coord(-birth, 0));
+		other = other.rotate(r.getOrientation());
+		other = other.add(r.getPosition());
+		
 		if (other.intersects(curve))
 			return r;
 
