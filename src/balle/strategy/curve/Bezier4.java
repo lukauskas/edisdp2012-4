@@ -28,4 +28,10 @@ public class Bezier4 extends SimpleCurve {
 		return p[0].mult(6 - (6 * t)).add(p[1].mult(3 * (-4 + (6 * t))))
 				.add(p[2].mult(3 * (2 - (6 * t)))).add(p[3].mult(6 * t));
 	}
+
+	@Override
+	public Coord closestPoint(Coord c) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

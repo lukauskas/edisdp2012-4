@@ -5,12 +5,33 @@ import balle.world.Coord;
 
 public interface Curve extends Drawable {
 
+	// Basic \\
+	
+	/** Shows position of a line at a moment in "time".
+	 * 
+	 * @param t
+	 * @return
+	 */
 	public abstract Coord pos(double t);
-
+	
+	/** First differential of position, shows "speed" of line
+	 * at a given moment in "time". 
+	 * 
+	 * @param t
+	 * @return
+	 */
 	public abstract Coord vel(double t);
-
+	
+	/** Second differential of position, shows "acceleration" of the 
+	 * line at a given moment in "time".
+	 * 
+	 * @param t
+	 * @return
+	 */
 	public abstract Coord acc(double t);
 
+	// Centre of Rotation \\
+	
 	/**
 	 * Centre Of Rotation.
 	 * 
@@ -29,4 +50,9 @@ public interface Curve extends Drawable {
 	 * @return Radius of the centre of rotation.
 	 */
 	public abstract double rad(double t);
+	
+	
+	// Utility \\
+	
+	public abstract Coord closestPoint(Coord c);
 }

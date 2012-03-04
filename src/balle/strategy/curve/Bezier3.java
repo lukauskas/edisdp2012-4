@@ -27,4 +27,10 @@ public class Bezier3 extends SimpleCurve {
 		// Not exactly what the derivitive is yet,
 		// I think it is constant.
 	}
+
+	@Override
+	public Coord closestPoint(Coord c) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

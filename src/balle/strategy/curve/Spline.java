@@ -58,4 +58,15 @@ public class Spline implements Curve {
 		for (Curve spline : splines)
 			spline.draw(g, s);
 	}
+
+	@Override
+	public Coord closestPoint(Coord c) {
+		Coord closest = null;
+		for (Curve each : splines) {
+			Coord testing = each.closestPoint(c);
+			if (closest == null || c.dist(closest) > c.dist(testing))
+				closest = testing;
+		}
+		return closest;
+	}
 }
