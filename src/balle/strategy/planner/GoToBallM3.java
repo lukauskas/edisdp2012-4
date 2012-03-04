@@ -9,7 +9,6 @@ import balle.main.drawable.DrawableLine;
 import balle.misc.Globals;
 import balle.strategy.executor.movement.GoToObject;
 import balle.strategy.executor.movement.GoToObjectPFN;
-import balle.strategy.executor.movement.MovementExecutor;
 import balle.strategy.executor.turning.FaceAngle;
 import balle.strategy.executor.turning.RotateToOrientationExecutor;
 import balle.world.Coord;
@@ -80,8 +79,15 @@ public class GoToBallM3 extends GoToBall {
         else
         {
             LOG.info("Going to the ball");
-            MovementExecutor strategy = new GoToObject(new FaceAngle());
+			GoToObject strategy = new GoToObject(new FaceAngle());
 			strategy.setStopDistance(0.00);
+
+			if (stage == 2) {
+				strategy.setMovementSpeed(300);
+			} else {
+				strategy.setMovementSpeed(GoToObject.DEFAULT_MOVEMENT_SPEED);
+			}
+
             setExecutorStrategy(strategy);
         }
     }
@@ -99,7 +105,7 @@ public class GoToBallM3 extends GoToBall {
             setAppropriateMovementStrategy();
         }
         if (stage == 2) {
-			if (ourRobot.getPosition().dist(snapshot.getBall().getPosition()) < (Globals.ROBOT_LENGTH + 0.05)
+			if (ourRobot.possessesBall(snapshot.getBall())
 					&& ourRobot.getFacingLine().intersects(
 							snapshot.getOpponentsGoal().getGoalLine())) {
                 LOG.info("Kicking");
