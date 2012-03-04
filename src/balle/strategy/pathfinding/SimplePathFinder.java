@@ -1,10 +1,12 @@
 package balle.strategy.pathfinding;
 
-import java.util.ArrayList;
+import java.util.Stack;
+import java.util.Vector;
 
 import balle.strategy.curve.Curve;
 import balle.strategy.curve.Interpolator;
 import balle.world.Coord;
+import balle.world.Line;
 import balle.world.Orientation;
 import balle.world.Snapshot;
 import balle.world.objects.Robot;
@@ -32,7 +34,7 @@ public class SimplePathFinder implements PathFinder {
 		this.end = end;
 		this.endAngle = endAngle;
 
-		ArrayList<Coord> list = new ArrayList<Coord>();
+		Stack<Coord> list = new Stack<Coord>();
 
 		list.add(s.getBalle().getPosition());
 		list = getWaypoint(s.getBalle().getPosition(), list, s);
@@ -42,34 +44,54 @@ public class SimplePathFinder implements PathFinder {
 	}
 
 	@SuppressWarnings("unchecked")
-	public ArrayList<Coord> getWaypoint(Coord pos, ArrayList<Coord> path,
+	public Stack<Coord> getWaypoint(Coord pos, Stack<Coord> path,
 			Snapshot s) {
 		
 		// Make new curve.
-		path = (ArrayList<Coord>) path.clone();
+		path = (Stack<Coord>) path.clone();
 		path.add(end);
-		Curve c = getCurve(path);
+		Line c = new Line(pos, end);
 
 		// Check for intersections.
 		Robot obsticle = isClear(c, s);
 		if (obsticle == null) {
 			return path;
 		} else {
+			path.pop();
+			
+			Orientation toObsticle = obsticle.getPosition().sub(path.peek()).getOrientation();
 
-			// TODO check the branches
+			double birth = 0.3;
+			Coord left, right;
+			left = new Coord(birth, 0).rotate(toObsticle);
+			right = new Coord(-birth, 0).rotate(toObsticle);
 
-			return null;
+			Stack<Coord> leftPath, rightPath;
+			leftPath = getWaypoint(left, path, s);
+			rightPath = getWaypoint(right, path, s);
+
+			if (leftPath.size() < rightPath.size())
+				return leftPath;
+			else
+				return rightPath;
 		}
 	}
 
-	protected Robot isClear(Curve curve, Snapshot s) {
-		
-		// TODO check for collisions
-		
+	protected Robot isClear(Line curve, Snapshot s) {
+		Robot r = s.getOpponent();
+		Coord rr = r.getPosition();
+
+		double birth = 0.3;
+		Line other = new Line(new Coord(birth, 0).rotate(r.getOrientation())
+				.add(rr), new Coord(-birth, 0).rotate(r.getOrientation()).add(
+				rr));
+		if (other.intersects(curve))
+			return r;
+
 		return null;
 	}
 
-	protected Curve getCurve(ArrayList<Coord> path) {
+	protected Curve getCurve(Vector<Coord> path) {
 		// Convert to array.
 		Coord[] out = new Coord[path.size()];
 		for (int i = 0; i < out.length; i++)
