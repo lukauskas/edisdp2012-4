@@ -10,9 +10,9 @@ import balle.main.drawable.Dot;
 import balle.main.drawable.Drawable;
 import balle.misc.Globals;
 import balle.strategy.curve.Curve;
-import balle.strategy.curve.Interpolator;
 import balle.strategy.curve.Spline;
 import balle.strategy.executor.movement.OrientedMovementExecutor;
+import balle.strategy.pathfinding.PathFinder;
 import balle.world.Coord;
 import balle.world.Orientation;
 import balle.world.Snapshot;
@@ -72,7 +72,7 @@ public class BezierNav implements OrientedMovementExecutor {
 			}));
 	
 	
-	private Interpolator interpolator;
+	private PathFinder pathfinder;
 	private Curve c;
 
 	private StaticFieldObject target;
@@ -82,8 +82,8 @@ public class BezierNav implements OrientedMovementExecutor {
 	private Coord p0, p3;
 
 
-	public BezierNav(Interpolator interpolator) {
-		this.interpolator = interpolator;
+	public BezierNav(PathFinder pathfinder) {
+		this.pathfinder = pathfinder;
 	}
 
 	@Override
@@ -154,8 +154,8 @@ public class BezierNav implements OrientedMovementExecutor {
 			tpa[i + 1] = targetPoints.get(i);
 		}
 
-		c = interpolator.getCurve(tpa, robot.getOrientation(), orient);
-		
+		c = pathfinder.getPath(state, robot.getPosition(),
+				robot.getOrientation(), target.getPosition(), orient);
 		
 		// calculate turning radius
 		Coord a = c.acc(0);

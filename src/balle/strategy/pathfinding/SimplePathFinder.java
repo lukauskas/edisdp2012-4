@@ -18,8 +18,12 @@ public class SimplePathFinder implements PathFinder {
 	protected Coord start, end;
 	protected Orientation startAngle, endAngle;
 
+	public SimplePathFinder(Interpolator i) {
+		this.interpolator = i;
+	}
+
 	@Override
-	public Coord[] getPath(Snapshot s, Coord start, Orientation startAngle,
+	public Curve getPath(Snapshot s, Coord start, Orientation startAngle,
 			Coord end, Orientation endAngle) {
 
 		// Initialise temporary variables.
@@ -33,16 +37,8 @@ public class SimplePathFinder implements PathFinder {
 		list.add(s.getBalle().getPosition());
 		list = getWaypoint(s.getBalle().getPosition(), list, s);
 
-		// Convert to array.
-		Coord[] out = new Coord[list.size()];
-		for (int i = 0; i < out.length; i++)
-			out[i] = list.get(i);
-		return out;
-	}
-
-	@Override
-	public void setInterpolator(Interpolator i) {
-		interpolator = i;
+		// Convert to a curve.
+		return getCurve(list);
 	}
 
 	@SuppressWarnings("unchecked")
