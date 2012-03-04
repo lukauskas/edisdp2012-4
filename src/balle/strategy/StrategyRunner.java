@@ -10,9 +10,9 @@ import balle.world.processing.AbstractWorldProcessor;
 
 public class StrategyRunner extends AbstractWorldProcessor {
 
-	private final Controller controller;
 	private final static Logger LOG = Logger.getLogger(StrategyRunner.class);
 
+	private Controller controller;
 	private Strategy currentStrategy;
 	private final SimpleWorldGUI gui;
 
@@ -83,6 +83,16 @@ public class StrategyRunner extends AbstractWorldProcessor {
 		// Start the new strategy
 		currentStrategy = strategy;
 		LOG.info("Started " + currentStrategy.getClass().getName());
+	}
+
+	/**
+	 * Used by the simulator to switch robots
+	 * 
+	 * @param controller
+	 */
+	public void setController(Controller controller) {
+		this.controller.stop();
+		this.controller = controller;
 	}
 
 	@Override

@@ -174,13 +174,15 @@ public class StratTab extends JPanel implements ActionListener {
 				world.setGoalPosition(true);
 			}
 		} else if (event.getActionCommand().equals("robot")) {
-			simulator.resetBallPosition();
-			if (switchRobot.getText().equals("Robot: Blue")) {
+
+			if (world.isBlue()) {
 				switchRobot.setText("Robot: Yellow");
 				world.setIsBlue(false);
+				strategyRunner.setController(simulator.getYellowSoft());
 			} else {
 				switchRobot.setText("Robot: Blue");
 				world.setIsBlue(true);
+				strategyRunner.setController(simulator.getBlueSoft());
 			}
 		}
 	}
