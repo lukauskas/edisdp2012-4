@@ -92,35 +92,12 @@ public class GoToBallM3 extends GoToBall {
         }
     }
 
-	public void changeStages(Controller controller, Snapshot snapshot) {
-        Robot ourRobot = snapshot.getBalle();
-        Coord ourPosition = ourRobot.getPosition();
-        
-        if (ourPosition == null)
-            return;
-
-		if (stage == 1
-				&& ourRobot.containsCoord(getTarget(snapshot).getPosition())) {
-            stage = 2;
-            setAppropriateMovementStrategy();
-        }
-        if (stage == 2) {
-			if (ourRobot.possessesBall(snapshot.getBall())
-					&& ourRobot.getFacingLine().intersects(
-							snapshot.getOpponentsGoal().getGoalLine())) {
-                LOG.info("Kicking");
-                controller.kick();
-				controller.setWheelSpeeds(200, 200);
-                return;
-            }
-        }
-    }
-
 	@Override
 	protected void onStep(Controller controller, Snapshot snapshot) {
+		Robot ourRobot = snapshot.getBalle();
+
         if (stage == 0)
         {
-			Robot ourRobot = snapshot.getBalle();
             if ((ourRobot.getPosition() == null)
                     || (ourRobot.getOrientation() == null))
                 return;
@@ -141,7 +118,21 @@ public class GoToBallM3 extends GoToBall {
                 stage = 1;
             }
         } else {
-			changeStages(controller, snapshot);
+        	
+    		if (stage == 1
+    				&& ourRobot.containsCoord(getTarget(snapshot).getPosition())) {
+                stage = 2;
+                setAppropriateMovementStrategy();
+            } else if (stage == 2) {
+				if (ourRobot.possessesBall(snapshot.getBall())
+						&& ourRobot.getFacingLine().intersects(
+								snapshot.getOpponentsGoal().getGoalLine())) {
+					LOG.info("Kicking");
+					controller.kick();
+					controller.setWheelSpeeds(200, 200);
+				}
+			}
+
 			super.onStep(controller, snapshot);
         }
     }
