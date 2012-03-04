@@ -10,7 +10,6 @@ import balle.main.drawable.Dot;
 import balle.main.drawable.Drawable;
 import balle.misc.Globals;
 import balle.strategy.curve.Curve;
-import balle.strategy.curve.Spline;
 import balle.strategy.executor.movement.OrientedMovementExecutor;
 import balle.strategy.pathfinding.PathFinder;
 import balle.world.Coord;
@@ -196,9 +195,10 @@ public class BezierNav implements OrientedMovementExecutor {
 		if (p0 == null) {
 			return l;
 		}
-		if (c instanceof Spline) {
-			l.add((Spline) c);
-		}
+
+		l.add(c);
+		l.addAll(pathfinder.getDrawables());
+
 		Coord center = c.cor(0);
 		l.add(new Dot(center, Color.BLACK));
 		l.add(new Circle(center, center.dist(state.getBalle().getPosition()),
