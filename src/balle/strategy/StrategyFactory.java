@@ -2,6 +2,7 @@ package balle.strategy;
 
 import balle.strategy.bezierNav.BezierNav;
 import balle.strategy.bezierNav.CurveNav;
+import balle.strategy.curve.CustomCHI;
 import balle.strategy.curve.FiniteDifferenceCHI;
 import balle.strategy.executor.movement.GoToObject;
 import balle.strategy.executor.movement.GoToObjectAvoidOpponentPurePF;
@@ -9,6 +10,7 @@ import balle.strategy.executor.movement.GoToObjectPFN;
 import balle.strategy.executor.movement.GoToObjectPurePF;
 import balle.strategy.executor.movement.OrientedMovementExecutor;
 import balle.strategy.executor.turning.FaceAngle;
+import balle.strategy.pathfinding.SimplePathFinder;
 import balle.strategy.planner.AbstractPlanner;
 import balle.strategy.planner.DefensiveStrategy;
 import balle.strategy.planner.DribbleMilestone2;
@@ -34,7 +36,7 @@ public class StrategyFactory {
 			throws UnknownDesignatorException {
 		if (designator.equals("BezierNav")) {
 			return new SimpleGoToBallFaceGoal(new BezierNav(
-					new FiniteDifferenceCHI()));
+					new SimplePathFinder(new CustomCHI())));
 		} else if (designator.equals("CurveNav")) {
 			return new SimpleGoToBallFaceGoal(
 					(OrientedMovementExecutor) new CurveNav(

@@ -155,7 +155,7 @@ public class BezierNav implements OrientedMovementExecutor {
 		}
 
 		c = pathfinder.getPath(state, robot.getPosition(),
-				robot.getOrientation(), target.getPosition(), orient);
+				robot.getOrientation(), tP, orient);
 		
 		// calculate turning radius
 		Coord a = c.acc(0);
