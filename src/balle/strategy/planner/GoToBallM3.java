@@ -47,7 +47,8 @@ public class GoToBallM3 extends GoToBall {
 			Pitch pitch = snapshot.getPitch();
             double ballSafeGap = BALL_SAFE_GAP;
             Line newTargetLine = targetLine.extend(ballSafeGap);
-            while (!pitch.containsCoord(newTargetLine.extend(
+			while (ballSafeGap > 0.01
+					&& !pitch.containsCoord(newTargetLine.extend(
                     Globals.ROBOT_LENGTH).getB())) {
                 ballSafeGap *= 0.95;
                 newTargetLine = targetLine.extend(ballSafeGap);
