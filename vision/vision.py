@@ -28,6 +28,7 @@ class Vision:
     def __init__(self, pitchnum, stdout, sourcefile, resetPitchSize):
                
         self.running = True
+        self.connected = False
         
         self.stdout = stdout 
 
@@ -56,6 +57,8 @@ class Vision:
             try:
                 if not self.stdout:
                     self.connect()
+                else:
+                    self.connected = True
 
                 if self.preprocessor.hasPitchSize:
                     self.outputPitchSize()
@@ -63,39 +66,45 @@ class Vision:
                 else:
                     eventHandler.setClickListener(self.setNextPitchCorner)
 
-                self.doStuff()
+                while self.running:
+                    self.doStuff()
+
             except socket.error:
+                self.connected = False
                 # If the rest of the system is not up yet/gets quit,
                 # just wait for it to come available.
                 time.sleep(1)
+
+                # Strange things seem to happen to X sometimes if the
+                # display isn't updated for a while
+                self.doStuff()
+
+        if not self.stdout:
+            self.socket.close()
         
     def connect(self):
         print("Attempting to connect...")
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect( (HOST, PORT) )
-        connected = True
+        self.connected = True
 
     def quit(self):
         self.running = False
         
     def doStuff(self):
-        while self.running:
-            if self.cap.getCameraMatrix is None:
-                frame = self.cap.getImage()
-            else:
-                frame = self.cap.getImageUndistort()
+        if self.cap.getCameraMatrix is None:
+            frame = self.cap.getImage()
+        else:
+            frame = self.cap.getImageUndistort()
 
-            frame = self.preprocessor.preprocess(frame)
-            
-            self.gui.updateLayer('raw', frame)
-
-            ents = self.features.extractFeatures(frame)
-            self.outputEnts(ents)
-
-            self.gui.loop()
+        frame = self.preprocessor.preprocess(frame)
         
-        if not self.stdout:
-            self.socket.close()
+        self.gui.updateLayer('raw', frame)
+
+        ents = self.features.extractFeatures(frame)
+        self.outputEnts(ents)
+
+        self.gui.loop()
 
     def setNextPitchCorner(self, where):
         self.preprocessor.setNextPitchCorner(where)
@@ -116,7 +125,7 @@ class Vision:
     def outputEnts(self, ents):
 
         # Messyyy
-        if not self.preprocessor.hasPitchSize:
+        if not self.connected or not self.preprocessor.hasPitchSize:
             return
 
         self.send("{0} ".format(ENTITY_BIT))
