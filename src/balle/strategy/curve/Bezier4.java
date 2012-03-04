@@ -32,6 +32,8 @@ public class Bezier4 extends SimpleCurve {
 	@Override
 	public Coord closestPoint(Coord c) {
 		// TODO re-do this code, it is very crude
+		// http://mathoverflow.net/questions/8983/closest-point-on-bezier-spline
+		// Might be helpfull.
 
 		Coord closest = null;
 		for (double i = 0; i <= 1; i += 0.1) {
