@@ -1,4 +1,4 @@
-package balle.strategy.bezierNav;
+package balle.strategy.pathfinding;
 
 import balle.strategy.curve.Interpolator;
 import balle.world.Coord;

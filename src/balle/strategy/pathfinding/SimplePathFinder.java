@@ -1,4 +1,4 @@
-package balle.strategy.bezierNav;
+package balle.strategy.pathfinding;
 
 import java.util.ArrayList;
 
