@@ -92,9 +92,15 @@ public class GoToBallM3 extends GoToBall {
         }
     }
 
+	private void changeStage(int newStage) {
+		stage = newStage;
+		setAppropriateMovementStrategy();
+	}
+
 	@Override
 	protected void onStep(Controller controller, Snapshot snapshot) {
 		Robot ourRobot = snapshot.getBalle();
+		Ball ball = snapshot.getBall();
 
         if (stage == 0)
         {
@@ -115,16 +121,19 @@ public class GoToBallM3 extends GoToBall {
             } else {
                 LOG.info("Facing the target correctly");
                 turnExecutor.stop(controller);
-                stage = 1;
+				changeStage(1);
             }
         } else {
         	
     		if (stage == 1
     				&& ourRobot.containsCoord(getTarget(snapshot).getPosition())) {
-                stage = 2;
-                setAppropriateMovementStrategy();
+				changeStage(2);
             } else if (stage == 2) {
-				if (ourRobot.possessesBall(snapshot.getBall())
+				if (ourRobot.getPosition().dist(ball.getPosition()) > BALL_SAFE_GAP * 2) {
+
+					changeStage(1);
+					
+				} else if (ourRobot.possessesBall(snapshot.getBall())
 						&& ourRobot.getFacingLine().intersects(
 								snapshot.getOpponentsGoal().getGoalLine())) {
 					LOG.info("Kicking");
