@@ -51,10 +51,6 @@ public abstract class AbstractWorld implements Listener {
 		return goalIsLeft = goal;
 	}
 
-	public boolean getIsBlue() {
-		return balleIsBlue;
-	}
-
 	public boolean setIsBlue(boolean robot) {
 		return balleIsBlue = robot;
 	}
@@ -64,7 +60,7 @@ public abstract class AbstractWorld implements Listener {
 	 * 
 	 * @return true if our robot is the blue one, false otherwise
 	 */
-	protected boolean isBlue() {
+	public boolean isBlue() {
 		return balleIsBlue;
 	}
 

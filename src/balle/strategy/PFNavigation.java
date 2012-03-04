@@ -28,20 +28,19 @@ public class PFNavigation extends AbstractPlanner {
     PFPlanning                  plann = new PFPlanning(conf, 0.05, 0.4, 52, 80);
 
     @Override
-    public void step(Controller controller) {
+	public void onStep(Controller controller, Snapshot snapshot) {
         // TODO Auto-generated method stub
-        Snapshot snap = getSnapshot();
 
-        if (snap != null) {
-            if (snap.getBalle().getPosition() == null)
+        if (snapshot != null) {
+            if (snapshot.getBalle().getPosition() == null)
                 return;
-            Pos opponent = new Pos(new Point(snap.getOpponent().getPosition().getX(), snap
-                    .getOpponent().getPosition().getY()), snap.getOpponent().getOrientation()
+            Pos opponent = new Pos(new Point(snapshot.getOpponent().getPosition().getX(), snapshot
+                    .getOpponent().getPosition().getY()), snapshot.getOpponent().getOrientation()
                     .atan2styleradians());
             // Pos opponent = null;
-            Pos initPos = new Pos(new Point(snap.getBalle().getPosition().getX(), snap.getBalle()
-                    .getPosition().getY()), snap.getBalle().getOrientation().atan2styleradians());
-            Point ball = new Point(snap.getBall().getPosition().getX(), snap.getBall()
+            Pos initPos = new Pos(new Point(snapshot.getBalle().getPosition().getX(), snapshot.getBalle()
+                    .getPosition().getY()), snapshot.getBalle().getOrientation().atan2styleradians());
+            Point ball = new Point(snapshot.getBall().getPosition().getX(), snapshot.getBall()
                     .getPosition().getY());
             VelocityVec res = plann.update(initPos, opponent, ball);
             LOG.trace("Left speed: " + Math.toDegrees(res.getLeft()) + ", right speed: "

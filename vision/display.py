@@ -209,7 +209,7 @@ class ThresholdGui:
 
         if window is None:
             self.window = 'thresh_adjust'
-            cv.NamedWindow(self.window)
+            cv.NamedWindow(self.window, 0)
         else:
             self.window = window
 

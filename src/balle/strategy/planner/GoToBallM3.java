@@ -35,16 +35,16 @@ public class GoToBallM3 extends GoToBall {
     }
 
     @Override
-    protected StaticFieldObject getTarget() {
-        Ball ball = getSnapshot().getBall();
-        Goal targetGoal = getSnapshot().getOpponentsGoal();
+	protected StaticFieldObject getTarget(Snapshot snapshot) {
+		Ball ball = snapshot.getBall();
+		Goal targetGoal = snapshot.getOpponentsGoal();
 
         Line targetLine = new Line(targetGoal.getPosition(), ball.getPosition());
 
         if (stage < 2)
         {
 
-            Pitch pitch = getSnapshot().getPitch();
+			Pitch pitch = snapshot.getPitch();
             double ballSafeGap = BALL_SAFE_GAP;
             Line newTargetLine = targetLine.extend(ballSafeGap);
             while (!pitch.containsCoord(newTargetLine.extend(
@@ -57,9 +57,9 @@ public class GoToBallM3 extends GoToBall {
 
         if (stage == 1) {
             Coord targetCoord = targetLine.getB();
-            Line ballTargetLine = new Line(getSnapshot().getBall()
+			Line ballTargetLine = new Line(snapshot.getBall()
                     .getPosition(), targetCoord);
-            Coord ourPos = getSnapshot().getBalle().getPosition();
+			Coord ourPos = snapshot.getBalle().getPosition();
 
             if (ballTargetLine.contains(ourPos)) {
                 LOG.warn("Were fucked, TODO get out!");
@@ -85,15 +85,15 @@ public class GoToBallM3 extends GoToBall {
         }
     }
 
-    public void changeStages(Controller controller) {
-        Snapshot snapshot = getSnapshot();
+	public void changeStages(Controller controller, Snapshot snapshot) {
         Robot ourRobot = snapshot.getBalle();
         Coord ourPosition = ourRobot.getPosition();
         
         if (ourPosition == null)
             return;
 
-        if (stage == 1 && ourRobot.containsCoord(getTarget().getPosition())) {
+		if (stage == 1
+				&& ourRobot.containsCoord(getTarget(snapshot).getPosition())) {
             stage = 2;
             setAppropriateMovementStrategy();
         }
@@ -109,18 +109,16 @@ public class GoToBallM3 extends GoToBall {
         }
     }
 
-    public void step(Controller controller) {
+	@Override
+	protected void onStep(Controller controller, Snapshot snapshot) {
         if (stage == 0)
         {
-            Robot ourRobot = getSnapshot().getBalle();
+			Robot ourRobot = snapshot.getBalle();
             if ((ourRobot.getPosition() == null)
                     || (ourRobot.getOrientation() == null))
                 return;
 
-            Coord targetCoord = getTarget().getPosition();
-
-            turnExecutor.updateState(getSnapshot());
-
+			Coord targetCoord = getTarget(snapshot).getPosition();
 
             double angleToFaceTarget = ourRobot
                     .getAngleToTurnToTarget(targetCoord);
@@ -129,15 +127,15 @@ public class GoToBallM3 extends GoToBall {
 				turnExecutor.setTargetOrientation(targetCoord.sub(
 						ourRobot.getPosition()).orientation());
                 LOG.info("Turning to target");
-                turnExecutor.step(controller);
+				turnExecutor.step(controller, snapshot);
             } else {
                 LOG.info("Facing the target correctly");
                 turnExecutor.stop(controller);
                 stage = 1;
             }
         } else {
-            changeStages(controller);
-            super.step(controller);
+			changeStages(controller, snapshot);
+			super.onStep(controller, snapshot);
         }
     }
 

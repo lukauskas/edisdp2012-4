@@ -11,7 +11,7 @@ import balle.controller.Controller;
 import balle.main.drawable.Dot;
 import balle.strategy.executor.movement.MovementExecutor;
 import balle.world.Coord;
-import balle.world.objects.Ball;
+import balle.world.Snapshot;
 import balle.world.objects.Pitch;
 import balle.world.objects.Point;
 import balle.world.objects.Robot;
@@ -72,24 +72,23 @@ public class GoToBall extends AbstractPlanner {
         this.approachTargetFromCorrectSide = approachTargetFromCorrectSide;
     }
 
-    protected StaticFieldObject getTarget() {
-
-		Ball ball = getSnapshot().getBall();
-        return ball;
+	protected StaticFieldObject getTarget(Snapshot snapshot) {
+		return snapshot.getBall();
     }
 
     protected Color getTargetColor() {
         return Color.CYAN;
     }
 
-    protected Coord calculateAvoidanceCoord(double gap, boolean belowPoint) {
+	protected Coord calculateAvoidanceCoord(double gap, boolean belowPoint,
+			Snapshot snapshot) {
         int side = 1;
         if (belowPoint) {
             side = -1;
         }
 
-        Robot robot = getSnapshot().getBalle();
-        Coord point = getSnapshot().getOpponent().getPosition();
+		Robot robot = snapshot.getBalle();
+		Coord point = snapshot.getOpponent().getPosition();
 
         // Gets the angle and distance between the robot and the ball
         double robotObstacleAngle = point.sub(robot.getPosition())
@@ -116,14 +115,14 @@ public class GoToBall extends AbstractPlanner {
     }
 
     protected Coord calculateOvershootCoord(StaticFieldObject target,
-            double gap, boolean belowPoint) {
+			double gap, boolean belowPoint, Snapshot snapshot) {
         int side = 1;
         if (belowPoint) {
             side = -1;
         }
 
-        Robot robot = getSnapshot().getBalle();
-        Coord point = getSnapshot().getBall().getPosition();
+		Robot robot = snapshot.getBalle();
+		Coord point = snapshot.getBall().getPosition();
 
         // Gets the angle and distance between the robot and the ball
         double robotTargetOrientation = point.sub(robot.getPosition())
@@ -160,24 +159,24 @@ public class GoToBall extends AbstractPlanner {
      * @return the overshoot target
      */
     protected StaticFieldObject getOvershootTarget(StaticFieldObject target,
-            double overshootGap) {
+			double overshootGap, Snapshot snapshot) {
         // End case for recursive search for overshoot target
         if (overshootGap < 0.1)
             return target;
 
         boolean belowBall = true;
-        Robot robot = getSnapshot().getBalle();
-        Pitch pitch = getSnapshot().getPitch();
+		Robot robot = snapshot.getBalle();
+		Pitch pitch = snapshot.getPitch();
 
         if (robot.getPosition().getY() > target.getPosition().getY()) {
             belowBall = false;
         }
 
-        if (getSnapshot().getOpponentsGoal().isRightGoal())
+		if (snapshot.getOpponentsGoal().isRightGoal())
             belowBall = !belowBall;
 
         Coord overshootCoord = calculateOvershootCoord(target, overshootGap,
-                belowBall);
+				belowBall, snapshot);
 
         // If the point is in the pitch
         if (pitch.containsCoord(overshootCoord)) {
@@ -203,15 +202,17 @@ public class GoToBall extends AbstractPlanner {
         // If the target is *still* not suitable, go to the original target at
         // least
         // Recurse with smaller gap
-        return getOvershootTarget(target, overshootGap / 2.0);
+		return getOvershootTarget(target, overshootGap / 2.0, snapshot);
     }
 
-    protected Point getAvoidanceTarget() {
-        Coord pointAbove = calculateAvoidanceCoord(AVOIDANCE_GAP, true);
-        Coord pointBelow = calculateAvoidanceCoord(AVOIDANCE_GAP, false);
-        Pitch pitch = getSnapshot().getPitch();
+	protected Point getAvoidanceTarget(Snapshot snapshot) {
+		Coord pointAbove = calculateAvoidanceCoord(AVOIDANCE_GAP, true,
+				snapshot);
+		Coord pointBelow = calculateAvoidanceCoord(AVOIDANCE_GAP, false,
+				snapshot);
+		Pitch pitch = snapshot.getPitch();
 
-        Coord currentPosition = getSnapshot().getBalle().getPosition();
+		Coord currentPosition = snapshot.getBalle().getPosition();
         if (pitch.containsCoord(pointAbove) && pitch.containsCoord(pointBelow)) {
             // If both points happen to be in the pitch, return the closest one
             double distToPointAbove = currentPosition.dist(pointAbove);
@@ -226,9 +227,9 @@ public class GoToBall extends AbstractPlanner {
                 else
                     return new Point(pointBelow);
             } else {
-                double angleToTurnPointAbove = getSnapshot().getBalle()
+				double angleToTurnPointAbove = snapshot.getBalle()
                         .getAngleToTurnToTarget(pointAbove);
-                double angleToTurnPointBelow = getSnapshot().getBalle()
+				double angleToTurnPointBelow = snapshot.getBalle()
                         .getAngleToTurnToTarget(pointBelow);
 
                 if (Math.abs(angleToTurnPointAbove) < Math
@@ -252,37 +253,32 @@ public class GoToBall extends AbstractPlanner {
     }
 
     @Override
-    public void step(Controller controller) {
-        StaticFieldObject target = getTarget();
+	protected void onStep(Controller controller, Snapshot snapshot) {
+		StaticFieldObject target = getTarget(snapshot);
 
-        if ((getSnapshot() == null)
-                || (getSnapshot().getBalle().getPosition() == null)
+		if ((snapshot == null) || (snapshot.getBalle().getPosition() == null)
                 || (target == null))
             return;
 
-        // Update the current state of executor strategy
-        executorStrategy.updateState(getSnapshot());
-
         if (shouldApproachTargetFromCorrectSide()
-                && (!getSnapshot().getBalle()
+                && (!snapshot.getBalle()
                         .isApproachingTargetFromCorrectSide(target,
-                                getSnapshot().getOpponentsGoal()))) {
-
+                                snapshot.getOpponentsGoal()))) {
             LOG.info("Approaching target from wrong side, calculating overshoot target");
-            target = getOvershootTarget(target, OVERSHOOT_GAP);
+			target = getOvershootTarget(target, OVERSHOOT_GAP, snapshot);
             addDrawable(new Dot(target.getPosition(), Color.BLUE));
         }
 
-		// If we see the opponent
-		if (getSnapshot().getOpponent().getPosition() != null) {
-			if (!getSnapshot().getBalle().canReachTargetInStraightLine(target,
-					getSnapshot().getOpponent())) {
-				// pick a new target then
-				LOG.info("Opponent is blocking the target, avoiding it");
-				target = getAvoidanceTarget();
-				addDrawable(new Dot(target.getPosition(), Color.MAGENTA));
-			}
-		}
+        // If we see the opponent
+		if (snapshot.getOpponent().getPosition() != null) {
+			if (!snapshot.getBalle().canReachTargetInStraightLine(target,
+					snapshot.getOpponent())) {
+                // pick a new target then
+                LOG.info("Opponent is blocking the target, avoiding it");
+				target = getAvoidanceTarget(snapshot);
+                addDrawable(new Dot(target.getPosition(), Color.MAGENTA));
+            }
+        }
 
         // Update the target's location in executorStrategy (e.g. if target
         // moved)
@@ -292,8 +288,8 @@ public class GoToBall extends AbstractPlanner {
             addDrawable(new Dot(target.getPosition(), getTargetColor()));
 
         // If it says it is not finished, tell it to do something for a step.
-        if (!executorStrategy.isFinished()) {
-            executorStrategy.step(controller);
+        if (!executorStrategy.isFinished(snapshot)) {
+			executorStrategy.step(controller, snapshot);
         } else {
             // Tell the strategy to stop doing whatever it was doing
             executorStrategy.stop(controller);
@@ -302,8 +298,9 @@ public class GoToBall extends AbstractPlanner {
 
     @Override
     public void stop(Controller controller) {
-        if (!executorStrategy.isFinished())
-            executorStrategy.stop(controller);
+		// TODO: do we really need to check this?
+		// if (!executorStrategy.isFinished(snapshot))
+		executorStrategy.stop(controller);
 
     }
 }

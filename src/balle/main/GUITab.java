@@ -28,11 +28,11 @@ public class GUITab extends JPanel {
         main.setLayout(new BorderLayout(5, 0));
         sidebar = new JPanel();
 		sidebar.setPreferredSize(new Dimension(300, 500));
-        sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
+		sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
 
-        mainPanel = new JPanel();
+		mainPanel = new JPanel();
 		mainPanel.setPreferredSize(new Dimension(700, 500));
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 
         main.add(BorderLayout.WEST, sidebar);
         main.add(BorderLayout.CENTER, mainPanel);
