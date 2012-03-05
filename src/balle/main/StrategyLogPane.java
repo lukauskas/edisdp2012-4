@@ -64,17 +64,23 @@ class EvenOddRenderer implements TableCellRenderer {
 		row = table.convertRowIndexToModel(row);
 		String s = table.getModel().getValueAt(row, 1).toString();
 		if (s == "INFO") {
-				foreground = Color.blue;
+			foreground = Color.blue;
 				background = Color.white;
 			} else {
 			if (s == "DEBUG") {
-				background = Color.red;
+				background = Color.gray;
 				foreground = Color.white;
 			} else {
+				if (s == "ERROR") {
+					background = Color.red;
+					foreground = Color.white;
+				} else {
 				foreground = Color.black;
 
 				background = Color.yellow;
-			}}
+				}
+			}
+		}
 
 		renderer.setForeground(foreground);
 		renderer.setBackground(background);
