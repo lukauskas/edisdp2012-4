@@ -83,7 +83,7 @@ public class GoToBallM3 extends GoToBall {
 			strategy.setStopDistance(0.00);
 
 			if (stage == 2) {
-				strategy.setMovementSpeed(300);
+				strategy.setMovementSpeed(200);
 			} else {
 				strategy.setMovementSpeed(GoToObject.DEFAULT_MOVEMENT_SPEED);
 			}
@@ -114,9 +114,12 @@ public class GoToBallM3 extends GoToBall {
                     .getAngleToTurnToTarget(targetCoord);
             
             if (Math.abs(angleToFaceTarget) > Math.PI / 8) {
-				turnExecutor.setTargetOrientation(targetCoord.sub(
-						ourRobot.getPosition()).orientation());
-                LOG.info("Turning to target");
+				if (!turnExecutor.isTurning()) {
+					turnExecutor.setTargetOrientation(targetCoord.sub(
+							ourRobot.getPosition()).orientation());
+					LOG.info("Turning to target");
+				}
+
 				turnExecutor.step(controller, snapshot);
             } else {
                 LOG.info("Facing the target correctly");
@@ -127,7 +130,9 @@ public class GoToBallM3 extends GoToBall {
         	
     		if (stage == 1
     				&& ourRobot.containsCoord(getTarget(snapshot).getPosition())) {
+    			
 				changeStage(2);
+    		
             } else if (stage == 2) {
 				if (ourRobot.getPosition().dist(ball.getPosition()) > BALL_SAFE_GAP * 2) {
 
@@ -139,6 +144,13 @@ public class GoToBallM3 extends GoToBall {
 					LOG.info("Kicking");
 					controller.kick();
 					controller.setWheelSpeeds(200, 200);
+				} else if (ourRobot.getFrontSide().midpoint()
+						.dist(snapshot.getBall().getPosition()) < 0.14
+						&& !ourRobot.getFacingLine().intersects(
+								snapshot.getOpponentsGoal().getGoalLine())) {
+
+					LOG.info("Trying that again");
+					changeStage(0);
 				}
 			}
 
