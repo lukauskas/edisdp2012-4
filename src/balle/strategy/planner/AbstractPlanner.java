@@ -8,7 +8,6 @@ import balle.strategy.Strategy;
 import balle.world.Snapshot;
 
 public abstract class AbstractPlanner implements Strategy {
-    private Snapshot                  snapshot;
     private final ArrayList<Drawable> drawables = new ArrayList<Drawable>();
 
     /**
@@ -18,18 +17,10 @@ public abstract class AbstractPlanner implements Strategy {
      * @param snapshot
      */
     @Override
-    public void updateState(Snapshot snapshot) {
-        this.snapshot = snapshot;
+	public final void step(Controller controller, Snapshot snapshot) {
         clearDrawables();
-    }
-
-    /**
-     * Returns the current snapshot
-     * 
-     * @return the snapshot
-     */
-    protected Snapshot getSnapshot() {
-        return snapshot;
+        
+        onStep(controller, snapshot);
     }
 
     @Override
@@ -63,5 +54,7 @@ public abstract class AbstractPlanner implements Strategy {
     protected void addDrawables(ArrayList<Drawable> drawables) {
         this.drawables.addAll(drawables);
     }
+
+	protected abstract void onStep(Controller controller, Snapshot snapshot);
 
 }

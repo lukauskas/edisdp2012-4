@@ -1,4 +1,4 @@
-package balle.world;
+package balle.main;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -16,6 +16,10 @@ import org.apache.log4j.Logger;
 import balle.main.drawable.Drawable;
 import balle.main.drawable.DrawableLine;
 import balle.misc.Globals;
+import balle.world.AbstractWorld;
+import balle.world.Coord;
+import balle.world.Scaler;
+import balle.world.Snapshot;
 import balle.world.objects.Ball;
 import balle.world.objects.Goal;
 import balle.world.objects.Robot;
