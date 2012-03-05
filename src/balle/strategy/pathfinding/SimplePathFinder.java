@@ -95,15 +95,14 @@ public class SimplePathFinder implements PathFinder {
 		Line other = new Line(new Coord(0, birth), new Coord(0, -birth));
 		other = other.rotate(curve.getA().sub(curve.getB()).getOrientation());
 		other = other.add(r.getPosition());
-		
-		System.out.println(curve + "\t" + r.getPosition() + "\t" + other + "\t"
-				+ other.intersects(curve));
+
+		drawables.add(new DrawableLine(other, Color.BLUE));
+		drawables.add(new DrawableLine(curve, Color.BLUE));
 
 		if (other.intersects(curve))
 			return r;
 
-		drawables.add(new DrawableLine(other, Color.BLUE));
-		drawables.add(new DrawableLine(curve, Color.BLUE));
+
 
 		return null;
 	}
