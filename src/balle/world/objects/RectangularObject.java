@@ -101,7 +101,7 @@ public class RectangularObject extends MovingPoint implements FieldObject {
         return false;
     }
 
-    public Line getLeftSide() {
+    public Line getBackSide() {
         double hw = getWidth() / 2;
         double hh = getHeight() / 2;
         Line c = new Line(-hh, -hw, -hh, hw);
@@ -110,7 +110,7 @@ public class RectangularObject extends MovingPoint implements FieldObject {
         return c;
     }
 
-    public Line getRightSide() {
+    public Line getFrontSide() {
         double hw = getWidth() / 2;
         double hh = getHeight() / 2;
         Line a = new Line(hh, hw, hh, -hw);
@@ -121,7 +121,7 @@ public class RectangularObject extends MovingPoint implements FieldObject {
         return a;
     }
 
-    public Line getFrontSide() {
+    public Line getLeftSide() {
         double hw = getWidth() / 2;
         double hh = getHeight() / 2;
         Line d = new Line(-hh, hw, hh, hw);
@@ -132,7 +132,7 @@ public class RectangularObject extends MovingPoint implements FieldObject {
         return d;
     }
 
-    public Line getBackSide() {
+    public Line getRightSide() {
         double hw = getWidth() / 2;
         double hh = getHeight() / 2;
         Line b = new Line(hh, -hw, -hh, -hw);

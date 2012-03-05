@@ -75,11 +75,12 @@ public class GoToBallM3 extends GoToBall {
         {
             LOG.info("Going to BALL_SAFE target");
             setExecutorStrategy(new GoToObjectPFN(0));
+            setApproachTargetFromCorrectSide(true);
         }
         else
         {
             LOG.info("Going to the ball");
-			GoToObject strategy = new GoToObject(new FaceAngle());
+            GoToObject strategy = new GoToObject(turnExecutor);
 			strategy.setStopDistance(0.00);
 
 			if (stage == 2) {
@@ -89,6 +90,7 @@ public class GoToBallM3 extends GoToBall {
 			}
 
             setExecutorStrategy(strategy);
+            setApproachTargetFromCorrectSide(false);
         }
     }
 
@@ -129,7 +131,8 @@ public class GoToBallM3 extends GoToBall {
         } else {
         	
     		if (stage == 1
-    				&& ourRobot.containsCoord(getTarget(snapshot).getPosition())) {
+                    && ourRobot.getPosition().dist(
+                            getTarget(snapshot).getPosition()) < Globals.ROBOT_LENGTH / 4) {
     			
 				changeStage(2);
     		
@@ -144,16 +147,31 @@ public class GoToBallM3 extends GoToBall {
 					LOG.info("Kicking");
 					controller.kick();
 					controller.setWheelSpeeds(200, 200);
-				} else if (ourRobot.getFrontSide().midpoint()
-						.dist(snapshot.getBall().getPosition()) < 0.14
+                } else if (ourRobot.getFrontSide().midpoint()
+                        .dist(snapshot.getBall().getPosition()) < 0.11
 						&& !ourRobot.getFacingLine().intersects(
-								snapshot.getOpponentsGoal().getGoalLine())) {
-
-					LOG.info("Trying that again");
-					changeStage(0);
-				}
+                                snapshot.getOpponentsGoal().getGoalLine())
+                        && (!turnExecutor.isTurning())) {
+                    LOG.trace("dist "
+                            + ourRobot.getFrontSide().midpoint()
+                                    .dist(snapshot.getBall().getPosition()));
+                    if (ourRobot.getFrontSide().midpoint()
+                            .dist(snapshot.getBall().getPosition()) > 0.07)
+				    {
+    					LOG.info("Trying to go to ball-safe-gap again");
+    					changeStage(0);
+				    }
+				    else
+				    {
+                        LOG.info("Backing away from the ball");
+				        controller.setWheelSpeeds(-200, -200);
+				    }
+                } else {
+                    LOG.trace("elsedist "
+                            + ourRobot.getFrontSide().midpoint()
+                                    .dist(snapshot.getBall().getPosition()));
+                }
 			}
-
 			super.onStep(controller, snapshot);
         }
     }
