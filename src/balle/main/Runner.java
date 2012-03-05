@@ -162,7 +162,7 @@ public class Runner {
 		// Initialise world
 		world = new BasicWorld(balleIsBlue, goalIsLeft, Globals.getPitch());
 		world.addFilter(new HeightFilter(world.getPitch().getPosition(),
-				Globals.P0_CAMERA_HEIGHT));
+                Globals.P1_CAMERA_HEIGHT));
 
 		// Moving this forward so we do not start a GUI until controller is
 		// initialised
