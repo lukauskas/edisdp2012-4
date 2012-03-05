@@ -45,7 +45,8 @@ public class BezierNav implements OrientedMovementExecutor {
 													// turns the speed will be
 													// slowed toward max/this
 	private final double MAX_VELOCITY = Globals
-			.powerToVelocity(Globals.MAXIMUM_MOTOR_SPEED); // the maximum wheel
+			.powerToVelocity(Globals.MAXIMUM_MOTOR_SPEED) / 4; // the maximum
+																// wheel
 															// velocity to use
 
 	private static final double SUBTARGET_RADIUS = 0.05; // how close the robot

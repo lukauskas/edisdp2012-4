@@ -14,7 +14,6 @@ import balle.world.Coord;
 import balle.world.Line;
 import balle.world.Orientation;
 import balle.world.Snapshot;
-import balle.world.objects.Robot;
 
 public class SimplePathFinder implements PathFinder {
 
@@ -55,20 +54,19 @@ public class SimplePathFinder implements PathFinder {
 		path = (Stack<Coord>) path.clone();
 		path.add(pos);
 		path.add(end);
-		Line c = new Line(pos, end);
 
 		// Check for intersections.
-		Robot obsticle = isClear(c, s);
+		Obstical obsticle = isClear(getCurve(path), s);
 		if (obsticle == null || path.size() > 4) {
 			return path;
 		} else {
 			path.pop();
 			
-			Orientation toObsticle = obsticle.getPosition().sub(path.peek()).getOrientation();
+			Orientation toObsticle = obsticle.sub(path.peek()).getOrientation();
 
 			Coord left, right;
-			left = getWaypoint(s, obsticle.getPosition(), pos, toObsticle);
-			right = getWaypoint(s, obsticle.getPosition(), pos,
+			left = getWaypoint(s, obsticle, pos, toObsticle);
+			right = getWaypoint(s, obsticle, pos,
 					toObsticle.getOpposite());
 
 			drawables.add(new Dot(left, Color.CYAN));
@@ -85,21 +83,30 @@ public class SimplePathFinder implements PathFinder {
 		}
 	}
 
-	protected Robot isClear(Line curve, Snapshot s) {
-		Robot r = s.getOpponent();
-
-		// Make line
-		double birth = 0.2;
-		Line other = new Line(new Coord(0, birth), new Coord(0, -birth));
-		other = other.rotate(curve.getA().sub(curve.getB()).getOrientation());
-		other = other.add(r.getPosition());
-
-		drawables.add(new DrawableLine(other, Color.BLUE));
-		drawables.add(new DrawableLine(curve, Color.BLUE));
-
-		if (other.intersects(curve))
-			return r;
-
+	protected Obstical isClear(Curve c, Snapshot s) {
+		Obstical [] obsticals = new Obstical[]{
+				
+			new Obstical(s.getOpponent().getPosition(),
+					Obstical.ROBOT_CLEARANCE),
+		// new Obstical(s.getBall().getPosition(),
+		// Obstical.ROBOT_CLEARANCE)
+		};
+		
+		Coord pos = s.getBalle().getPosition();
+		for(Obstical o : obsticals) {
+			// check that the current path does not go from out of
+			// the object clearance to into the clearance
+			// TODO make sure that if the robot is already in the clearance
+			// area,#
+			// that it doesn't move through the obstical
+			boolean in = !o.clear(pos);
+			for (double i = 0; i < 1; i += 0.01) {
+				boolean newIn = !o.clear(c.pos(i));
+				if (!in && newIn) {
+					return o;
+				}
+			}
+		}
 		return null;
 	}
 
