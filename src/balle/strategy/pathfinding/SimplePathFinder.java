@@ -64,12 +64,13 @@ public class SimplePathFinder implements PathFinder {
 		} else {
 			path.pop();
 			
-			Orientation toObsticle = obsticle.getPosition().sub(path.peek()).getOrientation();
+			Orientation toTarget = end.sub(pos).getOrientation();
 
 			Coord left, right;
-			left = getWaypoint(s, obsticle.getPosition(), pos, toObsticle);
-			right = getWaypoint(s, obsticle.getPosition(), pos,
-					toObsticle.getOpposite());
+			left = getWaypoint(s, obsticle.getPosition(),
+ toTarget);
+			right = getWaypoint(s, obsticle.getPosition(),
+					toTarget.getOpposite());
 
 			drawables.add(new Dot(left, Color.CYAN));
 			drawables.add(new Dot(right, Color.CYAN));
@@ -103,7 +104,7 @@ public class SimplePathFinder implements PathFinder {
 		return null;
 	}
 
-	protected Coord getWaypoint(Snapshot s, Coord obs, Coord pos, Orientation o) {
+	protected Coord getWaypoint(Snapshot s, Coord obs, Orientation o) {
 		Line l, out, walls[];
 		walls = s.getPitch().getWalls();
 		l = new Line(obs, obs.add(new Coord(0, 10).rotate(o)));

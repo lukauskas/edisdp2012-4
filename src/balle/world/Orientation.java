@@ -4,6 +4,8 @@ public class Orientation {
 
 	private final double angleInRadians;
 
+	public static final Orientation rightAngle = new Orientation(90, false);
+
 	/**
 	 * Initialises orientation. The angle must be set to radians if useRadians
 	 * is true else the angle should be set to radians
@@ -92,6 +94,7 @@ public class Orientation {
 		return new Orientation(this.angleInRadians
 				+ targetOrientation.angleInRadians, true);
 	}
+
 
 	public boolean isFacingLeft(double epsilon) {
 		return (degrees() > 90 + epsilon) && (degrees() < 270 - epsilon);
