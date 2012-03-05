@@ -40,7 +40,7 @@ public class SimplePathFinder implements PathFinder {
 		this.end = end;
 		this.endAngle = endAngle;
 
-		Stack<Coord> list = getWaypoint(s.getBalle().getPosition(),
+		Stack<Coord> list = getPath(s.getBalle().getPosition(),
 				new Stack<Coord>(), s);
 
 		// Convert to a curve.
@@ -48,7 +48,7 @@ public class SimplePathFinder implements PathFinder {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Stack<Coord> getWaypoint(Coord pos, Stack<Coord> path,
+	public Stack<Coord> getPath(Coord pos, Stack<Coord> path,
 			Snapshot s) {
 		
 		// Make new curve.
@@ -66,19 +66,17 @@ public class SimplePathFinder implements PathFinder {
 			
 			Orientation toObsticle = obsticle.getPosition().sub(path.peek()).getOrientation();
 
-			double birth = 0.3;
 			Coord left, right;
-			left = new Coord(0.1, birth).rotate(toObsticle).add(
-					obsticle.getPosition());
-			right = new Coord(0.1, -birth).rotate(toObsticle).add(
-					obsticle.getPosition());
+			left = getWaypoint(s, obsticle.getPosition(), pos, toObsticle);
+			right = getWaypoint(s, obsticle.getPosition(), pos,
+					toObsticle.getOpposite());
 
 			drawables.add(new Dot(left, Color.CYAN));
 			drawables.add(new Dot(right, Color.CYAN));
 
 			Stack<Coord> leftPath, rightPath;
-			leftPath = getWaypoint(left, path, s);
-			rightPath = getWaypoint(right, path, s);
+			leftPath = getPath(left, path, s);
+			rightPath = getPath(right, path, s);
 
 			if (leftPath.size() < rightPath.size())
 				return leftPath;
@@ -102,9 +100,24 @@ public class SimplePathFinder implements PathFinder {
 		if (other.intersects(curve))
 			return r;
 
-
-
 		return null;
+	}
+
+	protected Coord getWaypoint(Snapshot s, Coord obs, Coord pos, Orientation o) {
+		Line l, out, walls[];
+		walls = s.getPitch().getWalls();
+		l = new Line(obs, obs.add(new Coord(0, 10).rotate(o)));
+
+		Coord wallIntersect = null;
+		for (Line wall : walls) {
+			wallIntersect = l.getIntersect(wall);
+			if (wallIntersect != null)
+				break;
+		}
+
+		out = new Line(wallIntersect, obs);
+		drawables.add(new DrawableLine(out, Color.RED));
+		return out.midpoint();
 	}
 
 	protected Curve getCurve(Vector<Coord> path) {
@@ -114,6 +127,8 @@ public class SimplePathFinder implements PathFinder {
 			out[i] = path.get(i);
 		return interpolator.getCurve(out, startAngle, endAngle);
 	}
+
+	// Visual Output \\
 
 	ArrayList<Drawable> drawables = new ArrayList<Drawable>();
 	public ArrayList<Drawable> getDrawables() {
