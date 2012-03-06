@@ -70,7 +70,6 @@ public class BezierNav implements OrientedMovementExecutor {
 
 			}));
 	
-	
 	private PathFinder pathfinder;
 	private Curve c;
 
@@ -80,6 +79,9 @@ public class BezierNav implements OrientedMovementExecutor {
 	private Orientation orient;
 	private Coord p0, p3;
 
+	// James, sorry, it was just easier this way.
+	private double p = 1, i = 1, d = 1;
+	private PID left = new PID(p, d, i), right = new PID(p, d, i);
 
 	public BezierNav(PathFinder pathfinder) {
 		this.pathfinder = pathfinder;
@@ -173,12 +175,17 @@ public class BezierNav implements OrientedMovementExecutor {
 		}
 
 		// calculate wheel speeds/powers
-		int v1, v2;
-		v1 = (int) Globals
-				.velocityToPower((float) (max * getMinVelocityRato(r)));
-		v2 = (int) Globals.velocityToPower((float) max);
-		System.out.println(v2);
-		controller.setWheelSpeeds(isLeft ? v1 : v2, isLeft ? v2 : v1);
+		double v1, v2;
+		v1 = Globals.velocityToPower((float) (max * getMinVelocityRato(r)));
+		v2 = Globals.velocityToPower((float) max);
+
+		int lSpeed, rSpeed;
+		lSpeed = (int) left.convert((isLeft ? v1 : v2), 0);
+		rSpeed = (int) right.convert((isLeft ? v2 : v1), 0);
+
+		System.out.println(lSpeed + "\t" + rSpeed);
+
+		controller.setWheelSpeeds(lSpeed, rSpeed);
 
 		// apply wheel speeds using sum movement executer
 		// if (false) {
