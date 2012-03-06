@@ -23,7 +23,7 @@ public class Globals {
     public static final float PITCH_HEIGHT = 1.2192f; // Metres
     public static final float GOAL_POSITION = 0.31f; // Metres
 
-    public static final float ROBOT_POSSESS_DISTANCE = 0.05f;
+    public static final float ROBOT_POSSESS_DISTANCE = 0.025f;
 
     public static final float METERS_PER_PIXEL = PITCH_WIDTH / 605f;
 
@@ -39,7 +39,7 @@ public class Globals {
     public static final float P1_CAMERA_HEIGHT = 2.386f; // Meters
     public static final float P0_CAMERA_HEIGHT = 2.421f; // Meters
 
-    public static final float ROBOT_HEIGHT = 0.18f; // Meters
+    public static final float ROBOT_HEIGHT = 0.19f; // Meters
 
     public static final double OVERSHOOT_ANGLE_EPSILON = 50; // Degrees
 
