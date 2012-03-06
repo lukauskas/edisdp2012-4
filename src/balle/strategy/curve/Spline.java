@@ -19,7 +19,11 @@ public class Spline implements Curve {
 
 	@Override
 	public Coord pos(double t) {
-		return splines[(int) Math.floor(t / div())].pos((t % div()) / div());
+		if (t >= 1)
+			return splines[splines.length - 1].pos(t);
+		else
+			return splines[(int) Math.floor(t / div())]
+					.pos((t % div()) / div());
 	}
 
 	@Override

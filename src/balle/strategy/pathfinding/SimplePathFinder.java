@@ -7,13 +7,12 @@ import java.util.Vector;
 
 import balle.main.drawable.Dot;
 import balle.main.drawable.Drawable;
-import balle.main.drawable.DrawableLine;
 import balle.strategy.curve.Curve;
 import balle.strategy.curve.Interpolator;
 import balle.world.Coord;
-import balle.world.Line;
 import balle.world.Orientation;
 import balle.world.Snapshot;
+import balle.world.objects.Pitch;
 
 public class SimplePathFinder implements PathFinder {
 
@@ -47,9 +46,8 @@ public class SimplePathFinder implements PathFinder {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Stack<Coord> getPath(Coord pos, Stack<Coord> path,
-			Snapshot s) {
-		
+	public Stack<Coord> getPath(Coord pos, Stack<Coord> path, Snapshot s) {
+
 		// Make new curve.
 		path = (Stack<Coord>) path.clone();
 		path.add(pos);
@@ -60,15 +58,20 @@ public class SimplePathFinder implements PathFinder {
 		if (obsticle == null || path.size() > 4) {
 			return path;
 		} else {
-			path.pop();
-			
+
 			Orientation toTarget = end.sub(pos).getOrientation();
 
+			if (obsticle.getSource() instanceof Pitch) {
+				path.add(obsticle.getWaypoint(s, null, getCurve(path)));
+
+				return path;
+			}
+			path.pop();
+
 			Coord left, right;
-			left = getWaypoint(s, obsticle,
- toTarget);
-			right = getWaypoint(s, obsticle,
-					toTarget.getOpposite());
+			left = obsticle.getWaypoint(s, toTarget, getCurve(path));
+			right = obsticle.getWaypoint(s, toTarget.getOpposite(),
+					getCurve(path));
 
 			drawables.add(new Dot(left, Color.CYAN));
 			drawables.add(new Dot(right, Color.CYAN));
@@ -77,10 +80,6 @@ public class SimplePathFinder implements PathFinder {
 			rightPath = getPath(right, path, s);
 			leftPath = getPath(left, path, s);
 
-			System.out.println("----");
-			System.out.println(path.size());
-			System.out.println(leftPath.size());
-			System.out.println(rightPath.size());
 			// if (leftPath.size() < rightPath.size())
 			if (getCurve(leftPath).length() < getCurve(rightPath).length())
 				return leftPath;
@@ -91,14 +90,54 @@ public class SimplePathFinder implements PathFinder {
 
 	protected Obstacle isClear(Curve c, Snapshot s) {
 		Obstacle[] obstacles = new Obstacle[] {
-				
-			new Obstacle(s.getOpponent().getPosition(), Math.min(
-				Obstacle.ROBOT_CLEARANCE,
-				s.getOpponent().getPosition().dist(end))),
+
+				new Obstacle(s.getOpponent(), Math.min(
+						Obstacle.ROBOT_CLEARANCE, s.getOpponent().getPosition()
+								.dist(end))) {
+					@Override
+					public boolean clear(Coord c) {
+						return c.dist(this) > clearance;
+					}
+		}, /*
+			 * new Obstacle(s.getPitch(), Obstacle.WALL_CLEARANCE) {
+			 * 
+			 * @Override public boolean clear(Coord c) { Pitch p = (Pitch)
+			 * getSource(); if (c.getX() < p.getMinX() + clearance) return
+			 * false; if (c.getX() > p.getMaxX() - clearance) return false; if
+			 * (c.getY() < p.getMinY() + clearance) return false; if (c.getY() >
+			 * p.getMaxY() - clearance) return false; return true; }
+			 * 
+			 * private double distance(Coord c) { double d, x = c.getX(), y =
+			 * c.getY();
+			 * 
+			 * Pitch p = (Pitch) getSource(); d = Math.abs(p.getMinX() - x); d =
+			 * Math.min(d, Math.abs(p.getMaxX() - x)); d = Math.min(d,
+			 * Math.abs(p.getMaxY() - y)); d = Math.min(d, Math.abs(p.getMinY()
+			 * - y)); return d; }
+			 * 
+			 * @Override protected boolean isMovingTowards(Curve c) { double
+			 * initD = distance(c.pos(0)); for (double i = 0.01; i <= 1; i +=
+			 * 0.01) if (distance(c.pos(i)) < initD) return true; return false;
+			 * }
+			 * 
+			 * @Override public Coord getWaypoint(Snapshot s, Orientation o,
+			 * Curve curveSoFar) { Coord prev = curveSoFar.pos(0), intersect =
+			 * null, pos1 = curveSoFar .pos(1);
+			 * 
+			 * if (!clear(prev)) { System.out
+			 * .println("MEEEEEEEEEEEEEEEEEEEEEEEEEEEEHHHHHHHHHHHHHHHHHHHHHHHH!!"
+			 * );
+			 * 
+			 * } else { for (double i = 0.01; i <= 1; i += 0.01) { intersect =
+			 * curveSoFar.pos(i); if (!clear(intersect)) { break; } } }
+			 * 
+			 * return intersect.add(pos1.sub(intersect).getUnitCoord()
+			 * .mult(0.1)); } }
+			 */
 		// new Obstical(s.getBall().getPosition(),
 		// Obstical.ROBOT_CLEARANCE)
 		};
-		
+
 		Coord pos = s.getBalle().getPosition();
 		for (Obstacle o : obstacles) {
 
@@ -107,9 +146,11 @@ public class SimplePathFinder implements PathFinder {
 			// This is not applicable if the end point is also within the
 			// clearance area
 			// this is not really an obstacle if our path is already moving away
-			if (!o.clear(start) && c.closestPoint(o).dist(o) < o.dist(pos)) {
+			if (!o.clear(start) && o.isMovingTowards(c)) {
 				return o;
 			}
+
+			// (o.getSource() instanceof Pitch)
 
 			// check that the current path does not go from out of
 			// the object clearance to into the clearance
@@ -124,25 +165,27 @@ public class SimplePathFinder implements PathFinder {
 		return null;
 	}
 
-	protected Coord getWaypoint(Snapshot s, Obstacle obs, Orientation o) {
-		Line l, out, walls[];
-		walls = s.getPitch().getWalls();
-		l = new Line(obs, obs.add(new Coord(0, 10).rotate(o)));
-
-		Coord wallIntersect = null;
-		for (Line wall : walls) {
-			wallIntersect = l.getIntersect(wall);
-			if (wallIntersect != null)
-				break;
-		}
-
-		Coord c = new Coord(0, obs.getClearance());
-		c = c.rotate(o).add(obs);
-
-		out = new Line(wallIntersect, obs);
-		drawables.add(new DrawableLine(out, Color.RED));
-		return c;
-	}
+	//
+	// protected Coord getWaypoint(Snapshot s, Obstacle obs, Orientation o) {
+	// Line l, out, walls[];
+	// walls = s.getPitch().getWalls();
+	// l = new Line(obs, obs.add(new Coord(0, 10).rotate(o)));
+	//
+	// Coord wallIntersect = null;
+	// for (Line wall : walls) {
+	// wallIntersect = l.getIntersect(wall);
+	// if (wallIntersect != null)
+	// break;
+	// }
+	//
+	// out = new Line(wallIntersect, obs);
+	// drawables.add(new DrawableLine(out, Color.RED));
+	//
+	// Coord c = new Coord(0, obs.getClearance());
+	// c = c.rotate(o).add(obs);
+	//
+	// return c;
+	// }
 
 	protected Curve getCurve(Vector<Coord> path) {
 		// Convert to array.
@@ -155,6 +198,7 @@ public class SimplePathFinder implements PathFinder {
 	// Visual Output \\
 
 	ArrayList<Drawable> drawables = new ArrayList<Drawable>();
+
 	public ArrayList<Drawable> getDrawables() {
 		return drawables;
 	}
