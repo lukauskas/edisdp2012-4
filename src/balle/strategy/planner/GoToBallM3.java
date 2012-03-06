@@ -159,6 +159,7 @@ public class GoToBallM3 extends GoToBall {
 					LOG.info("Kicking");
 					controller.kick();
 					controller.setWheelSpeeds(200, 200);
+                    return;
                 } else if (ourRobot.getFrontSide().midpoint()
                         .dist(snapshot.getBall().getPosition()) < 0.11
 						&& !ourRobot.getFacingLine().intersects(
