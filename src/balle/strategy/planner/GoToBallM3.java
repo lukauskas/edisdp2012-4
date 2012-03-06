@@ -108,11 +108,13 @@ public class GoToBallM3 extends GoToBall {
 		Robot ourRobot = snapshot.getBalle();
 		Ball ball = snapshot.getBall();
 
+        if ((ourRobot.getPosition() == null)
+                || (ourRobot.getOrientation() == null)
+                || (ball.getPosition() == null))
+            return;
+
         if (stage == 0)
         {
-            if ((ourRobot.getPosition() == null)
-                    || (ourRobot.getOrientation() == null))
-                return;
 
 			Coord targetCoord = getTarget(snapshot).getPosition();
 
