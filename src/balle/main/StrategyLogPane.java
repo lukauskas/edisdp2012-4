@@ -18,7 +18,7 @@ public class StrategyLogPane extends JPanel {
 	private final DefaultTableModel model;
 	private final JTable table;
 
-    private final static int MAX_ROWS = 20;
+	private final static int MAX_ROWS = 100;
 
     public StrategyLogPane() {
 		super();
@@ -30,8 +30,8 @@ public class StrategyLogPane extends JPanel {
 
 		model.addColumn("Message");
 		model.addColumn("Level");
-		table.getColumnModel().getColumn(0).setWidth(500);
-		table.getColumnModel().getColumn(1).setMaxWidth(0);
+		table.getColumnModel().getColumn(0).setWidth(300);
+		table.getColumnModel().getColumn(1).setMaxWidth(5);
 
 		this.setLayout(new BorderLayout());
 
