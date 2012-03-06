@@ -145,6 +145,7 @@ public class GoToBallM3 extends GoToBall {
                         / 2 + Globals.BALL_RADIUS / 2 + 0.05) {
                     LOG.info("Backing off, might hit the ball");
                     controller.setWheelSpeeds(-200, -200);
+                    return;
                 }
     		
             } else if (stage == 2) {
@@ -176,8 +177,10 @@ public class GoToBallM3 extends GoToBall {
 				    {
                         LOG.info("Backing away from the ball");
 				        controller.setWheelSpeeds(-200, -200);
+                        return;
 				    }
                 } else {
+                    LOG.warn("Don't know what to do?");
                     LOG.trace("elsedist "
                             + ourRobot.getFrontSide().midpoint()
                                     .dist(snapshot.getBall().getPosition()));
