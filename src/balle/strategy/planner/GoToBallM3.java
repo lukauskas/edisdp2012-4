@@ -136,15 +136,20 @@ public class GoToBallM3 extends GoToBall {
             }
         } else {
         	
-    		if (stage == 1
-                    && ourRobot.getPosition().dist(
-                            getTarget(snapshot).getPosition()) < Globals.ROBOT_LENGTH / 4) {
+            if (stage == 1) {
+                if (ourRobot.getPosition().dist(
+                        getTarget(snapshot).getPosition()) < Globals.ROBOT_LENGTH / 2) {
     			
-				changeStage(2);
+                    changeStage(2);
+                } else if (ourRobot.getPosition().dist(ball.getPosition()) < Globals.ROBOT_LENGTH
+                        / 2 + Globals.BALL_RADIUS / 2 + 0.05) {
+                    LOG.info("Backing off, might hit the ball");
+                    controller.setWheelSpeeds(-200, -200);
+                }
     		
             } else if (stage == 2) {
 				if (ourRobot.getPosition().dist(ball.getPosition()) > BALL_SAFE_GAP * 2) {
-
+                    LOG.info("The ball ran away, catching up.");
 					changeStage(1);
 					
 				} else if (ourRobot.possessesBall(snapshot.getBall())
@@ -162,10 +167,10 @@ public class GoToBallM3 extends GoToBall {
                             + ourRobot.getFrontSide().midpoint()
                                     .dist(snapshot.getBall().getPosition()));
                     if (ourRobot.getFrontSide().midpoint()
-                            .dist(snapshot.getBall().getPosition()) > 0.07)
+                            .dist(snapshot.getBall().getPosition()) > BALL_SAFE_GAP / 2)
 				    {
     					LOG.info("Trying to go to ball-safe-gap again");
-    					changeStage(0);
+                        changeStage(1);
 				    }
 				    else
 				    {
