@@ -106,7 +106,8 @@ public class Runner {
 		boolean isMainPitch = true;
 		if ("1".equals(options.valueOf("pitch"))) {
 			isMainPitch = false;
-		} else if (options.valueOf("pitch") == null) {
+		} else if (options.valueOf("pitch") == null
+				&& !options.has("simulator")) {
 			System.out
 					.println("Invalid pitch provided, try one of the following:");
 			System.out.println("javac balle.main.Runner -p 0");
