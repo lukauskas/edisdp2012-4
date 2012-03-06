@@ -23,6 +23,8 @@ public abstract class AbstractWorld implements Listener {
 
 	public final int UNKNOWN_VALUE = -1;
 
+	private static final int MAX_ESTIMATED_FRAMES = 40;
+
 	private double pitchWidth = -1;
 	private double pitchHeight = -1;
 
@@ -79,16 +81,19 @@ public abstract class AbstractWorld implements Listener {
 	 * @return new coordinate for the position of the object after timestep
 	 */
 	public Coord estimatedPosition(MovingPoint object, double timestep) {
-		if ((object.getPosition() == null) || (object.getVelocity() == null))
+		Coord pos = object.getPosition();
+		if ((pos == null) || (object.getVelocity() == null)
+				|| pos.getEstimatedFrames() > MAX_ESTIMATED_FRAMES) {
 			return null;
-		else if (timestep == 0) {
-			return object.getPosition();
+		} else if (timestep == 0) {
+			return pos;
 		} else
 			// TODO: Make sure the robot does not go through the wall
 			// make sure the ball bounces from the wall, etc.
 
 			return new Coord(object.getPosition().add(
-					object.getVelocity().adjustLength(timestep)), true);
+					object.getVelocity().adjustLength(timestep)),
+					pos.getEstimatedFrames() + 1);
 	}
 
 	/***
