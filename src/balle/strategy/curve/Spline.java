@@ -69,4 +69,14 @@ public class Spline implements Curve {
 		}
 		return closest;
 	}
+
+	@Override
+	public double length() {
+		double sum = 0;
+		for (Curve each : splines) {
+			sum += each.length();
+		}
+		return sum;
+	}
+
 }

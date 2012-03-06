@@ -45,7 +45,7 @@ public class BezierNav implements OrientedMovementExecutor {
 													// turns the speed will be
 													// slowed toward max/this
 	private final double MAX_VELOCITY = Globals
-			.powerToVelocity(Globals.MAXIMUM_MOTOR_SPEED) / 4; // the maximum
+			.powerToVelocity(Globals.MAXIMUM_MOTOR_SPEED); // the maximum
 																// wheel
 															// velocity to use
 
@@ -59,7 +59,7 @@ public class BezierNav implements OrientedMovementExecutor {
 	// these 2 must moth be satisfied before this movement is finished
 	private double stopDistance = 0.03; // distance to target (centre of robot
 										// to adjusted p3)
-	private double stopAngle = Math.PI / 32; // angle of robot vs desired final
+	private double stopAngle = Math.PI / 13; // angle of robot vs desired final
 												// angle (orient)
 
 
@@ -86,6 +86,16 @@ public class BezierNav implements OrientedMovementExecutor {
 		this.pathfinder = pathfinder;
 	}
 
+	private boolean isMoveStraitFinished(Orientation botOrient) {
+		Coord n = botOrient.getUnitCoord()
+				.rotate(new Orientation(Math.PI / 2));
+		double da = Math
+				.abs(botOrient.angleToatan2Radians(orient));
+		double dd = Math.abs(n.dot(target.getPosition().sub(p0)));
+		return (da <= stopAngle && dd < (Globals.ROBOT_WIDTH / 2)
+				- TARGET_OFF_CENTER_TOLERANCE);
+	}
+
 	@Override
 	public boolean isFinished() {
 		if (p0 == null || p3 == null) {
@@ -93,11 +103,7 @@ public class BezierNav implements OrientedMovementExecutor {
 			return false;
 		}
 		return state.getBalle().getPosition().dist(getAdjustedP3()) <= stopDistance
-				&& Math.abs(state.getBalle().getOrientation()
-						.angleToatan2Radians(orient)) <= stopAngle;
-		// return p0.add(
-		// new Coord(0, Globals.ROBOT_LENGTH / 2).rotate(state.getBalle()
-		// .getOrientation())).dist(target.getPosition()) <= stopDistance;
+				&& isMoveStraitFinished(state.getBalle().getOrientation());
 	}
 
 	@Override
@@ -136,7 +142,7 @@ public class BezierNav implements OrientedMovementExecutor {
 				.abs(robot.getOrientation()
 				.angleToatan2Radians(orient));
 		double dd = Math.abs(n.dot(target.getPosition().sub(p0)));
-		if ((da <= Math.PI / 2 && dd < (Globals.ROBOT_HEIGHT / 2)
+		if ((da <= Math.PI / 2 && dd < (Globals.ROBOT_WIDTH / 2)
 				- TARGET_OFF_CENTER_TOLERANCE)) {
 			p3 = target.getPosition();
 		}
@@ -197,13 +203,17 @@ public class BezierNav implements OrientedMovementExecutor {
 			return l;
 		}
 
-		l.add(c);
 		l.addAll(pathfinder.getDrawables());
 
-		Coord center = c.cor(0);
-		l.add(new Dot(center, Color.BLACK));
-		l.add(new Circle(center, center.dist(state.getBalle().getPosition()),
+		if (c != null) {
+			l.add(c);
+			Coord center = c.cor(0);
+			l.add(new Dot(center, Color.BLACK));
+			l.add(new Circle(center, center
+					.dist(state.getBalle().getPosition()),
 				Color.yellow));
+		}
+
 		l.add(new Circle(p0, 0.03, Color.pink));
 		l.add(new Circle(p3, 0.03, Color.pink));
 

@@ -56,7 +56,7 @@ public class SimplePathFinder implements PathFinder {
 		path.add(end);
 
 		// Check for intersections.
-		Obstical obsticle = isClear(getCurve(path), s);
+		Obstacle obsticle = isClear(getCurve(path), s);
 		if (obsticle == null || path.size() > 4) {
 			return path;
 		} else {
@@ -74,32 +74,45 @@ public class SimplePathFinder implements PathFinder {
 			drawables.add(new Dot(right, Color.CYAN));
 
 			Stack<Coord> leftPath, rightPath;
-			leftPath = getPath(left, path, s);
 			rightPath = getPath(right, path, s);
+			leftPath = getPath(left, path, s);
 
-			if (leftPath.size() < rightPath.size())
+			System.out.println("----");
+			System.out.println(path.size());
+			System.out.println(leftPath.size());
+			System.out.println(rightPath.size());
+			// if (leftPath.size() < rightPath.size())
+			if (getCurve(leftPath).length() < getCurve(rightPath).length())
 				return leftPath;
 			else
 				return rightPath;
 		}
 	}
 
-	protected Obstical isClear(Curve c, Snapshot s) {
-		Obstical [] obsticals = new Obstical[]{
+	protected Obstacle isClear(Curve c, Snapshot s) {
+		Obstacle[] obstacles = new Obstacle[] {
 				
-			new Obstical(s.getOpponent().getPosition(),
-					Obstical.ROBOT_CLEARANCE),
+			new Obstacle(s.getOpponent().getPosition(), Math.min(
+				Obstacle.ROBOT_CLEARANCE,
+				s.getOpponent().getPosition().dist(end))),
 		// new Obstical(s.getBall().getPosition(),
 		// Obstical.ROBOT_CLEARANCE)
 		};
 		
 		Coord pos = s.getBalle().getPosition();
-		for(Obstical o : obsticals) {
+		for (Obstacle o : obstacles) {
+
+			// if we are inside the clearance area, just assume the obstical is
+			// in the way
+			// This is not applicable if the end point is also within the
+			// clearance area
+			// this is not really an obstacle if our path is already moving away
+			if (!o.clear(start) && c.closestPoint(o).dist(o) < o.dist(pos)) {
+				return o;
+			}
+
 			// check that the current path does not go from out of
 			// the object clearance to into the clearance
-			// TODO make sure that if the robot is already in the clearance
-			// area,#
-			// that it doesn't move through the obstical
 			boolean in = !o.clear(pos);
 			for (double i = 0; i < 1; i += 0.01) {
 				boolean newIn = !o.clear(c.pos(i));
@@ -111,7 +124,7 @@ public class SimplePathFinder implements PathFinder {
 		return null;
 	}
 
-	protected Coord getWaypoint(Snapshot s, Coord obs, Orientation o) {
+	protected Coord getWaypoint(Snapshot s, Obstacle obs, Orientation o) {
 		Line l, out, walls[];
 		walls = s.getPitch().getWalls();
 		l = new Line(obs, obs.add(new Coord(0, 10).rotate(o)));
@@ -123,9 +136,12 @@ public class SimplePathFinder implements PathFinder {
 				break;
 		}
 
+		Coord c = new Coord(0, obs.getClearance());
+		c = c.rotate(o).add(obs);
+
 		out = new Line(wallIntersect, obs);
 		drawables.add(new DrawableLine(out, Color.RED));
-		return out.midpoint();
+		return c;
 	}
 
 	protected Curve getCurve(Vector<Coord> path) {

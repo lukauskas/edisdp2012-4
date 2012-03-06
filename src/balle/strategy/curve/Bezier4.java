@@ -43,4 +43,15 @@ public class Bezier4 extends SimpleCurve {
 		}
 		return closest;
 	}
+
+	public double length() {
+		double sum = 0;
+		Coord last = pos(0);
+		for (double i = 0.1; i <= 1; i += 0.1) {
+			Coord curr = pos(i);
+			sum += last.dist(curr);
+			last = curr;
+		}
+		return sum;
+	}
 }
