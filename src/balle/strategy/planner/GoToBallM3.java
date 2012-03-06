@@ -36,6 +36,10 @@ public class GoToBallM3 extends GoToBall {
     @Override
 	protected StaticFieldObject getTarget(Snapshot snapshot) {
 		Ball ball = snapshot.getBall();
+        if (ball.getPosition() == null) {
+            LOG.warn("Cannot see the ball");
+            return null;
+        }
 		Goal targetGoal = snapshot.getOpponentsGoal();
 
         Line targetLine = new Line(targetGoal.getPosition(), ball.getPosition());
