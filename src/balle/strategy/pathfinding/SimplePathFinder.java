@@ -12,6 +12,7 @@ import balle.strategy.curve.Interpolator;
 import balle.world.Coord;
 import balle.world.Orientation;
 import balle.world.Snapshot;
+import balle.world.objects.Pitch;
 
 public class SimplePathFinder implements PathFinder {
 
@@ -38,8 +39,18 @@ public class SimplePathFinder implements PathFinder {
 		this.endAngle = endAngle;
 
 		Stack<Coord> list = new Stack<Coord>();
-		list.add(s.getBalle().getPosition());
+		list.push(start);
 		list = getPath(list, s);
+
+		// remove duplicates (in sequence)
+		Coord last = list.get(0);
+		for (int i = 1; i < list.size(); i++) {
+			if (last.equals(list.get(i))) {
+				list.remove(i);
+				i--;
+			}
+			last = list.get(i);
+		}
 
 		// Convert to a curve.
 		return getCurve(list);
@@ -47,6 +58,7 @@ public class SimplePathFinder implements PathFinder {
 
 	@SuppressWarnings("unchecked")
 	public Stack<Coord> getPath(Stack<Coord> path, Snapshot s) {
+		Coord curr = path.peek();
 
 		// Make new curve.
 		path.add(end);
@@ -55,22 +67,25 @@ public class SimplePathFinder implements PathFinder {
 		Obstacle obsticle = isClear(getCurve(path), s);
 		if (obsticle == null || path.size() > 4) {
 			return path;
-		} else {		
-			path.pop();
+		} else {
 
-			Coord[][] waypoints = obsticle.getWaypoint(s, null, getCurve(path));
+			Coord[][] waypoints = obsticle.getWaypoint(s, curr, getCurve(path));
+
 			for (Coord[] eachlist : waypoints)
 				for (Coord each : eachlist)
 					drawables.add(new Dot(each, Color.CYAN));
+
+			path.pop();
 
 			ArrayList<Stack<Coord>> finalpath = new ArrayList<Stack<Coord>>();
 			for (Coord[] waypoint : waypoints) {
 
 				Stack<Coord> currPath = (Stack<Coord>) path.clone();
 				for (Coord each : waypoint)
-					currPath.add(each);
+					currPath.push(each);
 
 				finalpath.add(getPath(currPath, s));
+				// drawables.add(getCurve(currPath));
 			}
 
 			// if (leftPath.size() < rightPath.size())
@@ -126,9 +141,10 @@ public class SimplePathFinder implements PathFinder {
 					}
 
 					@Override
-					public Coord[][] getWaypoint(Snapshot s, Orientation o,
+					public Coord[][] getWaypoint(Snapshot s, Coord curr,
 							Curve c) {
-						Coord prev = c.pos(0), p1, p2, end = c.pos(1);
+						Coord prev = c.pos(0), p1 = null, p2 = null, end = c
+								.pos(1);
 						double t1, t2;
 						Pitch pitch = s.getPitch();
 
@@ -143,26 +159,25 @@ public class SimplePathFinder implements PathFinder {
 											Math.max(pitch.getMinY(),
 													prev.getY()))) } };
 
-						} else {
-							// find enter and exit points of the clearance area
-							boolean firstChange = false;
-							for (t1 = 0.01; t1 <= 1; t1 += 0.01) {
-								p1 = c.pos(t1);
-								if (!clear(p1)) {
-									break;
-								}
+						}
+
+						// find enter and exit points of the clearance area
+						for (t1 = 0.01; t1 <= 1; t1 += 0.01) {
+							p1 = c.pos(t1);
+							if (!clear(p1)) {
+								break;
 							}
-							for (t2 = 0.01; t2 <= 1; t2 += 0.01) {
-								p2 = c.pos(t2);
-								if (clear(p2)) {
-									break;
-								}
+						}
+						for (t2 = 0.01; t2 <= 1; t2 += 0.01) {
+							p2 = c.pos(t2);
+							if (clear(p2)) {
+								break;
 							}
 						}
 						// may not have an exit point
 						boolean hasSecondPoint = t2 != 1;
 						int numWayPoints = (hasSecondPoint) ? 2 : 1;
-						Coord[] wayPoints = new Coord[2];
+						Coord[] wayPoints = new Coord[numWayPoints];
 						if (hasSecondPoint) {
 							wayPoints[0] = p1;
 							wayPoints[1] = p2;
@@ -248,7 +263,7 @@ public class SimplePathFinder implements PathFinder {
 		for (Stack<Coord> each : hopefulls) {
 
 			if (currBest == null
-					|| getCurve(currBest).length() < getCurve(each).length())
+					|| getCurve(currBest).length() > getCurve(each).length())
 				currBest = each;
 		}
 		return currBest;

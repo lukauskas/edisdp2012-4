@@ -46,11 +46,12 @@ public abstract class Obstacle extends Coord {
 	 */
 	public abstract boolean clear(Coord c);
 
-	public Coord[][] getWaypoint(Snapshot s, Orientation o, Curve curveSoFar) {
+	public Coord[][] getWaypoint(Snapshot s, Coord curr, Curve curveSoFar) {
 		Coord c = new Coord(0, this.getClearance());
-		c = c.rotate(o).add(this);
+		Orientation o = curveSoFar.pos(1).sub(curr).getOrientation();
 
-		return new Coord[][] { new Coord[] { c } };
+		return new Coord[][] { new Coord[] { c.rotate(o).add(this) },
+								new Coord[] { c.rotate(o.getOpposite()).add(this) } };
 	}
 
 }
