@@ -1,5 +1,7 @@
 package balle.misc;
 
+import org.jbox2d.common.Vec2;
+
 import balle.world.objects.Pitch;
 
 public class Globals {
@@ -9,6 +11,12 @@ public class Globals {
     public static final float ROBOT_LENGTH = 0.2f;
     public static final float ROBOT_TRACK_WIDTH = 0.155f; // Meters
     public static final float ROBOT_WHEEL_DIAMETER = 0.0816f; // Meters
+
+	public static final Vec2 ROBOT_LEFT_WHEEL_POS = new Vec2(0,
+			-ROBOT_TRACK_WIDTH / 2);
+
+	public static final Vec2 ROBOT_RIGHT_WHEEL_POS = new Vec2(0,
+			ROBOT_TRACK_WIDTH / 2);
 
     public static final float ROBOT_MAX_KICK_DISTANCE = Globals.PITCH_WIDTH; // Meters
     // TODO
@@ -32,6 +40,7 @@ public class Globals {
     public static final float VISION_ANGLE_NOISE_SD = 1.53f; // in
                                                              // degrees
     public static final float SIMULATED_VISON_FRAMERATE = 25f;
+	public static final long SIMULATED_VISON_DELAY = 450;
 
     public static final int MAXIMUM_MOTOR_SPEED = 900;
 
@@ -42,6 +51,21 @@ public class Globals {
     public static final float ROBOT_HEIGHT = 0.19f; // Meters
 
     public static final double OVERSHOOT_ANGLE_EPSILON = 50; // Degrees
+
+	// static final
+	// Vec2
+	// ROBOT_LEFT_WHEEL_POS
+	// = new
+	// Vec2(-ROBOT_TRACK_WIDTH/2,
+	// 0);
+
+	public static final float MaxWheelAccel = 10f;// 0.019f; // m/s^2 good value
+													// around
+	// 0.005 ish
+	public static final float SlipWheelAccel = MaxWheelAccel * 0.6f;
+	public static final float MAX_ROBOT_LINEAR_ACCEL = 4f; // m/s^2
+	public static final float MAX_ROBOT_ANG_ACCEL = 700f; // r/s^2
+	public static final float MAX_MOTOR_POWER_ACCEL = 5000f; // p/s^2
 
     public static float powerToVelocity(float p) {
         if (p > MAXIMUM_MOTOR_SPEED)
@@ -66,4 +90,6 @@ public class Globals {
     public static Pitch getPitch() {
         return new Pitch(0, PITCH_WIDTH, 0, PITCH_HEIGHT);
     }
+
+
 }

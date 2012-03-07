@@ -48,6 +48,14 @@ public class Pitch implements StaticFieldObject {
         return true;
     }
 
+	public Line[] getWalls() {
+		return new Line[] {
+				new Line(new Coord(minX, minY), new Coord(maxX, minY)),
+				new Line(new Coord(maxX, minY), new Coord(maxX, maxY)),
+				new Line(new Coord(maxX, maxY), new Coord(minX, maxY)),
+				new Line(new Coord(minX, maxY), new Coord(minX, minY)), };
+	}
+
 	@Override
 	public boolean intersects(Line line) {
 		return containsCoord(line.getA()) != containsCoord(line.getB());

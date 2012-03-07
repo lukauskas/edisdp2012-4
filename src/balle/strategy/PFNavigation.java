@@ -58,5 +58,4 @@ public class PFNavigation extends AbstractPlanner {
             controller.setWheelSpeeds((int) left, (int) right);
         }
     }
-
 }

@@ -1,9 +1,8 @@
 package balle.world;
 
-import java.awt.Point;
-
 import balle.world.objects.FieldObject;
 import balle.world.objects.Pitch;
+import balle.world.objects.Point;
 
 public class Coord {
 
@@ -60,6 +59,10 @@ public class Coord {
 
 	public Coord mult(double scalar) {
 		return new Coord(x * scalar, y * scalar, estimatedFrames);
+	}
+
+	public Coord div(double scalar) {
+		return new Coord(x / scalar, y / scalar, estimatedFrames);
 	}
 
 	public double dist(Coord c) {
@@ -161,6 +164,19 @@ public class Coord {
 	}
 
 	/**
+	 * Calculates the angle from this coordinate to another from (0,0).
+	 * 
+	 * TODO write test
+	 * 
+	 * @param to
+	 *            coordinate to.
+	 * @return Angle between this and to to using (0,0) as a reference point.
+	 */
+	public Orientation angleBetween(Coord to) {
+		return new Coord(0, 0).angleBetween(this, to);
+	}
+
+	/**
 	 * Calculates the angle from one coordinate to another from this point.
 	 * 
 	 * TODO write test
@@ -172,32 +188,42 @@ public class Coord {
 	 * @return Angle between from and to from this reference point.
 	 */
 	public Orientation angleBetween(Coord from, Coord to) {
-		Orientation out;
+		Coord a = from.sub(this);
+		Coord b = to.sub(this);
 
-		Coord dFrom, dTo;
-		dFrom = from.sub(this);
-		dTo = to.sub(this);
+		return b.getOrientation().sub(a.getOrientation());
 
-		double dotProduct, dX, dY, mulAbs, adbc;
-		dX = (dFrom.x * dTo.x);
-		dY = (dFrom.y * dTo.y);
-		mulAbs = dFrom.abs() * dTo.abs();
-		dotProduct = (dX + dY) / mulAbs;
+		/*
+		 * Orientation out;
+		 * 
+		 * Coord dFrom, dTo; dFrom = from.sub(this); dTo = to.sub(this);
+		 * 
+		 * double dotProduct, dX, dY, mulAbs, adbc; dX = (dFrom.x * dTo.x); dY =
+		 * (dFrom.y * dTo.y); mulAbs = dFrom.abs() * dTo.abs(); dotProduct = (dX
+		 * + dY) / mulAbs;
+		 * 
+		 * adbc = from.x * to.y - from.y * to.x; if (adbc >= 0) { out = new
+		 * Orientation(Math.acos(dotProduct), true); } else { out = new
+		 * Orientation(-Math.acos(dotProduct), true); }
+		 * 
+		 * return out;
+		 */
+	}
 
-		adbc = from.x * to.y - from.y * to.x;
-		if (adbc >= 0) {
-			out = new Orientation(Math.acos(dotProduct), true);
-		} else {
-			out = new Orientation(-Math.acos(dotProduct), true);
-		}
+	public Orientation getOrientation() {
+		return new Orientation(Math.atan2((double) getY(), (double) getX()));
+	}
 
-		return out;
+	public Coord opposite() {
+		return new Coord(-getX(), -getY());
+	}
+
+	public Coord getUnitCoord() {
+		return mult(1 / abs());
 	}
 
 	public Point getPoint() {
-		Point out = new Point();
-		out.setLocation(x, y);
-		return out;
+		return new Point(this);
 	}
 
 	@Override
