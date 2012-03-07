@@ -29,10 +29,14 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 
     private final JPanel        panel;
     private final Screen        screen;
-    private final JPanel        fpsPanel;
-    private final JLabel        fpsText;
+	private final JPanel fpsMainPanel;
+	private final JPanel fpsVisionPanel;
+	private final JLabel fpsVisionText;
     private final JLabel        fpsWarning;
-    private final JLabel        fps;
+	private final JLabel fpsVision;
+	private final JLabel fpsStrategyText;
+	private final JLabel fpsStrategy;
+	private final JPanel fpsStrategyPanel;
 
     private static final Logger LOG = Logger.getLogger(SimpleWorldGUI.class);
 
@@ -41,20 +45,35 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
         panel = new JPanel();
         panel.setLayout(new BorderLayout());
 
-        fpsPanel = new JPanel();
-        fpsPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        fpsText = new JLabel("Input FPS:");
+		// Initialising Vision FPS
+		fpsVisionPanel = new JPanel();
+		fpsVisionPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+		fpsVisionText = new JLabel("Input FPS:");
         fpsWarning = new JLabel("Vision down?");
         fpsWarning.setForeground(Color.RED);
 
-        fps = new JLabel();
-        fpsPanel.add(fpsText);
-        fpsPanel.add(fps);
-        fpsPanel.add(fpsWarning);
+		fpsVision = new JLabel();
+		fpsVisionPanel.add(fpsVisionText);
+		fpsVisionPanel.add(fpsVision);
+		fpsVisionPanel.add(fpsWarning);
+
+		// Initialising Strategy FPS
+		fpsStrategyPanel = new JPanel();
+		fpsStrategyPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+		fpsStrategyText = new JLabel("Strategy FPS:");
+
+		fpsStrategy = new JLabel();
+		fpsStrategyPanel.add(fpsStrategyText);
+		fpsStrategyPanel.add(fpsStrategy);
+
+		// Put both FPS into one JPanel
+		fpsMainPanel = new JPanel();
+		fpsMainPanel.add(BorderLayout.WEST, fpsVisionPanel);
+		fpsMainPanel.add(BorderLayout.EAST, fpsStrategyPanel);
 
         screen = new Screen();
         screen.addMouseMotionListener(screen);
-        panel.add(BorderLayout.NORTH, fpsPanel);
+		panel.add(BorderLayout.NORTH, fpsMainPanel);
         panel.add(BorderLayout.CENTER, screen);
     }
 
@@ -302,17 +321,17 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 
         double timePerFrame = 1000.0 / fpsCount;
         if ((fpsCount > 0) && (age < timePerFrame * 1.5)) {
-            fps.setForeground(new Color(50, 150, 50));
+			fpsVision.setForeground(new Color(50, 150, 50));
             fpsWarning.setVisible(false);
         } else if ((fpsCount > 0) && (age < timePerFrame * 3)) {
-            fps.setForeground(Color.ORANGE);
+			fpsVision.setForeground(Color.ORANGE);
             fpsWarning.setVisible(false);
         } else {
-            fps.setForeground(Color.RED);
+			fpsVision.setForeground(Color.RED);
             fpsWarning.setVisible(true);
         }
 
-        fps.setText(s);
+		fpsVision.setText(s);
     }
 
     @Override
