@@ -12,7 +12,6 @@ import balle.strategy.curve.Interpolator;
 import balle.world.Coord;
 import balle.world.Orientation;
 import balle.world.Snapshot;
-import balle.world.objects.Pitch;
 
 public class SimplePathFinder implements PathFinder {
 
@@ -31,16 +30,14 @@ public class SimplePathFinder implements PathFinder {
 	public Curve getPath(Snapshot s, Coord start, Orientation startAngle,
 			Coord end, Orientation endAngle) {
 		drawables = new ArrayList<Drawable>();
-
+		System.out.println(start);
 		// Initialise temporary variables.
 		this.start = start;
 		this.startAngle = startAngle;
 		this.end = end;
 		this.endAngle = endAngle;
 
-		Stack<Coord> list = new Stack<Coord>();
-		list.push(start);
-		list = getPath(list, s);
+		Stack<Coord> list = getPath(start, end, s);
 
 		// remove duplicates (in sequence)
 		Coord last = list.get(0);
@@ -56,41 +53,76 @@ public class SimplePathFinder implements PathFinder {
 		return getCurve(list);
 	}
 
-	@SuppressWarnings("unchecked")
-	public Stack<Coord> getPath(Stack<Coord> path, Snapshot s) {
-		Coord curr = path.peek();
+	/**
+	 * Given the start/end waypoints for a path, modify it by avoiding
+	 * obstacles.
+	 * 
+	 * @param pathStart
+	 *            Coord of the start of the path
+	 * @param pathEnd
+	 *            Coord of the end of the path
+	 * @param s
+	 *            current snapshot
+	 * @return new waypoints avoiding obstacles (includes pathStart and pathEnd)
+	 */
+	public Stack<Coord> getPath(Coord pathStart, Coord pathEnd, Snapshot s) {
+		return getPath(pathStart, pathEnd, s, 0);
+	}
 
-		// Make new curve.
-		path.add(end);
+	private Stack<Coord> getPath(Coord pathStart, Coord pathEnd, Snapshot s,
+			int currentDepth) {
 
+		// get the curve without avoiding obstacles
+		Stack<Coord> currentPathStack = new Stack<Coord>();
+		currentPathStack.push(pathStart);
+		currentPathStack.push(pathEnd);
+		Curve currentCurve = getCurve(currentPathStack);
+
+		// find next obstacle
 		// Check for intersections.
-		Obstacle obsticle = isClear(getCurve(path), s);
-		if (obsticle == null || path.size() > 4) {
-			return path;
+		Obstacle obsticle = isClear(currentCurve, s);
+
+		// if no obstacls of the path is getting too long, just stop
+		if (obsticle == null || currentDepth > 4) {
+			return currentPathStack;
 		} else {
 
-			Coord[][] waypoints = obsticle.getWaypoint(s, curr, getCurve(path));
+			// get new waypoint(s) possibilities
+			Coord[][] possibleNextWaypoints = obsticle.getWaypoint(s,
+					pathStart,
+					currentCurve);
 
-			for (Coord[] eachlist : waypoints)
-				for (Coord each : eachlist)
+			// add all options to the possible paths list
+			ArrayList<Stack<Coord>> possiblePaths = new ArrayList<Stack<Coord>>();
+			for (Coord[] waypoits : possibleNextWaypoints) {
+
+				// reconstruct the path from the pathStart to the final waypoint
+				Stack<Coord> newPath = new Stack<Coord>();
+				newPath.push(pathStart);
+				for (Coord wp : waypoits)
+					newPath.push(wp);
+
+				// recursivelly fill the gap from last waypoint to pathEnd
+				Coord recCallStart = newPath.peek();
+				Coord recCallEnd = pathEnd;
+				Stack<Coord> pathToAppend = getPath(recCallStart, recCallEnd,
+						s,
+						currentDepth + 1);
+				// // appends the new part
+				while (pathToAppend.size() > 0)
+					newPath.push(pathToAppend.remove(0));
+
+				// finish for this possible path
+				possiblePaths.add(newPath);
+
+				// // add drawables
+				for (Coord each : waypoits) {
 					drawables.add(new Dot(each, Color.CYAN));
-
-			path.pop();
-
-			ArrayList<Stack<Coord>> finalpath = new ArrayList<Stack<Coord>>();
-			for (Coord[] waypoint : waypoints) {
-
-				Stack<Coord> currPath = (Stack<Coord>) path.clone();
-				for (Coord each : waypoint)
-					currPath.push(each);
-
-				finalpath.add(getPath(currPath, s));
-				// drawables.add(getCurve(currPath));
+				}
 			}
 
-			// if (leftPath.size() < rightPath.size())
-
-			return best(finalpath);
+			// return best possible path
+			return best(possiblePaths);
 		}
 	}
 
@@ -104,83 +136,85 @@ public class SimplePathFinder implements PathFinder {
 					public boolean clear(Coord c) {
 						return c.dist(this) > clearance;
 					}
-				}, new Obstacle(s.getPitch(), Obstacle.WALL_CLEARANCE) {
-
-					@Override
-					public boolean clear(Coord c) {
-						Pitch p = (Pitch) getSource();
-						if (c.getX() < p.getMinX() + clearance)
-							return false;
-						if (c.getX() > p.getMaxX() - clearance)
-							return false;
-						if (c.getY() < p.getMinY() + clearance)
-							return false;
-						if (c.getY() > p.getMaxY() - clearance)
-							return false;
-						return true;
-					}
-
-					private double distance(Coord c) {
-						double d, x = c.getX(), y = c.getY();
-
-						Pitch p = (Pitch) getSource();
-						d = Math.abs(p.getMinX() - x);
-						d = Math.min(d, Math.abs(p.getMaxX() - x));
-						d = Math.min(d, Math.abs(p.getMaxY() - y));
-						d = Math.min(d, Math.abs(p.getMinY() - y));
-						return d;
-					}
-
-					@Override
-					protected boolean isMovingTowards(Curve c) {
-						double initD = distance(c.pos(0));
-						for (double i = 0.01; i <= 1; i += 0.01)
-							if (distance(c.pos(i)) < initD)
-								return true;
-						return false;
-					}
-					
-					public Coord constrain(Coord c, Pitch p) {
-						double 	x = c.getX(),
-								y = c.getY();
-						return new Coord(
-								Math.min(p.getMaxX(), Math.max(p.getMinX(), x)),
- Math.min(
-								p.getMaxY(), Math.max(p.getMinY(), y))
-								);
-					}
-
-					@Override
-					public Coord[][] getWaypoint(Snapshot s, Coord curr,
-							Curve c) {
-
-						Pitch pitch = (Pitch) getSource();
-
-						ArrayList<Coord> waypoints = new ArrayList<Coord>();
-						for (double t = 0; t <= 1; t += 0.01) {
-							Coord point = c.pos(t);
-							Coord cons = constrain(point, pitch);
-							if (!point.equals(cons)) {
-								waypoints.add(cons);
-							}
-						}
-						
-						if (waypoints.size() == 0) {
-							System.out
-									.println("aaaaaaaaaaaaaaaaaaaaaaaaaaa34dss7");
-							return new Coord[0][0];
-						}
-						if (waypoints.size() == 1) {
-							System.out
-									.println("bbbbbbbbbbbbbbbbbbbbbbbbbbbbw45732");
-							return new Coord[][] { new Coord[] { waypoints
-									.get(0) } };
-						}
-						Coord[] wpa = new Coord[] { waypoints.get(0),
-								waypoints.get(waypoints.size() - 1) };
-						return new Coord[][] { wpa };
-					}
-				}
+				}, 
+//				new Obstacle(s.getPitch(), Obstacle.WALL_CLEARANCE) {
+//
+//					@Override
+//					public boolean clear(Coord c) {
+//						Pitch p = (Pitch) getSource();
+//						if (c.getX() < p.getMinX() + clearance)
+//							return false;
+//						if (c.getX() > p.getMaxX() - clearance)
+//							return false;
+//						if (c.getY() < p.getMinY() + clearance)
+//							return false;
+//						if (c.getY() > p.getMaxY() - clearance)
+//							return false;
+//						return true;
+//					}
+//
+//					private double distance(Coord c) {
+//						double d, x = c.getX(), y = c.getY();
+//
+//						Pitch p = (Pitch) getSource();
+//						d = Math.abs(p.getMinX() - x);
+//						d = Math.min(d, Math.abs(p.getMaxX() - x));
+//						d = Math.min(d, Math.abs(p.getMaxY() - y));
+//						d = Math.min(d, Math.abs(p.getMinY() - y));
+//						return d;
+//					}
+//
+//					@Override
+//					protected boolean isMovingTowards(Curve c) {
+//						double initD = distance(c.pos(0));
+//						for (double i = 0.01; i <= 1; i += 0.01)
+//							if (distance(c.pos(i)) < initD)
+//								return true;
+//						return false;
+//					}
+//
+//					public Coord constrain(Coord c, Pitch p) {
+//						double x = c.getX(), y = c.getY(),
+//
+//						xmin = p.getMinX() + getClearance(), xmax = p.getMaxX()
+//								- getClearance(), ymin = p.getMinY()
+//								+ getClearance(), ymax = p.getMaxY()
+//								- getClearance();
+//
+//						return new Coord(Math.min(xmax, Math.max(xmin, x)),
+//								Math.min(ymax, Math.max(ymin, y)));
+//					}
+//
+//					@Override
+//					public Coord[][] getWaypoint(Snapshot s, Coord curr, Curve c) {
+//
+//						Pitch pitch = (Pitch) getSource();
+//
+//						ArrayList<Coord> waypoints = new ArrayList<Coord>();
+//						for (double t = 0; t <= 1; t += 0.01) {
+//							Coord point = c.pos(t);
+//							Coord cons = constrain(point, pitch);
+//							if (!point.equals(cons)) {
+//								waypoints.add(cons);
+//							}
+//						}
+//
+//						if (waypoints.size() == 0) {
+//							System.out
+//									.println("aaaaaaaaaaaaaaaaaaaaaaaaaaa34dss7");
+//							return new Coord[0][0];
+//						}
+//						if (waypoints.size() == 1) {
+//							System.out
+//									.println("bbbbbbbbbbbbbbbbbbbbbbbbbbbbw45732");
+//							return new Coord[][] { new Coord[] { waypoints
+//									.get(0) } };
+//						}
+//						Coord[] wpa = new Coord[] { waypoints.get(0),
+//								waypoints.get(waypoints.size() - 1) };
+//						return new Coord[][] { wpa };
+//					}
+		// }
 		// new Obstical(s.getBall().getPosition(),
 		// Obstical.ROBOT_CLEARANCE)
 		};

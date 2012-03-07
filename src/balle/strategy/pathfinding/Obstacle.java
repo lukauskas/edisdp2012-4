@@ -51,7 +51,21 @@ public abstract class Obstacle extends Coord {
 		Orientation o = curveSoFar.pos(1).sub(curr).getOrientation();
 
 		return new Coord[][] { new Coord[] { c.rotate(o).add(this) },
-								new Coord[] { c.rotate(o.getOpposite()).add(this) } };
+				new Coord[] { c.rotate(o.getOpposite()).add(this) } };
+		
+// // if (clear(curr)) { Coord c = new Coord(0, this.getClearance());
+		// Orientation oObsEnd = curveSoFar.pos(1).sub(this).getOrientation();
+		// Orientation oObsCur = curr.sub(this).getOrientation();
+		// Orientation o = oObsEnd;
+		// boolean onOppositeSide = oObsEnd.getUnitCoord().dot(
+		// oObsCur.getUnitCoord()) < -0.2;
+		// if (!onOppositeSide) {
+		// o = o.add(new Orientation(Math.PI / 2));
+		// }
+		// Coord c = new Coord(0, this.getClearance());
+		// return new Coord[][] { new Coord[] { c.rotate(o).add(this) },
+		// new Coord[] { c.rotate(o.getOpposite()).add(this) } };
+		
 	}
 
 }

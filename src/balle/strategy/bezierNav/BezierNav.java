@@ -163,7 +163,6 @@ public class BezierNav implements OrientedMovementExecutor {
 				robot.getOrientation().getUnitCoord(), a)
 				.atan2styleradians() > 0;
 		double r = c.rad(0);
-		// System.out.println(r);
 
 		// throttle speed (slow when doing sharp turns)
 		double max = MAX_VELOCITY;
@@ -178,7 +177,6 @@ public class BezierNav implements OrientedMovementExecutor {
 		v1 = (int) Globals
 				.velocityToPower((float) (max * getMinVelocityRato(r)));
 		v2 = (int) Globals.velocityToPower((float) max);
-		System.out.println(v2);
 		controller.setWheelSpeeds(isLeft ? v1 : v2, isLeft ? v2 : v1);
 
 		// apply wheel speeds using sum movement executer
