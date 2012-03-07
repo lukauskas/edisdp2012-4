@@ -26,7 +26,7 @@ public class GoToBallM3 extends GoToBall {
     private static final double BALL_SAFE_GAP = 0.25;
     private RotateToOrientationExecutor turnExecutor = new FaceAngle();
     private RotateToOrientationExecutor preciseTurnExecutor = new FaceAngle(
-            Math.PI / 32);
+            Math.PI / 64);
 
     private static Logger LOG = Logger.getLogger(GoToBallM3.class);
 
@@ -75,13 +75,13 @@ public class GoToBallM3 extends GoToBall {
         return new Point(targetLine.getB());
     }
 
-    public void setAppropriateMovementStrategy()
+    public void setAppropriateMovementStrategy(boolean correctAngle)
     {
         if (stage == 1)
         {
             LOG.info("Going to BALL_SAFE target");
             setExecutorStrategy(new GoToObjectPFN(0));
-            setApproachTargetFromCorrectSide(true);
+            setApproachTargetFromCorrectSide(correctAngle);
         }
         else
         {
@@ -100,10 +100,14 @@ public class GoToBallM3 extends GoToBall {
         }
     }
 
-	private void changeStage(int newStage) {
+    private void changeStage(int newStage, boolean correctAngle) {
 		stage = newStage;
-		setAppropriateMovementStrategy();
+        setAppropriateMovementStrategy(correctAngle);
 	}
+
+    private void changeStage(int newStage) {
+        changeStage(newStage, true);
+    }
 
 	@Override
 	protected void onStep(Controller controller, Snapshot snapshot) {
@@ -140,15 +144,24 @@ public class GoToBallM3 extends GoToBall {
         	
             if (stage == 1) {
                 if (ourRobot.getPosition().dist(
-                        getTarget(snapshot).getPosition()) < Globals.ROBOT_LENGTH / 2) {
+                        getTarget(snapshot).getPosition()) < 0.07) {
     			
                     changeStage(2);
-                } else if (ourRobot.getPosition().dist(ball.getPosition()) < Globals.ROBOT_LENGTH
-                        / 2 + Globals.BALL_RADIUS / 2 + 0.05) {
-                    LOG.info("Backing off, might hit the ball");
-                    controller.setWheelSpeeds(-200, -200);
-                    return;
+                } else {
+                    if (ourRobot.isApproachingTargetFromCorrectSide(ball,
+                        snapshot.getOpponentsGoal())) {
+                    setAppropriateMovementStrategy(false);
+                    } else {
+                        setAppropriateMovementStrategy(true);
+                    }
                 }
+//                } else if ((ourRobot.getPosition().dist(ball.getPosition()) < Globals.ROBOT_LENGTH
+//                        / 2 + Globals.BALL_RADIUS / 2 + 0.05)
+//                        && ourRobot.getAngleToTurnToTarget(ball.getPosition()) < Math.PI / 4) {
+//                    LOG.info("Backing off, might hit the ball");
+//                    controller.setWheelSpeeds(-200, -200);
+//                    return;
+//                }
     		
             } else if (stage == 2) {
 				if (ourRobot.getPosition().dist(ball.getPosition()) > BALL_SAFE_GAP * 2) {
@@ -163,7 +176,7 @@ public class GoToBallM3 extends GoToBall {
 					controller.setWheelSpeeds(200, 200);
                     return;
                 } else if (ourRobot.getFrontSide().midpoint()
-                        .dist(snapshot.getBall().getPosition()) < 0.11
+                        .dist(snapshot.getBall().getPosition()) < 0.15
 						&& !ourRobot.getFacingLine().intersects(
                                 snapshot.getOpponentsGoal().getGoalLine())
                         && (!preciseTurnExecutor.isTurning())) {
@@ -174,7 +187,7 @@ public class GoToBallM3 extends GoToBall {
                             .dist(snapshot.getBall().getPosition()) > BALL_SAFE_GAP / 2)
 				    {
     					LOG.info("Trying to go to ball-safe-gap again");
-                        changeStage(1);
+                        changeStage(1, false);
 				    }
 				    else
 				    {
@@ -183,10 +196,7 @@ public class GoToBallM3 extends GoToBall {
                         return;
 				    }
                 } else {
-                    LOG.warn("Don't know what to do?");
-                    LOG.trace("elsedist "
-                            + ourRobot.getFrontSide().midpoint()
-                                    .dist(snapshot.getBall().getPosition()));
+                    LOG.warn("Don't know what to do ;(");
                 }
 			}
 			super.onStep(controller, snapshot);
