@@ -12,7 +12,6 @@ import balle.strategy.curve.Interpolator;
 import balle.world.Coord;
 import balle.world.Orientation;
 import balle.world.Snapshot;
-import balle.world.objects.Pitch;
 
 public class SimplePathFinder implements PathFinder {
 
@@ -38,53 +37,45 @@ public class SimplePathFinder implements PathFinder {
 		this.end = end;
 		this.endAngle = endAngle;
 
-		Stack<Coord> list = getPath(s.getBalle().getPosition(),
-				new Stack<Coord>(), s);
+		Stack<Coord> list = new Stack<Coord>();
+		list.add(s.getBalle().getPosition());
+		list = getPath(list, s);
 
 		// Convert to a curve.
 		return getCurve(list);
 	}
 
 	@SuppressWarnings("unchecked")
-	public Stack<Coord> getPath(Coord pos, Stack<Coord> path, Snapshot s) {
+	public Stack<Coord> getPath(Stack<Coord> path, Snapshot s) {
 
 		// Make new curve.
-		path = (Stack<Coord>) path.clone();
-		path.add(pos);
 		path.add(end);
 
 		// Check for intersections.
 		Obstacle obsticle = isClear(getCurve(path), s);
 		if (obsticle == null || path.size() > 4) {
 			return path;
-		} else {
-
-			Orientation toTarget = end.sub(pos).getOrientation();
-
-			if (obsticle.getSource() instanceof Pitch) {
-				path.add(obsticle.getWaypoint(s, null, getCurve(path)));
-
-				return path;
-			}
+		} else {		
 			path.pop();
 
-			Coord left, right;
-			left = obsticle.getWaypoint(s, toTarget, getCurve(path));
-			right = obsticle.getWaypoint(s, toTarget.getOpposite(),
-					getCurve(path));
+			Coord[][] waypoints = obsticle.getWaypoint(s, null, getCurve(path));
+			for (Coord[] eachlist : waypoints)
+				for (Coord each : eachlist)
+					drawables.add(new Dot(each, Color.CYAN));
 
-			drawables.add(new Dot(left, Color.CYAN));
-			drawables.add(new Dot(right, Color.CYAN));
+			ArrayList<Stack<Coord>> finalpath = new ArrayList<Stack<Coord>>();
+			for (Coord[] waypoint : waypoints) {
 
-			Stack<Coord> leftPath, rightPath;
-			rightPath = getPath(right, path, s);
-			leftPath = getPath(left, path, s);
+				Stack<Coord> currPath = (Stack<Coord>) path.clone();
+				for (Coord each : waypoint)
+					currPath.add(each);
+
+				finalpath.add(getPath(currPath, s));
+			}
 
 			// if (leftPath.size() < rightPath.size())
-			if (getCurve(leftPath).length() < getCurve(rightPath).length())
-				return leftPath;
-			else
-				return rightPath;
+
+			return best(finalpath);
 		}
 	}
 
@@ -193,6 +184,18 @@ public class SimplePathFinder implements PathFinder {
 		for (int i = 0; i < out.length; i++)
 			out[i] = path.get(i);
 		return interpolator.getCurve(out, startAngle, endAngle);
+	}
+
+	protected Stack<Coord> best(ArrayList<Stack<Coord>> hopefulls) {
+		Stack<Coord> currBest = null;
+		for (Stack<Coord> each : hopefulls) {
+
+			if (currBest == null
+					|| getCurve(currBest).length() < getCurve(each).length())
+				currBest = each;
+		}
+		return currBest;
+
 	}
 
 	// Visual Output \\
