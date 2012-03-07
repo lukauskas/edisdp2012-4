@@ -2,6 +2,7 @@ package balle.strategy;
 
 import balle.strategy.bezierNav.BezierNav;
 import balle.strategy.bezierNav.CurveNav;
+import balle.strategy.bezierNav.GameBezier;
 import balle.strategy.curve.CustomCHI;
 import balle.strategy.curve.FiniteDifferenceCHI;
 import balle.strategy.executor.movement.GoToObject;
@@ -23,7 +24,8 @@ import balle.strategy.planner.SimpleGoToBallFaceGoal;
 
 public class StrategyFactory {
 	public static String[] availableDesignators() {
-		String[] designators = { "BezierNav", "CurveNav", "GoToBallPurePFOnly",
+		String[] designators = { "GameBezier", "BezierNav", "CurveNav",
+				"GoToBallPurePFOnly",
 				"GoToObjectAvoidOpponentPurePF", "GoToBall", "GoToFaceBall",
 				"GoToBallPFN", "Dribble", "Blocking", "PFNavigation",
 				"DefensiveStrategy", "Game", "GameFromPenaltyKick",
@@ -34,7 +36,10 @@ public class StrategyFactory {
     public static AbstractPlanner createClass(String designator)
             throws UnknownDesignatorException {
     	
-		if (designator.equals("BezierNav")) {
+		if (designator.equals("GameBezier")) {
+			return new GameBezier(new BezierNav(new SimplePathFinder(
+					new CustomCHI())));
+		} else if (designator.equals("BezierNav")) {
 			return new SimpleGoToBallFaceGoal(new BezierNav(
 					new SimplePathFinder(new CustomCHI())));
 		} else if (designator.equals("CurveNav")) {
