@@ -11,18 +11,19 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.spi.LoggingEvent;
 
 public class StrategyLogPane extends JPanel {
 
-	private final DefaultTableModel model;
+	private final LoggingEventTableModel model;
 	private final JTable table;
 
     private final static int MAX_ROWS = 15;
 
     public StrategyLogPane() {
 		super();
-		model = new DefaultTableModel();
+		model = new LoggingEventTableModel();
 		table = new JTable(model);
 		TableCellRenderer renderer = new EvenOddRenderer();
 		table.setDefaultRenderer(Object.class, renderer);
@@ -41,11 +42,25 @@ public class StrategyLogPane extends JPanel {
 		if (model.getRowCount() > MAX_ROWS)
 			model.removeRow(0);
 
-		String[] rowData = new String[model.getColumnCount()];
-		rowData[0] = (String) e.getMessage();
+		LoggingEvent[] rowData = new LoggingEvent[model.getColumnCount()];
+		rowData[0] = e;
 
         model.addRow(rowData);
 	}
+}
+
+class LoggingEventTableModel extends DefaultTableModel {
+
+	@Override
+	public Object getValueAt(int row, int column) {
+		return ((LoggingEvent) super.getValueAt(row, column)).getMessage()
+				.toString();
+	}
+
+	public Level getLevel(int row, int column) {
+		return ((LoggingEvent) super.getValueAt(row, column)).getLevel();
+	}
+
 }
 
 class EvenOddRenderer implements TableCellRenderer {
@@ -59,24 +74,23 @@ class EvenOddRenderer implements TableCellRenderer {
 
 		Color foreground, background;
 		row = table.convertRowIndexToModel(row);
-        String s = table.getModel().getValueAt(row, 0).toString();
-		if (s == "INFO") {
-			foreground = Color.blue;
-				background = Color.white;
-			} else {
-			if (s == "DEBUG") {
-				background = Color.gray;
-				foreground = Color.white;
-			} else {
-				if (s == "ERROR") {
-					background = Color.red;
-					foreground = Color.white;
-				} else {
-				foreground = Color.black;
+		Level level = ((LoggingEventTableModel) table.getModel()).getLevel(row, 0);
 
-				background = Color.yellow;
-				}
-			}
+		if (level.equals(Level.WARN)) {
+			foreground = Color.black;
+			background = Color.yellow;
+		} else if (level.equals(Level.DEBUG)) {
+			background = Color.gray;
+			foreground = Color.white;
+		} else if (level.equals(Level.ERROR)) {
+			background = Color.red;
+			foreground = Color.white;
+		} else if (level.equals(Level.INFO)) {
+			foreground = Color.blue;
+			background = Color.white;
+		} else {
+			foreground = Color.black;
+			background = Color.white;
 		}
 
 		renderer.setForeground(foreground);
