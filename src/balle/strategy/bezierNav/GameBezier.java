@@ -11,6 +11,7 @@ import balle.controller.Controller;
 import balle.main.drawable.Dot;
 import balle.strategy.executor.movement.OrientedMovementExecutor;
 import balle.strategy.planner.AbstractPlanner;
+import balle.world.Orientation;
 import balle.world.Snapshot;
 import balle.world.objects.StaticFieldObject;
 
@@ -53,11 +54,20 @@ public class GameBezier extends AbstractPlanner {
 		if ((snapshot == null) || (snapshot.getBalle().getPosition() == null)
 				|| (target == null))
 			return;
-
-		// Update the target's location in executorStrategy (e.g. if target
-		// moved)
-		executorStrategy.updateTarget(target, snapshot.getOpponentsGoal()
-				.getPosition().sub(target.getPosition()).getOrientation());
+		
+		Orientation usToTar, midToTar, tarToGoal;
+		usToTar = target.getPosition().sub(snapshot.getBalle().getPosition()).getOrientation();
+		midToTar = snapshot.getPitch().getPosition().sub(snapshot.getBalle().getPosition()).getOrientation();
+		tarToGoal = snapshot.getOpponentsGoal().getPosition()
+				.sub(target.getPosition()).getOrientation();
+		
+		if (midToTar.sub(midToTar).abs().degrees()>90)
+			executorStrategy.updateTarget(target, midToTar);
+		else 
+			executorStrategy.updateTarget(target, usToTar);
+			
+		
+		
 		// Draw the target
 		addDrawables(executorStrategy.getDrawables());
 		if (target.getPosition() != null)
