@@ -2,6 +2,7 @@ package balle.strategy.executor.turning;
 
 import balle.strategy.executor.Executor;
 import balle.world.Orientation;
+import balle.world.Snapshot;
 
 public interface RotateToOrientationExecutor extends Executor {
 
@@ -16,10 +17,11 @@ public interface RotateToOrientationExecutor extends Executor {
      * Returns the angle required to turn using atan2 style radians. Positive
      * angle means to turn CCW this much radians, whereas negative means turning
      * CW that amount of radians.
+     * @param snapshot TODO
      * 
      * @return angle to turn
      */
-    public abstract double getAngleToTurn();
+    public abstract double getAngleToTurn(Snapshot snapshot);
 
     /**
      * Returns true if robot is turning at the moment

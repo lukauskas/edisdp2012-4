@@ -165,7 +165,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 										 * James: Do not use. Use initTest()
 										 * instead.
 										 */
-		this.noisy = noisy;
+		Simulator.noisy = noisy;
 	}
 
 	public static Simulator createSimulator() {
@@ -305,13 +305,16 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 			robot.setAngularVelocity(va);
 			// System.out.println(va);
 
-			if (bot.isKicking() && ballInRange()) {
-				// Kick
-				float xF, yF;
-				xF = (float) (kickForce * Math.cos(blueAng));
-				yF = (float) (kickForce * Math.sin(blueAng));
-				ball.applyForce(new Vec2(xF, yF), ball.getWorldCenter());
-				bot.stopKicking();
+            if (bot.isKicking()) {
+                if (ballInRange()) {
+                    // Kick
+                    float xF, yF;
+                    xF = (float) (kickForce * Math.cos(blueAng));
+                    yF = (float) (kickForce * Math.sin(blueAng));
+                    ball.applyForce(new Vec2(xF, yF), ball.getWorldCenter());
+                }
+
+                bot.stopKicking();
 			}
 		}
 

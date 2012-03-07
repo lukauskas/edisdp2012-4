@@ -24,8 +24,12 @@ public class Line {
 		this.b = b;
 	}
 
+    public double dist(Coord a) {
+        return getLine2DVersion().ptLineDist(a.getX(), a.getY());
+    }
+
 	public boolean contains(Coord a) {
-		double dist = getLine2DVersion().ptLineDist(a.getX(), a.getY());
+        double dist = this.dist(a);
 		if (dist > 0.000001) {
 			return false;
 		}

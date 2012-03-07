@@ -76,7 +76,6 @@ public class BezierNav implements OrientedMovementExecutor {
 	private Curve c;
 
 	private StaticFieldObject target;
-	private Snapshot state;
 
 	private Orientation orient;
 	private Coord p0, p3;
@@ -97,41 +96,36 @@ public class BezierNav implements OrientedMovementExecutor {
 	}
 
 	@Override
-	public boolean isFinished() {
+	public boolean isFinished(Snapshot snapshot) {
 		if (p0 == null || p3 == null) {
 			// haven't even started
 			return false;
 		}
-		return state.getBalle().getPosition().dist(getAdjustedP3()) <= stopDistance
-				&& isMoveStraitFinished(state.getBalle().getOrientation());
+		return snapshot.getBalle().getPosition().dist(getAdjustedP3()) <= stopDistance
+				&& isMoveStraitFinished(snapshot.getBalle().getOrientation());
 	}
 
 	@Override
-	public boolean isPossible() {
+	public boolean isPossible(Snapshot snapshot) {
 		return true;
 	}
 
 	@Override
-	public void updateState(Snapshot snapshot) {
-		state = snapshot;
-	}
-
-	@Override
-	public void step(Controller controller) {
+	public void step(Controller controller, Snapshot snapshot) {
 		// controller.kick();
-		if (isFinished()) {
+		if (isFinished(snapshot)) {
 			stop(controller);
 			return;
 		}
 		// calculate bezier points 0 to 3
-		Robot robot = state.getBalle();
+		Robot robot = snapshot.getBalle();
 		Coord rP = robot.getPosition(), tP = getAdjustedP3();
 		if (rP == null || tP == null) {
 			return;
 		}
+
 		p0 = rP;
 		p3 = tP;
-
 
 		// if we are close to the target and facing the correct orientation
 		// (orient)
@@ -160,7 +154,7 @@ public class BezierNav implements OrientedMovementExecutor {
 			tpa[i + 1] = targetPoints.get(i);
 		}
 
-		c = pathfinder.getPath(state, robot.getPosition(),
+		c = pathfinder.getPath(snapshot, robot.getPosition(),
 				robot.getOrientation(), tP, orient);
 		
 		// calculate turning radius
@@ -209,9 +203,9 @@ public class BezierNav implements OrientedMovementExecutor {
 			l.add(c);
 			Coord center = c.cor(0);
 			l.add(new Dot(center, Color.BLACK));
-			l.add(new Circle(center, center
-					.dist(state.getBalle().getPosition()),
-				Color.yellow));
+			// l.add(new Circle(center, center
+			// .dist(snapshot.getBalle().getPosition()),
+			// Color.yellow));
 		}
 
 		l.add(new Circle(p0, 0.03, Color.pink));

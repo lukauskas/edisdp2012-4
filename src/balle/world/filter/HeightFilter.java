@@ -38,13 +38,19 @@ public class HeightFilter implements Filter {
 
 	@Override
 	public Snapshot filter(Snapshot s) {
-		Robot nBalle = new Robot(filter(s.getBalle().getPosition(),
-				Globals.ROBOT_HEIGHT), s.getBalle().getVelocity(), s.getBalle()
-				.getOrientation());
+		Robot nBalle = s.getBalle();
+		if (nBalle.getPosition() != null && !nBalle.getPosition().isEstimated()) {
+			nBalle = new Robot(filter(s.getBalle().getPosition(),
+					Globals.ROBOT_HEIGHT), s.getBalle().getVelocity(), s
+					.getBalle().getOrientation());
+		}
 
-		Robot nOpp = new Robot(filter(s.getOpponent().getPosition(),
-				Globals.ROBOT_HEIGHT), s.getOpponent().getVelocity(), s
-				.getOpponent().getOrientation());
+		Robot nOpp = s.getOpponent();
+		if (nOpp.getPosition() != null && !nOpp.getPosition().isEstimated()) {
+			nOpp = new Robot(filter(s.getOpponent().getPosition(),
+					Globals.ROBOT_HEIGHT), s.getOpponent().getVelocity(), s
+					.getOpponent().getOrientation());
+		}
 
 		return new Snapshot(nOpp, nBalle, s.getBall(), s.getOpponentsGoal(),
 				s.getOwnGoal(), s.getPitch(), s.getTimestamp());

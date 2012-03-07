@@ -18,8 +18,6 @@ public class GoToObjectAvoidOpponentPurePF implements MovementExecutor {
 
 	private StaticFieldObject target;
 
-	private Snapshot currentState;
-
 	private double stopDistance = 0;
 	private final double ZERO_TH = Math.PI / 2;
 
@@ -40,8 +38,8 @@ public class GoToObjectAvoidOpponentPurePF implements MovementExecutor {
 	}
 
 	@Override
-	public boolean isFinished() {
-		Robot robot = currentState.getBalle();
+	public boolean isFinished(Snapshot snapshot) {
+		Robot robot = snapshot.getBalle();
 		Coord currentPosition = robot.getPosition();
 		if ((target == null) || (currentPosition == null)) {
 			return false;
@@ -50,8 +48,8 @@ public class GoToObjectAvoidOpponentPurePF implements MovementExecutor {
 	}
 
 	@Override
-	public boolean isPossible() {
-		Robot robot = currentState.getBalle();
+	public boolean isPossible(Snapshot snapshot) {
+		Robot robot = snapshot.getBalle();
 		Coord currentPosition = robot.getPosition();
 		Orientation currentOrientation = robot.getOrientation();
 		Coord targetPosition = (target != null) ? target.getPosition() : null;
@@ -60,13 +58,8 @@ public class GoToObjectAvoidOpponentPurePF implements MovementExecutor {
 	}
 
 	@Override
-	public void updateState(Snapshot snapshot) {
-		this.currentState = snapshot;
-	}
-
-	@Override
-	public void step(Controller controller) {
-		Robot ourRobot = currentState.getBalle();
+	public void step(Controller controller, Snapshot snapshot) {
+		Robot ourRobot = snapshot.getBalle();
 		Coord rF, totalRelativeForce = new Coord(0, 0);
 
 		// PFObject opponentPFO = new PFObject() {
@@ -82,10 +75,10 @@ public class GoToObjectAvoidOpponentPurePF implements MovementExecutor {
 
 		PFObject objects[] = new PFObject[] {
 				// ball
-				new PullPointPurePFObject(currentState.getBall().getPosition(),
+				new PullPointPurePFObject(snapshot.getBall().getPosition(),
 						1, 1),
 				// opponent
-				new PullPointPurePFObject(currentState.getOpponent()
+				new PullPointPurePFObject(snapshot.getOpponent()
 						.getPosition(), -0.2, 2),
 				// walls
 				new WallPurePFObject(new Coord(0, Globals.PITCH_HEIGHT),

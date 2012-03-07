@@ -1,7 +1,7 @@
 /**
  * 
  */
-package balle.strategy.planner;
+package balle.strategy.bezierNav;
 
 import java.awt.Color;
 
@@ -9,7 +9,9 @@ import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
 import balle.main.drawable.Dot;
-import balle.strategy.executor.movement.MovementExecutor;
+import balle.strategy.executor.movement.OrientedMovementExecutor;
+import balle.strategy.planner.AbstractPlanner;
+import balle.world.Orientation;
 import balle.world.Snapshot;
 import balle.world.objects.StaticFieldObject;
 
@@ -17,21 +19,23 @@ import balle.world.objects.StaticFieldObject;
  * @author s0909773
  * 
  */
-public class SimpleGoToBall extends AbstractPlanner {
+public class GameBezier extends AbstractPlanner {
 
-	protected static final Logger LOG = Logger.getLogger(SimpleGoToBall.class);
+	protected static final Logger LOG = Logger
+			.getLogger(GameBezier.class);
 
-	MovementExecutor executorStrategy;
+	OrientedMovementExecutor executorStrategy;
 
-	public SimpleGoToBall(MovementExecutor movementExecutor) {
-		executorStrategy = movementExecutor;
+	public GameBezier(
+			OrientedMovementExecutor OrientedMovementExecutor) {
+		executorStrategy = OrientedMovementExecutor;
 	}
 
-	public MovementExecutor getExecutorStrategy() {
+	public OrientedMovementExecutor getExecutorStrategy() {
 		return executorStrategy;
 	}
 
-	public void setExecutorStrategy(MovementExecutor executorStrategy) {
+	public void setExecutorStrategy(OrientedMovementExecutor executorStrategy) {
 		this.executorStrategy = executorStrategy;
 	}
 
@@ -50,10 +54,20 @@ public class SimpleGoToBall extends AbstractPlanner {
 		if ((snapshot == null) || (snapshot.getBalle().getPosition() == null)
 				|| (target == null))
 			return;
-
-		// Update the target's location in executorStrategy (e.g. if target
-		// moved)
-		executorStrategy.updateTarget(target);
+		
+		Orientation usToTar, midToTar, tarToGoal;
+		usToTar = target.getPosition().sub(snapshot.getBalle().getPosition()).getOrientation();
+		midToTar = snapshot.getPitch().getPosition().sub(snapshot.getBalle().getPosition()).getOrientation();
+		tarToGoal = snapshot.getOpponentsGoal().getPosition()
+				.sub(target.getPosition()).getOrientation();
+		
+		if (midToTar.sub(midToTar).abs().degrees()>90)
+			executorStrategy.updateTarget(target, midToTar);
+		else 
+			executorStrategy.updateTarget(target, usToTar);
+			
+		
+		
 		// Draw the target
 		addDrawables(executorStrategy.getDrawables());
 		if (target.getPosition() != null)
@@ -71,6 +85,5 @@ public class SimpleGoToBall extends AbstractPlanner {
 	@Override
 	public void stop(Controller controller) {
 		executorStrategy.stop(controller);
-
 	}
 }
