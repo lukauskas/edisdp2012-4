@@ -127,7 +127,7 @@ public class GoToBallM3 extends GoToBall {
             double angleToFaceTarget = ourRobot
                     .getAngleToTurnToTarget(targetCoord);
             
-            if (Math.abs(angleToFaceTarget) > Math.PI / 8) {
+            if (Math.abs(angleToFaceTarget) > Math.PI / 16) {
                 if (!turnExecutor.isTurning()) {
 					turnExecutor.setTargetOrientation(targetCoord.sub(
 							ourRobot.getPosition()).orientation());
