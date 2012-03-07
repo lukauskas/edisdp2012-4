@@ -61,7 +61,7 @@ public class BezierNav implements OrientedMovementExecutor {
 										// to adjusted p3)
 	private double stopAngle = Math.PI / 13; // angle of robot vs desired final
 												// angle (orient)
-	private PID pid = new PID(0.6, 1, 1);
+	private PID pid = new PID(0.3, 0.7, 0.5);
 	private Orientation lastAngle;
 	private long lastAngleTime;
 
@@ -188,6 +188,8 @@ public class BezierNav implements OrientedMovementExecutor {
 		long dT = snapshot.getTimestamp() - lastAngleTime;
 		if (dT > 0) {
 			if (lastAngle != null) {
+				// this uses the angular and linear velocity of the robot to
+				// find the estimated powers to the wheels
 				double dA = lastAngle.angleToatan2Radians(robot
 						.getOrientation());
 				double basicV = (dA * Globals.ROBOT_TRACK_WIDTH / 2) / dT;
@@ -199,6 +201,7 @@ public class BezierNav implements OrientedMovementExecutor {
 				double curentRightP = Globals
 						.velocityToPower((float) ((flipper * robot
 								.getVelocity().abs()) + basicV));
+				// use PID
 				left = pid.convert(left, curentLeftP);
 				right = pid.convert(right, curentRightP);
 			}
