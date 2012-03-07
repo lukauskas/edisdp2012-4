@@ -16,13 +16,14 @@ public class GoToObject implements MovementExecutor {
 	private double stopDistance = 0.2;
 
 	private final static double EPSILON = 0.00001;
+	private final static double DISTANCE_DIFF_TO_TURN_FOR = 0.3;
+
+	public final static int DEFAULT_MOVEMENT_SPEED = 500;
 
 	protected StaticFieldObject target = null;
-	protected Snapshot currentState = null;
 	private boolean isMoving = false;
 
-	private final static double DISTANCE_DIFF_TO_TURN_FOR = 0.3;
-	private final static int MOVEMENT_SPEED = 500;
+	private int movementSpeed = DEFAULT_MOVEMENT_SPEED;
 
 	RotateToOrientationExecutor turningExecutor = null;
 
@@ -36,8 +37,8 @@ public class GoToObject implements MovementExecutor {
 	}
 
 	@Override
-	public boolean isFinished() {
-		Robot robot = currentState.getBalle();
+	public boolean isFinished(Snapshot snapshot) {
+		Robot robot = snapshot.getBalle();
 		Coord currentPosition = robot.getPosition();
 		if ((target == null) || (currentPosition == null)) {
 			return false;
@@ -46,11 +47,11 @@ public class GoToObject implements MovementExecutor {
 	}
 
 	@Override
-	public boolean isPossible() {
+	public boolean isPossible(Snapshot snapshot) {
 		if (turningExecutor == null)
 			return false;
 
-		Robot robot = currentState.getBalle();
+		Robot robot = snapshot.getBalle();
 		Coord currentPosition = robot.getPosition();
 		Orientation currentOrientation = robot.getOrientation();
 		Coord targetPosition = (target != null) ? target.getPosition() : null;
@@ -58,42 +59,36 @@ public class GoToObject implements MovementExecutor {
 	}
 
 	@Override
-	public void updateState(Snapshot snapshot) {
-		currentState = snapshot;
-	}
-
-	@Override
-	public void step(Controller controller) {
+	public void step(Controller controller, Snapshot snapshot) {
 		// Fail quickly if state not set
-		if (currentState == null)
+		if (snapshot == null)
 			return;
 
 		Coord targetCoord = target.getPosition();
-		Robot robot = currentState.getBalle();
+		Robot robot = snapshot.getBalle();
 
 		Coord currentPosition = robot.getPosition();
 
-		if (isFinished()) {
+		if (isFinished(snapshot)) {
 			stop(controller);
 			return;
 		} else {
 			// Fail quickly if not possible
-			if (!isPossible())
+			if (!isPossible(snapshot))
 				return;
-			turningExecutor.updateState(currentState);
-			if (turningExecutor.isFinished()) {
+			if (turningExecutor.isFinished(snapshot)) {
 				turningExecutor.stop(controller);
 			}
 
 			if (turningExecutor.isTurning()) // If we are still turning here
 			{
-				turningExecutor.step(controller);
+				turningExecutor.step(controller, snapshot);
 				return; // Continue
 			} else {
 				Orientation orientationToTarget = targetCoord.sub(
 						currentPosition).orientation();
 				turningExecutor.setTargetOrientation(orientationToTarget);
-				double turnAngle = turningExecutor.getAngleToTurn();
+				double turnAngle = turningExecutor.getAngleToTurn(snapshot);
 				double dist = targetCoord.dist(robot.getPosition());
 				double distDiffFromTarget = Math
 						.abs(Math.sin(turnAngle) * dist);
@@ -108,16 +103,18 @@ public class GoToObject implements MovementExecutor {
 						isMoving = false;
 					}
 
-					turningExecutor.step(controller);
+					turningExecutor.step(controller, snapshot);
 				} else {
-					if (!isMoving) {
-						controller.forward(MOVEMENT_SPEED);
-						isMoving = true;
-					}
+                    controller.forward(movementSpeed);
+                    isMoving = true;
 				}
 			}
 		}
 
+	}
+
+	public void setMovementSpeed(int movementSpeed) {
+		this.movementSpeed = movementSpeed;
 	}
 
 	@Override

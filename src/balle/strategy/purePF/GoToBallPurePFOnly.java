@@ -19,11 +19,10 @@ public class GoToBallPurePFOnly extends AbstractPlanner {
 	}
 
 	@Override
-	public void step(Controller controller) {
-		Snapshot s = getSnapshot();
+	public void onStep(Controller controller, Snapshot snapshot) {
 
-		Ball b = s.getBall();
-		ball.update(b.getPosition(), s.getOpponentsGoal());
+		Ball b = snapshot.getBall();
+		ball.update(b.getPosition(), snapshot.getOpponentsGoal());
 
 		// Coord force = ball.getForce(s.getBalle().getPosition());
 		// System.out.println(force);
@@ -31,8 +30,8 @@ public class GoToBallPurePFOnly extends AbstractPlanner {
 		// Coord rF = force.rotate(s.getBalle().getOrientation().getOpposite());
 		// System.out.println(rF);
 		// double rFO = rF.getOrientation().atan2styleradians();
-		Coord rToB = s.getBall().getPosition().sub(s.getBalle().getPosition());
-		Orientation rO = s.getBalle().getOrientation();
+		Coord rToB = snapshot.getBall().getPosition().sub(snapshot.getBalle().getPosition());
+		Orientation rO = snapshot.getBalle().getOrientation();
 		double rFO = rToB.rotate(rO.getOpposite()).getOrientation()
 				.atan2styleradians();
 		System.out.println(rFO);

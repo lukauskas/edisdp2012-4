@@ -61,24 +61,19 @@ public class CurveNav implements OrientedMovementExecutor {
 	}
 
 	@Override
-	public boolean isFinished() {
+	public boolean isFinished(Snapshot snapshot) {
 		return false;
 		// TODO
 	}
 
 	@Override
-	public boolean isPossible() {
+	public boolean isPossible(Snapshot snapshot) {
 		return true;
 	}
 
 	@Override
-	public void updateState(Snapshot snapshot) {
-		state = snapshot;
-	}
-
-	@Override
-	public void step(Controller controller) {
-		if (isFinished()) {
+	public void step(Controller controller, Snapshot snapshot) {
+		if (isFinished(snapshot)) {
 			stop(controller);
 			return;
 		}
@@ -89,9 +84,8 @@ public class CurveNav implements OrientedMovementExecutor {
 			return;
 
 		// Update Movement Executor.
-		movementExecutor.updateState(state);
 		movementExecutor.updateTarget(curve.pos(stepDist).getPoint());
-		movementExecutor.step(controller);
+		movementExecutor.step(controller, snapshot);
 	}
 
 	@Override

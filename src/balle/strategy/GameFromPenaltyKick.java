@@ -3,6 +3,7 @@ package balle.strategy;
 import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
+import balle.world.Snapshot;
 
 public class GameFromPenaltyKick extends Game {
 
@@ -17,7 +18,7 @@ public class GameFromPenaltyKick extends Game {
 	}
 
 	@Override
-	public void step(Controller controller) {
+	public void onStep(Controller controller, Snapshot snapshot) {
 		if (timeToKick == 0) {
 			timeToKick = System.currentTimeMillis() + 1000;
 		} else if ((timeToKick <= System.currentTimeMillis())
@@ -27,7 +28,7 @@ public class GameFromPenaltyKick extends Game {
 			controller.penaltyKick();
 		} else if ((timeToGame != 0)
 				&& (timeToGame <= System.currentTimeMillis())) {
-			super.step(controller);
+			super.onStep(controller, snapshot);
 		}
 
 	}

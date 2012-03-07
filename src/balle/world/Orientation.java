@@ -73,6 +73,19 @@ public class Orientation {
 		return (angleInRadians * 180) / Math.PI;
 	}
 
+	/**
+	 * Version of this angle that is between 0 and 180, returns the opposite for
+	 * reflex angles.
+	 * 
+	 * @return
+	 */
+	public Orientation abs() {
+		if (this.atan2styleradians() < 0)
+			return getOpposite();
+		else
+			return this;
+	}
+
 	@Override
 	public boolean equals(Object other) {
 		if (other == null)

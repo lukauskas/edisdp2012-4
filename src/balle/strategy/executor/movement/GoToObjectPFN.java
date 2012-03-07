@@ -17,7 +17,6 @@ import balle.world.Snapshot;
 import balle.world.objects.StaticFieldObject;
 
 public class GoToObjectPFN implements MovementExecutor {
-    private Snapshot            snapshot          = null;
 
     private static final Logger LOG               = Logger.getLogger(MovementExecutor.class);
 
@@ -88,7 +87,7 @@ public class GoToObjectPFN implements MovementExecutor {
     }
 
     @Override
-    public boolean isFinished() {
+    public boolean isFinished(Snapshot snapshot) {
         if ((snapshot == null) || (target == null)
                 || (target.getPosition() == null)
                 || (snapshot.getBalle().getPosition() == null))
@@ -98,7 +97,7 @@ public class GoToObjectPFN implements MovementExecutor {
     }
 
     @Override
-    public boolean isPossible() {
+    public boolean isPossible(Snapshot snapshot) {
         return ((snapshot != null) && (target != null)
                 && (target.getPosition() != null)
                 && (snapshot.getBalle().getPosition() != null) && (snapshot
@@ -106,18 +105,13 @@ public class GoToObjectPFN implements MovementExecutor {
     }
 
     @Override
-    public void updateState(Snapshot snapshot) {
-        this.snapshot = snapshot;
-
-    }
-
-    @Override
-    public void step(Controller controller) {
-        if (!isPossible())
+	public void step(Controller controller, Snapshot snapshot) {
+        if (!isPossible(snapshot))
             return;
 
         Pos opponent;
-        if (snapshot.getOpponent().getOrientation() == null)
+        if ((snapshot.getOpponent().getOrientation() == null)
+                || (snapshot.getOpponent().getPosition() == null))
             opponent = null;
         else
             opponent = new Pos(new Point(snapshot.getOpponent().getPosition()

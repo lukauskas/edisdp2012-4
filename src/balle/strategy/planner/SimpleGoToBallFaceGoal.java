@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 import balle.controller.Controller;
 import balle.main.drawable.Dot;
 import balle.strategy.executor.movement.OrientedMovementExecutor;
+import balle.world.Snapshot;
 import balle.world.objects.StaticFieldObject;
 
 /**
@@ -36,8 +37,8 @@ public class SimpleGoToBallFaceGoal extends AbstractPlanner {
 		this.executorStrategy = executorStrategy;
 	}
 
-	protected StaticFieldObject getTarget() {
-		return getSnapshot().getBall();
+	protected StaticFieldObject getTarget(Snapshot snapshot) {
+		return snapshot.getBall();
 	}
 
 	protected Color getTargetColor() {
@@ -45,19 +46,16 @@ public class SimpleGoToBallFaceGoal extends AbstractPlanner {
 	}
 
 	@Override
-	public void step(Controller controller) {
-		StaticFieldObject target = getTarget();
+	public void onStep(Controller controller, Snapshot snapshot) {
+		StaticFieldObject target = getTarget(snapshot);
 
-		if ((getSnapshot() == null)
-				|| (getSnapshot().getBalle().getPosition() == null)
+		if ((snapshot == null) || (snapshot.getBalle().getPosition() == null)
 				|| (target == null))
 			return;
-		// Update the current state of executor strategy
-		executorStrategy.updateState(getSnapshot());
 
 		// Update the target's location in executorStrategy (e.g. if target
 		// moved)
-		executorStrategy.updateTarget(target, getSnapshot().getOpponentsGoal()
+		executorStrategy.updateTarget(target, snapshot.getOpponentsGoal()
 				.getPosition().sub(target.getPosition()).getOrientation());
 		// Draw the target
 		addDrawables(executorStrategy.getDrawables());
@@ -65,8 +63,8 @@ public class SimpleGoToBallFaceGoal extends AbstractPlanner {
 			addDrawable(new Dot(target.getPosition(), getTargetColor()));
 
 		// If it says it is not finished, tell it to do something for a step.
-		if (!executorStrategy.isFinished()) {
-			executorStrategy.step(controller);
+		if (!executorStrategy.isFinished(snapshot)) {
+			executorStrategy.step(controller, snapshot);
 		} else {
 			// Tell the strategy to stop doing whatever it was doing
 			executorStrategy.stop(controller);
@@ -75,8 +73,6 @@ public class SimpleGoToBallFaceGoal extends AbstractPlanner {
 
 	@Override
 	public void stop(Controller controller) {
-		if (!executorStrategy.isFinished())
-			executorStrategy.stop(controller);
-
+		executorStrategy.stop(controller);
 	}
 }

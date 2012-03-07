@@ -27,8 +27,7 @@ public class DefensiveStrategy extends GoToBall {
 		super(movementExecutor);
 	}
 
-	protected Coord calculateDefenceCoord() {
-		Snapshot snapshot = getSnapshot();
+	protected Coord calculateDefenceCoord(Snapshot snapshot) {
 		Goal ownGoal = snapshot.getOwnGoal();
 
 		Robot opponent = snapshot.getOpponent();
@@ -64,8 +63,8 @@ public class DefensiveStrategy extends GoToBall {
 	}
 
 	@Override
-	protected StaticFieldObject getTarget() {
-		Coord defenceCoord = calculateDefenceCoord();
+	protected StaticFieldObject getTarget(Snapshot snapshot) {
+		Coord defenceCoord = calculateDefenceCoord(snapshot);
 		return new Point(defenceCoord);
 	}
 

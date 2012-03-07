@@ -55,6 +55,8 @@ public class Runner {
 		parser.acceptsAll(asList("g", "goal")).withRequiredArg()
 				.ofType(String.class);
 		parser.acceptsAll(asList("v", "verbose"));
+		parser.acceptsAll(asList("p", "pitch")).withRequiredArg()
+				.ofType(String.class);
 		return parser;
 	}
 
@@ -101,21 +103,24 @@ public class Runner {
 									// balleIsBlue initialisation
 		}
 
-		boolean goalIsLeft;
-		if ("left".equals(options.valueOf("goal")))
-			goalIsLeft = true;
-		else if ("right".equals(options.valueOf("goal")))
-			goalIsLeft = false;
-		else {
+		boolean isMainPitch = true;
+		if ("1".equals(options.valueOf("pitch"))) {
+			isMainPitch = false;
+		} else if (options.valueOf("pitch") == null
+				&& !options.has("simulator")) {
 			System.out
-					.println("Invalid goal provided, try one of the following:");
-			System.out.println("javac balle.main.Runner -g left");
-			System.out.println("javac balle.main.Runner -g right");
+					.println("Invalid pitch provided, try one of the following:");
+			System.out.println("javac balle.main.Runner -p 0");
+			System.out.println("javac balle.main.Runner -p 1");
 			print_usage();
 			System.exit(-1);
-			goalIsLeft = false; // This is just to fool Eclipse about
-								// balleIsBlue initialisation
 		}
+
+		boolean goalIsLeft = true;
+		if ("right".equals(options.valueOf("goal"))) {
+			goalIsLeft = false;
+		}
+
 		StrategyLogPane strategyLog = new StrategyLogPane();
 
 		initialiseLogging(strategyLog, options.has("verbose"));
@@ -123,7 +128,8 @@ public class Runner {
 		if (options.has("simulator"))
 			runSimulator(balleIsBlue, goalIsLeft, strategyLog);
 		else
-			runRobot(balleIsBlue, goalIsLeft, options.has("dummy-controller"),
+			runRobot(isMainPitch, balleIsBlue, goalIsLeft,
+					options.has("dummy-controller"),
 					strategyLog);
 	}
 
@@ -152,7 +158,8 @@ public class Runner {
 
 	}
 
-	public static void runRobot(boolean balleIsBlue, boolean goalIsLeft,
+	public static void runRobot(boolean isMainPitch, boolean balleIsBlue,
+			boolean goalIsLeft,
 			boolean useDummyController, StrategyLogPane strategyLog) {
 
 		AbstractWorld world;
@@ -161,8 +168,14 @@ public class Runner {
 
 		// Initialise world
 		world = new BasicWorld(balleIsBlue, goalIsLeft, Globals.getPitch());
-		world.addFilter(new HeightFilter(world.getPitch().getPosition(),
-				Globals.P0_CAMERA_HEIGHT));
+
+		if (isMainPitch) {
+			world.addFilter(new HeightFilter(world.getPitch().getPosition(),
+					Globals.P0_CAMERA_HEIGHT));
+		} else {
+			world.addFilter(new HeightFilter(world.getPitch().getPosition(),
+					Globals.P1_CAMERA_HEIGHT));
+		}
 
 		// Moving this forward so we do not start a GUI until controller is
 		// initialised

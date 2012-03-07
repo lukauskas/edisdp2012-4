@@ -7,14 +7,12 @@ import java.util.Vector;
 
 import balle.main.drawable.Dot;
 import balle.main.drawable.Drawable;
-import balle.main.drawable.DrawableLine;
 import balle.strategy.curve.Curve;
 import balle.strategy.curve.Interpolator;
 import balle.world.Coord;
-import balle.world.Line;
 import balle.world.Orientation;
 import balle.world.Snapshot;
-import balle.world.objects.Robot;
+import balle.world.objects.Pitch;
 
 public class SimplePathFinder implements PathFinder {
 
@@ -40,86 +38,217 @@ public class SimplePathFinder implements PathFinder {
 		this.end = end;
 		this.endAngle = endAngle;
 
-		Stack<Coord> list = getPath(s.getBalle().getPosition(),
-				new Stack<Coord>(), s);
+		Stack<Coord> list = new Stack<Coord>();
+		list.push(start);
+		list = getPath(list, s);
+
+		// remove duplicates (in sequence)
+		Coord last = list.get(0);
+		for (int i = 1; i < list.size(); i++) {
+			if (last.equals(list.get(i))) {
+				list.remove(i);
+				i--;
+			}
+			last = list.get(i);
+		}
 
 		// Convert to a curve.
 		return getCurve(list);
 	}
 
 	@SuppressWarnings("unchecked")
-	public Stack<Coord> getPath(Coord pos, Stack<Coord> path,
-			Snapshot s) {
-		
+	public Stack<Coord> getPath(Stack<Coord> path, Snapshot s) {
+		Coord curr = path.peek();
+
 		// Make new curve.
-		path = (Stack<Coord>) path.clone();
-		path.add(pos);
 		path.add(end);
-		Line c = new Line(pos, end);
 
 		// Check for intersections.
-		Robot obsticle = isClear(c, s);
+		Obstacle obsticle = isClear(getCurve(path), s);
 		if (obsticle == null || path.size() > 4) {
 			return path;
 		} else {
+
+			Coord[][] waypoints = obsticle.getWaypoint(s, curr, getCurve(path));
+
+			for (Coord[] eachlist : waypoints)
+				for (Coord each : eachlist)
+					drawables.add(new Dot(each, Color.CYAN));
+
 			path.pop();
-			
-			Orientation toTarget = end.sub(pos).getOrientation();
 
-			Coord left, right;
-			left = getWaypoint(s, obsticle.getPosition(),
- toTarget);
-			right = getWaypoint(s, obsticle.getPosition(),
-					toTarget.getOpposite());
+			ArrayList<Stack<Coord>> finalpath = new ArrayList<Stack<Coord>>();
+			for (Coord[] waypoint : waypoints) {
 
-			drawables.add(new Dot(left, Color.CYAN));
-			drawables.add(new Dot(right, Color.CYAN));
+				Stack<Coord> currPath = (Stack<Coord>) path.clone();
+				for (Coord each : waypoint)
+					currPath.push(each);
 
-			Stack<Coord> leftPath, rightPath;
-			leftPath = getPath(left, path, s);
-			rightPath = getPath(right, path, s);
+				finalpath.add(getPath(currPath, s));
+				// drawables.add(getCurve(currPath));
+			}
 
-			if (leftPath.size() < rightPath.size())
-				return leftPath;
-			else
-				return rightPath;
+			// if (leftPath.size() < rightPath.size())
+
+			return best(finalpath);
 		}
 	}
 
-	protected Robot isClear(Line curve, Snapshot s) {
-		Robot r = s.getOpponent();
+	protected Obstacle isClear(Curve c, Snapshot s) {
+		Obstacle[] obstacles = new Obstacle[] {
 
-		// Make line
-		double birth = 0.2;
-		Line other = new Line(new Coord(0, birth), new Coord(0, -birth));
-		other = other.rotate(curve.getA().sub(curve.getB()).getOrientation());
-		other = other.add(r.getPosition());
+				new Obstacle(s.getOpponent(), Math.min(
+						Obstacle.ROBOT_CLEARANCE, s.getOpponent().getPosition()
+								.dist(end))) {
+					@Override
+					public boolean clear(Coord c) {
+						return c.dist(this) > clearance;
+					}
+				}, new Obstacle(s.getPitch(), Obstacle.WALL_CLEARANCE) {
 
-		drawables.add(new DrawableLine(other, Color.BLUE));
-		drawables.add(new DrawableLine(curve, Color.BLUE));
+					@Override
+					public boolean clear(Coord c) {
+						Pitch p = (Pitch) getSource();
+						if (c.getX() < p.getMinX() + clearance)
+							return false;
+						if (c.getX() > p.getMaxX() - clearance)
+							return false;
+						if (c.getY() < p.getMinY() + clearance)
+							return false;
+						if (c.getY() > p.getMaxY() - clearance)
+							return false;
+						return true;
+					}
 
-		if (other.intersects(curve))
-			return r;
+					private double distance(Coord c) {
+						double d, x = c.getX(), y = c.getY();
 
+						Pitch p = (Pitch) getSource();
+						d = Math.abs(p.getMinX() - x);
+						d = Math.min(d, Math.abs(p.getMaxX() - x));
+						d = Math.min(d, Math.abs(p.getMaxY() - y));
+						d = Math.min(d, Math.abs(p.getMinY() - y));
+						return d;
+					}
+
+					@Override
+					protected boolean isMovingTowards(Curve c) {
+						double initD = distance(c.pos(0));
+						for (double i = 0.01; i <= 1; i += 0.01)
+							if (distance(c.pos(i)) < initD)
+								return true;
+						return false;
+					}
+
+					@Override
+					public Coord[][] getWaypoint(Snapshot s, Coord curr,
+							Curve c) {
+						Coord prev = c.pos(0), p1 = null, p2 = null, end = c
+								.pos(1);
+						double t1, t2;
+						Pitch pitch = s.getPitch();
+
+						// if starting in clearance area, take shortest path out
+						if (!clear(prev)) {
+							return new Coord[][] { new Coord[] { new Coord(
+									Math.min(
+									pitch.getMaxX(),
+									Math.max(pitch.getMinX(), prev.getX())),
+									Math.min(
+											pitch.getMaxY(),
+											Math.max(pitch.getMinY(),
+													prev.getY()))) } };
+
+						}
+
+						// find enter and exit points of the clearance area
+						for (t1 = 0.01; t1 <= 1; t1 += 0.01) {
+							p1 = c.pos(t1);
+							if (!clear(p1)) {
+								break;
+							}
+						}
+						for (t2 = 0.01; t2 <= 1; t2 += 0.01) {
+							p2 = c.pos(t2);
+							if (clear(p2)) {
+								break;
+							}
+						}
+						// may not have an exit point
+						boolean hasSecondPoint = t2 != 1;
+						int numWayPoints = (hasSecondPoint) ? 2 : 1;
+						Coord[] wayPoints = new Coord[numWayPoints];
+						if (hasSecondPoint) {
+							wayPoints[0] = p1;
+							wayPoints[1] = p2;
+						} else {
+							wayPoints[0] = p1;
+							System.out.println("Implementation needed!");
+							boolean horiz = p1.getX() < pitch.getMaxX()
+									&& p1.getX() > pitch.getMinX();
+							if (horiz) {
+
+							} else {
+
+							}
+
+						}
+
+						return new Coord[][] { wayPoints };
+					}
+				}
+		// new Obstical(s.getBall().getPosition(),
+		// Obstical.ROBOT_CLEARANCE)
+		};
+
+		Coord pos = s.getBalle().getPosition();
+		for (Obstacle o : obstacles) {
+
+			// if we are inside the clearance area, just assume the obstical is
+			// in the way
+			// This is not applicable if the end point is also within the
+			// clearance area
+			// this is not really an obstacle if our path is already moving away
+			if (!o.clear(start) && o.isMovingTowards(c)) {
+				return o;
+			}
+
+			// (o.getSource() instanceof Pitch)
+
+			// check that the current path does not go from out of
+			// the object clearance to into the clearance
+			boolean in = !o.clear(pos);
+			for (double i = 0; i < 1; i += 0.01) {
+				boolean newIn = !o.clear(c.pos(i));
+				if (!in && newIn) {
+					return o;
+				}
+			}
+		}
 		return null;
 	}
 
-	protected Coord getWaypoint(Snapshot s, Coord obs, Orientation o) {
-		Line l, out, walls[];
-		walls = s.getPitch().getWalls();
-		l = new Line(obs, obs.add(new Coord(0, 10).rotate(o)));
-
-		Coord wallIntersect = null;
-		for (Line wall : walls) {
-			wallIntersect = l.getIntersect(wall);
-			if (wallIntersect != null)
-				break;
-		}
-
-		out = new Line(wallIntersect, obs);
-		drawables.add(new DrawableLine(out, Color.RED));
-		return out.midpoint();
-	}
+	//
+	// protected Coord getWaypoint(Snapshot s, Obstacle obs, Orientation o) {
+	// Line l, out, walls[];
+	// walls = s.getPitch().getWalls();
+	// l = new Line(obs, obs.add(new Coord(0, 10).rotate(o)));
+	//
+	// Coord wallIntersect = null;
+	// for (Line wall : walls) {
+	// wallIntersect = l.getIntersect(wall);
+	// if (wallIntersect != null)
+	// break;
+	// }
+	//
+	// out = new Line(wallIntersect, obs);
+	// drawables.add(new DrawableLine(out, Color.RED));
+	//
+	// Coord c = new Coord(0, obs.getClearance());
+	// c = c.rotate(o).add(obs);
+	//
+	// return c;
+	// }
 
 	protected Curve getCurve(Vector<Coord> path) {
 		// Convert to array.
@@ -129,9 +258,22 @@ public class SimplePathFinder implements PathFinder {
 		return interpolator.getCurve(out, startAngle, endAngle);
 	}
 
+	protected Stack<Coord> best(ArrayList<Stack<Coord>> hopefulls) {
+		Stack<Coord> currBest = null;
+		for (Stack<Coord> each : hopefulls) {
+
+			if (currBest == null
+					|| getCurve(currBest).length() > getCurve(each).length())
+				currBest = each;
+		}
+		return currBest;
+
+	}
+
 	// Visual Output \\
 
 	ArrayList<Drawable> drawables = new ArrayList<Drawable>();
+
 	public ArrayList<Drawable> getDrawables() {
 		return drawables;
 	}

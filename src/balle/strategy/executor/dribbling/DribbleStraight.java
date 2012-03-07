@@ -12,14 +12,13 @@ import balle.world.objects.Robot;
 
 public class DribbleStraight implements Executor {
 
-    Snapshot                 currentState = null;
     boolean                  isMoving     = false;
 
     private static final int INIT_SPEED   = 320;
     private int              speed        = INIT_SPEED;
 
     @Override
-    public boolean isFinished() {
+	public boolean isFinished(Snapshot snapshot) {
         // Dribbling never finishes
         // we assume it to dribble straight until told to cancel everything
         return false;
@@ -30,57 +29,53 @@ public class DribbleStraight implements Executor {
      * answers the question "is the ball nearby?"
      */
     @Override
-    public boolean isPossible() {
-        if (currentState == null)
+	public boolean isPossible(Snapshot snapshot) {
+		if (snapshot == null)
             return false;
 
-        FieldObject ball = currentState.getBall();
+		FieldObject ball = snapshot.getBall();
         Coord target = ball.getPosition();
 
-        Robot robot = currentState.getBalle();
+		Robot robot = snapshot.getBalle();
         Coord currentPosition = robot.getPosition();
 
         if ((target == null) || (currentPosition == null)) {
             return false;
         }
 
-        return ballIsCloseToRobot();
+		return ballIsCloseToRobot(snapshot);
     }
 
-    public boolean ballIsCloseToRobot() {
+	public boolean ballIsCloseToRobot(Snapshot snapshot) {
 
         double DISTANCE_THRESHOLD = 0.15;
         double EPSILON = 0.000001;
-        return currentState.getBalle().getPosition().dist(currentState.getBall().getPosition())
+        return snapshot.getBalle().getPosition().dist(snapshot.getBall().getPosition())
                 - DISTANCE_THRESHOLD <= EPSILON;
     }
 
     @Override
-    public void updateState(Snapshot snapshot) {
-        currentState = snapshot;
-    }
+	public void step(Controller controller, Snapshot snapshot) {
 
-    @Override
-    public void step(Controller controller) {
-
-        if (currentState == null) {
+		if (snapshot == null) {
             return;
         }
 
-        if ((!isPossible()) && (!isMoving)) // If we're not currently moving and
+        if ((!isPossible(snapshot)) && (!isMoving)) // If we're not currently moving and
                                             // it is not possible
             return; // to drible, do not do it!
 
-        if (ballIsCloseToRobot()) {
+		if (ballIsCloseToRobot(snapshot)) {
             if (!isMoving) {
                 controller.forward(INIT_SPEED);
                 isMoving = true;
             }
-            blockBall(controller, currentState.getBall().getPosition(), currentState.getBalle());
+			blockBall(controller, snapshot.getBall().getPosition(),
+					snapshot.getBalle());
         } else {
             // Ball away from robot
-            Coord target = currentState.getBall().getPosition();
-            Robot robot = currentState.getBalle();
+			Coord target = snapshot.getBall().getPosition();
+			Robot robot = snapshot.getBalle();
             Coord currentPosition = robot.getPosition();
             double angleToTarget = target.sub(currentPosition).orientation().atan2styleradians();
 

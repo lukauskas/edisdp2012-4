@@ -45,25 +45,12 @@ public class Game extends AbstractPlanner {
     }
 
     @Override
-    public void updateState(Snapshot snapshot) {
-        // Update the state for ourselves
-        super.updateState(snapshot);
-        // Propagate the state to our strategies
-        defensiveStrategy.updateState(snapshot);
-        goToBallStrategy.updateState(snapshot);
-        turningExecutor.updateState(snapshot);
-        pickBallFromWallStrategy.updateState(snapshot);
-    }
+    public void onStep(Controller controller, Snapshot snapshot) {
 
-    @Override
-    public void step(Controller controller) {
-
-        Snapshot snapshot = getSnapshot();
         Robot ourRobot = snapshot.getBalle();
         Robot opponent = snapshot.getOpponent();
         Ball ball = snapshot.getBall();
         Goal ownGoal = snapshot.getOwnGoal();
-        Goal opponentsGoal = snapshot.getOpponentsGoal();
         Pitch pitch = snapshot.getPitch();
 
         Orientation targetOrientation = ball.getPosition()
@@ -99,7 +86,7 @@ public class Game extends AbstractPlanner {
                             .findMaxRotationMaintaintingPossession(ball, true);
                     System.out.println(orien);
                     turningExecutor.setTargetOrientation(orien);
-                    turningExecutor.step(controller);
+					turningExecutor.step(controller, snapshot);
                     if (ourRobot.findMaxRotationMaintaintingPossession(ball,
                             true).degrees() < 10)
                         controller.kick();
@@ -109,7 +96,7 @@ public class Game extends AbstractPlanner {
                             .findMaxRotationMaintaintingPossession(ball, false);
                     System.out.println(orien);
                     turningExecutor.setTargetOrientation(orien);
-                    turningExecutor.step(controller);
+					turningExecutor.step(controller, snapshot);
                     if (ourRobot.findMaxRotationMaintaintingPossession(ball,
                             false).degrees() > -10)
                         controller.kick();
@@ -119,25 +106,25 @@ public class Game extends AbstractPlanner {
                 && (opponent.isFacingGoal(ownGoal))) {
             LOG.info("Defending");
             // Let defensiveStrategy deal with it!
-            defensiveStrategy.step(controller);
+			defensiveStrategy.step(controller, snapshot);
             addDrawables(defensiveStrategy.getDrawables());
         } else if (ball.isNearWall(pitch)) {
-            pickBallFromWallStrategy.step(controller);
+			pickBallFromWallStrategy.step(controller, snapshot);
             addDrawables(pickBallFromWallStrategy.getDrawables());
         } else if (ball.isNear(ourRobot)
                 && (ourRobot.isApproachingTargetFromCorrectSide(ball,
-                        getSnapshot().getOpponentsGoal()))) {
+						snapshot.getOpponentsGoal()))) {
             if (Math.abs(ourRobot.getAngleToTurn(targetOrientation)) > (Math.PI / 4)) {
                 LOG.info("Ball is near our robot, turning to it");
                 turningExecutor.setTargetOrientation(targetOrientation);
-                turningExecutor.step(controller);
+				turningExecutor.step(controller, snapshot);
             } else {
                 // Go forward!
                 controller.setWheelSpeeds(400, 400);
             }
         } else {
             // Approach ball
-            goToBallStrategy.step(controller);
+			goToBallStrategy.step(controller, snapshot);
             addDrawables(goToBallStrategy.getDrawables());
 
         }

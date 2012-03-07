@@ -5,13 +5,14 @@ import org.apache.log4j.Logger;
 import balle.controller.Controller;
 import balle.main.SimpleWorldGUI;
 import balle.world.AbstractWorld;
+import balle.world.Snapshot;
 import balle.world.processing.AbstractWorldProcessor;
 
 public class StrategyRunner extends AbstractWorldProcessor {
 
-	private final Controller controller;
 	private final static Logger LOG = Logger.getLogger(StrategyRunner.class);
 
+	private Controller controller;
 	private Strategy currentStrategy;
 	private final SimpleWorldGUI gui;
 
@@ -39,11 +40,12 @@ public class StrategyRunner extends AbstractWorldProcessor {
 	}
 
 	@Override
-	protected void actionOnChange() {
+    protected synchronized void actionOnChange() {
 		if (currentStrategy != null) {
-			currentStrategy.updateState(getSnapshot());
+
+			Snapshot snapshot = getSnapshot();
 			try {
-				currentStrategy.step(controller);
+				currentStrategy.step(controller, snapshot);
 			} catch (Exception e) {
 				LOG.error("Strategy raised exception" + e.toString());
 
@@ -60,7 +62,7 @@ public class StrategyRunner extends AbstractWorldProcessor {
 	/**
 	 * Stops the current running strategy
 	 */
-	public void stopStrategy() {
+    public synchronized void stopStrategy() {
 		if (currentStrategy != null) {
 			LOG.info("Stopping " + currentStrategy.getClass().getName());
 			currentStrategy.stop(controller);
@@ -74,13 +76,23 @@ public class StrategyRunner extends AbstractWorldProcessor {
 	 * @param strategy
 	 *            the strategy
 	 */
-	public void startStrategy(Strategy strategy) {
+    public synchronized void startStrategy(Strategy strategy) {
 		// Stop the old strategy
 		if (currentStrategy != null)
 			stopStrategy();
 		// Start the new strategy
 		currentStrategy = strategy;
 		LOG.info("Started " + currentStrategy.getClass().getName());
+	}
+
+	/**
+	 * Used by the simulator to switch robots
+	 * 
+	 * @param controller
+	 */
+	public void setController(Controller controller) {
+		this.controller.stop();
+		this.controller = controller;
 	}
 
 	@Override

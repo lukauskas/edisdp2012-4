@@ -4,8 +4,8 @@ public class Velocity extends Coord {
 
     protected final double timeDelta;
 
-    public Velocity(double x, double y, double timeDelta, boolean estimated) {
-        super(x / timeDelta, y / timeDelta, estimated);
+	public Velocity(double x, double y, double timeDelta, int estimatedFrames) {
+		super(x / timeDelta, y / timeDelta, estimatedFrames);
         this.timeDelta = timeDelta;
     }
 
@@ -16,7 +16,7 @@ public class Velocity extends Coord {
 
     public Velocity(Coord coord, double timeDelta) {
         this(coord.getX() / timeDelta, coord.getY() / timeDelta, timeDelta,
-                coord.isEstimated());
+				coord.getEstimatedFrames());
     }
 
     public Velocity adjustLength(double newTimeDelta) {

@@ -17,8 +17,6 @@ public class GoToObjectPurePF implements MovementExecutor {
 
 	private StaticFieldObject target;
 
-	private Snapshot currentState;
-
 	private double stopDistance = 0;
 	private static final double ZERO_TH = Math.PI * 0.01;
 
@@ -42,10 +40,10 @@ public class GoToObjectPurePF implements MovementExecutor {
 	}
 
 	@Override
-	public boolean isFinished() {
+	public boolean isFinished(Snapshot snapshot) {
 		if (true)
 			return false;
-		Robot robot = currentState.getBalle();
+		Robot robot = snapshot.getBalle();
 		Coord currentPosition = robot.getPosition();
 		if ((target == null) || (currentPosition == null)) {
 			return false;
@@ -54,8 +52,8 @@ public class GoToObjectPurePF implements MovementExecutor {
 	}
 
 	@Override
-	public boolean isPossible() {
-		Robot robot = currentState.getBalle();
+	public boolean isPossible(Snapshot snapshot) {
+		Robot robot = snapshot.getBalle();
 		Coord currentPosition = robot.getPosition();
 		Orientation currentOrientation = robot.getOrientation();
 		Coord targetPosition = (target != null) ? target.getPosition() : null;
@@ -64,14 +62,8 @@ public class GoToObjectPurePF implements MovementExecutor {
 	}
 
 	@Override
-	public void updateState(Snapshot snapshot) {
-		this.currentState = snapshot;
-
-	}
-
-	@Override
-	public void step(Controller controller) {
-		Robot r = currentState.getBalle();
+	public void step(Controller controller, Snapshot snapshot) {
+		Robot r = snapshot.getBalle();
 		Orientation rO = r.getOrientation();
 		Coord rP = r.getPosition();
 		double rFO = rP.angleBetween(rP.add(rO.getUnitCoord()),
