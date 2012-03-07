@@ -62,7 +62,7 @@ public class Coord {
 	}
 
 	public Coord div(double scalar) {
-		return new Coord(x / scalar, y / scalar, estimated);
+		return new Coord(x / scalar, y / scalar, estimatedFrames);
 	}
 
 	public double dist(Coord c) {
