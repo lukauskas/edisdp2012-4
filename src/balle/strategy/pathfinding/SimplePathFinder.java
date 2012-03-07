@@ -30,7 +30,6 @@ public class SimplePathFinder implements PathFinder {
 	public Curve getPath(Snapshot s, Coord start, Orientation startAngle,
 			Coord end, Orientation endAngle) {
 		drawables = new ArrayList<Drawable>();
-		System.out.println(start);
 		// Initialise temporary variables.
 		this.start = start;
 		this.startAngle = startAngle;
