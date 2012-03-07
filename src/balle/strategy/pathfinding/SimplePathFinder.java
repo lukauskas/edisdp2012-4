@@ -139,62 +139,46 @@ public class SimplePathFinder implements PathFinder {
 								return true;
 						return false;
 					}
+					
+					public Coord constrain(Coord c, Pitch p) {
+						double 	x = c.getX(),
+								y = c.getY();
+						return new Coord(
+								Math.min(p.getMaxX(), Math.max(p.getMinX(), x)),
+ Math.min(
+								p.getMaxY(), Math.max(p.getMinY(), y))
+								);
+					}
 
 					@Override
 					public Coord[][] getWaypoint(Snapshot s, Coord curr,
 							Curve c) {
-						Coord prev = c.pos(0), p1 = null, p2 = null, end = c
-								.pos(1);
-						double t1, t2;
-						Pitch pitch = s.getPitch();
 
-						// if starting in clearance area, take shortest path out
-						if (!clear(prev)) {
-							return new Coord[][] { new Coord[] { new Coord(
-									Math.min(
-									pitch.getMaxX(),
-									Math.max(pitch.getMinX(), prev.getX())),
-									Math.min(
-											pitch.getMaxY(),
-											Math.max(pitch.getMinY(),
-													prev.getY()))) } };
+						Pitch pitch = (Pitch) getSource();
 
-						}
-
-						// find enter and exit points of the clearance area
-						for (t1 = 0.01; t1 <= 1; t1 += 0.01) {
-							p1 = c.pos(t1);
-							if (!clear(p1)) {
-								break;
+						ArrayList<Coord> waypoints = new ArrayList<Coord>();
+						for (double t = 0; t <= 1; t += 0.01) {
+							Coord point = c.pos(t);
+							Coord cons = constrain(point, pitch);
+							if (!point.equals(cons)) {
+								waypoints.add(cons);
 							}
 						}
-						for (t2 = 0.01; t2 <= 1; t2 += 0.01) {
-							p2 = c.pos(t2);
-							if (clear(p2)) {
-								break;
-							}
+						
+						if (waypoints.size() == 0) {
+							System.out
+									.println("aaaaaaaaaaaaaaaaaaaaaaaaaaa34dss7");
+							return new Coord[0][0];
 						}
-						// may not have an exit point
-						boolean hasSecondPoint = t2 != 1;
-						int numWayPoints = (hasSecondPoint) ? 2 : 1;
-						Coord[] wayPoints = new Coord[numWayPoints];
-						if (hasSecondPoint) {
-							wayPoints[0] = p1;
-							wayPoints[1] = p2;
-						} else {
-							wayPoints[0] = p1;
-							System.out.println("Implementation needed!");
-							boolean horiz = p1.getX() < pitch.getMaxX()
-									&& p1.getX() > pitch.getMinX();
-							if (horiz) {
-
-							} else {
-
-							}
-
+						if (waypoints.size() == 1) {
+							System.out
+									.println("bbbbbbbbbbbbbbbbbbbbbbbbbbbbw45732");
+							return new Coord[][] { new Coord[] { waypoints
+									.get(0) } };
 						}
-
-						return new Coord[][] { wayPoints };
+						Coord[] wpa = new Coord[] { waypoints.get(0),
+								waypoints.get(waypoints.size() - 1) };
+						return new Coord[][] { wpa };
 					}
 				}
 		// new Obstical(s.getBall().getPosition(),
