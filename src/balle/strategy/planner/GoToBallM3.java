@@ -25,6 +25,8 @@ public class GoToBallM3 extends GoToBall {
     private int stage;
     private static final double BALL_SAFE_GAP = 0.25;
     private RotateToOrientationExecutor turnExecutor = new FaceAngle();
+    private RotateToOrientationExecutor preciseTurnExecutor = new FaceAngle(
+            Math.PI / 32);
 
     private static Logger LOG = Logger.getLogger(GoToBallM3.class);
 
@@ -84,7 +86,7 @@ public class GoToBallM3 extends GoToBall {
         else
         {
             LOG.info("Going to the ball");
-            GoToObject strategy = new GoToObject(turnExecutor);
+            GoToObject strategy = new GoToObject(preciseTurnExecutor);
 			strategy.setStopDistance(0.00);
 
 			if (stage == 2) {
@@ -122,7 +124,7 @@ public class GoToBallM3 extends GoToBall {
                     .getAngleToTurnToTarget(targetCoord);
             
             if (Math.abs(angleToFaceTarget) > Math.PI / 8) {
-				if (!turnExecutor.isTurning()) {
+                if (!turnExecutor.isTurning()) {
 					turnExecutor.setTargetOrientation(targetCoord.sub(
 							ourRobot.getPosition()).orientation());
 					LOG.info("Turning to target");
@@ -164,7 +166,7 @@ public class GoToBallM3 extends GoToBall {
                         .dist(snapshot.getBall().getPosition()) < 0.11
 						&& !ourRobot.getFacingLine().intersects(
                                 snapshot.getOpponentsGoal().getGoalLine())
-                        && (!turnExecutor.isTurning())) {
+                        && (!preciseTurnExecutor.isTurning())) {
                     LOG.trace("dist "
                             + ourRobot.getFrontSide().midpoint()
                                     .dist(snapshot.getBall().getPosition()));
