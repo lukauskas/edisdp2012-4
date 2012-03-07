@@ -74,7 +74,6 @@ public class BezierNav implements OrientedMovementExecutor {
 
 			}));
 	
-	
 	private PathFinder pathfinder;
 	private Curve c;
 
@@ -83,6 +82,9 @@ public class BezierNav implements OrientedMovementExecutor {
 	private Orientation orient;
 	private Coord p0, p3;
 
+	// James, sorry, it was just easier this way.
+	private double p = 1, i = 1, d = 1;
+	private PID left = new PID(p, d, i), right = new PID(p, d, i);
 
 	public BezierNav(PathFinder pathfinder) {
 		this.pathfinder = pathfinder;
@@ -199,9 +201,6 @@ public class BezierNav implements OrientedMovementExecutor {
 								.getVelocity().abs()) + basicV));
 				left = pid.convert(left, curentLeftP);
 				right = pid.convert(right, curentRightP);
-				System.out.println(basicV);
-				System.out.println(curentLeftP + "  aa  " + curentRightP);
-				System.out.println(left + "  aa  " + right);
 			}
 			lastAngleTime = snapshot.getTimestamp();
 			lastAngle = robot.getOrientation();
