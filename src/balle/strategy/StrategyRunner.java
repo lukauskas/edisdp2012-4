@@ -51,9 +51,15 @@ public class StrategyRunner extends AbstractWorldProcessor {
 		if (currentStrategyA != null && currentStrategyB != null) {
 
 			Snapshot snapshot = getSnapshot();
+			// Snapshot centered on opponent robot (Balle from snapshot
+			// becomes opponent in snapshot2 etc
+			Snapshot snapshot2 = new Snapshot(snapshot.getBalle(),
+					snapshot.getOpponent(), snapshot.getBall(),
+					snapshot.getOwnGoal(), snapshot.getOpponentsGoal(),
+					snapshot.getPitch(), snapshot.getTimestamp());
 			try {
 				currentStrategyA.step(controllerA, snapshot);
-				currentStrategyB.step(controllerB, snapshot);
+				currentStrategyB.step(controllerB, snapshot2);
 			} catch (Exception e) {
 				LOG.error("Strategy raised exception" + e.toString());
 

@@ -40,10 +40,10 @@ public class StratTab extends JPanel implements ActionListener {
 	private boolean isBlue;
 
 	private StrategyRunner strategyRunner;
-	private Controller controllerA;
-	private Controller controllerB;
+	// private Controller controllerA;
+	// private Controller controllerB;
 	private AbstractWorld worldA;
-	private AbstractWorld worldB;
+	// private AbstractWorld worldB;
 	private Simulator simulator;
 
 	private final static String GREEN_LABEL_TEXT = "Select X strategy";
@@ -54,10 +54,10 @@ public class StratTab extends JPanel implements ActionListener {
 			StrategyRunner strategyRunner,
 			Simulator simulator) {
 		super();
-		this.controllerA = controllerA;
-		this.controllerB = controllerB;
+		// this.controllerA = controllerA;
+		// this.controllerB = controllerB;
 		this.worldA = worldA;
-		this.worldB = worldB;
+		// this.worldB = worldB;
 		this.simulator = simulator;
 		// Initialise strategy runner
 		this.strategyRunner = strategyRunner;
@@ -93,6 +93,7 @@ public class StratTab extends JPanel implements ActionListener {
 		c.gridx = 0;
 		c.gridy = 3;
 		c.gridwidth = 2;
+		redStrategy.setEnabled(simulator != null);
 		controlPanel.add(redStrategy, c);
 
 		startButton = new JButton("Start");
