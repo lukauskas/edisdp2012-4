@@ -18,7 +18,7 @@ public class StrategyLogPane extends JPanel {
 	private final DefaultTableModel model;
 	private final JTable table;
 
-    private final static int MAX_ROWS = 20;
+    private final static int MAX_ROWS = 15;
 
     public StrategyLogPane() {
 		super();
@@ -29,9 +29,7 @@ public class StrategyLogPane extends JPanel {
 		// table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 
 		model.addColumn("Message");
-		model.addColumn("Level");
 		table.getColumnModel().getColumn(0).setWidth(500);
-		table.getColumnModel().getColumn(1).setMaxWidth(0);
 
 		this.setLayout(new BorderLayout());
 
@@ -44,7 +42,6 @@ public class StrategyLogPane extends JPanel {
 			model.removeRow(0);
 
 		String[] rowData = new String[model.getColumnCount()];
-		rowData[1] = e.getLevel().toString();
 		rowData[0] = (String) e.getMessage();
 
         model.addRow(rowData);
@@ -62,7 +59,7 @@ class EvenOddRenderer implements TableCellRenderer {
 
 		Color foreground, background;
 		row = table.convertRowIndexToModel(row);
-		String s = table.getModel().getValueAt(row, 1).toString();
+        String s = table.getModel().getValueAt(row, 0).toString();
 		if (s == "INFO") {
 			foreground = Color.blue;
 				background = Color.white;

@@ -9,24 +9,24 @@ public class Coord {
 	private final double x;
 	private final double y;
 
-	private final boolean estimated;
+	private final int estimatedFrames;
 
 	public Coord(double x, double y) {
 		super();
 		this.x = x;
 		this.y = y;
-		this.estimated = false;
+		this.estimatedFrames = 0;
 	}
 
-	public Coord(double x, double y, boolean estimated) {
+	public Coord(double x, double y, int estimatedFrames) {
 		super();
 		this.x = x;
 		this.y = y;
-		this.estimated = estimated;
+		this.estimatedFrames = estimatedFrames;
 	}
 
-	public Coord(Coord coordinate, boolean estimated) {
-		this(coordinate.getX(), coordinate.getY(), estimated);
+	public Coord(Coord coordinate, int estimatedFrames) {
+		this(coordinate.getX(), coordinate.getY(), estimatedFrames);
 	}
 
 	public double getX() {
@@ -50,15 +50,15 @@ public class Coord {
 	}
 
 	public Coord sub(Coord c) {
-		return new Coord(x - c.getX(), y - c.getY(), estimated);
+		return new Coord(x - c.getX(), y - c.getY(), estimatedFrames);
 	}
 
 	public Coord add(Coord c) {
-		return new Coord(x + c.getX(), y + c.getY(), estimated);
+		return new Coord(x + c.getX(), y + c.getY(), estimatedFrames);
 	}
 
 	public Coord mult(double scalar) {
-		return new Coord(x * scalar, y * scalar, estimated);
+		return new Coord(x * scalar, y * scalar, estimatedFrames);
 	}
 
 	public Coord div(double scalar) {
@@ -82,11 +82,22 @@ public class Coord {
 	 * coordinates that are updated from velocities e.g. when the vision returns
 	 * -1 are.
 	 * 
+	 * Equivalent to checking that getEstimatedFrames() > 1
+	 * 
 	 * @return true or false depending whether the coordinates were estimated or
 	 *         not
 	 */
 	public boolean isEstimated() {
-		return estimated;
+		return estimatedFrames > 0;
+	}
+
+	/**
+	 * Get the number of frames since this object last had a known location
+	 * 
+	 * @return the number of estimated frames
+	 */
+	public int getEstimatedFrames() {
+		return estimatedFrames;
 	}
 
 	@Override

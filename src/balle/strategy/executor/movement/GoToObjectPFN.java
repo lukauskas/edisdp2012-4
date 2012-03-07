@@ -110,7 +110,8 @@ public class GoToObjectPFN implements MovementExecutor {
             return;
 
         Pos opponent;
-        if (snapshot.getOpponent().getOrientation() == null)
+        if ((snapshot.getOpponent().getOrientation() == null)
+                || (snapshot.getOpponent().getPosition() == null))
             opponent = null;
         else
             opponent = new Pos(new Point(snapshot.getOpponent().getPosition()

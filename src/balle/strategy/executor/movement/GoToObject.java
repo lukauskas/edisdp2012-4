@@ -105,10 +105,8 @@ public class GoToObject implements MovementExecutor {
 
 					turningExecutor.step(controller, snapshot);
 				} else {
-					if (!isMoving) {
-						controller.forward(movementSpeed);
-						isMoving = true;
-					}
+                    controller.forward(movementSpeed);
+                    isMoving = true;
 				}
 			}
 		}
