@@ -36,7 +36,6 @@ public class Line {
 
 		return (((minX() - a.getX() < 0.00001) && (maxX() - a.getX()) > -0.00001) && ((minY()
 				- a.getY() < 0.00001) && (maxY() - a.getY() > -0.00001)));
-
 	}
 
 	/**
@@ -155,6 +154,10 @@ public class Line {
 		}
 	}
 
+	public Coord getCenter() {
+		return new Coord((getA().getX() + getB().getX()) / 2,
+				(getA().getY() + getB().getY()) / 2);
+	}
 	/**
 	 * Get the angle of the line from the horizontal (going from A to B).
 	 * 
