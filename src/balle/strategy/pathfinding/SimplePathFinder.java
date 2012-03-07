@@ -98,42 +98,99 @@ public class SimplePathFinder implements PathFinder {
 					public boolean clear(Coord c) {
 						return c.dist(this) > clearance;
 					}
-		}, /*
-			 * new Obstacle(s.getPitch(), Obstacle.WALL_CLEARANCE) {
-			 * 
-			 * @Override public boolean clear(Coord c) { Pitch p = (Pitch)
-			 * getSource(); if (c.getX() < p.getMinX() + clearance) return
-			 * false; if (c.getX() > p.getMaxX() - clearance) return false; if
-			 * (c.getY() < p.getMinY() + clearance) return false; if (c.getY() >
-			 * p.getMaxY() - clearance) return false; return true; }
-			 * 
-			 * private double distance(Coord c) { double d, x = c.getX(), y =
-			 * c.getY();
-			 * 
-			 * Pitch p = (Pitch) getSource(); d = Math.abs(p.getMinX() - x); d =
-			 * Math.min(d, Math.abs(p.getMaxX() - x)); d = Math.min(d,
-			 * Math.abs(p.getMaxY() - y)); d = Math.min(d, Math.abs(p.getMinY()
-			 * - y)); return d; }
-			 * 
-			 * @Override protected boolean isMovingTowards(Curve c) { double
-			 * initD = distance(c.pos(0)); for (double i = 0.01; i <= 1; i +=
-			 * 0.01) if (distance(c.pos(i)) < initD) return true; return false;
-			 * }
-			 * 
-			 * @Override public Coord getWaypoint(Snapshot s, Orientation o,
-			 * Curve curveSoFar) { Coord prev = curveSoFar.pos(0), intersect =
-			 * null, pos1 = curveSoFar .pos(1);
-			 * 
-			 * if (!clear(prev)) { System.out
-			 * .println("MEEEEEEEEEEEEEEEEEEEEEEEEEEEEHHHHHHHHHHHHHHHHHHHHHHHH!!"
-			 * );
-			 * 
-			 * } else { for (double i = 0.01; i <= 1; i += 0.01) { intersect =
-			 * curveSoFar.pos(i); if (!clear(intersect)) { break; } } }
-			 * 
-			 * return intersect.add(pos1.sub(intersect).getUnitCoord()
-			 * .mult(0.1)); } }
-			 */
+				}, new Obstacle(s.getPitch(), Obstacle.WALL_CLEARANCE) {
+
+					@Override
+					public boolean clear(Coord c) {
+						Pitch p = (Pitch) getSource();
+						if (c.getX() < p.getMinX() + clearance)
+							return false;
+						if (c.getX() > p.getMaxX() - clearance)
+							return false;
+						if (c.getY() < p.getMinY() + clearance)
+							return false;
+						if (c.getY() > p.getMaxY() - clearance)
+							return false;
+						return true;
+					}
+
+					private double distance(Coord c) {
+						double d, x = c.getX(), y = c.getY();
+
+						Pitch p = (Pitch) getSource();
+						d = Math.abs(p.getMinX() - x);
+						d = Math.min(d, Math.abs(p.getMaxX() - x));
+						d = Math.min(d, Math.abs(p.getMaxY() - y));
+						d = Math.min(d, Math.abs(p.getMinY() - y));
+						return d;
+					}
+
+					@Override
+					protected boolean isMovingTowards(Curve c) {
+						double initD = distance(c.pos(0));
+						for (double i = 0.01; i <= 1; i += 0.01)
+							if (distance(c.pos(i)) < initD)
+								return true;
+						return false;
+					}
+
+					@Override
+					public Coord[][] getWaypoint(Snapshot s, Orientation o,
+							Curve c) {
+						Coord prev = c.pos(0), p1, p2, end = c.pos(1);
+						double t1, t2;
+						Pitch pitch = s.getPitch();
+
+						// if starting in clearance area, take shortest path out
+						if (!clear(prev)) {
+							return new Coord[][] { new Coord[] { new Coord(
+									Math.min(
+									pitch.getMaxX(),
+									Math.max(pitch.getMinX(), prev.getX())),
+									Math.min(
+											pitch.getMaxY(),
+											Math.max(pitch.getMinY(),
+													prev.getY()))) } };
+
+						} else {
+							// find enter and exit points of the clearance area
+							boolean firstChange = false;
+							for (t1 = 0.01; t1 <= 1; t1 += 0.01) {
+								p1 = c.pos(t1);
+								if (!clear(p1)) {
+									break;
+								}
+							}
+							for (t2 = 0.01; t2 <= 1; t2 += 0.01) {
+								p2 = c.pos(t2);
+								if (clear(p2)) {
+									break;
+								}
+							}
+						}
+						// may not have an exit point
+						boolean hasSecondPoint = t2 != 1;
+						int numWayPoints = (hasSecondPoint) ? 2 : 1;
+						Coord[] wayPoints = new Coord[2];
+						if (hasSecondPoint) {
+							wayPoints[0] = p1;
+							wayPoints[1] = p2;
+						} else {
+							wayPoints[0] = p1;
+							System.out.println("Implementation needed!");
+							boolean horiz = p1.getX() < pitch.getMaxX()
+									&& p1.getX() > pitch.getMinX();
+							if (horiz) {
+
+							} else {
+
+							}
+
+						}
+
+						return new Coord[][] { wayPoints };
+					}
+				}
 		// new Obstical(s.getBall().getPosition(),
 		// Obstical.ROBOT_CLEARANCE)
 		};
