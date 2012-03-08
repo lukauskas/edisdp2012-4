@@ -1,5 +1,6 @@
 package balle.simulator;
 
+import java.util.LinkedList;
 import java.util.Random;
 
 import javax.swing.JFrame;
@@ -46,6 +47,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 	private final SoftBot yellowSoft = new SoftBot();
 
 	private long startTime;
+	private long lastStepTime;
 
 	private CircleShape ballShape;
 	private final Random rand = new Random();
@@ -87,7 +89,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 	@Override
 	public void initTest(boolean arg0) {
 
-		startTime = System.currentTimeMillis();
+		lastStepTime = startTime = System.currentTimeMillis();
 
 		// centre the camera
 		setCamera(new Vec2(1.22f * scale, 1.22f * scale),
@@ -143,14 +145,16 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 
 	@Override
 	public void update() {
-		blue.updateRobot(blueSoft);
-		yellow.updateRobot(yellowSoft);
+		long dt = System.currentTimeMillis() - lastStepTime;
+		blue.updateRobot(blueSoft, dt);
+		yellow.updateRobot(yellowSoft, dt);
 		super.update();
 
 		// Update world with new information, throtteling the frame rate
+		reader.update();
 		if (System.currentTimeMillis() - lastFrameTime > 1000f / Globals.SIMULATED_VISON_FRAMERATE) {
 			lastFrameTime = System.currentTimeMillis();
-			this.reader.update();
+			reader.propagate();
 		}
 	}
 
@@ -161,7 +165,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 										 * James: Do not use. Use initTest()
 										 * instead.
 										 */
-		this.noisy = noisy;
+		Simulator.noisy = noisy;
 	}
 
 	public static Simulator createSimulator() {
@@ -201,7 +205,6 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 		private final Body kicker;
 
 		private final Body robot;
-
 		private final float robotWidth = Globals.ROBOT_WIDTH * scale / 2;
 		private final float robotLength = Globals.ROBOT_LENGTH * scale / 2;
 
@@ -211,6 +214,9 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 		private Vec2 kickPos = new Vec2((robotLength + kickerLength), 0);
 		private final PolygonShape kickerShape;
 		private static final float kickForce = 20f;
+
+		private float lastRPower;
+		private float lastLPower;
 
 		// wheel power (-1 for lock and 0 for float and (0,100] for power )
 
@@ -273,7 +279,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 					kicker.getTransform());
 		}
 
-		public void updateRobot(SoftBot bot) {
+		public void updateRobot(SoftBot bot, long dt) {
 
 			double blueAng = robot.getAngle();
 
@@ -291,21 +297,24 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 				}
 			}
 
-			float vl = linearVelocity(bot) * scale; // linear velocity
-			float va = angularVelocityRadians(bot); // angular velocity
+			float vl = linearVelocity(bot, dt) * scale; // linear velocity
+			float va = angularVelocityRadians(bot, dt); // angular velocity
 			robot.setLinearVelocity(new Vec2((float) (vl * Math.cos(blueAng)),
 					(float) (vl * Math.sin(blueAng))));
 			;
 			robot.setAngularVelocity(va);
 			// System.out.println(va);
 
-			if (bot.isKicking() && ballInRange()) {
-				// Kick
-				float xF, yF;
-				xF = (float) (kickForce * Math.cos(blueAng));
-				yF = (float) (kickForce * Math.sin(blueAng));
-				ball.applyForce(new Vec2(xF, yF), ball.getWorldCenter());
-				bot.stopKicking();
+            if (bot.isKicking()) {
+                if (ballInRange()) {
+                    // Kick
+                    float xF, yF;
+                    xF = (float) (kickForce * Math.cos(blueAng));
+                    yF = (float) (kickForce * Math.sin(blueAng));
+                    ball.applyForce(new Vec2(xF, yF), ball.getWorldCenter());
+                }
+
+                bot.stopKicking();
 			}
 		}
 
@@ -313,17 +322,108 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 			return robot;
 		}
 
-		private float angularVelocityRadians(SoftBot bot) {
-			float vl = Globals.powerToVelocity(bot.getLeftWheelSpeed());
-			float vr = Globals.powerToVelocity(bot.getRightWheelSpeed());
-			float w = Globals.ROBOT_TRACK_WIDTH;
-			return (vr - vl) / w;
+		private float getSlipableWheelVelocity(SoftBot bot,
+				float nonSlipVelocity, Vec2 wheelPos, long dt) {
+			// current velocity of wheel
+			Vec2 unitForward = new Vec2((float) Math.cos(bot.getBody()
+					.getAngle()), (float) Math.sin(bot.getBody().getAngle()));
+			float vi = Vec2.dot(
+					bot.getBody().getLinearVelocityFromLocalPoint(wheelPos),
+					unitForward) / scale;
+
+			// no-slip velocity
+			float vf = nonSlipVelocity;
+
+			// find acceleration of wheel
+			// NOTE: must convert dt to seconds (td/1000)
+			float dts = dt / 1000f;
+			float a = (vf - vi) / dts;
+			// Account for slip
+			// if above maximum (Globals.MaxWheelAccel)
+			if (Math.abs(a) > Globals.MaxWheelAccel) {
+				// use Globals.WheelSlipAccel to calculate velocities
+				float slipAccel = Globals.SlipWheelAccel;
+				if (a < 0)
+					slipAccel = -slipAccel;
+				vf = vi + (dts * slipAccel);
+			}
+
+			return vf;
 		}
 
-		private float linearVelocity(SoftBot bot) {
-			float vl = Globals.powerToVelocity(bot.getLeftWheelSpeed());
-			float vr = Globals.powerToVelocity(bot.getRightWheelSpeed());
-			return (vl + vr) / 2f;
+		private float getLeftWheelVelocity(SoftBot bot, long dt) {
+			float p = bot.getLeftWheelSpeed();
+			float a = (p - lastLPower) / dt;
+			float maxA = Globals.MAX_MOTOR_POWER_ACCEL;
+			// System.out.println("lw a:" + a + "lw p: " + p);
+			if (Math.abs(a) > maxA) {
+				if (a > 0) {
+					p = lastLPower + (maxA * dt);
+				} else {
+					p = lastLPower - (maxA * dt);
+				}
+			}
+			return getSlipableWheelVelocity(bot, Globals.powerToVelocity(p),
+					Globals.ROBOT_RIGHT_WHEEL_POS, dt);
+		}
+
+		private float getRightWheelVelocity(SoftBot bot, long dt) {
+			float p = bot.getRightWheelSpeed();
+			float a = (p - lastRPower) / dt;
+			float maxA = Globals.MAX_MOTOR_POWER_ACCEL;
+			if (Math.abs(a) > maxA) {
+				if (a > 0) {
+					p = lastRPower + (maxA * dt);
+				} else {
+					p = lastRPower - (maxA * dt);
+				}
+			}
+			return getSlipableWheelVelocity(bot, Globals.powerToVelocity(p),
+					Globals.ROBOT_RIGHT_WHEEL_POS, dt);
+		}
+
+		private float angularVelocityRadians(SoftBot bot, long dt) {
+			float vl = getLeftWheelVelocity(bot, dt);
+			float vr = getRightWheelVelocity(bot, dt);
+			float w = Globals.ROBOT_TRACK_WIDTH;
+			float avf = (vr - vl) / w; // final (new) angualar velocity
+			// cap accleration
+			float maxA = Globals.MAX_ROBOT_ANG_ACCEL;
+			float avi = bot.getBody().getAngularVelocity(); // current angular
+															// velocity
+			float a = (avf - avi) / dt; // angular acceleration
+			// if (Math.abs(a) > Globals.MAX_ROBOT_ANG_ACCEL
+			// && (Math.abs(avi) > Math.abs(avf))) {
+			// System.out.println("Ang Accel above max. Accel: " + a);
+			// if (a > 0) {
+			// avf = avi + (maxA * dt);
+			// } else {
+			// avf = avi - (maxA * dt);
+			// }
+			// }
+			return avf;
+		}
+
+		private float linearVelocity(SoftBot bot, long dt) {
+			float vl = getLeftWheelVelocity(bot, dt);
+			float vr = getRightWheelVelocity(bot, dt);
+			float vlf = (vl + vr) / 2f;
+			// cap accleration
+			float maxA = Globals.MAX_ROBOT_ANG_ACCEL;
+			float vli = bot.getBody().getAngularVelocity(); // current angular
+															// velocity
+															// float a = (vlf -
+															// vli) / dt; //
+															// angular
+															// acceleration
+			// if (Math.abs(a) > Globals.MAX_ROBOT_LINEAR_ACCEL) {
+			// if (a > 0) {
+			// vlf = vli + (maxA * dt);
+			// } else {
+			// vlf = vli - (maxA * dt);
+			// }
+			// }
+			return vlf;
 		}
 	}
 
@@ -334,6 +434,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 	 * here.
 	 */
 	class SimulatorReader extends Reader {
+		LinkedList<VisionPackage> history = new LinkedList<VisionPackage>();
 
 		private long getTimeStamp() {
 			return System.currentTimeMillis() - startTime;
@@ -363,6 +464,35 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 					+ getTimeStamp();
 		}
 
+		/**
+		 * propagate using the history and the vision delay
+		 */
+		public void propagate() {
+			long targetTs = getTimeStamp();
+			if (noisy) {
+				targetTs -= Globals.SIMULATED_VISON_DELAY;
+			}
+			VisionPackage vp, next;
+			do {
+				vp = history.poll();
+				next = history.peek();
+			} while (vp != null && next != null
+					&& next.getTimestamp() < targetTs);
+
+			// default package
+			if (vp == null) {
+				vp = new VisionPackage(-1, -1, -1, -1, -1, -1, -1, -1, targetTs);
+				System.out.println("waiting for vision delay.");
+			}
+
+			super.propagate(vp.getYPosX(), vp.getYPosY(), vp.getYRad(),
+					vp.getBPosX(), vp.getBPosY(), vp.getBRad(),
+					vp.getBallPosX(), vp.getBallPosY(), vp.getTimestamp());
+		}
+
+		/**
+		 * update the reader with the latest info
+		 */
 		public void update() {
 			float yPosX, yPosY, yRad, bPosX, bPosY, bRad, ballPosX, ballPosY;
 
@@ -439,8 +569,9 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 				bRad = genRandDeg(angSd, bRad);
 			}
 
-			super.propagate(yPosX, yPosY, yRad, bPosX, bPosY, bRad, ballPosX,
-					ballPosY, timestamp);
+			VisionPackage vp = new VisionPackage(yPosX, yPosY, yRad, bPosX,
+					bPosY, bRad, ballPosX, ballPosY, timestamp);
+			history.add(vp);
 		}
 
 		private float genRand(float sd, float mean) {
@@ -571,4 +702,5 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 		blueSoft.setBody(blue.getBody());
 		yellowSoft.setBody(yellow.getBody());
 	}
+
 }

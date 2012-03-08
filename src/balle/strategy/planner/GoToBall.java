@@ -29,7 +29,7 @@ public class GoToBall extends AbstractPlanner {
 
     private static final double AVOIDANCE_GAP = 0.5; // Meters
     private static final double OVERSHOOT_GAP = 0.7; // Meters
-    private static final double DIST_DIFF_THRESHOLD = 0.2; // Meters
+	private static final double DIST_DIFF_THRESHOLD = 0.2; // Meters
 
     private boolean approachTargetFromCorrectSide;
 
@@ -38,6 +38,9 @@ public class GoToBall extends AbstractPlanner {
         approachTargetFromCorrectSide = false;
     }
 
+    public void setStopDistance(double distance) {
+        executorStrategy.setStopDistance(distance);
+    }
     public MovementExecutor getExecutorStrategy() {
         return executorStrategy;
     }
@@ -52,7 +55,7 @@ public class GoToBall extends AbstractPlanner {
      * @param movementExecutor
      *            the movement executor
      * @param approachTargetFromCorrectSide
-     *            whether to always appraoch target from correct side
+     *            whether to always approach target from correct side
      */
     public GoToBall(MovementExecutor movementExecutor,
             boolean approachTargetFromCorrectSide) {
@@ -250,7 +253,7 @@ public class GoToBall extends AbstractPlanner {
     }
 
     @Override
-    public void onStep(Controller controller, Snapshot snapshot) {
+	protected void onStep(Controller controller, Snapshot snapshot) {
 		StaticFieldObject target = getTarget(snapshot);
 
 		if ((snapshot == null) || (snapshot.getBalle().getPosition() == null)

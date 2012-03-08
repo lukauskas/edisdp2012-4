@@ -49,7 +49,6 @@ public class StrategyRunner extends AbstractWorldProcessor {
 	@Override
 	protected void actionOnChange() {
 		if (currentStrategyA != null && currentStrategyB != null) {
-
 			Snapshot snapshot = getSnapshot();
 			// Snapshot centered on opponent robot (Balle from snapshot
 			// becomes opponent in snapshot2 etc
@@ -95,6 +94,7 @@ public class StrategyRunner extends AbstractWorldProcessor {
 	 * @param strategy
 	 *            the strategy
 	 */
+
 	public void startStrategy(Strategy strategyA, Strategy strategyB) {
 		// Stop the old strategy
 		if (currentStrategyA != null && currentStrategyB != null)
