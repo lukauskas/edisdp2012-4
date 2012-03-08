@@ -51,8 +51,7 @@ public class StratTab extends JPanel implements ActionListener {
 
 	public StratTab(Controller controllerA, Controller controllerB,
 			AbstractWorld worldA, AbstractWorld worldB,
-			StrategyRunner strategyRunner,
-			Simulator simulator) {
+			StrategyRunner strategyRunner, Simulator simulator) {
 		super();
 		// this.controllerA = controllerA;
 		// this.controllerB = controllerB;
@@ -148,6 +147,7 @@ public class StratTab extends JPanel implements ActionListener {
 		controlPanel.add(resetButton, c);
 
 		this.add(controlPanel);
+
 	}
 
 	// Listener for button clicks
@@ -157,15 +157,23 @@ public class StratTab extends JPanel implements ActionListener {
 			if (startButton.getText().equals("Start")) {
 				String selectedStrategyA = (String) greenStrategy
 						.getSelectedItem();
-				String selectedStrategyB = (String) redStrategy
-						.getSelectedItem();
+
+				String selectedStrategyB;
+				if (simulator == null) {
+					selectedStrategyB = "NullStrategy";
+				} else {
+					selectedStrategyB = (String) redStrategy.getSelectedItem();
+				}
+
 				try {
+					System.out.println((String) redStrategy.getSelectedItem());
 					strategyRunner.startStrategy(
 							StrategyFactory.createClass(selectedStrategyA),
 							StrategyFactory.createClass(selectedStrategyB));
 				} catch (UnknownDesignatorException e) {
 					LOG.error("Cannot start starategy \"" + selectedStrategyA
 							+ "\": " + e.toString());
+					System.out.println("Valiant effort, chaps");
 					return;
 				}
 				startButton.setText("Stop");

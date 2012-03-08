@@ -179,7 +179,6 @@ public class Runner {
 		}
 
 		initialiseGUI(controllerA, null, world, null, strategyLog, null);
-		System.out.println("NOOOOOOO THIS SHOULDN'T HAPPEN");
 		// Create visionInput buffer
 		visionInput = new SocketVisionReader();
 		visionInput.addListener(world);
