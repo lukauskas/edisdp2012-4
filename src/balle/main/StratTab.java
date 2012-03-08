@@ -43,17 +43,19 @@ public class StratTab extends JPanel implements ActionListener {
 	private Controller controller;
 	private AbstractWorld world;
 	private Simulator simulator;
+    private StrategyFactory     strategyFactory;
 
 	private final static String LABEL_TEXT = "Select strategy";
 
-	public StratTab(Controller controller, AbstractWorld world,
-			StrategyRunner strategyRunner, Simulator simulator) {
+    public StratTab(Controller controller, AbstractWorld world, StrategyRunner strategyRunner,
+            Simulator simulator, StrategyFactory strategyFactory) {
 		super();
 		this.controller = controller;
 		this.world = world;
 		this.simulator = simulator;
 		// Initialise strategy runner
 		this.strategyRunner = strategyRunner;
+        this.strategyFactory = strategyFactory;
 
 		// Class Variables
 		top = new JPanel();
@@ -121,7 +123,7 @@ public class StratTab extends JPanel implements ActionListener {
 				String selectedStrategy = stratTabs
 						.get(menu.getSelectedIndex());
 				try {
-					strategyRunner.startStrategy(StrategyFactory
+                    strategyRunner.startStrategy(strategyFactory
 							.createClass(selectedStrategy));
 				} catch (UnknownDesignatorException e) {
 					LOG.error("Cannot start starategy \"" + selectedStrategy
@@ -200,7 +202,7 @@ public class StratTab extends JPanel implements ActionListener {
 		return out;
 	}
 
-	public final void addStrategy(String designator) {
+    public final void addStrategy(String designator) {
 		stratTabs.add(designator);
 		strings = getStrings();
 		this.remove(menu);
