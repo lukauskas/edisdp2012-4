@@ -624,6 +624,9 @@ public class SimulatorWorld {
 	 */
 	public void setRobotStatesFromSnapshot(Snapshot s, boolean balleIsBlue,
 			float lastLPower, float lastRPower) {
+
+		// TODO set ball position?
+
 		ball.getPosition().set(-100f, -100f);
 		Robot balle = balleIsBlue ? blue : yellow;
 		Robot opponent = balleIsBlue ? yellow : blue;
@@ -632,7 +635,7 @@ public class SimulatorWorld {
 
 		balle.world.objects.Robot b = s.getBalle();
 		Coord bp = b.getPosition().mult(SCALE);
-		Coord bv = b.getVelocity().mult(1 / 1000);
+		Coord bv = b.getVelocity().mult(SCALE * 1000);
 		balle.getBody().setLinearVelocity(
 				new Vec2((float) bv.getX(), (float) bv.getY()));
 		balle.getBody().setTransform(
@@ -641,7 +644,7 @@ public class SimulatorWorld {
 
 		balle.world.objects.Robot o = s.getOpponent();
 		Coord op = b.getPosition().mult(SCALE);
-		Coord ov = b.getVelocity().mult(1 / 1000);
+		Coord ov = b.getVelocity().mult(SCALE * 1000);
 		balle.getBody().setLinearVelocity(
 				new Vec2((float) ov.getX(), (float) ov.getY()));
 		balle.getBody().setTransform(
