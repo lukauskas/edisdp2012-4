@@ -104,7 +104,7 @@ public class SoftBot implements Controller {
 	}
 
 	@Override
-	public void kick() {
+    public synchronized void kick() {
 		kick = true;
 	}
 
@@ -123,6 +123,10 @@ public class SoftBot implements Controller {
 
 	public void setBody(Body body) {
 		this.body = body;
+	}
+	
+	public Body getBody() {
+		return body;
 	}
 
 	public float getDesiredAngle() {
@@ -156,11 +160,11 @@ public class SoftBot implements Controller {
 		return rotating;
 	}
 
-	public boolean isKicking() {
+    public synchronized boolean isKicking() {
 		return kick;
 	}
 	
-	public void stopKicking() {
+    public synchronized void stopKicking() {
 		kick = false;
 	}
 

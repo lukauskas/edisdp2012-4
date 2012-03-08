@@ -23,12 +23,8 @@ public class Robot extends RectangularObject {
     public boolean possessesBall(Ball ball) {
         if ((ball.getPosition() == null) || (getPosition() == null))
             return false;
-        Coord possessVector = new Coord(this.getHeight() / 2.0, 0);
-        possessVector = possessVector.rotate(getOrientation());
 
-        Coord possessPosition = getPosition().add(possessVector);
-
-        double distance = ball.getPosition().dist(possessPosition);
+        double distance = getFrontSide().dist(ball.getPosition());
         return distance <= Globals.ROBOT_POSSESS_DISTANCE + ball.getRadius();
     }
 

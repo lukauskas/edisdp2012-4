@@ -16,12 +16,14 @@ public class GoToObject implements MovementExecutor {
 	private double stopDistance = 0.2;
 
 	private final static double EPSILON = 0.00001;
+	private final static double DISTANCE_DIFF_TO_TURN_FOR = 0.3;
+
+	public final static int DEFAULT_MOVEMENT_SPEED = 500;
 
 	protected StaticFieldObject target = null;
 	private boolean isMoving = false;
 
-	private final static double DISTANCE_DIFF_TO_TURN_FOR = 0.3;
-	private final static int MOVEMENT_SPEED = 500;
+	private int movementSpeed = DEFAULT_MOVEMENT_SPEED;
 
 	RotateToOrientationExecutor turningExecutor = null;
 
@@ -103,14 +105,16 @@ public class GoToObject implements MovementExecutor {
 
 					turningExecutor.step(controller, snapshot);
 				} else {
-					if (!isMoving) {
-						controller.forward(MOVEMENT_SPEED);
-						isMoving = true;
-					}
+                    controller.forward(movementSpeed);
+                    isMoving = true;
 				}
 			}
 		}
 
+	}
+
+	public void setMovementSpeed(int movementSpeed) {
+		this.movementSpeed = movementSpeed;
 	}
 
 	@Override

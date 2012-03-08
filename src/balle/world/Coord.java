@@ -1,33 +1,32 @@
 package balle.world;
 
-import java.awt.Point;
-
 import balle.world.objects.FieldObject;
 import balle.world.objects.Pitch;
+import balle.world.objects.Point;
 
 public class Coord {
 
 	private final double x;
 	private final double y;
 
-	private final boolean estimated;
+	private final int estimatedFrames;
 
 	public Coord(double x, double y) {
 		super();
 		this.x = x;
 		this.y = y;
-		this.estimated = false;
+		this.estimatedFrames = 0;
 	}
 
-	public Coord(double x, double y, boolean estimated) {
+	public Coord(double x, double y, int estimatedFrames) {
 		super();
 		this.x = x;
 		this.y = y;
-		this.estimated = estimated;
+		this.estimatedFrames = estimatedFrames;
 	}
 
-	public Coord(Coord coordinate, boolean estimated) {
-		this(coordinate.getX(), coordinate.getY(), estimated);
+	public Coord(Coord coordinate, int estimatedFrames) {
+		this(coordinate.getX(), coordinate.getY(), estimatedFrames);
 	}
 
 	public double getX() {
@@ -51,15 +50,19 @@ public class Coord {
 	}
 
 	public Coord sub(Coord c) {
-		return new Coord(x - c.getX(), y - c.getY(), estimated);
+		return new Coord(x - c.getX(), y - c.getY(), estimatedFrames);
 	}
 
 	public Coord add(Coord c) {
-		return new Coord(x + c.getX(), y + c.getY(), estimated);
+		return new Coord(x + c.getX(), y + c.getY(), estimatedFrames);
 	}
 
 	public Coord mult(double scalar) {
-		return new Coord(x * scalar, y * scalar, estimated);
+		return new Coord(x * scalar, y * scalar, estimatedFrames);
+	}
+
+	public Coord div(double scalar) {
+		return new Coord(x / scalar, y / scalar, estimatedFrames);
 	}
 
 	public double dist(Coord c) {
@@ -79,11 +82,22 @@ public class Coord {
 	 * coordinates that are updated from velocities e.g. when the vision returns
 	 * -1 are.
 	 * 
+	 * Equivalent to checking that getEstimatedFrames() > 1
+	 * 
 	 * @return true or false depending whether the coordinates were estimated or
 	 *         not
 	 */
 	public boolean isEstimated() {
-		return estimated;
+		return estimatedFrames > 0;
+	}
+
+	/**
+	 * Get the number of frames since this object last had a known location
+	 * 
+	 * @return the number of estimated frames
+	 */
+	public int getEstimatedFrames() {
+		return estimatedFrames;
 	}
 
 	@Override
@@ -150,6 +164,19 @@ public class Coord {
 	}
 
 	/**
+	 * Calculates the angle from this coordinate to another from (0,0).
+	 * 
+	 * TODO write test
+	 * 
+	 * @param to
+	 *            coordinate to.
+	 * @return Angle between this and to to using (0,0) as a reference point.
+	 */
+	public Orientation angleBetween(Coord to) {
+		return new Coord(0, 0).angleBetween(this, to);
+	}
+
+	/**
 	 * Calculates the angle from one coordinate to another from this point.
 	 * 
 	 * TODO write test
@@ -161,32 +188,42 @@ public class Coord {
 	 * @return Angle between from and to from this reference point.
 	 */
 	public Orientation angleBetween(Coord from, Coord to) {
-		Orientation out;
+		Coord a = from.sub(this);
+		Coord b = to.sub(this);
 
-		Coord dFrom, dTo;
-		dFrom = from.sub(this);
-		dTo = to.sub(this);
+		return b.getOrientation().sub(a.getOrientation());
 
-		double dotProduct, dX, dY, mulAbs, adbc;
-		dX = (dFrom.x * dTo.x);
-		dY = (dFrom.y * dTo.y);
-		mulAbs = dFrom.abs() * dTo.abs();
-		dotProduct = (dX + dY) / mulAbs;
+		/*
+		 * Orientation out;
+		 * 
+		 * Coord dFrom, dTo; dFrom = from.sub(this); dTo = to.sub(this);
+		 * 
+		 * double dotProduct, dX, dY, mulAbs, adbc; dX = (dFrom.x * dTo.x); dY =
+		 * (dFrom.y * dTo.y); mulAbs = dFrom.abs() * dTo.abs(); dotProduct = (dX
+		 * + dY) / mulAbs;
+		 * 
+		 * adbc = from.x * to.y - from.y * to.x; if (adbc >= 0) { out = new
+		 * Orientation(Math.acos(dotProduct), true); } else { out = new
+		 * Orientation(-Math.acos(dotProduct), true); }
+		 * 
+		 * return out;
+		 */
+	}
 
-		adbc = from.x * to.y - from.y * to.x;
-		if (adbc >= 0) {
-			out = new Orientation(Math.acos(dotProduct), true);
-		} else {
-			out = new Orientation(-Math.acos(dotProduct), true);
-		}
+	public Orientation getOrientation() {
+		return new Orientation(Math.atan2((double) getY(), (double) getX()));
+	}
 
-		return out;
+	public Coord opposite() {
+		return new Coord(-getX(), -getY());
+	}
+
+	public Coord getUnitCoord() {
+		return mult(1 / abs());
 	}
 
 	public Point getPoint() {
-		Point out = new Point();
-		out.setLocation(x, y);
-		return out;
+		return new Point(this);
 	}
 
 	@Override
