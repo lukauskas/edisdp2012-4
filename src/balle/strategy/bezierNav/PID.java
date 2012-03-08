@@ -72,6 +72,6 @@ public class PID {
 		kp = desX - currX;
 		kd = ((double) (x-xd))/HISTORY;
 
-		return kp * p + ki * i + kd * d;
+		return currX + (kp * p) + (ki * i) + (kd * d);
 	}
 }

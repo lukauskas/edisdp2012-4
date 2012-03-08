@@ -61,7 +61,7 @@ public class BezierNav implements OrientedMovementExecutor {
 										// to adjusted p3)
 	private double stopAngle = Math.PI / 13; // angle of robot vs desired final
 												// angle (orient)
-	private PID pid = new PID(0.3, 0.7, 0.5);
+	private PID pid = new PID(0.25, 4, 1);
 	private Orientation lastAngle;
 	private long lastAngleTime;
 
