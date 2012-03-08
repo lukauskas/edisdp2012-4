@@ -17,6 +17,8 @@ import org.jbox2d.dynamics.joints.WeldJointDef;
 
 import balle.io.reader.Reader;
 import balle.misc.Globals;
+import balle.world.Coord;
+import balle.world.Snapshot;
 
 public class SimulatorWorld {
 
@@ -39,19 +41,48 @@ public class SimulatorWorld {
 	private CircleShape ballShape;
 	private final Random rand = new Random();
 
+	private boolean noisy;
+
+	private long visionDelay = Globals.SIMULATED_VISON_DELAY;
+
 	// Increases sizes, but keeps real-world SCALE; jbox2d acts unrealistically
 	// at a small SCALE
 	protected final static float SCALE = 10;
 
+	public SimulatorWorld(boolean noisy) {
+		this.noisy = noisy;
+	}
+
 	public void setWorld(World w) {
 		world = w;
+	}
+
+	public World getWorld() {
+		return world;
 	}
 
 	public void setStartTime(long t) {
 		startTime = t;
 	}
 
-	protected SimulatorReader getReader() {
+
+	protected boolean isNoisy() {
+		return noisy;
+	}
+
+	protected void setNoisy(boolean noisy) {
+		this.noisy = noisy;
+	}
+
+	public SoftBot getBlueSoft() {
+		return blueSoft;
+	}
+
+	public SoftBot getYellowSoft() {
+		return yellowSoft;
+	}
+
+	public SimulatorReader getReader() {
 		return reader;
 	}
 
@@ -214,7 +245,7 @@ public class SimulatorWorld {
 	 * Output to World: All code refering to the output from the simulator goes
 	 * here.
 	 */
-	class SimulatorReader extends Reader {
+	public class SimulatorReader extends Reader {
 		LinkedList<VisionPackage> history = new LinkedList<VisionPackage>();
 
 		private long getTimeStamp() {
@@ -250,8 +281,8 @@ public class SimulatorWorld {
 		 */
 		public void propagate() {
 			long targetTs = getTimeStamp();
-			if (Simulator.isNoisy()) {
-				targetTs -= Globals.SIMULATED_VISON_DELAY;
+			if (noisy) {
+				targetTs -= visionDelay;
 			}
 			VisionPackage vp, next;
 			do {
@@ -263,7 +294,6 @@ public class SimulatorWorld {
 			// default package
 			if (vp == null) {
 				vp = new VisionPackage(-1, -1, -1, -1, -1, -1, -1, -1, targetTs);
-				System.out.println("waiting for vision delay.");
 			}
 
 			super.propagate(vp.getYPosX(), vp.getYPosY(), vp.getYRad(),
@@ -293,7 +323,7 @@ public class SimulatorWorld {
 
 			long timestamp = getTimeStamp();
 
-			if (Simulator.isNoisy()) {
+			if (noisy) {
 				// set standard deviations
 				float posSd = Globals.VISION_COORD_NOISE_SD;
 				float angSd = Globals.VISION_ANGLE_NOISE_SD;
@@ -348,6 +378,14 @@ public class SimulatorWorld {
 		public void propagateGoals() {
 			super.propagateGoals(0, Globals.PITCH_WIDTH, 0, 0);
 		}
+	}
+
+	public long getVisionDelay() {
+		return visionDelay;
+	}
+
+	public void setVisionDelay(long visionDelay) {
+		this.visionDelay = visionDelay;
 	}
 
 	protected class Robot {
@@ -578,6 +616,37 @@ public class SimulatorWorld {
 			// }
 			return vlf;
 		}
+	}
+
+	/**
+	 * sets the robot positions and linear velocities from a given snapshot
+	 * (ball is taken off the field)
+	 */
+	public void setRobotStatesFromSnapshot(Snapshot s, boolean balleIsBlue,
+			float lastLPower, float lastRPower) {
+		ball.getPosition().set(-100f, -100f);
+		Robot balle = balleIsBlue ? blue : yellow;
+		Robot opponent = balleIsBlue ? yellow : blue;
+		balle.lastLPower = lastLPower;
+		balle.lastLPower = lastRPower;
+
+		balle.world.objects.Robot b = s.getBalle();
+		Coord bp = b.getPosition().mult(SCALE);
+		Coord bv = b.getVelocity().mult(1 / 1000);
+		balle.getBody().setLinearVelocity(
+				new Vec2((float) bv.getX(), (float) bv.getY()));
+		balle.getBody().setTransform(
+				new Vec2((float) bp.getX(), (float) bp.getY()),
+				(float) b.getOrientation().radians());
+
+		balle.world.objects.Robot o = s.getOpponent();
+		Coord op = b.getPosition().mult(SCALE);
+		Coord ov = b.getVelocity().mult(1 / 1000);
+		balle.getBody().setLinearVelocity(
+				new Vec2((float) ov.getX(), (float) ov.getY()));
+		balle.getBody().setTransform(
+				new Vec2((float) op.getX(), (float) op.getY()),
+				(float) b.getOrientation().radians());
 	}
 
 }

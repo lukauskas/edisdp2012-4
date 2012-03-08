@@ -4,15 +4,22 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.World;
+
 import balle.controller.Controller;
+import balle.main.SimpleWorldGUI;
 import balle.main.drawable.Circle;
 import balle.main.drawable.Dot;
 import balle.main.drawable.Drawable;
 import balle.misc.Globals;
+import balle.simulator.SimulatorWorld;
 import balle.strategy.curve.Curve;
 import balle.strategy.executor.movement.OrientedMovementExecutor;
 import balle.strategy.pathfinding.PathFinder;
+import balle.world.BasicWorld;
 import balle.world.Coord;
+import balle.world.EmptySnapshot;
 import balle.world.Orientation;
 import balle.world.Snapshot;
 import balle.world.objects.Robot;
@@ -65,6 +72,9 @@ public class BezierNav implements OrientedMovementExecutor {
 	private PID pid = new PID(0.25, 4, 1);
 	private final boolean USE_PID = false;
 
+	SimulatorWorld simulator;
+	BasicWorld world;
+
 	private Orientation lastAngle;
 	private long lastAngleTime;
 
@@ -85,14 +95,19 @@ public class BezierNav implements OrientedMovementExecutor {
 	private Orientation orient;
 	private Coord p0, p3;
 
-	// James, sorry, it was just easier this way.
-	private double p = 1, i = 1, d = 1;
-	private PID left = new PID(p, d, i), right = new PID(p, d, i);
-
-	private ArrayList<ControllerHistoryElement> controllerHistory;
+	private ArrayList<ControllerHistoryElement> controllerHistory; // newer
+																	// snapshots
+																	// at the
+																	// end
 
 	public BezierNav(PathFinder pathfinder) {
 		this.pathfinder = pathfinder;
+		simulator = new SimulatorWorld(false);
+		SimpleWorldGUI g = new SimpleWorldGUI(world);
+		simulator.setWorld(new World(new Vec2(), true));
+		simulator.initWorld();
+		simulator.setVisionDelay(0);
+		controllerHistory = new ArrayList<ControllerHistoryElement>();
 	}
 
 	private boolean isMoveStraitFinished(Orientation botOrient) {
@@ -232,14 +247,61 @@ public class BezierNav implements OrientedMovementExecutor {
 	 * @return Estimated snapshot of where the robots actually are
 	 */
 	private Snapshot getLatencyAdjustedSnapshot(Snapshot s) {
-		// ///////////////////////////////////////////////
-		//  //
-		// ///////////////////////////////////////////////
+		if(world == null) {
+			world = new BasicWorld(true, false, s.getPitch());
+			simulator.getReader().addListener(world);
+			simulator.getReader().propagateGoals();
+			simulator.getReader().propagatePitchSize();
+			controllerHistory.add(new ControllerHistoryElement(0, 0,
+					new EmptySnapshot(s.getOpponentsGoal(), s.getOwnGoal(), s
+							.getPitch(), 0)));
 
-		// setup a simulator using the current snapshot
+		}
+		long currentTime = s.getTimestamp();
+		long simulatorTime = currentTime - Globals.SIMULATED_VISON_DELAY;
+
+		// clean up the history (ensure there is at least one element left in
+		// history)
+		while (controllerHistory.size() > 1
+				&& controllerHistory.get(0).getSnapshot().getTimestamp() < simulatorTime) {
+			controllerHistory.remove(0);
+		}
+
+		// setup a simulator using the current snapshot (assume we are blue)
+		float lastLPower = 0, lastRPower = 0;
+		if (controllerHistory.size() > 0) {
+			ControllerHistoryElement lastState = controllerHistory.get(0);
+			lastLPower = lastState.getPowerLeft();
+			lastRPower = lastState.getPowerRight();
+		}
+		simulator.setRobotStatesFromSnapshot(s, true, lastLPower,
+				lastRPower);
+		simulator.setStartTime(simulatorTime);
+		
 		// use the controllerHistory to simulate the wheelspeeds
-		// retrieve the positions
-		return null;
+		//// run a simulation while adjusting wheel speeds
+		long maxTD = 50; // low values may make this less accurate
+		for (int i = 0; i < controllerHistory.size(); i++) {
+			ControllerHistoryElement curr = controllerHistory.get(i);
+			long nextTime = currentTime;
+			if(i < controllerHistory.size() - 1)
+				nextTime = controllerHistory.get(i + 1).getSnapshot().getTimestamp();
+			for(long tD = maxTD; simulatorTime < currentTime;tD = Math.min(simulatorTime + tD, nextTime) - simulatorTime) {
+				simulator.getBlueSoft().setWheelSpeeds(900, 900);
+				// curr.getPowerLeft(),curr.getPowerRight());
+				simulator.update(tD);
+				simulator.getWorld().step(tD / 1000f, 8, 3);
+				simulator.getReader().update();
+				simulator.getReader().propagate();
+				System.out.println(tD);
+				System.out
+						.println(world.getSnapshot().getBalle().getPosition());
+				simulatorTime += tD;
+			}
+		}
+
+		// retrieve the new snapshot
+		return world.getSnapshot();
 	}
 
 	@Override

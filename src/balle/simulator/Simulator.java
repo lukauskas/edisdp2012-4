@@ -18,22 +18,17 @@ import balle.misc.Globals;
 
 public class Simulator extends TestbedTest implements AbstractVisionReader {
 
-	private static boolean noisy = true;
-
-	private final SoftBot blueSoft = new SoftBot();
-	private final SoftBot yellowSoft = new SoftBot();
-
 	private long lastStepTime;
 	private long lastFrameTime;
 
-	private SimulatorWorld worldWrapper = new SimulatorWorld();;
+	private SimulatorWorld worldWrapper = new SimulatorWorld(false);;
 
 	public SoftBot getBlueSoft() {
-		return blueSoft;
+		return worldWrapper.getBlueSoft();
 	}
 
 	public SoftBot getYellowSoft() {
-		return yellowSoft;
+		return worldWrapper.getYellowSoft();
 	}
 
 	@Override
@@ -41,12 +36,13 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 		return "Super Cool Simulator";
 	}
 
-	public static boolean setIsNoisy(boolean noisy) {
-		return Simulator.noisy = noisy;
+	public boolean setIsNoisy(boolean noisy) {
+		worldWrapper.setNoisy(noisy);
+		return noisy;
 	}
 
-	public static boolean isNoisy() {
-		return noisy;
+	public boolean isNoisy() {
+		return worldWrapper.isNoisy();
 	}
 
 	@Override
@@ -131,11 +127,11 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 										 * James: Do not use. Use initTest()
 										 * instead.
 										 */
-		Simulator.noisy = noisy;
+		worldWrapper.setNoisy(noisy);
 	}
 
 	public static Simulator createSimulator() {
-		return createSimulator(noisy);
+		return createSimulator(true);
 	}
 
 	/**
