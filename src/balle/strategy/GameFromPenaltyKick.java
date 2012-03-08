@@ -13,9 +13,14 @@ public class GameFromPenaltyKick extends Game {
 	public long timeToKick = 0;
 	public long timeToGame = 0;
 
-	public GameFromPenaltyKick() throws UnknownDesignatorException {
+    public GameFromPenaltyKick() {
 		super();
 	}
+
+    @FactoryMethod(designator = "Game (Penalty Kick)")
+    public static GameFromPenaltyKick gameFromPenaltyKickFactory() {
+        return new GameFromPenaltyKick();
+    }
 
 	@Override
 	public void onStep(Controller controller, Snapshot snapshot) {

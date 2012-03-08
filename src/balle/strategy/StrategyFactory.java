@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
+import javassist.Modifier;
+
 import org.apache.log4j.Logger;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
@@ -33,12 +35,16 @@ public class StrategyFactory {
         for (Method m : annotatedMethods)
         {
             String designator = m.getAnnotation(FactoryMethod.class).designator();
-            if (m.getDeclaringClass().isInstance(AbstractPlanner.class))
+            if (!AbstractPlanner.class.isAssignableFrom(m.getReturnType()))
             {
-                LOG.debug("Skipping designator " + designator
-                        + " as it is not defined in an instance of AbstractPlanner");
+                LOG.warn("Skipping designator " + designator
+                        + " as it is does not return an instance of AbstractPlanner");
+                continue;
+            } else if (!Modifier.isStatic(m.getModifiers())) {
+                LOG.warn("Skipping designator " + designator + " as it is not static");
                 continue;
             }
+
             runnableStrategies.put(designator, m);
         }
         LOG.debug("Found " + runnableStrategies.size() + " runnable strategies");

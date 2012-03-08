@@ -3,9 +3,13 @@ package balle.strategy;
 import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
+import balle.strategy.executor.movement.GoToObjectPFN;
 import balle.strategy.executor.turning.IncFaceAngle;
 import balle.strategy.executor.turning.RotateToOrientationExecutor;
 import balle.strategy.planner.AbstractPlanner;
+import balle.strategy.planner.DefensiveStrategy;
+import balle.strategy.planner.GoToBall;
+import balle.strategy.planner.KickFromWall;
 import balle.world.Coord;
 import balle.world.Orientation;
 import balle.world.Snapshot;
@@ -24,17 +28,21 @@ public class Game extends AbstractPlanner {
     Strategy pickBallFromWallStrategy;
     RotateToOrientationExecutor turningExecutor;
 
-    public Game() throws UnknownDesignatorException {
-        defensiveStrategy = StrategyFactory.createClass("DefensiveStrategy");
+    @FactoryMethod(designator = "Game")
+    public static Game gameFactory() {
+        return new Game();
+    }
+
+    public Game() {
+        defensiveStrategy = new DefensiveStrategy(new GoToObjectPFN(0.1f));
         // TODO: implement a new strategy that inherits from GoToBall but always
         // approaches the ball from correct angle. (This can be done by always
         // pointing robot
         // to a location that is say 0.2 m before the ball in correct direction
         // and then, once the robot reaches it, pointing it to the ball itself
         // so it reaches it.
-        goToBallStrategy = StrategyFactory.createClass("GoToBallPFN");
-        // TODO: UPDATE THIS
-        pickBallFromWallStrategy = StrategyFactory.createClass("BallNearWall");
+        goToBallStrategy = new GoToBall(new GoToObjectPFN(0.15f));
+        pickBallFromWallStrategy = new KickFromWall(new GoToObjectPFN(0.15f));
         turningExecutor = new IncFaceAngle();
     }
 
