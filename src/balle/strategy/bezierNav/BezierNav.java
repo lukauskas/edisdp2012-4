@@ -122,7 +122,10 @@ public class BezierNav implements OrientedMovementExecutor {
 
 	@Override
 	public void step(Controller controller, Snapshot snapshot) {
-		// controller.kick();
+		if (!USE_PID) {
+			snapshot = getLatencyAdjustedSnapshot(snapshot);
+		}
+
 		if (isFinished(snapshot)) {
 			stop(controller);
 			return;
@@ -212,22 +215,31 @@ public class BezierNav implements OrientedMovementExecutor {
 			}
 			lastAngleTime = snapshot.getTimestamp();
 			lastAngle = robot.getOrientation();
-		} else {
-			// use simulator to predict where the robot is
-
 		}
 		controller.setWheelSpeeds((int) left, (int) right);
 		controllerHistory.add(new ControllerHistoryElement((int) left,
-				(int) right,
-				snapshot.getTimestamp()));
+				(int) right, snapshot));
+	}
 
-		// apply wheel speeds using sum movement executer
-		// if (false) {
-		// movementExecutor.updateState(state);
-		// movementExecutor.updateTarget(pos(stepDist).getPoint());
-		// movementExecutor.step(controller);
-		// }
+	/**
+	 * Use the simulator to predict where the robot is after the latency
+	 * Globals.SIMULATED_VISON_DELAY. This relies on controllerHistory being up
+	 * to date;
+	 * 
+	 * @param s
+	 *            Snapshot representing the world Globals.SIMULATED_VISON_DELAY
+	 *            ms ago
+	 * @return Estimated snapshot of where the robots actually are
+	 */
+	private Snapshot getLatencyAdjustedSnapshot(Snapshot s) {
+		// ///////////////////////////////////////////////
+		//  //
+		// ///////////////////////////////////////////////
 
+		// setup a simulator using the current snapshot
+		// use the controllerHistory to simulate the wheelspeeds
+		// retrieve the positions
+		return null;
 	}
 
 	@Override
