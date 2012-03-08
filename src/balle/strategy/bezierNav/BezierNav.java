@@ -61,7 +61,10 @@ public class BezierNav implements OrientedMovementExecutor {
 										// to adjusted p3)
 	private double stopAngle = Math.PI / 13; // angle of robot vs desired final
 												// angle (orient)
+
 	private PID pid = new PID(0.25, 4, 1);
+	private final boolean USE_PID = false;
+
 	private Orientation lastAngle;
 	private long lastAngleTime;
 
@@ -85,6 +88,8 @@ public class BezierNav implements OrientedMovementExecutor {
 	// James, sorry, it was just easier this way.
 	private double p = 1, i = 1, d = 1;
 	private PID left = new PID(p, d, i), right = new PID(p, d, i);
+
+	private ArrayList<ControllerHistoryElement> controllerHistory;
 
 	public BezierNav(PathFinder pathfinder) {
 		this.pathfinder = pathfinder;
@@ -186,7 +191,7 @@ public class BezierNav implements OrientedMovementExecutor {
 		right = isLeft ? v2 : v1;
 		// find current wheel powers
 		long dT = snapshot.getTimestamp() - lastAngleTime;
-		if (dT > 0) {
+		if (USE_PID && dT > 0) {
 			if (lastAngle != null) {
 				// this uses the angular and linear velocity of the robot to
 				// find the estimated powers to the wheels
@@ -207,8 +212,14 @@ public class BezierNav implements OrientedMovementExecutor {
 			}
 			lastAngleTime = snapshot.getTimestamp();
 			lastAngle = robot.getOrientation();
+		} else {
+			// use simulator to predict where the robot is
+
 		}
 		controller.setWheelSpeeds((int) left, (int) right);
+		controllerHistory.add(new ControllerHistoryElement((int) left,
+				(int) right,
+				snapshot.getTimestamp()));
 
 		// apply wheel speeds using sum movement executer
 		// if (false) {
