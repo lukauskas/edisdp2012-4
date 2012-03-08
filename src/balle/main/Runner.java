@@ -3,6 +3,7 @@ package balle.main;
 import static java.util.Arrays.asList;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -143,9 +144,11 @@ public class Runner {
 		StrategyRunner strategyRunner = new StrategyRunner(controller, world,
 				gui);
 
-		StratTab strategyTab = new StratTab(controller, world, strategyRunner,
-				simulator);
-		for (String strategy : StrategyFactory.availableDesignators())
+        StrategyFactory sf = new StrategyFactory();
+        StratTab strategyTab = new StratTab(controller, world, strategyRunner, simulator, sf);
+
+        ArrayList<String> availableDesignators = sf.availableDesignators();
+        for (String strategy : availableDesignators)
 			strategyTab.addStrategy(strategy);
 
 		mainWindow.addToSidebar(strategyTab);

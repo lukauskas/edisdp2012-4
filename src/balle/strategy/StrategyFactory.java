@@ -1,85 +1,94 @@
 package balle.strategy;
 
-import balle.strategy.bezierNav.BezierNav;
-import balle.strategy.bezierNav.CurveNav;
-import balle.strategy.bezierNav.GameBezier;
-import balle.strategy.curve.CustomCHI;
-import balle.strategy.curve.FiniteDifferenceCHI;
-import balle.strategy.executor.movement.GoToObject;
-import balle.strategy.executor.movement.GoToObjectAvoidOpponentPurePF;
-import balle.strategy.executor.movement.GoToObjectPFN;
-import balle.strategy.executor.movement.GoToObjectPurePF;
-import balle.strategy.executor.movement.OrientedMovementExecutor;
-import balle.strategy.executor.turning.FaceAngle;
-import balle.strategy.pathfinding.SimplePathFinder;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
+
+import javassist.Modifier;
+
+import org.apache.log4j.Logger;
+import org.reflections.Reflections;
+import org.reflections.scanners.MethodAnnotationsScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
+
 import balle.strategy.planner.AbstractPlanner;
-import balle.strategy.planner.DefensiveStrategy;
-import balle.strategy.planner.DribbleMilestone2;
-import balle.strategy.planner.GoToBall;
-import balle.strategy.planner.GoToBallM3;
-import balle.strategy.planner.GoToFaceBall;
-import balle.strategy.planner.KickFromWall;
-import balle.strategy.planner.SimpleGoToBall;
-import balle.strategy.planner.SimpleGoToBallFaceGoal;
 
 public class StrategyFactory {
-	public static String[] availableDesignators() {
-		String[] designators = { "GameBezier", "BezierNav", "CurveNav",
-				"GoToBallPurePFOnly",
-				"GoToObjectAvoidOpponentPurePF", "GoToBall", "GoToFaceBall",
-				"GoToBallPFN", "Dribble", "Blocking", "PFNavigation",
-				"DefensiveStrategy", "Game", "GameFromPenaltyKick",
-				"GameFromPenaltyDefence", "BallNearWall", "GoToBallM3" };
-		return designators;
+
+    private static final Logger LOG = Logger.getLogger(StrategyFactory.class);
+
+    private static HashMap<String, Method> runnableStrategies = null;
+
+    private HashMap<String, Method> getRunnableStrategies() {
+        if (runnableStrategies != null)
+            return runnableStrategies;
+
+        runnableStrategies = new HashMap<String, Method>();
+        // Reflections reflections = new Reflections("balle.strategy");
+        Reflections reflections = new Reflections(new ConfigurationBuilder().setUrls(
+                ClasspathHelper.forPackage("balle.strategy")).setScanners(
+                new MethodAnnotationsScanner()));
+        Set<Method> annotatedMethods = reflections.getMethodsAnnotatedWith(FactoryMethod.class);
+        for (Method m : annotatedMethods)
+        {
+            String designator = m.getAnnotation(FactoryMethod.class).designator();
+            if (!AbstractPlanner.class.isAssignableFrom(m.getReturnType()))
+            {
+                LOG.warn("Skipping designator " + designator
+                        + " as it is does not return an instance of AbstractPlanner");
+                continue;
+            } else if (!Modifier.isStatic(m.getModifiers())) {
+                LOG.warn("Skipping designator " + designator + " as it is not static");
+                continue;
+            }
+
+            runnableStrategies.put(designator, m);
+        }
+        LOG.debug("Found " + runnableStrategies.size() + " runnable strategies");
+        return runnableStrategies;
+
+    }
+
+    public ArrayList<String> availableDesignators() {
+        runnableStrategies = getRunnableStrategies();
+
+        ArrayList<String> titles = new ArrayList<String>();
+
+        Set<String> keys = runnableStrategies.keySet();
+        for (String key : keys)
+            titles.add(key);
+        return titles;
+
 	}
 
-    public static AbstractPlanner createClass(String designator)
+    public AbstractPlanner createClass(String designator)
             throws UnknownDesignatorException {
-    	
-		if (designator.equals("GameBezier")) {
-			return new GameBezier(new BezierNav(new SimplePathFinder(
-					new CustomCHI())));
-		} else if (designator.equals("BezierNav")) {
-			return new SimpleGoToBallFaceGoal(new BezierNav(
-					new SimplePathFinder(new CustomCHI())));
-		} else if (designator.equals("CurveNav")) {
-			return new SimpleGoToBallFaceGoal(
-					(OrientedMovementExecutor) new CurveNav(
-							new FiniteDifferenceCHI(),
-					new GoToObjectPurePF()));
-		} else if (designator.equals("GoToObjectAvoidOpponentPurePF")) {
-			return new SimpleGoToBall(new GoToObjectAvoidOpponentPurePF());
-		} else if (designator.equals("GoToBallPurePFOnly")) {
-			return new SimpleGoToBall(new GoToObjectPurePF());
-		} else if (designator.equals("GoToBall")) {
-            return new GoToBall(new GoToObject(new FaceAngle()), true);
-        } else if (designator.equals("GoToFaceBall")) {
-            return new GoToFaceBall(new GoToObject(new FaceAngle()),
-                    new FaceAngle());
-        } else if (designator.equals("GoToBallPFN")) {
-            return new GoToBall(new GoToObjectPFN(0.15f), true);
-        } else if (designator.equals("DummyStrategy")) {
-            return new DummyStrategy();
-        } else if (designator.equals("Blocking")) {
-            return new Blocking();
-        } else if (designator.equals("Dribble")) {
-            return new DribbleMilestone2();
-        } else if (designator.equals("PFNavigation")) {
-            return new PFNavigation();
-        } else if (designator.equals("BallNearWall")) {
-            return new KickFromWall(new GoToObjectPFN(0.15f));
-        } else if (designator.equals("DefensiveStrategy")) {
-            return new DefensiveStrategy(new GoToObjectPFN(0.1f));
-        } else if (designator.equals("Game")) {
-            return new Game();
-        } else if (designator.equals("GameFromPenaltyKick")) {
-            return new GameFromPenaltyKick();
-        } else if (designator.equals("GameFromPenaltyDefence")) {
-            return new GameFromPenaltyDefence();
-        } else if (designator.equals("GoToBallM3")) {
-            return new GoToBallM3();
-        } else
-            throw new UnknownDesignatorException("Don't know strategy \""
-                    + designator + "\"");
+        runnableStrategies = getRunnableStrategies();
+        Method m = runnableStrategies.get(designator);
+
+        if (m == null)
+            throw new UnknownDesignatorException("Don't know strategy \"" + designator + "\"");
+
+        AbstractPlanner strategy;
+        try {
+            strategy = (AbstractPlanner) m.invoke(null, new Object[] {});
+        } catch (IllegalArgumentException e) {
+            LOG.error("IllegalArgumentException while trying to invoke " + designator);
+            e.printStackTrace();
+            return null;
+        } catch (IllegalAccessException e) {
+            LOG.error("IllegalAccessException while trying to invoke " + designator);
+            e.printStackTrace();
+            return null;
+        } catch (InvocationTargetException e) {
+            LOG.error("InvocationTargetException while trying to invoke " + designator);
+            e.printStackTrace();
+            return null;
+        }
+        
+        return strategy;
     }
 }
