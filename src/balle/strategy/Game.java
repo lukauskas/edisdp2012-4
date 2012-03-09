@@ -8,7 +8,7 @@ import balle.strategy.executor.turning.IncFaceAngle;
 import balle.strategy.executor.turning.RotateToOrientationExecutor;
 import balle.strategy.planner.AbstractPlanner;
 import balle.strategy.planner.DefensiveStrategy;
-import balle.strategy.planner.GoToBall;
+import balle.strategy.planner.GoToBallM3;
 import balle.strategy.planner.KickFromWall;
 import balle.strategy.planner.KickToGoal;
 import balle.world.Orientation;
@@ -42,7 +42,8 @@ public class Game extends AbstractPlanner {
         // to a location that is say 0.2 m before the ball in correct direction
         // and then, once the robot reaches it, pointing it to the ball itself
         // so it reaches it.
-        goToBallStrategy = new GoToBall(new GoToObjectPFN(0));
+        goToBallStrategy = new GoToBallM3(); // new GoToBall(new
+                                             // GoToObjectPFN(0));
         pickBallFromWallStrategy = new KickFromWall(new GoToObjectPFN(0));
         turningExecutor = new IncFaceAngle();
         kickingStrategy = new KickToGoal();

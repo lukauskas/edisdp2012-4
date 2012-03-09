@@ -6,9 +6,12 @@ import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
 import balle.main.drawable.DrawableLine;
+import balle.main.drawable.Label;
 import balle.misc.Globals;
+import balle.strategy.FactoryMethod;
 import balle.strategy.executor.movement.GoToObject;
 import balle.strategy.executor.movement.GoToObjectPFN;
+import balle.strategy.executor.movement.MovementExecutor;
 import balle.strategy.executor.turning.FaceAngle;
 import balle.strategy.executor.turning.RotateToOrientationExecutor;
 import balle.world.Coord;
@@ -22,39 +25,61 @@ import balle.world.objects.Point;
 import balle.world.objects.Robot;
 
 public class GoToBallM3 extends GoToBall {
-    private int stage;
     private static final double BALL_SAFE_GAP = 0.25;
     private RotateToOrientationExecutor turnExecutor = new FaceAngle();
-    private RotateToOrientationExecutor preciseTurnExecutor = new FaceAngle(
-            Math.PI / 64);
 
     private static Logger LOG = Logger.getLogger(GoToBallM3.class);
 
     public GoToBallM3() {
         super(new GoToObjectPFN(0), true);
-        stage = 0;
+        setExecutorStrategy(new GoToObjectPFN(0));
+    }
+
+    protected int getStage(Snapshot snapshot) {
+        FieldObject originalTarget = getOriginalTarget(snapshot);
+
+        Line targetGoalLine = new Line(snapshot.getBalle().getPosition(),
+                originalTarget.getPosition());
+        targetGoalLine = targetGoalLine.extend(Globals.PITCH_WIDTH);
+
+        int stage;
+        if ((originalTarget.getPosition().dist(
+                snapshot.getBalle().getPosition()) < BALL_SAFE_GAP * 1.25)
+            &&
+                (targetGoalLine.intersects(snapshot.getOpponentsGoal()
+                .getGoalLine())) || (turnExecutor.isTurning()))
+            stage = 2;
+        else
+            stage = 1;
+
+        addDrawable(new Label("Stage: " + Integer.toString(stage), new Coord(0,
+                -0.1), Color.RED));
+        return stage;
+    }
+
+    protected FieldObject getOriginalTarget(Snapshot snapshot) {
+        return snapshot.getBall();
     }
 
     @Override
     protected FieldObject getTarget(Snapshot snapshot) {
-		Ball ball = snapshot.getBall();
+        FieldObject ball = getOriginalTarget(snapshot);
         if (ball.getPosition() == null) {
             LOG.warn("Cannot see the ball");
             return null;
         }
-		Goal targetGoal = snapshot.getOpponentsGoal();
+        Goal targetGoal = snapshot.getOpponentsGoal();
 
         Line targetLine = new Line(targetGoal.getPosition(), ball.getPosition());
 
-        if (stage < 2)
-        {
-
-			Pitch pitch = snapshot.getPitch();
+        int stage = getStage(snapshot);
+        if (stage < 2) {
+            Pitch pitch = snapshot.getPitch();
             double ballSafeGap = BALL_SAFE_GAP;
             Line newTargetLine = targetLine.extend(ballSafeGap);
-			while (ballSafeGap > 0.01
-					&& !pitch.containsCoord(newTargetLine.extend(
-                    Globals.ROBOT_LENGTH).getB())) {
+            while (ballSafeGap > 0.01
+                    && !pitch.containsCoord(newTargetLine.extend(
+                            Globals.ROBOT_LENGTH).getB())) {
                 ballSafeGap *= 0.95;
                 newTargetLine = targetLine.extend(ballSafeGap);
             }
@@ -63,9 +88,9 @@ public class GoToBallM3 extends GoToBall {
 
         if (stage == 1) {
             Coord targetCoord = targetLine.getB();
-			Line ballTargetLine = new Line(snapshot.getBall()
-                    .getPosition(), targetCoord);
-			Coord ourPos = snapshot.getBalle().getPosition();
+            Line ballTargetLine = new Line(snapshot.getBall().getPosition(),
+                    targetCoord);
+            Coord ourPos = snapshot.getBalle().getPosition();
 
             if (ballTargetLine.contains(ourPos)) {
                 LOG.warn("Were fucked, TODO get out!");
@@ -75,132 +100,57 @@ public class GoToBallM3 extends GoToBall {
         return new Point(targetLine.getB());
     }
 
-    public void setAppropriateMovementStrategy(boolean correctAngle)
-    {
-        if (stage == 1)
-        {
+    public void setAppropriateMovementStrategy(boolean correctAngle, int stage) {
+        // TODO: Start here
+        if (stage == 1) {
             LOG.info("Going to BALL_SAFE target");
-            setExecutorStrategy(new GoToObjectPFN(0));
             setApproachTargetFromCorrectSide(correctAngle);
-        }
-        else
-        {
+            setExecutorStrategy(new GoToObjectPFN(0));
+        } else {
             LOG.info("Going to the ball");
-            GoToObject strategy = new GoToObject(preciseTurnExecutor);
-			strategy.setStopDistance(0.00);
-
-			if (stage == 2) {
-				strategy.setMovementSpeed(200);
-			} else {
-				strategy.setMovementSpeed(GoToObject.DEFAULT_MOVEMENT_SPEED);
-			}
-
-            setExecutorStrategy(strategy);
+            MovementExecutor executor = new GoToObject(turnExecutor);
+            executor.setStopDistance(0);
+            setExecutorStrategy(executor);
             setApproachTargetFromCorrectSide(false);
+
         }
     }
 
     private void changeStage(int newStage, boolean correctAngle) {
-		stage = newStage;
-        setAppropriateMovementStrategy(correctAngle);
-	}
+        setAppropriateMovementStrategy(correctAngle, newStage);
+    }
 
     private void changeStage(int newStage) {
         changeStage(newStage, true);
     }
 
-	@Override
-	protected void onStep(Controller controller, Snapshot snapshot) {
-		Robot ourRobot = snapshot.getBalle();
-		Ball ball = snapshot.getBall();
+    @Override
+    protected void onStep(Controller controller, Snapshot snapshot) {
+        Robot ourRobot = snapshot.getBalle();
+        Ball ball = snapshot.getBall();
 
         if ((ourRobot.getPosition() == null)
                 || (ourRobot.getOrientation() == null)
                 || (ball.getPosition() == null))
             return;
 
-        if (stage == 0)
-        {
-
-			Coord targetCoord = getTarget(snapshot).getPosition();
-
-            double angleToFaceTarget = ourRobot
-                    .getAngleToTurnToTarget(targetCoord);
-            
-            if (Math.abs(angleToFaceTarget) > Math.PI / 16) {
-                if (!turnExecutor.isTurning()) {
-					turnExecutor.setTargetOrientation(targetCoord.sub(
-							ourRobot.getPosition()).orientation());
-					LOG.info("Turning to target");
-				}
-
-				turnExecutor.step(controller, snapshot);
+        int stage = getStage(snapshot);
+        changeStage(stage);
+        if (stage != 1) {
+            if (ourRobot.isApproachingTargetFromCorrectSide(ball,
+                    snapshot.getOpponentsGoal())) {
+                setAppropriateMovementStrategy(false, stage);
             } else {
-                LOG.info("Facing the target correctly");
-                turnExecutor.stop(controller);
-				changeStage(1);
+                setAppropriateMovementStrategy(true, stage);
             }
-        } else {
-        	
-            if (stage == 1) {
-                if (ourRobot.getPosition().dist(
-                        getTarget(snapshot).getPosition()) < 0.07) {
-    			
-                    changeStage(2);
-                } else {
-                    if (ourRobot.isApproachingTargetFromCorrectSide(ball,
-                        snapshot.getOpponentsGoal())) {
-                    setAppropriateMovementStrategy(false);
-                    } else {
-                        setAppropriateMovementStrategy(true);
-                    }
-                }
-//                } else if ((ourRobot.getPosition().dist(ball.getPosition()) < Globals.ROBOT_LENGTH
-//                        / 2 + Globals.BALL_RADIUS / 2 + 0.05)
-//                        && ourRobot.getAngleToTurnToTarget(ball.getPosition()) < Math.PI / 4) {
-//                    LOG.info("Backing off, might hit the ball");
-//                    controller.setWheelSpeeds(-200, -200);
-//                    return;
-//                }
-    		
-            } else if (stage == 2) {
-				if (ourRobot.getPosition().dist(ball.getPosition()) > BALL_SAFE_GAP * 2) {
-                    LOG.info("The ball ran away, catching up.");
-					changeStage(1);
-					
-				} else if (ourRobot.possessesBall(snapshot.getBall())
-						&& ourRobot.getFacingLine().intersects(
-								snapshot.getOpponentsGoal().getGoalLine())) {
-					LOG.info("Kicking");
-					controller.kick();
-					controller.setWheelSpeeds(200, 200);
-                    return;
-                } else if (ourRobot.getFrontSide().midpoint()
-                        .dist(snapshot.getBall().getPosition()) < 0.15
-						&& !ourRobot.getFacingLine().intersects(
-                                snapshot.getOpponentsGoal().getGoalLine())
-                        && (!preciseTurnExecutor.isTurning())) {
-                    LOG.trace("dist "
-                            + ourRobot.getFrontSide().midpoint()
-                                    .dist(snapshot.getBall().getPosition()));
-                    if (ourRobot.getFrontSide().midpoint()
-                            .dist(snapshot.getBall().getPosition()) > BALL_SAFE_GAP / 2)
-				    {
-    					LOG.info("Trying to go to ball-safe-gap again");
-                        changeStage(1, false);
-				    }
-				    else
-				    {
-                        LOG.info("Backing away from the ball");
-				        controller.setWheelSpeeds(-200, -200);
-                        return;
-				    }
-                } else {
-                    LOG.warn("Don't know what to do ;(");
-                }
-			}
-			super.onStep(controller, snapshot);
+
         }
+        super.onStep(controller, snapshot);
+    }
+
+    @FactoryMethod(designator = "GoToBallM3")
+    public static GoToBallM3 factoryMethod() {
+        return new GoToBallM3();
     }
 
 }
