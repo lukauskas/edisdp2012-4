@@ -89,20 +89,24 @@ public class Runner {
 
 		// Get the colour
 		boolean balleIsBlue;
-		if ("blue".equals(options.valueOf("colour")))
-			balleIsBlue = true;
-		else if ("yellow".equals(options.valueOf("colour")))
-			balleIsBlue = false;
-		else {
-			System.out
-					.println("Invalid colour provided, try one of the following:");
-			System.out.println("javac balle.main.Runner -c blue");
-			System.out.println("javac balle.main.Runner -c yellow");
-			print_usage();
-			System.exit(-1);
-			balleIsBlue = false; // This is just to fool Eclipse about
-									// balleIsBlue initialisation
-		}
+        if (options.has("colour")) {
+            if ("blue".equals(options.valueOf("colour")))
+                balleIsBlue = true;
+            else if ("yellow".equals(options.valueOf("colour")))
+                balleIsBlue = false;
+            else {
+                System.out
+                        .println("Invalid colour provided, try one of the following:");
+                System.out.println("javac balle.main.Runner -c blue");
+                System.out.println("javac balle.main.Runner -c yellow");
+                print_usage();
+                System.exit(-1);
+                balleIsBlue = false; // This is just to fool Eclipse about
+                                     // balleIsBlue initialisation
+            }
+
+        } else
+            balleIsBlue = true;
 
 		boolean isMainPitch = true;
 		if ("1".equals(options.valueOf("pitch"))) {
@@ -118,8 +122,10 @@ public class Runner {
 		}
 
 		boolean goalIsLeft = true;
-		if ("right".equals(options.valueOf("goal"))) {
-			goalIsLeft = false;
+        if (options.has("goal")) {
+            if ("right".equals(options.valueOf("goal"))) {
+                goalIsLeft = false;
+            }
 		}
 
 		StrategyLogPane strategyLog = new StrategyLogPane();
