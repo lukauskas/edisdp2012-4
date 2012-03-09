@@ -11,12 +11,12 @@ import balle.strategy.purePF.WallPurePFObject;
 import balle.world.Coord;
 import balle.world.Orientation;
 import balle.world.Snapshot;
+import balle.world.objects.FieldObject;
 import balle.world.objects.Robot;
-import balle.world.objects.StaticFieldObject;
 
 public class GoToObjectAvoidOpponentPurePF implements MovementExecutor {
 
-	private StaticFieldObject target;
+    private FieldObject  target;
 
 	private double stopDistance = 0;
 	private final double ZERO_TH = Math.PI / 2;
@@ -32,7 +32,7 @@ public class GoToObjectAvoidOpponentPurePF implements MovementExecutor {
 	}
 
 	@Override
-	public void updateTarget(StaticFieldObject target) {
+    public void updateTarget(FieldObject target) {
 		this.target = target;
 
 	}

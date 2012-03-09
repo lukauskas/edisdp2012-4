@@ -11,8 +11,8 @@ import balle.strategy.executor.movement.MovementExecutor;
 import balle.strategy.executor.turning.FaceAngle;
 import balle.world.Coord;
 import balle.world.Snapshot;
+import balle.world.objects.FieldObject;
 import balle.world.objects.Point;
-import balle.world.objects.StaticFieldObject;
 
 public class KickFromWall extends GoToBall {
 
@@ -116,7 +116,7 @@ public class KickFromWall extends GoToBall {
 	}
 
 	@Override
-	protected StaticFieldObject getTarget(Snapshot snapshot) {
+    protected FieldObject getTarget(Snapshot snapshot) {
 		Coord nearWallCoord = calculateNearWallCoord(snapshot);
 		return new Point(nearWallCoord);
 	}

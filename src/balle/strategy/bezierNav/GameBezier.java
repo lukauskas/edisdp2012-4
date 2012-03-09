@@ -13,7 +13,7 @@ import balle.strategy.executor.movement.OrientedMovementExecutor;
 import balle.strategy.planner.AbstractPlanner;
 import balle.world.Orientation;
 import balle.world.Snapshot;
-import balle.world.objects.StaticFieldObject;
+import balle.world.objects.FieldObject;
 
 /**
  * @author s0909773
@@ -39,7 +39,7 @@ public class GameBezier extends AbstractPlanner {
 		this.executorStrategy = executorStrategy;
 	}
 
-	protected StaticFieldObject getTarget(Snapshot snapshot) {
+    protected FieldObject getTarget(Snapshot snapshot) {
 		return snapshot.getBall();
 	}
 
@@ -49,7 +49,7 @@ public class GameBezier extends AbstractPlanner {
 
 	@Override
 	public void onStep(Controller controller, Snapshot snapshot) {
-		StaticFieldObject target = getTarget(snapshot);
+        FieldObject target = getTarget(snapshot);
 
 		if ((snapshot == null) || (snapshot.getBalle().getPosition() == null)
 				|| (target == null))

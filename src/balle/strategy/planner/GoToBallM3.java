@@ -15,11 +15,11 @@ import balle.world.Coord;
 import balle.world.Line;
 import balle.world.Snapshot;
 import balle.world.objects.Ball;
+import balle.world.objects.FieldObject;
 import balle.world.objects.Goal;
 import balle.world.objects.Pitch;
 import balle.world.objects.Point;
 import balle.world.objects.Robot;
-import balle.world.objects.StaticFieldObject;
 
 public class GoToBallM3 extends GoToBall {
     private int stage;
@@ -36,7 +36,7 @@ public class GoToBallM3 extends GoToBall {
     }
 
     @Override
-	protected StaticFieldObject getTarget(Snapshot snapshot) {
+    protected FieldObject getTarget(Snapshot snapshot) {
 		Ball ball = snapshot.getBall();
         if (ball.getPosition() == null) {
             LOG.warn("Cannot see the ball");

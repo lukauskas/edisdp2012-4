@@ -3,7 +3,7 @@ package balle.world.objects;
 import balle.world.Coord;
 import balle.world.Line;
 
-public class Pitch implements StaticFieldObject {
+public class Pitch extends StaticFieldObject {
 
     private final double minX, maxX, minY, maxY;
 

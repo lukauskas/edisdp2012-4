@@ -1,8 +1,10 @@
 package balle.world.objects;
 
+import balle.world.Coord;
+import balle.world.Line;
 import balle.world.Velocity;
 
-public interface FieldObject extends StaticFieldObject {
+public interface FieldObject {
 
     /**
      * Gets the velocity of the object (centroid to centroid)
@@ -24,5 +26,23 @@ public interface FieldObject extends StaticFieldObject {
      * @return true, if is in corner
      */
     public abstract boolean isInCorner(Pitch p);
+
+    /**
+     * Gets the coordinate of the centroid of the object
+     * 
+     * @return the position
+     */
+    public abstract Coord getPosition();
+
+    /**
+     * Returns true if point is contained in the object
+     * 
+     * @param point
+     *            the point in question
+     * @return true if point is in the object
+     */
+    public abstract boolean containsCoord(Coord point);
+
+    public abstract boolean intersects(Line line);
 
 }

@@ -3,11 +3,11 @@ package balle.strategy.executor.movement;
 import balle.controller.Controller;
 import balle.strategy.executor.Executor;
 import balle.world.Snapshot;
-import balle.world.objects.StaticFieldObject;
+import balle.world.objects.FieldObject;
 
 public interface MovementExecutor extends Executor {
 
-/**
+    /**
      * Update the current target we are to approach. This should allow to
      * quickly deal with changing locations of target without the loss of
      * momentum.
@@ -15,9 +15,9 @@ public interface MovementExecutor extends Executor {
      * If fieldObject
      * 
      * @param target
-     *            StaticFieldObject of the target we want to approach
+     *            FieldObject of the target we want to approach
      */
-    public void updateTarget(StaticFieldObject target);
+    public void updateTarget(FieldObject target);
 
 	@Override
 	public boolean isFinished(Snapshot snapshot);

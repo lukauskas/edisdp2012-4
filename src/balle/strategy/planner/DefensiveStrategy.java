@@ -10,10 +10,10 @@ import balle.world.Coord;
 import balle.world.Line;
 import balle.world.Snapshot;
 import balle.world.objects.Ball;
+import balle.world.objects.FieldObject;
 import balle.world.objects.Goal;
 import balle.world.objects.Point;
 import balle.world.objects.Robot;
-import balle.world.objects.StaticFieldObject;
 
 /**
  * The Class DefensiveStrategy. Controls the robot so it gets in between
@@ -63,7 +63,7 @@ public class DefensiveStrategy extends GoToBall {
 	}
 
 	@Override
-	protected StaticFieldObject getTarget(Snapshot snapshot) {
+    protected FieldObject getTarget(Snapshot snapshot) {
 		Coord defenceCoord = calculateDefenceCoord(snapshot);
 		return new Point(defenceCoord);
 	}

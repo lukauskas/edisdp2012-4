@@ -12,7 +12,7 @@ import balle.strategy.executor.movement.OrientedMovementExecutor;
 import balle.world.Coord;
 import balle.world.Orientation;
 import balle.world.Snapshot;
-import balle.world.objects.StaticFieldObject;
+import balle.world.objects.FieldObject;
 
 /**
  * Uses the movement executor to follow the given curve towards the target.
@@ -22,7 +22,7 @@ public class CurveNav implements OrientedMovementExecutor {
 	private final double TARGET_PERIMETER = Math.sqrt(Math.pow(
 			Globals.ROBOT_LENGTH, 2) + Math.pow(Globals.ROBOT_WIDTH, 2)) / 2;
 
-	private StaticFieldObject target;
+    private FieldObject      target;
 	private Snapshot state;
 
 	private float stepDist = 0.5f;
@@ -55,7 +55,7 @@ public class CurveNav implements OrientedMovementExecutor {
 	}
 
 	@Override
-	public void updateTarget(StaticFieldObject target, Orientation o) {
+    public void updateTarget(FieldObject target, Orientation o) {
 		this.target = target;
 		this.orient = o;
 	}

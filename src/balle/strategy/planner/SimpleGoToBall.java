@@ -11,7 +11,7 @@ import balle.controller.Controller;
 import balle.main.drawable.Dot;
 import balle.strategy.executor.movement.MovementExecutor;
 import balle.world.Snapshot;
-import balle.world.objects.StaticFieldObject;
+import balle.world.objects.FieldObject;
 
 /**
  * @author s0909773
@@ -35,7 +35,7 @@ public class SimpleGoToBall extends AbstractPlanner {
 		this.executorStrategy = executorStrategy;
 	}
 
-	protected StaticFieldObject getTarget(Snapshot snapshot) {
+    protected FieldObject getTarget(Snapshot snapshot) {
 		return snapshot.getBall();
 	}
 
@@ -45,7 +45,7 @@ public class SimpleGoToBall extends AbstractPlanner {
 
 	@Override
 	public void onStep(Controller controller, Snapshot snapshot) {
-		StaticFieldObject target = getTarget(snapshot);
+        FieldObject target = getTarget(snapshot);
 
 		if ((snapshot == null) || (snapshot.getBalle().getPosition() == null)
 				|| (target == null))
