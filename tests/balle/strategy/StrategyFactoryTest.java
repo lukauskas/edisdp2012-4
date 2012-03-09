@@ -1,5 +1,7 @@
 package balle.strategy;
 
+import java.util.ArrayList;
+
 import org.junit.Test;
 
 public class StrategyFactoryTest {
@@ -13,10 +15,12 @@ public class StrategyFactoryTest {
      */
     @Test
     public void testAvailableDesignators() throws UnknownDesignatorException {
-        String[] availableDesignators = StrategyFactory.availableDesignators();
+        StrategyFactory sf = new StrategyFactory();
+
+        ArrayList<String> availableDesignators = sf.availableDesignators();
         for (String designator : availableDesignators) {
             // An actual test
-            StrategyFactory.createClass(designator);
+            sf.createClass(designator);
         }
     }
 

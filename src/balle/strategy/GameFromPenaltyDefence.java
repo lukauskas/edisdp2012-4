@@ -17,8 +17,14 @@ public class GameFromPenaltyDefence extends Game {
 
 	private boolean finished = false;
 
-	public GameFromPenaltyDefence() throws UnknownDesignatorException {
+    public GameFromPenaltyDefence() {
 		super();
+	}
+	
+    @FactoryMethod(designator = "Game (Penalty Defence)")
+	public static GameFromPenaltyDefence gameFromPenaltyDefenceFactory()
+	{
+	    return new GameFromPenaltyDefence();
 	}
 
 	public boolean isStillInPenaltyDefence(Snapshot snapshot) {

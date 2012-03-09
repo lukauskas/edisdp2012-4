@@ -5,6 +5,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -38,20 +39,25 @@ public class StratTab extends JPanel implements ActionListener {
 	private JButton randomButton;
 	private JButton resetButton;
 	private boolean isBlue;
+	private ArrayList<String> stratTabs;
+	private String[] strings = new String[0];
 
+	GridBagConstraints c = new GridBagConstraints();
 	private StrategyRunner strategyRunner;
 	// private Controller controllerA;
 	// private Controller controllerB;
 	private AbstractWorld worldA;
 	// private AbstractWorld worldB;
 	private Simulator simulator;
+    private StrategyFactory     strategyFactory;
 
 	private final static String GREEN_LABEL_TEXT = "Select X strategy";
 	private final static String RED_LABEL_TEXT = "Select Y strategy";
 
 	public StratTab(Controller controllerA, Controller controllerB,
 			AbstractWorld worldA, AbstractWorld worldB,
-			StrategyRunner strategyRunner, Simulator simulator) {
+			StrategyRunner strategyRunner, Simulator simulator, StrategyFactory strategyFactory) {
+
 		super();
 		// this.controllerA = controllerA;
 		// this.controllerB = controllerB;
@@ -60,6 +66,7 @@ public class StratTab extends JPanel implements ActionListener {
 		this.simulator = simulator;
 		// Initialise strategy runner
 		this.strategyRunner = strategyRunner;
+        this.strategyFactory = strategyFactory;
 
 		// Declare layout of buttons etc
 		// Layout composed of 3 by 6 grid (0 indexed)
@@ -67,7 +74,6 @@ public class StratTab extends JPanel implements ActionListener {
 		// for each component. Leftmost column is gridx = 0
 		// and topmost row is grid y = 0)
 		controlPanel = new JPanel(new GridBagLayout());
-		GridBagConstraints c = new GridBagConstraints();
 
 		greenLabel = new JLabel(GREEN_LABEL_TEXT);
 		c.fill = GridBagConstraints.HORIZONTAL;
@@ -76,7 +82,7 @@ public class StratTab extends JPanel implements ActionListener {
 		c.insets = new Insets(1, 5, 1, 5);
 		controlPanel.add(greenLabel, c);
 
-		greenStrategy = new JComboBox(StrategyFactory.availableDesignators());
+		greenStrategy = new JComboBox();
 		c.gridx = 0;
 		c.gridy = 1;
 		c.gridwidth = 2;
@@ -88,7 +94,7 @@ public class StratTab extends JPanel implements ActionListener {
 		c.gridwidth = 1;
 		controlPanel.add(redLabel, c);
 
-		redStrategy = new JComboBox(StrategyFactory.availableDesignators());
+		redStrategy = new JComboBox();
 		c.gridx = 0;
 		c.gridy = 3;
 		c.gridwidth = 2;
@@ -155,8 +161,9 @@ public class StratTab extends JPanel implements ActionListener {
 	public final void actionPerformed(ActionEvent event) {
 		if (event.getActionCommand().equals("startstop")) {
 			if (startButton.getText().equals("Start")) {
-				String selectedStrategyA = (String) greenStrategy
-						.getSelectedItem();
+
+				String selectedStrategyA = stratTabs
+				.get(greenStrategy.getSelectedIndex());
 
 				String selectedStrategyB;
 				if (simulator == null) {
@@ -166,12 +173,12 @@ public class StratTab extends JPanel implements ActionListener {
 				}
 
 				try {
-					System.out.println((String) redStrategy.getSelectedItem());
 					strategyRunner.startStrategy(
-							StrategyFactory.createClass(selectedStrategyA),
-							StrategyFactory.createClass(selectedStrategyB));
+							strategyFactory.createClass(selectedStrategyA),
+							strategyFactory.createClass(selectedStrategyB));
+
 				} catch (UnknownDesignatorException e) {
-					LOG.error("Cannot start starategy \"" + selectedStrategyA
+					LOG.error("Cannot start strategy \"" + selectedStrategyA
 							+ "\": " + e.toString());
 					System.out.println("Valiant effort, chaps");
 					return;
@@ -247,27 +254,33 @@ public class StratTab extends JPanel implements ActionListener {
 		}
 	}
 
-	// Jon: NOT NEEDED?
-	// Using getSelectedItem() in ActionPerformed instead
 
-	// public String[] getStrings() {
-	// int size = stratTabs.size();
-	// String[] out = new String[size];
-	// for (int i = 0; i < size; i++) {
-	// out[i] = (i + 1) + ": " + stratTabs.get(i);
-	// }
-	// return out;
-	// }
-	//
-	// public final void addStrategy(String designator) {
-	// stratTabs.add(designator);
-	// strings = getStrings();
-	// this.remove(greenStrategy);
-	// greenStrategy = new JComboBox(strings);
-	// top.add(BorderLayout.WEST, greenStrategy);
-	// }
+
+
+	public String[] getStrings() {
+		int size = stratTabs.size();
+		String[] out = new String[size];
+		for (int i = 0; i < size; i++) {
+			out[i] = (i + 1) + ": " + stratTabs.get(i);
+		}
+		return out;
+	}
+
+	public final void addStrategy(String designator) {
+		stratTabs.add(designator);
+		strings = getStrings();
+		this.remove(greenStrategy);
+		greenStrategy = new JComboBox(strings);
+		c.gridx = 0;
+		c.gridy = 1;
+		c.gridwidth = 2;
+		controlPanel.add(greenStrategy, c);
+		
+		//top.add(BorderLayout.WEST, greenStrategy);
+	}
 
 	// Called from reset/randomise buttons
+
 	public void randomiseBall(Simulator s) {
 		s.randomiseBallPosition();
 	}

@@ -3,6 +3,7 @@ package balle.main;
 import static java.util.Arrays.asList;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -21,6 +22,7 @@ import balle.logging.StrategyLogAppender;
 import balle.misc.Globals;
 import balle.simulator.Simulator;
 import balle.simulator.SoftBot;
+import balle.strategy.StrategyFactory;
 import balle.strategy.StrategyRunner;
 import balle.world.AbstractWorld;
 import balle.world.BasicWorld;
@@ -142,11 +144,14 @@ public class Runner {
 		StrategyRunner strategyRunner = new StrategyRunner(controllerA,
 				controllerB, worldA, worldB, gui);
 
+        StrategyFactory sf = new StrategyFactory();
 		StratTab strategyTab = new StratTab(controllerA, controllerB, worldA,
-				worldB, strategyRunner, simulator);
+				worldB, strategyRunner, simulator, sf);
 
-		// for (String strategy : StrategyFactory.availableDesignators())
-		// strategyTab.addStrategy(strategy);
+		ArrayList<String> availableDesignators = sf.availableDesignators();
+		for (String strategy : availableDesignators)
+			strategyTab.addStrategy(strategy);
+
 
 		mainWindow.addToSidebar(strategyTab);
 		mainWindow.addToSidebar(strategyLog);
