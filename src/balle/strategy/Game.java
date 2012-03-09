@@ -42,8 +42,8 @@ public class Game extends AbstractPlanner {
         // to a location that is say 0.2 m before the ball in correct direction
         // and then, once the robot reaches it, pointing it to the ball itself
         // so it reaches it.
-        goToBallStrategy = new GoToBall(new GoToObjectPFN(0.15f));
-        pickBallFromWallStrategy = new KickFromWall(new GoToObjectPFN(0.15f));
+        goToBallStrategy = new GoToBall(new GoToObjectPFN(0));
+        pickBallFromWallStrategy = new KickFromWall(new GoToObjectPFN(0));
         turningExecutor = new IncFaceAngle();
         kickingStrategy = new KickToGoal();
 
@@ -63,6 +63,9 @@ public class Game extends AbstractPlanner {
         Ball ball = snapshot.getBall();
         Goal ownGoal = snapshot.getOwnGoal();
         Pitch pitch = snapshot.getPitch();
+
+        if ((ourRobot.getPosition() == null) || (ball.getPosition() == null))
+            return;
 
         Orientation targetOrientation = ball.getPosition()
                 .sub(ourRobot.getPosition()).orientation();
