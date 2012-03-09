@@ -24,13 +24,13 @@ import balle.world.objects.Pitch;
 import balle.world.objects.Point;
 import balle.world.objects.Robot;
 
-public class GoToBallM3 extends GoToBall {
+public class GoToBallSafe extends GoToBall {
     private static final double BALL_SAFE_GAP = 0.25;
     private RotateToOrientationExecutor turnExecutor = new FaceAngle();
 
-    private static Logger LOG = Logger.getLogger(GoToBallM3.class);
+    private static Logger LOG = Logger.getLogger(GoToBallSafe.class);
 
-    public GoToBallM3() {
+    public GoToBallSafe() {
         super(new GoToObjectPFN(0), true);
         setExecutorStrategy(new GoToObjectPFN(0));
     }
@@ -149,8 +149,8 @@ public class GoToBallM3 extends GoToBall {
     }
 
     @FactoryMethod(designator = "GoToBallM3")
-    public static GoToBallM3 factoryMethod() {
-        return new GoToBallM3();
+    public static GoToBallSafe factoryMethod() {
+        return new GoToBallSafe();
     }
 
 }
