@@ -59,10 +59,7 @@ public class StratTab extends JPanel implements ActionListener {
 			StrategyRunner strategyRunner, Simulator simulator, StrategyFactory strategyFactory) {
 
 		super();
-		// this.controllerA = controllerA;
-		// this.controllerB = controllerB;
 		this.worldA = worldA;
-		// this.worldB = worldB;
 		this.simulator = simulator;
 		// Initialise strategy runner
 		this.strategyRunner = strategyRunner;
@@ -169,7 +166,9 @@ public class StratTab extends JPanel implements ActionListener {
 				if (simulator == null) {
 					selectedStrategyB = "NullStrategy";
 				} else {
-					selectedStrategyB = (String) redStrategy.getSelectedItem();
+					selectedStrategyB = "NullStrategy";
+					// selectedStrategyB = (String)
+					// redStrategy.getSelectedItem();
 				}
 
 				try {
