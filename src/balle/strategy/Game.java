@@ -10,7 +10,7 @@ import balle.strategy.planner.AbstractPlanner;
 import balle.strategy.planner.DefensiveStrategy;
 import balle.strategy.planner.GoToBall;
 import balle.strategy.planner.KickFromWall;
-import balle.world.Coord;
+import balle.strategy.planner.KickToGoal;
 import balle.world.Orientation;
 import balle.world.Snapshot;
 import balle.world.objects.Ball;
@@ -27,6 +27,7 @@ public class Game extends AbstractPlanner {
     Strategy goToBallStrategy;
     Strategy pickBallFromWallStrategy;
     RotateToOrientationExecutor turningExecutor;
+    KickToGoal                  kickingStrategy;
 
     @FactoryMethod(designator = "Game")
     public static Game gameFactory() {
@@ -44,6 +45,8 @@ public class Game extends AbstractPlanner {
         goToBallStrategy = new GoToBall(new GoToObjectPFN(0.15f));
         pickBallFromWallStrategy = new KickFromWall(new GoToObjectPFN(0.15f));
         turningExecutor = new IncFaceAngle();
+        kickingStrategy = new KickToGoal();
+
     }
 
     @Override
@@ -67,48 +70,11 @@ public class Game extends AbstractPlanner {
         if (ourRobot.possessesBall(ball)) {
             // Kick if we are facing opponents goal
             if (!ourRobot.isFacingGoalHalf(ownGoal)) {
-                LOG.info("Kicking the ball");
-                controller.kick();
-                // Slowly move forward as well in case we're not so close
-                controller.setWheelSpeeds(200, 200);
+                kickingStrategy.step(controller, snapshot);
+                addDrawables(kickingStrategy.getDrawables());
             } else {
-
-                // TODO: turn the robot slightly so we face away from our
-                // own goal.
-                // Implement a turning executor that would use
-                // setWheelSpeeds to some arbitrary low
-                // number (say -300,300 and 300,-300) to turn to correct
-                // direction and use it here.
-                // it has to be similar to FaceAngle executor but should not
-                // use the controller.rotate()
-                // command that is blocking.
-
-                Coord r, b, g;
-                r = ourRobot.getPosition();
-                b = ball.getPosition();
-                g = ownGoal.getPosition();
-
-                if (r.angleBetween(g, b).atan2styleradians() < 0) {
-                    // Clockwise.
-                    Orientation orien = ourRobot
-                            .findMaxRotationMaintaintingPossession(ball, true);
-                    System.out.println(orien);
-                    turningExecutor.setTargetOrientation(orien);
-					turningExecutor.step(controller, snapshot);
-                    if (ourRobot.findMaxRotationMaintaintingPossession(ball,
-                            true).degrees() < 10)
-                        controller.kick();
-                } else {
-                    // Anti-Clockwise
-                    Orientation orien = ourRobot
-                            .findMaxRotationMaintaintingPossession(ball, false);
-                    System.out.println(orien);
-                    turningExecutor.setTargetOrientation(orien);
-					turningExecutor.step(controller, snapshot);
-                    if (ourRobot.findMaxRotationMaintaintingPossession(ball,
-                            false).degrees() > -10)
-                        controller.kick();
-                }
+                LOG.warn("We need to go around the ball");
+                // TODO: go around the ball here
             }
         } else if ((opponent.possessesBall(ball))
                 && (opponent.isFacingGoal(ownGoal))) {
