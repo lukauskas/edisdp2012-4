@@ -18,7 +18,7 @@ public class StrategyLogPane extends JPanel {
 
 	private final LoggingEventTableModel model;
 	private final JTable table;
-    private final static int MAX_ROWS = 15;
+	private final static int MAX_ROWS = 20;
 
     public StrategyLogPane() {
 		super();
