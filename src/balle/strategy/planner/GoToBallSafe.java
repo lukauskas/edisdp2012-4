@@ -25,7 +25,7 @@ import balle.world.objects.Point;
 import balle.world.objects.Robot;
 
 public class GoToBallSafe extends GoToBall {
-    private static final double BALL_SAFE_GAP = 0.25;
+    private static final double BALL_SAFE_GAP = 0.4;
     private RotateToOrientationExecutor turnExecutor = new FaceAngle();
 
     private static Logger LOG = Logger.getLogger(GoToBallSafe.class);

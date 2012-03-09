@@ -25,7 +25,7 @@ public class Line {
 	}
 
     public double dist(Coord a) {
-        return getLine2DVersion().ptLineDist(a.getX(), a.getY());
+        return getLine2DVersion().ptSegDist(a.getX(), a.getY());
     }
 
 	public boolean contains(Coord a) {

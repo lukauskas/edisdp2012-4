@@ -92,7 +92,9 @@ public class KickToGoal extends AbstractPlanner {
                 // and hopefully bounce from the wall, or whether it is better
                 // to turn towards the goal
             }
-
+            LOG.warn("Kicking anyway");
+            // TODO: remove
+            controller.kick();
         }
 
     }
