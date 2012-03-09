@@ -27,7 +27,7 @@ public class Game extends AbstractPlanner {
     Strategy goToBallStrategy;
     Strategy pickBallFromWallStrategy;
     RotateToOrientationExecutor turningExecutor;
-    KickToGoal                  kickingStrategy;
+	KickToGoal kickingStrategy;
 
     @FactoryMethod(designator = "Game")
     public static Game gameFactory() {
