@@ -8,7 +8,6 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.World;
 
 import balle.controller.Controller;
-import balle.main.SimpleWorldGUI;
 import balle.main.drawable.Circle;
 import balle.main.drawable.Dot;
 import balle.main.drawable.Drawable;
@@ -103,7 +102,6 @@ public class BezierNav implements OrientedMovementExecutor {
 	public BezierNav(PathFinder pathfinder) {
 		this.pathfinder = pathfinder;
 		simulator = new SimulatorWorld(false);
-		SimpleWorldGUI g = new SimpleWorldGUI(world);
 		simulator.setWorld(new World(new Vec2(), true));
 		simulator.initWorld();
 		simulator.setVisionDelay(0);
@@ -277,31 +275,61 @@ public class BezierNav implements OrientedMovementExecutor {
 		simulator.setRobotStatesFromSnapshot(s, true, lastLPower,
 				lastRPower);
 		simulator.setStartTime(simulatorTime);
+
+		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		// this is just a test
+		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		BasicWorld w = new BasicWorld(true, false, s.getPitch());
+		SimulatorWorld sim = new SimulatorWorld(false);
+		sim.setWorld(new World(new Vec2(), true));
+		sim.initWorld();
+		sim.setVisionDelay(0);
+		sim.getReader().addListener(w);
+		sim.getReader().propagateGoals();
+		sim.getReader().propagatePitchSize();
+		for (int i = 0; i < 10; i++) {
+			long tD = 50;
+			sim.getBlueSoft().setWheelSpeeds(900, 900);
+			sim.update(tD);
+			sim.getWorld().step(tD / 1000f, 8, 3);
+			sim.getReader().update();
+			sim.getReader().propagate();
+		}
+		System.out.println("should be the same: "
+				+ sim.blue.getBody().getPosition());
 		
+		// !!!!!!!!!!!!!!!!!!!!!!!!!!!
+		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 		// use the controllerHistory to simulate the wheelspeeds
 		//// run a simulation while adjusting wheel speeds
 		long maxTD = 50; // low values may make this less accurate
 		for (int i = 0; i < controllerHistory.size(); i++) {
 			ControllerHistoryElement curr = controllerHistory.get(i);
 			long nextTime = currentTime;
+
+
 			if(i < controllerHistory.size() - 1)
 				nextTime = controllerHistory.get(i + 1).getSnapshot().getTimestamp();
 			for(long tD = maxTD; simulatorTime < currentTime;tD = Math.min(simulatorTime + tD, nextTime) - simulatorTime) {
-				simulator.getBlueSoft().setWheelSpeeds(900, 900);
-				// curr.getPowerLeft(),curr.getPowerRight());
+				//simulator.getBlueSoft().setWheelSpeeds(900, 900);
+				 curr.getPowerLeft(),curr.getPowerRight());
 				simulator.update(tD);
 				simulator.getWorld().step(tD / 1000f, 8, 3);
 				simulator.getReader().update();
 				simulator.getReader().propagate();
-				System.out.println(tD);
-				System.out
-						.println(world.getSnapshot().getBalle().getPosition());
+				// System.out.println(tD);
+				// System.out
+				// .println(world.getSnapshot().getBalle().getPosition());
 				simulatorTime += tD;
 			}
 		}
 
 		// retrieve the new snapshot
-		return world.getSnapshot();
+		return simulator.getSnapshot(s.getTimestamp(), s.getPitch(),
+				s.getOpponentsGoal(), s.getOwnGoal());
 	}
 
 	@Override

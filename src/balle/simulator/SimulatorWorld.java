@@ -18,7 +18,12 @@ import org.jbox2d.dynamics.joints.WeldJointDef;
 import balle.io.reader.Reader;
 import balle.misc.Globals;
 import balle.world.Coord;
+import balle.world.Orientation;
 import balle.world.Snapshot;
+import balle.world.Velocity;
+import balle.world.objects.Ball;
+import balle.world.objects.Goal;
+import balle.world.objects.Pitch;
 
 public class SimulatorWorld {
 
@@ -30,7 +35,7 @@ public class SimulatorWorld {
 	private Body ground;
 	protected Body ball;
 
-	protected Robot blue;
+	public Robot blue;
 	protected Robot yellow;
 
 	private final SoftBot blueSoft = new SoftBot();
@@ -388,7 +393,7 @@ public class SimulatorWorld {
 		this.visionDelay = visionDelay;
 	}
 
-	protected class Robot {
+	public class Robot {
 
 		private final Body kicker;
 
@@ -650,6 +655,23 @@ public class SimulatorWorld {
 		balle.getBody().setTransform(
 				new Vec2((float) op.getX(), (float) op.getY()),
 				(float) b.getOrientation().radians());
+	}
+
+	private Coord v2C(Vec2 v) {
+		return new Coord(v.x, v.y);
+	}
+
+	public Snapshot getSnapshot(long timeStamp, Pitch p, Goal opponentsGoal, Goal ownGoal) {
+		Body o = yellow.getBody();
+		Body me = blue.getBody();
+		Body b = ball;
+		return new Snapshot(
+				new balle.world.objects.Robot(v2C(o.getPosition()).mult(1.0/SCALE), new Velocity(v2C(b.getLinearVelocity()).mult(1.0/(SCALE)),1000), new Orientation(b.getAngle())),
+				
+		new balle.world.objects.Robot(v2C(me.getPosition()).mult(1.0 / SCALE),
+				new Velocity(v2C(me.getLinearVelocity()).mult(1.0 / (SCALE)),
+						1000), new Orientation(me.getAngle())),
+				new Ball(v2C(b.getPosition()).mult(1.0/SCALE), new Velocity(v2C(b.getLinearVelocity()).mult(1.0/(SCALE)),1000)), opponentsGoal, ownGoal, p, timeStamp);
 	}
 
 }
