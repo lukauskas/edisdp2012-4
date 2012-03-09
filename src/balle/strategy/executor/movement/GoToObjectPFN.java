@@ -14,7 +14,7 @@ import balle.strategy.pFStrategy.RectObject;
 import balle.strategy.pFStrategy.RobotConf;
 import balle.strategy.pFStrategy.VelocityVec;
 import balle.world.Snapshot;
-import balle.world.objects.StaticFieldObject;
+import balle.world.objects.FieldObject;
 
 public class GoToObjectPFN implements MovementExecutor {
 
@@ -35,7 +35,7 @@ public class GoToObjectPFN implements MovementExecutor {
         this.stopDistance = stopDistance;
     }
 
-    private StaticFieldObject target;
+    private FieldObject target;
 
     PFPlanning                plann;
 
@@ -81,7 +81,7 @@ public class GoToObjectPFN implements MovementExecutor {
     }
 
     @Override
-    public void updateTarget(StaticFieldObject target) {
+    public void updateTarget(FieldObject target) {
         this.target = target;
 
     }

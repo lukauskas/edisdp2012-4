@@ -12,10 +12,10 @@ import balle.main.drawable.Dot;
 import balle.strategy.executor.movement.MovementExecutor;
 import balle.world.Coord;
 import balle.world.Snapshot;
+import balle.world.objects.FieldObject;
 import balle.world.objects.Pitch;
 import balle.world.objects.Point;
 import balle.world.objects.Robot;
-import balle.world.objects.StaticFieldObject;
 
 /**
  * @author s0909773
@@ -72,7 +72,7 @@ public class GoToBall extends AbstractPlanner {
         this.approachTargetFromCorrectSide = approachTargetFromCorrectSide;
     }
 
-	protected StaticFieldObject getTarget(Snapshot snapshot) {
+    protected FieldObject getTarget(Snapshot snapshot) {
 		return snapshot.getBall();
     }
 
@@ -114,7 +114,7 @@ public class GoToBall extends AbstractPlanner {
                 .getPosition().getY() + yOffset);
     }
 
-    protected Coord calculateOvershootCoord(StaticFieldObject target,
+    protected Coord calculateOvershootCoord(FieldObject target,
 			double gap, boolean belowPoint, Snapshot snapshot) {
         int side = 1;
         if (belowPoint) {
@@ -158,7 +158,7 @@ public class GoToBall extends AbstractPlanner {
      *            the overshoot gap
      * @return the overshoot target
      */
-    protected StaticFieldObject getOvershootTarget(StaticFieldObject target,
+    protected FieldObject getOvershootTarget(FieldObject target,
 			double overshootGap, Snapshot snapshot) {
         // End case for recursive search for overshoot target
         if (overshootGap < 0.1)
@@ -254,7 +254,7 @@ public class GoToBall extends AbstractPlanner {
 
     @Override
 	protected void onStep(Controller controller, Snapshot snapshot) {
-		StaticFieldObject target = getTarget(snapshot);
+        FieldObject target = getTarget(snapshot);
 
 		if ((snapshot == null) || (snapshot.getBalle().getPosition() == null)
                 || (target == null))

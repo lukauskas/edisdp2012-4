@@ -10,12 +10,12 @@ import balle.misc.Globals;
 import balle.world.Coord;
 import balle.world.Orientation;
 import balle.world.Snapshot;
+import balle.world.objects.FieldObject;
 import balle.world.objects.Robot;
-import balle.world.objects.StaticFieldObject;
 
 public class GoToObjectPurePF implements MovementExecutor {
 
-	private StaticFieldObject target;
+    private FieldObject         target;
 
 	private double stopDistance = 0;
 	private static final double ZERO_TH = Math.PI * 0.01;
@@ -34,7 +34,7 @@ public class GoToObjectPurePF implements MovementExecutor {
 	}
 
 	@Override
-	public void updateTarget(StaticFieldObject target) {
+    public void updateTarget(FieldObject target) {
 		this.target = target;
 
 	}

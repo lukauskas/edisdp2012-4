@@ -3,7 +3,7 @@ package balle.world.objects;
 import balle.world.Coord;
 import balle.world.Line;
 
-public class Location implements StaticFieldObject{
+public class Location extends StaticFieldObject {
 
 	private Coord coord;
 	

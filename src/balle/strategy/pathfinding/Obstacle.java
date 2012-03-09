@@ -5,7 +5,7 @@ import balle.strategy.curve.Curve;
 import balle.world.Coord;
 import balle.world.Orientation;
 import balle.world.Snapshot;
-import balle.world.objects.StaticFieldObject;
+import balle.world.objects.FieldObject;
 
 public abstract class Obstacle extends Coord {
 
@@ -18,17 +18,17 @@ public abstract class Obstacle extends Coord {
 
 	protected double clearance;
 
-	private StaticFieldObject source;
+    private FieldObject        source;
 
 	protected double getClearance() {
 		return clearance;
 	}
 
-	protected StaticFieldObject getSource() {
+    protected FieldObject getSource() {
 		return source;
 	}
 
-	public Obstacle(StaticFieldObject source, double clearance) {
+    public Obstacle(FieldObject source, double clearance) {
 		super(source.getPosition().getX(), source.getPosition().getY());
 		this.source = source;
 		this.clearance = clearance;
