@@ -315,7 +315,8 @@ public class BezierNav implements OrientedMovementExecutor {
 				nextTime = controllerHistory.get(i + 1).getSnapshot().getTimestamp();
 			for(long tD = maxTD; simulatorTime < currentTime;tD = Math.min(simulatorTime + tD, nextTime) - simulatorTime) {
 				//simulator.getBlueSoft().setWheelSpeeds(900, 900);
-				 curr.getPowerLeft(),curr.getPowerRight());
+				simulator.getBlueSoft().setWheelSpeeds(curr.getPowerLeft(),
+						curr.getPowerRight());
 				simulator.update(tD);
 				simulator.getWorld().step(tD / 1000f, 8, 3);
 				simulator.getReader().update();
