@@ -86,8 +86,8 @@ public class UserInputStrategy extends AbstractPlanner {
             int dX = (mouseXPos - screen.getWidth() / 2);
             int dY = (screen.getHeight() - mouseYPos)
                     - (screen.getHeight() / 2);
-            leftWheelPower = leftWheelTurn(dX, dY) * 100;
-            rightWheelPower = rightWheelTurn(dX, dY) * 100;
+			leftWheelPower = leftWheelTurn(dX, dY) * 500;
+			rightWheelPower = rightWheelTurn(dX, dY) * 500;
 
         }
 
