@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
 
 import org.apache.log4j.Logger;
 
@@ -45,6 +46,14 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
         panel = new JPanel();
         panel.setLayout(new BorderLayout());
 
+		try {
+			// Set cross-platform Java L&F (also called "Metal")
+			UIManager
+					.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+		} catch (Exception e) {
+			System.err.println("UI Manager exception: " + e.getMessage());
+		}
+		System.out.println("This should happen");
 		// Initialising Vision FPS
 		fpsVisionPanel = new JPanel();
 		fpsVisionPanel.setLayout(new FlowLayout(FlowLayout.LEFT));

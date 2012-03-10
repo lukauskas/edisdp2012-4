@@ -48,8 +48,8 @@ public class StratTab extends JPanel implements ActionListener {
 	private Simulator simulator;
     private StrategyFactory     strategyFactory;
 
-	private final static String GREEN_LABEL_TEXT = "Select X strategy";
-	private final static String RED_LABEL_TEXT = "Select Y strategy";
+	private final static String GREEN_LABEL_TEXT = "Select Green strategy";
+	private final static String RED_LABEL_TEXT = "Select Red strategy";
 
 	public StratTab(Controller controllerA, Controller controllerB,
 			AbstractWorld worldA, AbstractWorld worldB,
