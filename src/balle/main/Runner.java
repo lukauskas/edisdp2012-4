@@ -3,7 +3,6 @@ package balle.main;
 import static java.util.Arrays.asList;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -148,9 +147,14 @@ public class Runner {
 		StratTab strategyTab = new StratTab(controllerA, controllerB, worldA,
 				worldB, strategyRunner, simulator, sf);
 
-		ArrayList<String> availableDesignators = sf.availableDesignators();
-		for (String strategy : availableDesignators)
-			strategyTab.addStrategy(strategy);
+		// Jon: I struggled to get this to work with new layout
+		// and both drop down menus. I'll look into it more
+
+		// ArrayList<String> availableDesignators = sf.availableDesignators();
+		// for (String strategy : availableDesignators) {
+		// System.out.println(strategy);
+		// strategyTab.addStrategy(strategy);
+		// }
 
 
 		mainWindow.addToSidebar(strategyTab);
@@ -228,6 +232,5 @@ public class Runner {
 		System.out.println(botB);
 
 		initialiseGUI(botA, botB, worldA, worldB, strategyLog, simulator);
-		System.out.println("THIS SHOULD HAPPEN");
 	}
 }

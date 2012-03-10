@@ -44,10 +44,7 @@ public class StratTab extends JPanel implements ActionListener {
 
 	GridBagConstraints c = new GridBagConstraints();
 	private StrategyRunner strategyRunner;
-	// private Controller controllerA;
-	// private Controller controllerB;
 	private AbstractWorld worldA;
-	// private AbstractWorld worldB;
 	private Simulator simulator;
     private StrategyFactory     strategyFactory;
 
@@ -70,8 +67,16 @@ public class StratTab extends JPanel implements ActionListener {
 		// (GridBagConstraints controls properties of grid
 		// for each component. Leftmost column is gridx = 0
 		// and topmost row is grid y = 0)
-		controlPanel = new JPanel(new GridBagLayout());
 
+		String[] names = new String[strategyFactory.availableDesignators()
+				.size()];
+		for (int count = 0; count < strategyFactory.availableDesignators()
+				.size(); count++) {
+			names[count] = strategyFactory.availableDesignators().get(count);
+		}
+
+		controlPanel = new JPanel(new GridBagLayout());
+		stratTabs = new ArrayList<String>();
 		greenLabel = new JLabel(GREEN_LABEL_TEXT);
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 0;
@@ -79,7 +84,7 @@ public class StratTab extends JPanel implements ActionListener {
 		c.insets = new Insets(1, 5, 1, 5);
 		controlPanel.add(greenLabel, c);
 
-		greenStrategy = new JComboBox();
+		greenStrategy = new JComboBox(names);
 		c.gridx = 0;
 		c.gridy = 1;
 		c.gridwidth = 2;
@@ -91,7 +96,7 @@ public class StratTab extends JPanel implements ActionListener {
 		c.gridwidth = 1;
 		controlPanel.add(redLabel, c);
 
-		redStrategy = new JComboBox();
+		redStrategy = new JComboBox(names);
 		c.gridx = 0;
 		c.gridy = 3;
 		c.gridwidth = 2;
@@ -159,14 +164,14 @@ public class StratTab extends JPanel implements ActionListener {
 		if (event.getActionCommand().equals("startstop")) {
 			if (startButton.getText().equals("Start")) {
 
-				String selectedStrategyA = stratTabs
-				.get(greenStrategy.getSelectedIndex());
+				String selectedStrategyA = (String) greenStrategy
+						.getSelectedItem();
 
 				String selectedStrategyB;
 				if (simulator == null) {
-					selectedStrategyB = "NullStrategy";
+					selectedStrategyB = (String) "NullStrategy";
 				} else {
-					selectedStrategyB = "NullStrategy";
+					selectedStrategyB = (String) redStrategy.getSelectedItem();
 					// selectedStrategyB = (String)
 					// redStrategy.getSelectedItem();
 				}
@@ -253,30 +258,35 @@ public class StratTab extends JPanel implements ActionListener {
 		}
 	}
 
-
-
-
-	public String[] getStrings() {
-		int size = stratTabs.size();
-		String[] out = new String[size];
-		for (int i = 0; i < size; i++) {
-			out[i] = (i + 1) + ": " + stratTabs.get(i);
-		}
-		return out;
+	public boolean isSimulator() {
+		return simulator != null;
 	}
 
-	public final void addStrategy(String designator) {
-		stratTabs.add(designator);
-		strings = getStrings();
-		this.remove(greenStrategy);
-		greenStrategy = new JComboBox(strings);
-		c.gridx = 0;
-		c.gridy = 1;
-		c.gridwidth = 2;
-		controlPanel.add(greenStrategy, c);
+
+	// Jon: I struggled to get this to work with new layout
+	// and both drop down menus. I'll look into it more
+
+	// public String[] getStrings() {
+	// int size = stratTabs.size();
+	// String[] out = new String[size];
+	// for (int i = 0; i < size; i++) {
+	// out[i] = (i + 1) + ": " + stratTabs.get(i);
+	// }
+	// return out;
+	// }
+	//
+	// public final void addStrategy(String designator) {
+	// stratTabs.add(designator);
+	// strings = getStrings();
+	// this.remove(greenStrategy);
+	// greenStrategy = new JComboBox(strings);
+	// c.gridx = 0;
+	// c.gridy = 1;
+	// c.gridwidth = 2;
+	// controlPanel.add(greenStrategy, c);
 		
 		//top.add(BorderLayout.WEST, greenStrategy);
-	}
+	// }
 
 	// Called from reset/randomise buttons
 

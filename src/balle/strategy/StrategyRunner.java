@@ -26,13 +26,14 @@ public class StrategyRunner extends AbstractWorldProcessor {
 	 * @param controllerB
 	 *            controller that will be used to move red robot
 	 * @param worldA
-	 *            world that will be used
+	 *            world that will be used for green robot
+	 * @param worldB
+	 *            world that will be used for red robot
 	 * @param gui
 	 *            GUI that Drawables will be drawn on.
 	 */
 	public StrategyRunner(Controller controllerA, Controller controllerB,
-			AbstractWorld worldA, AbstractWorld worldB,
-			SimpleWorldGUI gui) {
+			AbstractWorld worldA, AbstractWorld worldB, SimpleWorldGUI gui) {
 		super(worldA);
 		this.controllerA = controllerA;
 		this.controllerB = controllerB;
@@ -58,7 +59,9 @@ public class StrategyRunner extends AbstractWorldProcessor {
 					snapshot.getPitch(), snapshot.getTimestamp());
 			try {
 				currentStrategyA.step(controllerA, snapshot);
-				currentStrategyB.step(controllerB, snapshot2);
+				if (controllerB != null) {
+					currentStrategyB.step(controllerB, snapshot2);
+				}
 			} catch (Exception e) {
 				LOG.error("Strategy raised exception" + e.toString());
 
@@ -66,7 +69,9 @@ public class StrategyRunner extends AbstractWorldProcessor {
 					LOG.debug(se.toString());
 
 				controllerA.stop();
-				controllerB.stop();
+				if (controllerB != null) {
+					controllerB.stop();
+				}
 			}
 			gui.setDrawables(currentStrategyA.getDrawables());
 			gui.setDrawables(currentStrategyB.getDrawables());
@@ -80,10 +85,11 @@ public class StrategyRunner extends AbstractWorldProcessor {
 	public void stopStrategy() {
 		if (currentStrategyA != null && currentStrategyB != null) {
 			LOG.info("Stopping " + currentStrategyA.getClass().getName());
-			LOG.info("Stopping " + currentStrategyB.getClass().getName());
 			currentStrategyA.stop(controllerA);
 			currentStrategyA = null;
-			currentStrategyB.stop(controllerB);
+			if (controllerB != null) {
+				currentStrategyB.stop(controllerB);
+			}
 			currentStrategyB = null;
 		}
 	}
@@ -103,7 +109,6 @@ public class StrategyRunner extends AbstractWorldProcessor {
 		currentStrategyA = strategyA;
 		currentStrategyB = strategyB;
 		LOG.info("Started " + currentStrategyA.getClass().getName());
-		LOG.info("Started " + currentStrategyB.getClass().getName());
 	}
 
 	/**
