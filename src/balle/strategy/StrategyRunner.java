@@ -12,25 +12,33 @@ public class StrategyRunner extends AbstractWorldProcessor {
 
 	private final static Logger LOG = Logger.getLogger(StrategyRunner.class);
 
-	private Controller controller;
-	private Strategy currentStrategy;
+	private Controller controllerA;
+	private Controller controllerB;
+	private Strategy currentStrategyA;
+	private Strategy currentStrategyB;
 	private final SimpleWorldGUI gui;
 
 	/**
 	 * Initialises strategy runner
 	 * 
-	 * @param controller
-	 *            controller that will be used to move the robot
-	 * @param world
-	 *            world that will be used
+	 * @param controllerA
+	 *            controller that will be used to move green robot
+	 * @param controllerB
+	 *            controller that will be used to move red robot
+	 * @param worldA
+	 *            world that will be used for green robot
+	 * @param worldB
+	 *            world that will be used for red robot
 	 * @param gui
 	 *            GUI that Drawables will be drawn on.
 	 */
-	public StrategyRunner(Controller controller, AbstractWorld world,
-			SimpleWorldGUI gui) {
-		super(world);
-		this.controller = controller;
-		this.currentStrategy = null;
+	public StrategyRunner(Controller controllerA, Controller controllerB,
+			AbstractWorld worldA, AbstractWorld worldB, SimpleWorldGUI gui) {
+		super(worldA);
+		this.controllerA = controllerA;
+		this.controllerB = controllerB;
+		this.currentStrategyA = null;
+		this.currentStrategyB = null;
 		this.gui = gui;
 	}
 
@@ -40,21 +48,33 @@ public class StrategyRunner extends AbstractWorldProcessor {
 	}
 
 	@Override
-    protected synchronized void actionOnChange() {
-		if (currentStrategy != null) {
-
+	protected void actionOnChange() {
+		if (currentStrategyA != null && currentStrategyB != null) {
 			Snapshot snapshot = getSnapshot();
+			// Snapshot centered on opponent robot (Balle from snapshot
+			// becomes opponent in snapshot2 etc
+			Snapshot snapshot2 = new Snapshot(snapshot.getBalle(),
+					snapshot.getOpponent(), snapshot.getBall(),
+					snapshot.getOwnGoal(), snapshot.getOpponentsGoal(),
+					snapshot.getPitch(), snapshot.getTimestamp());
 			try {
-				currentStrategy.step(controller, snapshot);
+				currentStrategyA.step(controllerA, snapshot);
+				if (controllerB != null) {
+					currentStrategyB.step(controllerB, snapshot2);
+				}
 			} catch (Exception e) {
 				LOG.error("Strategy raised exception" + e.toString());
 
 				for (StackTraceElement se : e.getStackTrace())
 					LOG.debug(se.toString());
 
-				controller.stop();
+				controllerA.stop();
+				if (controllerB != null) {
+					controllerB.stop();
+				}
 			}
-			gui.setDrawables(currentStrategy.getDrawables());
+			gui.setDrawables(currentStrategyA.getDrawables());
+			gui.setDrawables(currentStrategyB.getDrawables());
 		}
 
 	}
@@ -62,11 +82,15 @@ public class StrategyRunner extends AbstractWorldProcessor {
 	/**
 	 * Stops the current running strategy
 	 */
-    public synchronized void stopStrategy() {
-		if (currentStrategy != null) {
-			LOG.info("Stopping " + currentStrategy.getClass().getName());
-			currentStrategy.stop(controller);
-			currentStrategy = null;
+	public void stopStrategy() {
+		if (currentStrategyA != null && currentStrategyB != null) {
+			LOG.info("Stopping " + currentStrategyA.getClass().getName());
+			currentStrategyA.stop(controllerA);
+			currentStrategyA = null;
+			if (controllerB != null) {
+				currentStrategyB.stop(controllerB);
+			}
+			currentStrategyB = null;
 		}
 	}
 
@@ -76,13 +100,15 @@ public class StrategyRunner extends AbstractWorldProcessor {
 	 * @param strategy
 	 *            the strategy
 	 */
-    public synchronized void startStrategy(Strategy strategy) {
+
+	public void startStrategy(Strategy strategyA, Strategy strategyB) {
 		// Stop the old strategy
-		if (currentStrategy != null)
+		if (currentStrategyA != null && currentStrategyB != null)
 			stopStrategy();
 		// Start the new strategy
-		currentStrategy = strategy;
-		LOG.info("Started " + currentStrategy.getClass().getName());
+		currentStrategyA = strategyA;
+		currentStrategyB = strategyB;
+		LOG.info("Started " + currentStrategyA.getClass().getName());
 	}
 
 	/**
@@ -90,16 +116,18 @@ public class StrategyRunner extends AbstractWorldProcessor {
 	 * 
 	 * @param controller
 	 */
-	public void setController(Controller controller) {
-		this.controller.stop();
-		this.controller = controller;
+	public void setController(Controller controllerA, Controller controllerB) {
+		this.controllerA.stop();
+		this.controllerA = controllerA;
+		this.controllerB.stop();
+		this.controllerB = controllerB;
 	}
 
 	@Override
 	public void cancel() {
 		super.cancel();
 		stopStrategy();
-		LOG.info("StrategyRunner canceled");
+		LOG.info("StrategyRunner cancelled");
 	}
 
 	@Override

@@ -19,6 +19,11 @@ public class UserInputStrategy extends AbstractPlanner {
     private int    mouseXPos = 10, mouseYPos = 4;
     private float  leftWheelPower = 0, rightWheelPower = 0;
 
+	@FactoryMethod(designator = "UserInput")
+	public static UserInputStrategy gameFactory() {
+		return new UserInputStrategy();
+	}
+
     public UserInputStrategy() {
         Listener l = new Listener();
 
@@ -48,7 +53,6 @@ public class UserInputStrategy extends AbstractPlanner {
     @Override
     // TODO Change to rely on and react to JPanel thing
     public void onStep(Controller controller, Snapshot snapshot) {
-        System.out.println(leftWheelPower + " " + rightWheelPower);
         controller.setWheelSpeeds(Math.round(leftWheelPower),
                 Math.round(rightWheelPower));
 

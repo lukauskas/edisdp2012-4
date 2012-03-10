@@ -61,11 +61,11 @@ public class StrategyFactory {
         for (String key : keys)
             titles.add(key);
         return titles;
-
 	}
 
     public AbstractPlanner createClass(String designator)
             throws UnknownDesignatorException {
+
         runnableStrategies = getRunnableStrategies();
         Method m = runnableStrategies.get(designator);
 
@@ -90,5 +90,6 @@ public class StrategyFactory {
         }
         
         return strategy;
+
     }
 }

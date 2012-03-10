@@ -19,9 +19,9 @@ public class StrategyLogPane extends JPanel {
 	private final LoggingEventTableModel model;
 	private final JTable table;
 
-    private final static int MAX_ROWS = 15;
+	private final static int MAX_ROWS = 15;
 
-    public StrategyLogPane() {
+	public StrategyLogPane() {
 		super();
 		model = new LoggingEventTableModel();
 		table = new JTable(model);
@@ -34,18 +34,17 @@ public class StrategyLogPane extends JPanel {
 
 		this.setLayout(new BorderLayout());
 
-        this.add(new JScrollPane(table), BorderLayout.CENTER);
+		this.add(new JScrollPane(table), BorderLayout.CENTER);
 	}
 
-
-    public void append(LoggingEvent e) {
+	public void append(LoggingEvent e) {
 		if (model.getRowCount() > MAX_ROWS)
 			model.removeRow(0);
 
 		LoggingEvent[] rowData = new LoggingEvent[model.getColumnCount()];
 		rowData[0] = e;
 
-        model.addRow(rowData);
+		model.addRow(rowData);
 	}
 }
 
@@ -74,7 +73,8 @@ class EvenOddRenderer implements TableCellRenderer {
 
 		Color foreground, background;
 		row = table.convertRowIndexToModel(row);
-		Level level = ((LoggingEventTableModel) table.getModel()).getLevel(row, 0);
+		Level level = ((LoggingEventTableModel) table.getModel()).getLevel(row,
+				0);
 
 		if (level.equals(Level.WARN)) {
 			foreground = Color.black;
