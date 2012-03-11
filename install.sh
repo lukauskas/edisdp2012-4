@@ -58,10 +58,6 @@ function install_slf4j {
    && echo "> extractiong $lLOCATION" \
    && cd $lEXTRACT_DIR \
    && tar xvf $lLOCATION \
-<<<<<<< HEAD
-=======
-   && cp "$lEXTRACT_DIR/slf4j-1.6.4/slf4j-simple-1.6.4.jar" $LIB \
->>>>>>> dancingRobots
    && cp "$lEXTRACT_DIR/slf4j-1.6.4/slf4j-api-1.6.4.jar" $LIB \
    && rm $lLOCATION \
    && rm -rf $lEXTRACT_DIR
