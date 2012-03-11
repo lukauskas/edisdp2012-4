@@ -143,12 +143,16 @@ public class BezierNav implements OrientedMovementExecutor {
 			stop(controller);
 			return;
 		}
+
 		// calculate bezier points 0 to 3
 		Robot robot = snapshot.getBalle();
 		Coord rP = robot.getPosition(), tP = getAdjustedP3();
 		if (rP == null || tP == null) {
 			return;
 		}
+
+		// -------------------------------------------
+		// Calculate turning circle
 
 		p0 = rP;
 		p3 = tP;
@@ -190,6 +194,10 @@ public class BezierNav implements OrientedMovementExecutor {
 				.atan2styleradians() > 0;
 		double r = c.rad(0);
 
+		// End of smoothing
+		// -------------------------------------------
+
+
 		// throttle speed (slow when doing sharp turns)
 		double max = MAX_VELOCITY;
 		// // maximum speed is ok
@@ -207,30 +215,51 @@ public class BezierNav implements OrientedMovementExecutor {
 		right = isLeft ? v2 : v1;
 		// find current wheel powers
 		long dT = snapshot.getTimestamp() - lastAngleTime;
-		if (USE_PID && dT > 0) {
-			if (lastAngle != null) {
-				// this uses the angular and linear velocity of the robot to
-				// find the estimated powers to the wheels
-				double dA = lastAngle.angleToatan2Radians(robot
-						.getOrientation());
-				double basicV = (dA * Globals.ROBOT_TRACK_WIDTH / 2) / dT;
-				int flipper = robot.getVelocity().dot(
-						robot.getOrientation().getUnitCoord()) <= 0 ? -1 : 1;
-				double curentLeftP = Globals
-						.velocityToPower((float) ((flipper * robot
-								.getVelocity().abs()) - basicV));
-				double curentRightP = Globals
-						.velocityToPower((float) ((flipper * robot
-								.getVelocity().abs()) + basicV));
-				// use PID
-				left = pid.convert(left, curentLeftP);
-				right = pid.convert(right, curentRightP);
-			}
-			lastAngleTime = snapshot.getTimestamp();
-			lastAngle = robot.getOrientation();
-		}
-		
-		// dampen
+
+		setWheelSpeeds(controller, snapshot, left, right, dT);
+
+		// if (USE_PID && dT > 0) {
+		// if (lastAngle != null) {
+		// // this uses the angular and linear velocity of the robot to
+		// // find the estimated powers to the wheels
+		// double dA = lastAngle.angleToatan2Radians(robot
+		// .getOrientation());
+		// double basicV = (dA * Globals.ROBOT_TRACK_WIDTH / 2) / dT;
+		// int flipper = robot.getVelocity().dot(
+		// robot.getOrientation().getUnitCoord()) <= 0 ? -1 : 1;
+		// double curentLeftP = Globals
+		// .velocityToPower((float) ((flipper * robot
+		// .getVelocity().abs()) - basicV));
+		// double curentRightP = Globals
+		// .velocityToPower((float) ((flipper * robot
+		// .getVelocity().abs()) + basicV));
+		// // use PID
+		// left = pid.convert(left, curentLeftP);
+		// right = pid.convert(right, curentRightP);
+		// }
+		// lastAngleTime = snapshot.getTimestamp();
+		// lastAngle = robot.getOrientation();
+		// }
+		//
+		// System.out.println(left + "\t\t" + right);
+		//
+		// controller.setWheelSpeeds((int) left, (int) right);
+		// controllerHistory.add(new ControllerHistoryElement((int) left,
+		// (int) right, snapshot));
+	}
+
+	/**
+	 * Supports a different methods for smoothing here.
+	 * 
+	 * @param controller
+	 * @param snapshot
+	 * @param left
+	 * @param right
+	 * @param dT
+	 */
+	protected void setWheelSpeeds(Controller controller, Snapshot snapshot,
+			double left, double right, long dT) {
+
 		if (controllerHistory.size() > 0) {
 			double dampening = 0.6;
 			double invDampening = 1 - dampening;
@@ -242,7 +271,8 @@ public class BezierNav implements OrientedMovementExecutor {
 					+ (dampening * controllerHistory.get(
 							controllerHistory.size() - 1).getPowerRight());
 		}
-		
+
+
 		System.out.println(left + "\t\t" + right);
 
 		controller.setWheelSpeeds((int) left, (int) right);
