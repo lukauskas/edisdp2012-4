@@ -648,13 +648,13 @@ public class SimulatorWorld {
 				(float) b.getOrientation().radians());
 
 		balle.world.objects.Robot o = s.getOpponent();
-		Coord op = b.getPosition().mult(SCALE);
-		Coord ov = b.getVelocity().mult(SCALE * 1000);
-		balle.getBody().setLinearVelocity(
+		Coord op = o.getPosition().mult(SCALE);
+		Coord ov = o.getVelocity().mult(SCALE * 1000);
+		opponent.getBody().setLinearVelocity(
 				new Vec2((float) ov.getX(), (float) ov.getY()));
-		balle.getBody().setTransform(
+		opponent.getBody().setTransform(
 				new Vec2((float) op.getX(), (float) op.getY()),
-				(float) b.getOrientation().radians());
+				(float) o.getOrientation().radians());
 	}
 
 	private Coord v2C(Vec2 v) {

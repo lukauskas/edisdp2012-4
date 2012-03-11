@@ -42,10 +42,10 @@ public class BezierNav implements OrientedMovementExecutor {
 														// target from the
 														// center front of the
 														// robot
-	private final double MIN_SAFE_RADIUS = 0.3; // the smallest turning radius
+	private final double MIN_SAFE_RADIUS = 0.5; // the smallest turning radius
 												// where moving at maximum speed
 												// is ok
-	private final double SAFER_SPEED_RATIO = 0.2; // ratio of (max
+	private final double SAFER_SPEED_RATIO = 0.3; // ratio of (max
 													// speed)/((minimum)safe
 													// speed). when making sharp
 													// turns the speed will be
@@ -229,6 +229,21 @@ public class BezierNav implements OrientedMovementExecutor {
 			lastAngleTime = snapshot.getTimestamp();
 			lastAngle = robot.getOrientation();
 		}
+		
+		// dampen
+		double dampening = 0.9;
+		double invDampening = 1 - dampening;
+
+		left = (invDampening * left)
+				+ (dampening * controllerHistory.get(
+						controllerHistory.size() - 1).getPowerLeft());
+		right = (invDampening * right)
+				+ (dampening * controllerHistory.get(
+				controllerHistory
+.size() - 1).getPowerRight());
+		
+		System.out.println(left + "\t\t" + right);
+
 		controller.setWheelSpeeds((int) left, (int) right);
 		controllerHistory.add(new ControllerHistoryElement((int) left,
 				(int) right, snapshot));
@@ -276,36 +291,9 @@ public class BezierNav implements OrientedMovementExecutor {
 				lastRPower);
 		simulator.setStartTime(simulatorTime);
 
-		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		// this is just a test
-		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		BasicWorld w = new BasicWorld(true, false, s.getPitch());
-		SimulatorWorld sim = new SimulatorWorld(false);
-		sim.setWorld(new World(new Vec2(), true));
-		sim.initWorld();
-		sim.setVisionDelay(0);
-		sim.getReader().addListener(w);
-		sim.getReader().propagateGoals();
-		sim.getReader().propagatePitchSize();
-		for (int i = 0; i < 10; i++) {
-			long tD = 50;
-			sim.getBlueSoft().setWheelSpeeds(900, 900);
-			sim.update(tD);
-			sim.getWorld().step(tD / 1000f, 8, 3);
-			sim.getReader().update();
-			sim.getReader().propagate();
-		}
-		System.out.println("should be the same: "
-				+ sim.blue.getBody().getPosition());
-		
-		// !!!!!!!!!!!!!!!!!!!!!!!!!!!
-		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 		// use the controllerHistory to simulate the wheelspeeds
 		//// run a simulation while adjusting wheel speeds
-		long maxTD = 50; // low values may make this less accurate
+		long maxTD = 10; // low values may make this less accurate
 		for (int i = 0; i < controllerHistory.size(); i++) {
 			ControllerHistoryElement curr = controllerHistory.get(i);
 			long nextTime = currentTime;
@@ -313,7 +301,8 @@ public class BezierNav implements OrientedMovementExecutor {
 
 			if(i < controllerHistory.size() - 1)
 				nextTime = controllerHistory.get(i + 1).getSnapshot().getTimestamp();
-			for(long tD = maxTD; simulatorTime < currentTime;tD = Math.min(simulatorTime + tD, nextTime) - simulatorTime) {
+			for (long tD = maxTD; simulatorTime < nextTime; tD = Math.min(
+					simulatorTime + tD, nextTime) - simulatorTime) {
 				//simulator.getBlueSoft().setWheelSpeeds(900, 900);
 				simulator.getBlueSoft().setWheelSpeeds(curr.getPowerLeft(),
 						curr.getPowerRight());
