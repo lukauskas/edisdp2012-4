@@ -1,6 +1,6 @@
 package balle.world;
 
-public class Velocity extends Coord {
+public class Velocity extends Coord implements Comparable<Velocity> {
 
     protected final double timeDelta;
 
@@ -22,4 +22,9 @@ public class Velocity extends Coord {
     public Velocity adjustLength(double newTimeDelta) {
         return new Velocity(this.mult(newTimeDelta / timeDelta), newTimeDelta);
     }
+
+	@Override
+	public int compareTo(Velocity o) {
+		return (int) (abs() - o.abs());
+	}
 }
