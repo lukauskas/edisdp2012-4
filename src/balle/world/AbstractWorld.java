@@ -35,6 +35,11 @@ public abstract class AbstractWorld implements Listener {
 
 	private final Pitch pitch;
 
+	/**
+	 * Wait on this to be notified when a new snapshot is ready
+	 */
+	public final Object snapshotWaitLock = new Object();
+
 	public AbstractWorld(boolean isBalleBlue, boolean goalIsLeft, Pitch pitch) {
 		this.balleIsBlue = isBalleBlue;
 		this.pitch = pitch;
@@ -172,6 +177,14 @@ public abstract class AbstractWorld implements Listener {
 		else
 			updateScaled(yPos, yOrientation, bPos, bOrientation, ballPos,
 					timestamp);
+
+		publishSnapshotUpdate();
+	}
+
+	private final void publishSnapshotUpdate() {
+		synchronized (snapshotWaitLock) {
+			snapshotWaitLock.notifyAll();
+		}
 	}
 
 	@Override
