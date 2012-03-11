@@ -7,6 +7,7 @@ import balle.strategy.executor.movement.GoToObjectPFN;
 import balle.strategy.executor.turning.IncFaceAngle;
 import balle.strategy.executor.turning.RotateToOrientationExecutor;
 import balle.strategy.planner.AbstractPlanner;
+import balle.strategy.planner.BackingOffStrategy;
 import balle.strategy.planner.DefensiveStrategy;
 import balle.strategy.planner.GoToBallSafe;
 import balle.strategy.planner.KickFromWall;
@@ -23,11 +24,12 @@ public class Game extends AbstractPlanner {
     private static final Logger LOG = Logger.getLogger(Game.class);
     // Strategies that we will need make sure to updateState() for each of them
     // and stop() each of them
-    Strategy defensiveStrategy;
-    Strategy goToBallStrategy;
-    Strategy pickBallFromWallStrategy;
-    RotateToOrientationExecutor turningExecutor;
-	KickToGoal kickingStrategy;
+	protected final Strategy defensiveStrategy;
+	protected final Strategy goToBallStrategy;
+	protected final Strategy pickBallFromWallStrategy;
+	protected final AbstractPlanner backingOffStrategy;
+	protected final RotateToOrientationExecutor turningExecutor;
+	protected final KickToGoal kickingStrategy;
 
     @FactoryMethod(designator = "Game")
     public static Game gameFactory() {
@@ -45,6 +47,7 @@ public class Game extends AbstractPlanner {
         goToBallStrategy = new GoToBallSafe(); // new GoToBall(new
                                              // GoToObjectPFN(0));
         pickBallFromWallStrategy = new KickFromWall(new GoToObjectPFN(0));
+		backingOffStrategy = new BackingOffStrategy();
         turningExecutor = new IncFaceAngle();
         kickingStrategy = new KickToGoal();
 
@@ -65,8 +68,15 @@ public class Game extends AbstractPlanner {
         Goal ownGoal = snapshot.getOwnGoal();
         Pitch pitch = snapshot.getPitch();
 
+		LOG.info(ourRobot.getVelocity().abs());
+
         if ((ourRobot.getPosition() == null) || (ball.getPosition() == null))
             return;
+        
+		if (backingOffStrategy.couldRun(snapshot)) {
+			backingOffStrategy.step(controller, snapshot);
+			return;
+		}
 
         Orientation targetOrientation = ball.getPosition()
                 .sub(ourRobot.getPosition()).orientation();

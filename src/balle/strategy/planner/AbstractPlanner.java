@@ -55,6 +55,10 @@ public abstract class AbstractPlanner implements Strategy {
         this.drawables.addAll(drawables);
     }
 
+	public boolean couldRun(Snapshot snapshot) {
+		return true;
+	}
+
 	protected abstract void onStep(Controller controller, Snapshot snapshot);
 
 }

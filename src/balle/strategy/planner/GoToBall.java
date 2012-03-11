@@ -31,7 +31,8 @@ public class GoToBall extends AbstractPlanner {
     private static final double OVERSHOOT_GAP = 0.7; // Meters
 	private static final double DIST_DIFF_THRESHOLD = 0.2; // Meters
 
-    private boolean approachTargetFromCorrectSide;
+	private boolean approachTargetFromCorrectSide;
+	private boolean shouldAvoidOpponent = true;
 
     public GoToBall(MovementExecutor movementExecutor) {
         executorStrategy = movementExecutor;
@@ -70,6 +71,14 @@ public class GoToBall extends AbstractPlanner {
     public void setApproachTargetFromCorrectSide(
             boolean approachTargetFromCorrectSide) {
         this.approachTargetFromCorrectSide = approachTargetFromCorrectSide;
+    }
+    
+	public boolean shouldAvoidOpponent() {
+    	return this.shouldAvoidOpponent;
+    }
+    
+	public void setShouldAvoidOpponent(boolean shouldAvoidOpponent) {
+		this.shouldAvoidOpponent = shouldAvoidOpponent;
     }
 
     protected FieldObject getTarget(Snapshot snapshot) {
@@ -270,7 +279,8 @@ public class GoToBall extends AbstractPlanner {
         }
 
         // If we see the opponent
-		if (snapshot.getOpponent().getPosition() != null) {
+		if (shouldAvoidOpponent
+				&& snapshot.getOpponent().getPosition() != null) {
 			if (!snapshot.getBalle().canReachTargetInStraightLine(target,
 					snapshot.getOpponent())) {
                 // pick a new target then
