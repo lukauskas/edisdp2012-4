@@ -68,8 +68,6 @@ public class Game extends AbstractPlanner {
         Goal ownGoal = snapshot.getOwnGoal();
         Pitch pitch = snapshot.getPitch();
 
-		LOG.info(ourRobot.getVelocity().abs());
-
         if ((ourRobot.getPosition() == null) || (ball.getPosition() == null))
             return;
         
