@@ -231,16 +231,17 @@ public class BezierNav implements OrientedMovementExecutor {
 		}
 		
 		// dampen
-		double dampening = 0.6;
-		double invDampening = 1 - dampening;
+		if (controllerHistory.size() > 0) {
+			double dampening = 0.6;
+			double invDampening = 1 - dampening;
 
-		left = (invDampening * left)
-				+ (dampening * controllerHistory.get(
-						controllerHistory.size() - 1).getPowerLeft());
-		right = (invDampening * right)
-				+ (dampening * controllerHistory.get(
-				controllerHistory
-.size() - 1).getPowerRight());
+			left = (invDampening * left)
+					+ (dampening * controllerHistory.get(
+							controllerHistory.size() - 1).getPowerLeft());
+			right = (invDampening * right)
+					+ (dampening * controllerHistory.get(
+							controllerHistory.size() - 1).getPowerRight());
+		}
 		
 		System.out.println(left + "\t\t" + right);
 
@@ -293,7 +294,7 @@ public class BezierNav implements OrientedMovementExecutor {
 
 		// use the controllerHistory to simulate the wheelspeeds
 		//// run a simulation while adjusting wheel speeds
-		long maxTD = 10; // low values may make this less accurate
+		long maxTD = 50; // low values may make this less accurate
 		for (int i = 0; i < controllerHistory.size(); i++) {
 			ControllerHistoryElement curr = controllerHistory.get(i);
 			long nextTime = currentTime;
