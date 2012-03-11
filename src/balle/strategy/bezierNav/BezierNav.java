@@ -208,9 +208,8 @@ public class BezierNav implements OrientedMovementExecutor {
 
 		// calculate wheel speeds/powers
 		double v1, v2, left, right;
-		v1 = Globals
-				.velocityToPower((float) (max * getMinVelocityRato(r)));
-		v2 = Globals.velocityToPower((float) max);
+		v1 = getMinVelocityRato(r);
+		v2 = 1;
 		left = isLeft ? v1 : v2;
 		right = isLeft ? v2 : v1;
 		// find current wheel powers
@@ -262,6 +261,10 @@ public class BezierNav implements OrientedMovementExecutor {
 	 */
 	protected void setWheelSpeeds(Controller controller, Snapshot snapshot,
 			double left, double right, long dT) {
+
+		double max = Globals.MAXIMUM_MOTOR_SPEED;
+		left = Globals.velocityToPower((float) (max * left));
+		right = Globals.velocityToPower((float) (max * right));
 
 		if (controllerHistory.size() > 0) {
 			double dampening = 0.6;
