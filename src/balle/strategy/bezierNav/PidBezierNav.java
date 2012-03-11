@@ -3,6 +3,7 @@ package balle.strategy.bezierNav;
 import balle.controller.Controller;
 import balle.strategy.pathfinding.PathFinder;
 import balle.world.Snapshot;
+import balle.world.objects.Robot;
 
 public class PidBezierNav extends BezierNav {
 
@@ -13,6 +14,8 @@ public class PidBezierNav extends BezierNav {
 	@Override
 	protected void setWheelSpeeds(Controller controller, Snapshot snapshot,
 			double left, double right, long dT) {
+
+		Robot robot = snapshot.getBalle();
 
 		// if (dT > 0) {
 		// if (lastAngle != null) {

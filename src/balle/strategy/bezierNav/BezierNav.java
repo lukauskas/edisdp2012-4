@@ -75,7 +75,7 @@ public class BezierNav implements OrientedMovementExecutor {
 	BasicWorld world;
 
 	private Orientation lastAngle;
-	private long lastAngleTime;
+	private long lastSnapshotTime;
 
 
 
@@ -214,7 +214,10 @@ public class BezierNav implements OrientedMovementExecutor {
 		left = isLeft ? v1 : v2;
 		right = isLeft ? v2 : v1;
 		// find current wheel powers
-		long dT = snapshot.getTimestamp() - lastAngleTime;
+		long dT = snapshot.getTimestamp() - lastSnapshotTime;
+
+		// Update last time-stamp.
+		lastSnapshotTime = snapshot.getTimestamp();
 
 		setWheelSpeeds(controller, snapshot, left, right, dT);
 
