@@ -45,7 +45,7 @@ public class BezierNav implements OrientedMovementExecutor {
 	private final double MIN_SAFE_RADIUS = 0.5; // the smallest turning radius
 												// where moving at maximum speed
 												// is ok
-	private final double SAFER_SPEED_RATIO = 0.3; // ratio of (max
+	private final double SAFER_SPEED_RATIO = 0.4; // ratio of (max
 													// speed)/((minimum)safe
 													// speed). when making sharp
 													// turns the speed will be
@@ -231,7 +231,7 @@ public class BezierNav implements OrientedMovementExecutor {
 		}
 		
 		// dampen
-		double dampening = 0.9;
+		double dampening = 0.6;
 		double invDampening = 1 - dampening;
 
 		left = (invDampening * left)
