@@ -15,7 +15,7 @@ import balle.strategy.executor.turning.RotateToOrientationExecutor;
 import balle.strategy.planner.AbstractPlanner;
 import balle.strategy.planner.BackingOffStrategy;
 import balle.strategy.planner.DefensiveStrategy;
-import balle.strategy.planner.GoToBallSafe;
+import balle.strategy.planner.GoToBallSafeProportional;
 import balle.strategy.planner.KickFromWall;
 import balle.strategy.planner.KickToGoal;
 import balle.world.Coord;
@@ -65,14 +65,7 @@ public class Game extends AbstractPlanner {
 
     public Game() {
         defensiveStrategy = new DefensiveStrategy(new GoToObjectPFN(0.1f));
-        // TODO: implement a new strategy that inherits from GoToBall but always
-        // approaches the ball from correct angle. (This can be done by always
-        // pointing robot
-        // to a location that is say 0.2 m before the ball in correct direction
-        // and then, once the robot reaches it, pointing it to the ball itself
-        // so it reaches it.
-        goToBallStrategy = new GoToBallSafe(); // new GoToBall(new
-                                             // GoToObjectPFN(0));
+        goToBallStrategy = new GoToBallSafeProportional();
         pickBallFromWallStrategy = new KickFromWall(new GoToObjectPFN(0));
 		backingOffStrategy = new BackingOffStrategy();
         turningExecutor = new IncFaceAngle();
@@ -157,19 +150,20 @@ public class Game extends AbstractPlanner {
             setCurrentStrategy(pickBallFromWallStrategy.getClass().getName());
 			pickBallFromWallStrategy.step(controller, snapshot);
             addDrawables(pickBallFromWallStrategy.getDrawables());
-        } else if (ball.isNear(ourRobot)
-                && (ourRobot.isApproachingTargetFromCorrectSide(ball,
-						snapshot.getOpponentsGoal()))) {
-            if (Math.abs(ourRobot.getAngleToTurn(targetOrientation)) > (Math.PI / 4)) {
-                LOG.info("Ball is near our robot, turning to it");
-                setCurrentStrategy(turningExecutor.getClass().getName());
-                turningExecutor.setTargetOrientation(targetOrientation);
-				turningExecutor.step(controller, snapshot);
-            } else {
-                setCurrentStrategy(null);
-                // Go forward!
-                controller.setWheelSpeeds(400, 400);
-            }
+            // } else if (ball.isNear(ourRobot)
+            // && (ourRobot.isApproachingTargetFromCorrectSide(ball,
+            // snapshot.getOpponentsGoal()))) {
+            // if (Math.abs(ourRobot.getAngleToTurn(targetOrientation)) >
+            // (Math.PI / 4)) {
+            // LOG.info("Ball is near our robot, turning to it");
+            // setCurrentStrategy(turningExecutor.getClass().getName());
+            // turningExecutor.setTargetOrientation(targetOrientation);
+            // turningExecutor.step(controller, snapshot);
+            // } else {
+            // setCurrentStrategy(null);
+            // // Go forward!
+            // controller.setWheelSpeeds(400, 400);
+            // }
         } else {
             // Approach ball
             setCurrentStrategy(goToBallStrategy.getClass().getName());
