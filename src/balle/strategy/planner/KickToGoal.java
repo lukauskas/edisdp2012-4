@@ -84,10 +84,16 @@ public class KickToGoal extends AbstractPlanner {
                 // position
                 // and hopefully bounce from the wall, or whether it is better
                 // to turn towards the goal
+
+				if (!opponent.intersects(ourRobot.getBallKickLine(ball))
+						&& ourRobot.isFacingGoalHalf(goal)) {
+					controller.kick();
+				}
+
             }
             LOG.warn("Kicking anyway");
             // TODO: remove
-            controller.kick();
+			// controller.kick();
         }
     }
 }
