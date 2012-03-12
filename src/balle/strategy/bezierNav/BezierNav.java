@@ -42,10 +42,10 @@ public class BezierNav implements OrientedMovementExecutor {
 														// target from the
 														// center front of the
 														// robot
-	private final double MIN_SAFE_RADIUS = 0.5; // the smallest turning radius
+	private final double MIN_SAFE_RADIUS = 0.05; // the smallest turning radius
 												// where moving at maximum speed
 												// is ok
-	private final double SAFER_SPEED_RATIO = 0.4; // ratio of (max
+	private final double SAFER_SPEED_RATIO = 0.5; // ratio of (max
 													// speed)/((minimum)safe
 													// speed). when making sharp
 													// turns the speed will be
@@ -54,8 +54,12 @@ public class BezierNav implements OrientedMovementExecutor {
 			.powerToVelocity(Globals.MAXIMUM_MOTOR_SPEED); // the maximum
 																// wheel
 															// velocity to use
+	private final double DAMPENING_POWERCHANGE = 0.7;
+	private final double DAMPENING_POWERRATIO = 0; // increase towards 1 to make
+													// the robot move more
+													// strait
 
-	private static final double SUBTARGET_RADIUS = 0.05; // how close the robot
+	private static final double SUBTARGET_RADIUS = 0.08; // how close the robot
 															// has
 														// to be to intermitent
 														// points befor it try
@@ -232,14 +236,13 @@ public class BezierNav implements OrientedMovementExecutor {
 		
 		// dampen
 		if (controllerHistory.size() > 0) {
-			double dampening = 0.6;
-			double invDampening = 1 - dampening;
+			double invDampening = 1 - DAMPENING_POWERCHANGE;
 
 			left = (invDampening * left)
-					+ (dampening * controllerHistory.get(
+					+ (DAMPENING_POWERCHANGE * controllerHistory.get(
 							controllerHistory.size() - 1).getPowerLeft());
 			right = (invDampening * right)
-					+ (dampening * controllerHistory.get(
+					+ (DAMPENING_POWERCHANGE * controllerHistory.get(
 							controllerHistory.size() - 1).getPowerRight());
 		}
 		
@@ -365,7 +368,8 @@ public class BezierNav implements OrientedMovementExecutor {
 
 	private double getMinVelocityRato(double radius) {
 		double rtw = Globals.ROBOT_TRACK_WIDTH / 2;
-		return ((radius - rtw) / (radius + rtw));
+		double ratio = ((radius - rtw) / (radius + rtw));
+		return ratio + ((1 - ratio) * DAMPENING_POWERRATIO);
 	}
 
 	@Override
