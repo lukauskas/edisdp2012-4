@@ -9,13 +9,13 @@ import balle.main.drawable.DrawableLine;
 import balle.main.drawable.Label;
 import balle.misc.Globals;
 import balle.strategy.FactoryMethod;
-import balle.strategy.executor.movement.GoToObject;
 import balle.strategy.executor.movement.GoToObjectPFN;
 import balle.strategy.executor.movement.MovementExecutor;
 import balle.strategy.executor.turning.FaceAngle;
 import balle.strategy.executor.turning.RotateToOrientationExecutor;
 import balle.world.Coord;
 import balle.world.Line;
+import balle.world.Orientation;
 import balle.world.Snapshot;
 import balle.world.objects.Ball;
 import balle.world.objects.FieldObject;
@@ -25,13 +25,16 @@ import balle.world.objects.Point;
 import balle.world.objects.Robot;
 
 public class GoToBallSafe extends GoToBall {
+    private static final double BALL_SPEED_THRESHOLD = 0.01 / 1000; // m/ms
     private static final double BALL_SAFE_GAP = 0.4;
-    private RotateToOrientationExecutor turnExecutor = new FaceAngle();
+    private static final double ANGLE_THRESHOLD = Math.PI / 32;
+    private final RotateToOrientationExecutor turnExecutor;
 
     private static Logger LOG = Logger.getLogger(GoToBallSafe.class);
 
     public GoToBallSafe() {
         super(new GoToObjectPFN(0), true);
+        turnExecutor = new FaceAngle(ANGLE_THRESHOLD);
         setExecutorStrategy(new GoToObjectPFN(0));
     }
 
@@ -47,8 +50,20 @@ public class GoToBallSafe extends GoToBall {
                 snapshot.getBalle().getPosition()) < BALL_SAFE_GAP * 1.25)
             &&
                 (targetGoalLine.intersects(snapshot.getOpponentsGoal()
-                .getGoalLine())) || (turnExecutor.isTurning()))
-            stage = 2;
+                        .getGoalLine()))) {
+            boolean facingBall = snapshot.getBalle().getAngleToTurnToTarget(
+                    originalTarget.getPosition()) < ANGLE_THRESHOLD;
+            boolean ballIsMovingFast = originalTarget.getVelocity().abs() > BALL_SPEED_THRESHOLD;
+
+            if (ballIsMovingFast)
+                LOG.warn("Ball is moving too fast to approach");
+            if ((!facingBall && !ballIsMovingFast)
+                || (turnExecutor.isTurning()))
+                stage = 2;
+            else
+                stage = 3;
+            
+        }
         else
             stage = 1;
 
@@ -73,7 +88,7 @@ public class GoToBallSafe extends GoToBall {
         Line targetLine = new Line(targetGoal.getPosition(), ball.getPosition());
 
         int stage = getStage(snapshot);
-        if (stage < 2) {
+        if (stage < 3) {
             Pitch pitch = snapshot.getPitch();
             double ballSafeGap = BALL_SAFE_GAP;
             Line newTargetLine = targetLine.extend(ballSafeGap);
@@ -97,22 +112,24 @@ public class GoToBallSafe extends GoToBall {
             }
         }
         addDrawable(new DrawableLine(targetLine, Color.ORANGE));
-        return new Point(targetLine.getB());
+        if (stage == 3)
+            return ball; // Return the ball itself so we can use the velocity
+                         // information
+        else
+            return new Point(targetLine.getB());
     }
 
     public void setAppropriateMovementStrategy(boolean correctAngle, int stage) {
-        // TODO: Start here
         if (stage == 1) {
             LOG.info("Going to BALL_SAFE target");
             setApproachTargetFromCorrectSide(correctAngle);
             setExecutorStrategy(new GoToObjectPFN(0, false));
-        } else {
+        } else if (stage == 3) {
             LOG.info("Going to the ball");
-            MovementExecutor executor = new GoToObject(turnExecutor);
+            MovementExecutor executor = new  GoToObjectPFN(0, true);
             executor.setStopDistance(0);
             setExecutorStrategy(executor);
             setApproachTargetFromCorrectSide(false);
-
         }
     }
 
@@ -136,7 +153,22 @@ public class GoToBallSafe extends GoToBall {
 
         int stage = getStage(snapshot);
         changeStage(stage);
-        if (stage != 1) {
+        if (stage == 2) {
+            if (turnExecutor.isTurning()) {
+                turnExecutor.step(controller, snapshot);
+                LOG.trace("Still turning");
+                return;
+            } else {
+                Orientation targetOrientation = ball
+                        .getPosition().sub(ourRobot.getPosition())
+                        .orientation();
+                LOG.info("Turning towards ball!");
+                turnExecutor.setTargetOrientation(targetOrientation);
+                turnExecutor.step(controller, snapshot);
+                return;
+            }
+
+        } else if (stage == 3) {
             if (ourRobot.isApproachingTargetFromCorrectSide(ball,
                     snapshot.getOpponentsGoal())) {
                 setAppropriateMovementStrategy(false, stage);

@@ -181,6 +181,23 @@ public class Line {
 		return new Line(a, new Coord(newX, newY));
 	}
 
+    public Line extendBothDirections(double howMuch) {
+
+        Coord point = new Coord(howMuch, 0);
+        Coord rotated = point.rotate(angle());
+
+        double newX = b.getX() + rotated.getX();
+        double newY = b.getY() + rotated.getY();
+
+        Coord point2 = new Coord(0, howMuch);
+        Coord rotated2 = point2.rotate(angle());
+
+        double newAX = a.getX() + rotated2.getX();
+        double newAY = a.getY() + rotated2.getY();
+
+        return new Line(new Coord(newAX, newAY), new Coord(newX, newY));
+    }
+
 	/**
 	 * Get a new line with direction opposite to this one
 	 * 
