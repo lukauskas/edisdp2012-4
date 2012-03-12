@@ -16,6 +16,7 @@ import org.apache.log4j.Logger;
 
 import balle.main.drawable.Drawable;
 import balle.main.drawable.DrawableLine;
+import balle.main.drawable.Label;
 import balle.misc.Globals;
 import balle.world.AbstractWorld;
 import balle.world.Coord;
@@ -195,6 +196,12 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 			float w = radius * 2 * scaler.getScale();
 			g.fillOval((int) (scaler.m2PX(pos.getX()) - (w / 2)),
 					(int) (scaler.m2PY(pos.getY()) - (w / 2)), (int) w, (int) w);
+			
+            Label ballSpeedLabel = new Label(String.format("%.5fE-3", ball
+                    .getVelocity().abs() * 1000), new Coord(ball.getPosition()
+                    .getX(), ball
+                    .getPosition().getY() - ball.getRadius() * 3), Color.RED);
+            ballSpeedLabel.draw(g, scaler);
 		}
 
 		private void drawRobot(Graphics g, Color c, Robot robot) {
