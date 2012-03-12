@@ -38,6 +38,8 @@ public class Game extends AbstractPlanner {
 	protected final RotateToOrientationExecutor turningExecutor;
 	protected final KickToGoal kickingStrategy;
 
+    protected boolean initial;
+
     private String currentStrategy = null;
 
     public String getCurrentStrategy() {
@@ -60,7 +62,12 @@ public class Game extends AbstractPlanner {
 
     @FactoryMethod(designator = "Game")
     public static Game gameFactory() {
-        return new Game();
+        return new Game(true);
+    }
+
+    @FactoryMethod(designator = "GameTesting")
+    public static Game gameFactoryTesting() {
+        return new Game(false);
     }
 
     public Game() {
@@ -70,9 +77,40 @@ public class Game extends AbstractPlanner {
 		backingOffStrategy = new BackingOffStrategy();
         turningExecutor = new IncFaceAngle();
         kickingStrategy = new KickToGoal();
+        initial = false;
+    }
+
+    public boolean isInitial(Snapshot snapshot) {
+        if (initial == false)
+            return false;
+
+        // Check if we have ball
+        Ball ball = snapshot.getBall();
+        if (ball.getPosition() == null)
+            return initial; // Return whatever is set to initial if we do not
+                            // see it
+        
+        Coord centerOfPitch = new Coord(Globals.PITCH_WIDTH / 2,
+                Globals.PITCH_HEIGHT / 2);
+        // If ball has moved 5 cm, turn off initial strategy
+        if (ball.getPosition().dist(centerOfPitch) > 0.05) {
+            LOG.info("Ball has moved. Turning off initial strategy");
+            setInitial(false);
+        }
+        
+        return initial;
 
     }
 
+    public void setInitial(boolean initial) {
+        this.initial = initial;
+    }
+
+    public Game(boolean startWithInitial) {
+        this();
+        initial = startWithInitial;
+        LOG.info("Starting game strategy with initial strategy turned on");
+    }
     @Override
     public void stop(Controller controller) {
         defensiveStrategy.stop(controller);
@@ -96,8 +134,9 @@ public class Game extends AbstractPlanner {
 			return;
 		}
 
-        Orientation targetOrientation = ball.getPosition()
-                .sub(ourRobot.getPosition()).orientation();
+        if (isInitial(snapshot)) {
+
+        }
 
         if (ourRobot.possessesBall(ball)) {
             // Kick if we are facing opponents goal
