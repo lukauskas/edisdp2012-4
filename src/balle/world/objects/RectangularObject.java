@@ -147,6 +147,8 @@ public class RectangularObject extends MovingPoint implements FieldObject {
     public boolean intersects(Line line) {
         if (line == null)
             return false;
+        if (getPosition() == null)
+            return false;
 
         if (containsCoord(line.getA()) || containsCoord(line.getB()))
             return true;

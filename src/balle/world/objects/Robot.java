@@ -100,7 +100,8 @@ public class Robot extends RectangularObject {
      */
     public boolean isInScoringPosition(Ball ball, Goal goal, Robot otherRobot) {
         return possessesBall(ball) && isFacingGoal(goal)
-                && !otherRobot.intersects(getFacingLine());
+                && ((otherRobot.getPosition() != null) && (!otherRobot
+                        .intersects(getFacingLine())));
     }
 
     /**
