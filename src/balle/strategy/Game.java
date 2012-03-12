@@ -12,6 +12,7 @@ import balle.strategy.planner.DefensiveStrategy;
 import balle.strategy.planner.GoToBallSafe;
 import balle.strategy.planner.KickFromWall;
 import balle.strategy.planner.KickToGoal;
+import balle.world.Coord;
 import balle.world.Orientation;
 import balle.world.Snapshot;
 import balle.world.objects.Ball;
@@ -86,7 +87,40 @@ public class Game extends AbstractPlanner {
                 addDrawables(kickingStrategy.getDrawables());
             } else {
                 LOG.warn("We need to go around the ball");
-                // TODO: go around the ball here
+             // TODO: turn the robot slightly so we face away from our
+                // own goal.
+                // Implement a turning executor that would use
+                // setWheelSpeeds to some arbitrary low
+                // number (say -300,300 and 300,-300) to turn to correct
+                // direction and use it here.
+                // it has to be similar to FaceAngle executor but should not
+                // use the controller.rotate()
+                // command that is blocking.
+
+                Coord r, b, g;
+                r = ourRobot.getPosition();
+                b = ball.getPosition();
+                g = ownGoal.getPosition();
+
+                if (r.angleBetween(g, b).atan2styleradians() < 0) {
+                    // Clockwise.
+                    Orientation orien = ourRobot
+                            .findMaxRotationMaintaintingPossession(ball, true);
+                    System.out.println(orien);
+                    turningExecutor.setTargetOrientation(orien);
+					turningExecutor.step(controller, snapshot);
+                } else {
+                    // Anti-Clockwise
+                    Orientation orien = ourRobot
+                            .findMaxRotationMaintaintingPossession(ball, false);
+                    System.out.println(orien);
+                    turningExecutor.setTargetOrientation(orien);
+					turningExecutor.step(controller, snapshot);
+                    if (ourRobot.findMaxRotationMaintaintingPossession(ball,
+                            false).degrees() > -10)
+                        controller.kick();
+                }
+
             }
         } else if ((opponent.possessesBall(ball))
                 && (opponent.isFacingGoal(ownGoal))) {
