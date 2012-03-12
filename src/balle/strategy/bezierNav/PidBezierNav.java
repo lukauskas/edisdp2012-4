@@ -30,7 +30,6 @@ public class PidBezierNav extends BezierNav {
 	protected Orientation lastAngle = null;
 	protected Coord lastPos = null;
 
-	@Override
 	protected void setWheelSpeeds(Controller controller, Snapshot snapshot,
 			double left, double right, long dT) {
 
