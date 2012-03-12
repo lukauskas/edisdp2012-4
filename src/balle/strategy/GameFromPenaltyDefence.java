@@ -30,6 +30,15 @@ public class GameFromPenaltyDefence extends Game {
 	public boolean isStillInPenaltyDefence(Snapshot snapshot) {
 
 		Coord ball = snapshot.getBall().getPosition();
+		if ((ball == null) && snapshot.getOwnGoal().isLeftGoal())
+			ball = new Coord(0.5, 0.6); // assume that ball is on penalty spot,
+										// if
+									// we cannot see it.
+		if ((ball == null) && !snapshot.getOwnGoal().isLeftGoal())
+			ball = new Coord(1.8, 0.6); // assume that ball is on penalty spot,
+										// if
+									// we cannot see it.
+
 		double minX = 0;
 		double maxX = 0.75;
 		if (!snapshot.getOwnGoal().isLeftGoal()) {
@@ -68,11 +77,12 @@ public class GameFromPenaltyDefence extends Game {
 		
 		Boolean isLeftGoal = snapshot.getOwnGoal().isLeftGoal();
 
-		if (snapshot.getOwnGoal().getMaxY() <= snapshot.getBalle()
-				.getPosition().getY() + 0.22) {
+		if (snapshot.getOwnGoal().getMaxY() < snapshot.getBalle()
+.getPosition()
+				.getY() + 0.3) {
 			robotState = "Up";
-		} else if (snapshot.getOwnGoal().getMinY() >= snapshot.getBalle()
-				.getPosition().getY() - 0.22) {
+		} else if (snapshot.getOwnGoal().getMinY() > snapshot.getBalle()
+				.getPosition().getY() - 0.3) {
 			robotState = "Down";
 		} else {
 			robotState = "Center";
@@ -106,19 +116,23 @@ public class GameFromPenaltyDefence extends Game {
 		LOG.debug("moveTo: " + moveTo);
 
 		if (robotState.equals("Center") && moveTo.equals("Up"))
-			rotateSpeed = 200;
+			rotateSpeed = 400;
 		if (robotState.equals("Center") && moveTo.equals("Down"))
-			rotateSpeed = -200;
+			rotateSpeed = -400;
 		if (robotState.equals("Up") && moveTo.equals("Center"))
-			rotateSpeed = -200;
+			rotateSpeed = -400;
 		if (robotState.equals("Up") && moveTo.equals("Down"))
-			rotateSpeed = -200;
+			rotateSpeed = -400;
 		if (robotState.equals("Down") && moveTo.equals("Center"))
-			rotateSpeed = 200;
+			rotateSpeed = 400;
 		if (robotState.equals("Down") && moveTo.equals("Up"))
-			rotateSpeed = 200;
+			rotateSpeed = 400;
 
-		controller.setWheelSpeeds(rotateSpeed, rotateSpeed);
+		if (rotateSpeed == 0)
+			controller.stop();
+		else
+			controller.setWheelSpeeds(rotateSpeed, rotateSpeed);
+
 		LOG.debug("Speed: " + rotateSpeed);
 	}
 }
