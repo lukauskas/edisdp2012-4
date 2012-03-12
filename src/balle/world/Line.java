@@ -25,6 +25,8 @@ public class Line {
 	}
 
     public double dist(Coord a) {
+        if (a == null)
+            return Double.MAX_VALUE;
         return getLine2DVersion().ptSegDist(a.getX(), a.getY());
     }
 
