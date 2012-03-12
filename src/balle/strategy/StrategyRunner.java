@@ -74,7 +74,6 @@ public class StrategyRunner extends AbstractWorldProcessor {
 				}
 			}
 			gui.setDrawables(currentStrategyA.getDrawables());
-			gui.setDrawables(currentStrategyB.getDrawables());
 		}
 
 	}
