@@ -116,9 +116,6 @@ public class Game extends AbstractPlanner {
                     System.out.println(orien);
                     turningExecutor.setTargetOrientation(orien);
 					turningExecutor.step(controller, snapshot);
-                    if (ourRobot.findMaxRotationMaintaintingPossession(ball,
-                            false).degrees() > -10)
-                        controller.kick();
                 }
 
             }
