@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
 import balle.misc.Globals;
+import balle.strategy.FactoryMethod;
 import balle.world.Snapshot;
 import balle.world.objects.Ball;
 import balle.world.objects.Goal;
@@ -15,10 +16,15 @@ import balle.world.objects.Robot;
 public class KickToGoal extends AbstractPlanner {
    
     private static final Logger LOG = Logger.getLogger(KickToGoal.class);
-    private static final int TURN_SPEED_MIN = 100;
-    private static final int TURN_SPEED_MAX = 300;
+	private static final int TURN_SPEED_MIN = 100;
+	private static final int TURN_SPEED_MAX = 300;
 	public KickToGoal() {
 		// TODO Auto-generated constructor stub
+	}
+
+	@FactoryMethod(designator = "KickToGoal")
+	public static KickToGoal kickToGoalFactory() {
+		return new KickToGoal();
 	}
 
     @Override
@@ -29,7 +35,7 @@ public class KickToGoal extends AbstractPlanner {
         Goal goal = snapshot.getOpponentsGoal();
 
         // Skip potential nullpointer exceptions
-        if ((ourRobot == null) || (ball == null)) {
+		if ((ourRobot == null) && (ball == null)) {
             return;
         }
         
@@ -44,7 +50,7 @@ public class KickToGoal extends AbstractPlanner {
                 controller.kick();
                 // Slowly move towards the ball if we missed it
                 controller.setWheelSpeeds(200, 200);
-            } else if (ourRobot.isFacingGoal(goal)) {
+			} else if (ourRobot.isFacingGoal(goal)) {
                 LOG.info("We are facing goal, but opponent is blocking the shot");
                 if (ourRobot.isFacingLeft())
                 {
@@ -77,17 +83,20 @@ public class KickToGoal extends AbstractPlanner {
                                 TURN_SPEED_MIN);
                     }
                 }
-                return;
-            } else {
+				controller.kick();
+            } else if (opponent != null){
                 LOG.info("We're not facing goal");
                 // TODO: Check if it is better to kick the ball from this
                 // position
                 // and hopefully bounce from the wall, or whether it is better
                 // to turn towards the goal
+
+				controller.kick();
+
             }
-            LOG.warn("Kicking anyway");
+			// LOG.warn("Kicking anyway");
             // TODO: remove
-            controller.kick();
+			// controller.kick();
         }
     }
 }
