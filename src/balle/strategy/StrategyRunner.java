@@ -1,9 +1,12 @@
 package balle.strategy;
 
+import java.util.ArrayList;
+
 import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
 import balle.main.SimpleWorldGUI;
+import balle.main.drawable.Drawable;
 import balle.world.AbstractWorld;
 import balle.world.Snapshot;
 import balle.world.processing.AbstractWorldProcessor;
@@ -73,8 +76,15 @@ public class StrategyRunner extends AbstractWorldProcessor {
 					controllerB.stop();
 				}
 			}
-			gui.setDrawables(currentStrategyA.getDrawables());
-		}
+            ArrayList<Drawable> drawables = currentStrategyA.getDrawables();
+            ArrayList<Drawable> opponentDrawables = currentStrategyB
+                    .getDrawables();
+            for (Drawable d : opponentDrawables) {
+                d.reduceVisibility();
+                drawables.add(d);
+            }
+            gui.setDrawables(drawables);
+        }
 
 	}
 

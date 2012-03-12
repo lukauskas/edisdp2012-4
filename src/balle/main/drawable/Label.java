@@ -10,20 +10,39 @@ public class Label implements Drawable {
 
     public final String str;
     public final Coord position;
-    public final Color color;
+    public Color colour;
+
+    public Color getColour() {
+        return colour;
+    }
+
+    public void setColour(Color colour) {
+        this.colour = colour;
+    }
 
     public Label(String str, Coord position, Color color) {
         super();
         this.str = str;
         this.position = position;
-        this.color = color;
+        this.colour = color;
     }
 
 
     @Override
     public void draw(Graphics g, Scaler s) {
-        g.setColor(color);
+        g.setColor(colour);
         g.drawString(str, s.m2PX(position.getX()), s.m2PY(position.getY()));
+    }
+
+    @Override
+    public void reduceVisibility() {
+        Color currentColour = getColour();
+        // Reduce the alpha by 1/10
+        Color newColour = new Color(currentColour.getRed(),
+                currentColour.getGreen(), currentColour.getBlue(),
+                currentColour.getAlpha() / 10);
+
+        setColour(newColour);
     }
 
 }

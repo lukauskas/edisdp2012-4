@@ -83,4 +83,9 @@ public class Spline implements Curve {
 		return sum;
 	}
 
+    @Override
+    public void reduceVisibility() {
+        // TODO: implement!!!
+    }
+
 }
