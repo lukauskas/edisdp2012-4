@@ -123,7 +123,7 @@ public class GoToBallSafe extends GoToBall {
         if (stage == 1) {
             LOG.info("Going to BALL_SAFE target");
             setApproachTargetFromCorrectSide(correctAngle);
-            setExecutorStrategy(new GoToObjectPFN(0, false));
+            setExecutorStrategy(new GoToObjectPFN(0, true));
         } else if (stage == 3) {
             LOG.info("Going to the ball");
             MovementExecutor executor = new  GoToObjectPFN(0, true);
@@ -168,7 +168,7 @@ public class GoToBallSafe extends GoToBall {
                 return;
             }
 
-        } else if (stage == 3) {
+        } else if ((stage == 1) || (stage == 3)) {
             if (ourRobot.isApproachingTargetFromCorrectSide(ball,
                     snapshot.getOpponentsGoal())) {
                 setAppropriateMovementStrategy(false, stage);
