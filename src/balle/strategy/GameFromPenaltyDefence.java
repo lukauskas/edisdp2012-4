@@ -58,20 +58,21 @@ public class GameFromPenaltyDefence extends Game {
 		}
 
 		if ((firstSnapshot == null)
-				&& (snapshot.getBall().getPosition() != null))
+				&& (snapshot.getBall().getPosition() != null)) {
 			firstSnapshot = snapshot;
+		}
 
 		Orientation opponentAngle = snapshot.getOpponent().getOrientation();
 
-		double threshold = Math.toRadians(20);
+		double threshold = Math.toRadians(30);
 		
 		Boolean isLeftGoal = snapshot.getOwnGoal().isLeftGoal();
 
 		if (snapshot.getOwnGoal().getMaxY() <= snapshot.getBalle()
-				.getPosition().getY() + 0.25) {
+				.getPosition().getY() + 0.22) {
 			robotState = "Up";
 		} else if (snapshot.getOwnGoal().getMinY() >= snapshot.getBalle()
-				.getPosition().getY() - 0.25) {
+				.getPosition().getY() - 0.22) {
 			robotState = "Down";
 		} else {
 			robotState = "Center";
@@ -118,5 +119,6 @@ public class GameFromPenaltyDefence extends Game {
 			rotateSpeed = 200;
 
 		controller.setWheelSpeeds(rotateSpeed, rotateSpeed);
+		LOG.debug("Speed: " + rotateSpeed);
 	}
 }
