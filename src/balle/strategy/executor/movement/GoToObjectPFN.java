@@ -12,9 +12,10 @@ import balle.strategy.pFStrategy.Point;
 import balle.strategy.pFStrategy.Pos;
 import balle.strategy.pFStrategy.RectObject;
 import balle.strategy.pFStrategy.RobotConf;
+import balle.strategy.pFStrategy.Vector;
 import balle.strategy.pFStrategy.VelocityVec;
 import balle.world.Snapshot;
-import balle.world.objects.StaticFieldObject;
+import balle.world.objects.FieldObject;
 
 public class GoToObjectPFN implements MovementExecutor {
 
@@ -24,7 +25,16 @@ public class GoToObjectPFN implements MovementExecutor {
     private static final double ROBOT_TRACK_WIDTH = Globals.ROBOT_TRACK_WIDTH * 100;
     private static final double WHEEL_RADIUS      = Globals.ROBOT_WHEEL_DIAMETER * 100 / 2.0;
 
-    private double              stopDistance;                                                // meters
+    private double stopDistance; // meters
+    private boolean slowDownCloseToTarget;
+
+    public boolean shouldSlowDownCloseToTarget() {
+        return slowDownCloseToTarget;
+    }
+
+    public void setSlowDownCloseToTarget(boolean slowDownCloseToTarget) {
+        this.slowDownCloseToTarget = slowDownCloseToTarget;
+    }
 
     public double getStopDistance() {
         return stopDistance;
@@ -35,10 +45,15 @@ public class GoToObjectPFN implements MovementExecutor {
         this.stopDistance = stopDistance;
     }
 
-    private StaticFieldObject target;
+    private FieldObject target;
 
     PFPlanning                plann;
 
+    public GoToObjectPFN(double stopDistance, boolean slowDownCloseToTarget) {
+        this(stopDistance);
+        setSlowDownCloseToTarget(slowDownCloseToTarget);
+
+    }
     /**
      * Instantiates a new go to object executor that uses Potential Fields
      * Navigation
@@ -48,6 +63,7 @@ public class GoToObjectPFN implements MovementExecutor {
      */
     public GoToObjectPFN(double stopDistance) {
         this.stopDistance = stopDistance;
+        setSlowDownCloseToTarget(true);
         RobotConf conf = new RobotConf(ROBOT_TRACK_WIDTH, WHEEL_RADIUS);
         // plann = new PFPlanning(conf, 0, 1, 12, 0.5); // No opponent avoidance
         // Avoids opponent:
@@ -81,7 +97,7 @@ public class GoToObjectPFN implements MovementExecutor {
     }
 
     @Override
-    public void updateTarget(StaticFieldObject target) {
+    public void updateTarget(FieldObject target) {
         this.target = target;
 
     }
@@ -128,6 +144,10 @@ public class GoToObjectPFN implements MovementExecutor {
                 .getPosition().getY());
 
         VelocityVec res = plann.update(initPos, opponent, targetLoc);
+        if (!shouldSlowDownCloseToTarget()) {
+            Vector newRes = res.mult(4);
+            res = new VelocityVec(newRes.getX(), newRes.getY());
+        }
         LOG.trace("UNSCALED Left speed: " + Math.toDegrees(res.getLeft())
                 + " right speed: " + Math.toDegrees(res.getRight()));
         double left, right;

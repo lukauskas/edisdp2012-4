@@ -19,13 +19,10 @@ public abstract class Obstacle {
 	private FieldObject source;
 	protected double clearance;
 
-
 	public Obstacle(FieldObject source, double clearance) {
 		this.source = source;
 		this.clearance = clearance;
 	}
-
-
 	protected double getClearance() {
 		return clearance;
 	}

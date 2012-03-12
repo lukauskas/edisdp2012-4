@@ -10,11 +10,13 @@ import java.util.ArrayList;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
 
 import org.apache.log4j.Logger;
 
 import balle.main.drawable.Drawable;
 import balle.main.drawable.DrawableLine;
+import balle.main.drawable.Label;
 import balle.misc.Globals;
 import balle.world.AbstractWorld;
 import balle.world.Coord;
@@ -27,302 +29,347 @@ import balle.world.processing.AbstractWorldProcessor;
 
 public class SimpleWorldGUI extends AbstractWorldProcessor {
 
-    private final JPanel        panel;
-    private final Screen        screen;
-    private final JPanel        fpsPanel;
-    private final JLabel        fpsText;
-    private final JLabel        fpsWarning;
-    private final JLabel        fps;
+	private final JPanel panel;
+	private final Screen screen;
+	private final JPanel fpsMainPanel;
+	private final JPanel fpsVisionPanel;
+	private final JLabel fpsVisionText;
+	private final JLabel fpsWarning;
+	private final JLabel fpsVision;
+	private final JLabel fpsStrategyText;
+	private final JLabel fpsStrategy;
+	private final JPanel fpsStrategyPanel;
 
-    private static final Logger LOG = Logger.getLogger(SimpleWorldGUI.class);
+	private static final Logger LOG = Logger.getLogger(SimpleWorldGUI.class);
 
-    public SimpleWorldGUI(AbstractWorld world) {
-        super(world);
-        panel = new JPanel();
-        panel.setLayout(new BorderLayout());
+	public SimpleWorldGUI(AbstractWorld world) {
+		super(world);
+		panel = new JPanel();
+		panel.setLayout(new BorderLayout());
 
-        fpsPanel = new JPanel();
-        fpsPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        fpsText = new JLabel("Input FPS:");
-        fpsWarning = new JLabel("Vision down?");
-        fpsWarning.setForeground(Color.RED);
+		try {
+			UIManager
+					.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
+		} catch (Exception e) {
+			System.out.println("UI Manager exception: " + e.getMessage());
+		}
 
-        fps = new JLabel();
-        fpsPanel.add(fpsText);
-        fpsPanel.add(fps);
-        fpsPanel.add(fpsWarning);
+		// Initialising Vision FPS
+		fpsVisionPanel = new JPanel();
+		fpsVisionPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+		fpsVisionText = new JLabel("Input FPS:");
+		fpsWarning = new JLabel("Vision down?");
+		fpsWarning.setForeground(Color.RED);
 
-        screen = new Screen();
-        screen.addMouseMotionListener(screen);
-        panel.add(BorderLayout.NORTH, fpsPanel);
-        panel.add(BorderLayout.CENTER, screen);
-    }
+		fpsVision = new JLabel();
+		fpsVisionPanel.add(fpsVisionText);
+		fpsVisionPanel.add(fpsVision);
+		fpsVisionPanel.add(fpsWarning);
 
-    public void setDrawables(ArrayList<Drawable> drawables) {
-        screen.setDrawables(drawables);
-    }
+		// Initialising Strategy FPS
+		fpsStrategyPanel = new JPanel();
+		fpsStrategyPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+		fpsStrategyText = new JLabel("Strategy FPS:");
 
-    public JPanel getPanel() {
-        return panel;
-    }
+		fpsStrategy = new JLabel();
+		fpsStrategyPanel.add(fpsStrategyText);
+		fpsStrategyPanel.add(fpsStrategy);
 
-    @SuppressWarnings("serial")
-    private class Screen extends JPanel implements MouseMotionListener {
+		// Put both FPS into one JPanel
+		fpsMainPanel = new JPanel();
+		fpsMainPanel.add(BorderLayout.WEST, fpsVisionPanel);
+		fpsMainPanel.add(BorderLayout.EAST, fpsStrategyPanel);
 
-        private final float         XSHIFTM     = 0.4f;
-        private final float         YSHIFTM     = 0.39f;
-        private final float         VIEWHEIGHTM = 2;
-        private ArrayList<Drawable> drawables   = new ArrayList<Drawable>();
-        private final Scaler        scaler;
+		screen = new Screen();
+		screen.addMouseMotionListener(screen);
+		panel.add(BorderLayout.NORTH, fpsMainPanel);
+		panel.add(BorderLayout.CENTER, screen);
+	}
 
-        public Screen() {
-            super();
-            scaler = new Scaler(XSHIFTM, YSHIFTM);
-        }
+	public void setDrawables(ArrayList<Drawable> drawables) {
+		screen.setDrawables(drawables);
+	}
 
-        public void setDrawables(ArrayList<Drawable> drawables) {
-            this.drawables = new ArrayList<Drawable>(drawables);
-        }
+	public JPanel getPanel() {
+		return panel;
+	}
 
-        @Override
-        public void paintComponent(Graphics g) {
-            float scale = getHeight() / VIEWHEIGHTM;
-            scaler.setScale(scale);
-            g.setColor(new Color(72, 104, 22));
-            g.fillRect(0, 0, getWidth(), getHeight());
-            drawField(g);
-            drawFieldObjects(g);
+	@SuppressWarnings("serial")
+	private class Screen extends JPanel implements MouseMotionListener {
 
-            drawMousePos(g);
+		private final float XSHIFTM = 0.4f;
+		private final float YSHIFTM = 0.39f;
+		private final float VIEWHEIGHTM = 2;
+		private ArrayList<Drawable> drawables = new ArrayList<Drawable>();
+		private final Scaler scaler;
 
-            for (Drawable d : drawables) {
-                d.draw(g, scaler);
-            }
-            drawables.clear();
-        }
+		public Screen() {
+			super();
+			scaler = new Scaler(XSHIFTM, YSHIFTM);
+		}
 
-        private void drawField(Graphics g) {
-            g.setColor(Color.BLACK);
-            drawLineTransformMeters(g, 0f, 0f, Globals.PITCH_WIDTH, 0f);
-            drawLineTransformMeters(g, 0f, Globals.PITCH_HEIGHT, Globals.PITCH_WIDTH,
-                    Globals.PITCH_HEIGHT);
-            drawLineTransformMeters(g, 0f, 0f, 0f, Globals.GOAL_POSITION);
-            drawLineTransformMeters(g, Globals.PITCH_WIDTH, 0f, Globals.PITCH_WIDTH,
-                    Globals.GOAL_POSITION);
-            drawLineTransformMeters(g, 0f, Globals.PITCH_HEIGHT, 0f, Globals.PITCH_HEIGHT
-                    - Globals.GOAL_POSITION);
-            drawLineTransformMeters(g, Globals.PITCH_WIDTH, Globals.PITCH_HEIGHT,
-                    Globals.PITCH_WIDTH, Globals.PITCH_HEIGHT - Globals.GOAL_POSITION);
-            // Left-hand goal area
-            drawLineTransformMeters(g, 0f, Globals.GOAL_POSITION, -0.1f, Globals.GOAL_POSITION);
-            drawLineTransformMeters(g, -0.1f, Globals.GOAL_POSITION, -0.1f, Globals.PITCH_HEIGHT
-                    - Globals.GOAL_POSITION);
-            drawLineTransformMeters(g, Globals.PITCH_WIDTH, Globals.GOAL_POSITION,
-                    Globals.PITCH_WIDTH + 0.1f, Globals.GOAL_POSITION);
-            // Right-hand goal area
-            drawLineTransformMeters(g, Globals.PITCH_WIDTH, Globals.PITCH_HEIGHT
-                    - Globals.GOAL_POSITION, Globals.PITCH_WIDTH + 0.1f, Globals.PITCH_HEIGHT
-                    - Globals.GOAL_POSITION);
-            drawLineTransformMeters(g, 0f, Globals.PITCH_HEIGHT - Globals.GOAL_POSITION, -0.1f,
-                    Globals.PITCH_HEIGHT - Globals.GOAL_POSITION);
-            drawLineTransformMeters(g, Globals.PITCH_WIDTH + 0.1f, Globals.GOAL_POSITION,
-                    Globals.PITCH_WIDTH + 0.1f, Globals.PITCH_HEIGHT - Globals.GOAL_POSITION);
-        }
+		public void setDrawables(ArrayList<Drawable> drawables) {
+			this.drawables = new ArrayList<Drawable>(drawables);
+		}
 
-        private void drawFieldObjects(Graphics g) {
-            Snapshot s = getSnapshot();
-            if (s != null) {
-                drawRobot(g, Color.GREEN, s.getBalle());
-                drawRobot(g, Color.RED, s.getOpponent());
-                drawBall(g, Color.RED, s.getBall());
-                drawGoals(g);
-            }
-        }
+		@Override
+		public void paintComponent(Graphics g) {
+			float scale = getHeight() / VIEWHEIGHTM;
+			scaler.setScale(scale);
+			g.setColor(new Color(72, 104, 22));
+			g.fillRect(0, 0, getWidth(), getHeight());
+			drawField(g);
+			drawFieldObjects(g);
 
-        private void drawBall(Graphics g, Color c, Ball ball) {
-            // TODO: Use ball.getRadius() instead of constants here
+			drawMousePos(g);
 
-            // Daniel: There is no method getRadius() for ball because its a
-            // MovingPoint object?
-            // For the mean time I've changed the object to Ball
+			for (Drawable d : drawables) {
+				d.draw(g, scaler);
+			}
+			drawables.clear();
+		}
 
-            // TODO: draw the velocity vector.
+		private void drawField(Graphics g) {
+			g.setColor(Color.BLACK);
+			drawLineTransformMeters(g, 0f, 0f, Globals.PITCH_WIDTH, 0f);
+			drawLineTransformMeters(g, 0f, Globals.PITCH_HEIGHT,
+					Globals.PITCH_WIDTH, Globals.PITCH_HEIGHT);
+			drawLineTransformMeters(g, 0f, 0f, 0f, Globals.GOAL_POSITION);
+			drawLineTransformMeters(g, Globals.PITCH_WIDTH, 0f,
+					Globals.PITCH_WIDTH, Globals.GOAL_POSITION);
+			drawLineTransformMeters(g, 0f, Globals.PITCH_HEIGHT, 0f,
+					Globals.PITCH_HEIGHT - Globals.GOAL_POSITION);
+			drawLineTransformMeters(g, Globals.PITCH_WIDTH,
+					Globals.PITCH_HEIGHT, Globals.PITCH_WIDTH,
+					Globals.PITCH_HEIGHT - Globals.GOAL_POSITION);
+			// Left-hand goal area
+			drawLineTransformMeters(g, 0f, Globals.GOAL_POSITION, -0.1f,
+					Globals.GOAL_POSITION);
+			drawLineTransformMeters(g, -0.1f, Globals.GOAL_POSITION, -0.1f,
+					Globals.PITCH_HEIGHT - Globals.GOAL_POSITION);
+			drawLineTransformMeters(g, Globals.PITCH_WIDTH,
+					Globals.GOAL_POSITION, Globals.PITCH_WIDTH + 0.1f,
+					Globals.GOAL_POSITION);
+			// Right-hand goal area
+			drawLineTransformMeters(g, Globals.PITCH_WIDTH,
+					Globals.PITCH_HEIGHT - Globals.GOAL_POSITION,
+					Globals.PITCH_WIDTH + 0.1f, Globals.PITCH_HEIGHT
+							- Globals.GOAL_POSITION);
+			drawLineTransformMeters(g, 0f, Globals.PITCH_HEIGHT
+					- Globals.GOAL_POSITION, -0.1f, Globals.PITCH_HEIGHT
+					- Globals.GOAL_POSITION);
+			drawLineTransformMeters(g, Globals.PITCH_WIDTH + 0.1f,
+					Globals.GOAL_POSITION, Globals.PITCH_WIDTH + 0.1f,
+					Globals.PITCH_HEIGHT - Globals.GOAL_POSITION);
+		}
 
-            if ((ball == null) || (ball.getPosition() == null)) {
-                return;
-            }
-            float radius = (float) ball.getRadius();
-            Coord pos = ball.getPosition();
+		private void drawFieldObjects(Graphics g) {
+			Snapshot s = getSnapshot();
+			if (s != null) {
+				drawRobot(g, Color.GREEN, s.getBalle());
+				drawRobot(g, Color.RED, s.getOpponent());
+				drawBall(g, Color.RED, s.getBall());
+				drawGoals(g);
+			}
+		}
 
-            if (!pos.isEstimated())
-                g.setColor(c);
-            else
-                g.setColor(Color.LIGHT_GRAY);
+		private void drawBall(Graphics g, Color c, Ball ball) {
+			// TODO: Use ball.getRadius() instead of constants here
 
-            float w = radius * 2 * scaler.getScale();
-            g.fillOval((int) (scaler.m2PX(pos.getX()) - (w / 2)),
-                    (int) (scaler.m2PY(pos.getY()) - (w / 2)), (int) w, (int) w);
-        }
+			// Daniel: There is no method getRadius() for ball because its a
+			// MovingPoint object?
+			// For the mean time I've changed the object to Ball
 
-        private void drawRobot(Graphics g, Color c, Robot robot) {
+			// TODO: draw the velocity vector.
 
-            Snapshot s = getSnapshot();
+			if ((ball == null) || (ball.getPosition() == null)) {
+				return;
+			}
+			float radius = (float) ball.getRadius();
+			Coord pos = ball.getPosition();
 
-            // Fail early, fail often
-            if ((robot.getPosition() == null) || (robot.getOrientation() == null)) {
-                return;
-            }
+			if (!pos.isEstimated())
+				g.setColor(c);
+			else
+				g.setColor(Color.LIGHT_GRAY);
 
-            // position of center of the robot
-            float x = (float) robot.getPosition().getX();
-            float y = (float) robot.getPosition().getY();
-            boolean isEstimated = robot.getPosition().isEstimated();
+			float w = radius * 2 * scaler.getScale();
+			g.fillOval((int) (scaler.m2PX(pos.getX()) - (w / 2)),
+					(int) (scaler.m2PY(pos.getY()) - (w / 2)), (int) w, (int) w);
+			
+            Label ballSpeedLabel = new Label(String.format("%.5fE-3", ball
+                    .getVelocity().abs() * 1000), new Coord(ball.getPosition()
+                    .getX(), ball
+                    .getPosition().getY() - ball.getRadius() * 3), Color.RED);
+            ballSpeedLabel.draw(g, scaler);
+		}
 
-            // half length and width of robot
-            float hl = (float) (robot.getHeight() / 2);
-            float hw = (float) (robot.getWidth() / 2);
+		private void drawRobot(Graphics g, Color c, Robot robot) {
 
-            // list of (x,y) positions of the corners of the robot
-            // with the center at (0,0)
-            float[][] poly = new float[][] { { hl, hw }, { hl, -hw }, { -hl, -hw }, { -hl, hw } };
+			Snapshot s = getSnapshot();
 
-            // for each point
-            double a = robot.getOrientation().radians();
-            for (int i = 0; i < poly.length; i++) {
-                float px = poly[i][0];
-                float py = poly[i][1];
+			// Fail early, fail often
+			if ((robot.getPosition() == null)
+					|| (robot.getOrientation() == null)) {
+				return;
+			}
 
-                // a = (90 * Math.PI) / 180;
+			// position of center of the robot
+			float x = (float) robot.getPosition().getX();
+			float y = (float) robot.getPosition().getY();
+			boolean isEstimated = robot.getPosition().isEstimated();
 
-                // System.out.println(robot.getOrientation().degrees());
-                // rotate by angle of orientation
-                poly[i][0] = (float) ((px * Math.cos(a)) + (py * -Math.sin(a)));
-                poly[i][1] = (float) ((px * Math.sin(a)) + (py * Math.cos(a)));
+			// half length and width of robot
+			float hl = (float) (robot.getHeight() / 2);
+			float hw = (float) (robot.getWidth() / 2);
 
-                // transform to robot's position
-                poly[i][0] += x;
-                poly[i][1] += y;
-            }
+			// list of (x,y) positions of the corners of the robot
+			// with the center at (0,0)
+			float[][] poly = new float[][] { { hl, hw }, { hl, -hw },
+					{ -hl, -hw }, { -hl, hw } };
 
-            // convert to pixel coordinates
-            int n = poly.length;
-            int[] xs = new int[n];
-            int[] ys = new int[n];
-            for (int i = 0; i < n; i++) {
-                xs[i] = scaler.m2PX(poly[i][0]);
-                ys[i] = scaler.m2PY(poly[i][1]);
-            }
+			// for each point
+			double a = robot.getOrientation().radians();
+			for (int i = 0; i < poly.length; i++) {
+				float px = poly[i][0];
+				float py = poly[i][1];
 
-            // draw robot, setting the colour depending on robot properties
-            // temporary colours until methods have been implemented
-            if (robot.possessesBall(s.getBall())) {
-                DrawableLine ballKickLine = new DrawableLine(robot.getBallKickLine(s.getBall()),
-                        Color.BLUE);
-                ballKickLine.draw(g, scaler);
-                if (robot.isInScoringPosition(s.getBall(), s.getOpponentsGoal(), s.getOpponent())) {
-                    g.setColor(Color.MAGENTA);
-                } else {
-                    g.setColor(Color.ORANGE);
-                }
+				// a = (90 * Math.PI) / 180;
 
-            } else if (!isEstimated) {
-                g.setColor(Color.LIGHT_GRAY);
-            } else {
-                g.setColor(Color.DARK_GRAY);
-            }
+				// System.out.println(robot.getOrientation().degrees());
+				// rotate by angle of orientation
+				poly[i][0] = (float) ((px * Math.cos(a)) + (py * -Math.sin(a)));
+				poly[i][1] = (float) ((px * Math.sin(a)) + (py * Math.cos(a)));
 
-            g.fillPolygon(xs, ys, n);
+				// transform to robot's position
+				poly[i][0] += x;
+				poly[i][1] += y;
+			}
 
-            DrawableLine orientationLine = new DrawableLine(robot.getFacingLine(), c);
-            orientationLine.draw(g, scaler);
+			// convert to pixel coordinates
+			int n = poly.length;
+			int[] xs = new int[n];
+			int[] ys = new int[n];
+			for (int i = 0; i < n; i++) {
+				xs[i] = scaler.m2PX(poly[i][0]);
+				ys[i] = scaler.m2PY(poly[i][1]);
+			}
 
-            g.setColor(c);
-            g.fillPolygon(new int[] { xs[2], xs[3], scaler.m2PX(x) }, new int[] { ys[2], ys[3],
-                    scaler.m2PY(y) }, 3);
-        }
+			// draw robot, setting the colour depending on robot properties
+			// temporary colours until methods have been implemented
+			if (robot.possessesBall(s.getBall())) {
+				DrawableLine ballKickLine = new DrawableLine(
+						robot.getBallKickLine(s.getBall()), Color.BLUE);
+				ballKickLine.draw(g, scaler);
+				if (robot.isInScoringPosition(s.getBall(),
+						s.getOpponentsGoal(), s.getOpponent())) {
+					g.setColor(Color.MAGENTA);
+				} else {
+					g.setColor(Color.ORANGE);
+				}
 
-        // Convert meters into pixels and draws line
-        private void drawLineTransformMeters(Graphics g, float x1, float y1, float x2, float y2) {
+			} else if (!isEstimated) {
+				g.setColor(Color.LIGHT_GRAY);
+			} else {
+				g.setColor(Color.DARK_GRAY);
+			}
 
-            g.drawLine(scaler.m2PX(x1), scaler.m2PY(y1), scaler.m2PX(x2), scaler.m2PY(y2));
+			g.fillPolygon(xs, ys, n);
 
-        }
+			DrawableLine orientationLine = new DrawableLine(
+					robot.getFacingLine(), c);
+			orientationLine.draw(g, scaler);
 
-        private void drawGoals(Graphics g) {
-            drawGoal(g, Color.red, getSnapshot().getOwnGoal());
-            drawGoal(g, Color.green, getSnapshot().getOpponentsGoal());
-        }
+			g.setColor(c);
+			g.fillPolygon(new int[] { xs[2], xs[3], scaler.m2PX(x) },
+					new int[] { ys[2], ys[3], scaler.m2PY(y) }, 3);
+		}
 
-        private void drawGoal(Graphics g, Color c, Goal goal) {
-            g.setColor(c);
+		// Convert meters into pixels and draws line
+		private void drawLineTransformMeters(Graphics g, float x1, float y1,
+				float x2, float y2) {
 
-            // Daniel: Does hardcoding the positions matter?
-            int xMin, width, yMax, height;
-            xMin = scaler.m2PX(goal.getMinX()) - 2;
-            width = scaler.m2PX(goal.getMaxX()) - scaler.m2PX(goal.getMinX());
-            yMax = scaler.m2PY(goal.getMaxY()) - 2;
-            height = scaler.m2PY(goal.getMinY()) - scaler.m2PY(goal.getMaxY());
+			g.drawLine(scaler.m2PX(x1), scaler.m2PY(y1), scaler.m2PX(x2),
+					scaler.m2PY(y2));
 
-            g.drawRect(xMin, yMax, width, height);
-        }
+		}
 
-        /**
-         * Where the mouse was last detected on screen.
-         */
-        private java.awt.Point mouse;
+		private void drawGoals(Graphics g) {
+			drawGoal(g, Color.red, getSnapshot().getOwnGoal());
+			drawGoal(g, Color.green, getSnapshot().getOpponentsGoal());
+		}
 
-        private void drawMousePos(Graphics g) {
-            if (mouse != null) {
-                g.setColor(Color.RED);
+		private void drawGoal(Graphics g, Color c, Goal goal) {
+			g.setColor(c);
 
-                double x = scaler.pX2m(mouse.getX()), y = scaler.pY2m(mouse.getY());
-                String s = String.format("Mouse Position (%.3f,%.3f)", x, y);
+			// Daniel: Does hardcoding the positions matter?
+			int xMin, width, yMax, height;
+			xMin = scaler.m2PX(goal.getMinX()) - 2;
+			width = scaler.m2PX(goal.getMaxX()) - scaler.m2PX(goal.getMinX());
+			yMax = scaler.m2PY(goal.getMaxY()) - 2;
+			height = scaler.m2PY(goal.getMinY()) - scaler.m2PY(goal.getMaxY());
 
-                g.drawString(s, 10, 10);
-            }
-        }
+			g.drawRect(xMin, yMax, width, height);
+		}
 
-        @Override
-        public void mouseDragged(MouseEvent arg0) {
-            mouse = arg0.getPoint();
-        }
+		/**
+		 * Where the mouse was last detected on screen.
+		 */
+		private java.awt.Point mouse;
 
-        @Override
-        public void mouseMoved(MouseEvent arg0) {
-            mouse = arg0.getPoint();
-        }
+		private void drawMousePos(Graphics g) {
+			if (mouse != null) {
+				g.setColor(Color.RED);
 
-    }
+				double x = scaler.pX2m(mouse.getX()), y = scaler.pY2m(mouse
+						.getY());
+				String s = String.format("Mouse Position (%.3f,%.3f)", x, y);
 
-    private void redrawFPS() {
-        long age = getFPSAge();
-        double fpsCount = getFPS();
+				g.drawString(s, 10, 10);
+			}
+		}
 
-        String s = String.format("%1$5.3f", fpsCount);
+		@Override
+		public void mouseDragged(MouseEvent arg0) {
+			mouse = arg0.getPoint();
+		}
 
-        double timePerFrame = 1000.0 / fpsCount;
-        if ((fpsCount > 0) && (age < timePerFrame * 1.5)) {
-            fps.setForeground(new Color(50, 150, 50));
-            fpsWarning.setVisible(false);
-        } else if ((fpsCount > 0) && (age < timePerFrame * 3)) {
-            fps.setForeground(Color.ORANGE);
-            fpsWarning.setVisible(false);
-        } else {
-            fps.setForeground(Color.RED);
-            fpsWarning.setVisible(true);
-        }
+		@Override
+		public void mouseMoved(MouseEvent arg0) {
+			mouse = arg0.getPoint();
+		}
 
-        fps.setText(s);
-    }
+	}
 
-    @Override
-    protected void actionOnStep() {
-        redrawFPS();
-    }
+	private void redrawFPS() {
+		long age = getFPSAge();
+		double fpsCount = getFPS();
 
-    @Override
-    protected void actionOnChange() {
-        screen.repaint();
-    }
+		String s = String.format("%1$5.3f", fpsCount);
+
+		double timePerFrame = 1000.0 / fpsCount;
+		if ((fpsCount > 0) && (age < timePerFrame * 1.5)) {
+			fpsVision.setForeground(new Color(50, 150, 50));
+			fpsWarning.setVisible(false);
+		} else if ((fpsCount > 0) && (age < timePerFrame * 3)) {
+			fpsVision.setForeground(Color.ORANGE);
+			fpsWarning.setVisible(false);
+		} else {
+			fpsVision.setForeground(Color.RED);
+			fpsWarning.setVisible(true);
+		}
+
+		fpsVision.setText(s);
+	}
+
+	@Override
+	protected void actionOnStep() {
+		redrawFPS();
+	}
+
+	@Override
+	protected void actionOnChange() {
+		screen.repaint();
+	}
 
 }

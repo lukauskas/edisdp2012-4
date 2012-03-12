@@ -58,7 +58,7 @@ function install_slf4j {
    && echo "> extractiong $lLOCATION" \
    && cd $lEXTRACT_DIR \
    && tar xvf $lLOCATION \
-   && cp "$lEXTRACT_DIR/slf4j-1.6.4/slf4j-simple-1.6.4.jar" $LIB \
+   && cp "$lEXTRACT_DIR/slf4j-1.6.4/slf4j-api-1.6.4.jar" $LIB \
    && rm $lLOCATION \
    && rm -rf $lEXTRACT_DIR
 }
@@ -87,11 +87,23 @@ function install_mockito {
 function install_joptsimple {
     wget -U "SomeUserAgent/1.0" "http://repo1.maven.org/maven2/net/sf/jopt-simple/jopt-simple/4.3/jopt-simple-4.3.jar" -O "$LIB/jopt-simple-4.3.jar"
 }
+
+function install_reflections {
+    local lTMP_REFLECTIONS_INSTALL_DIR="`mktemp -d /tmp/reflections.XXXXX`"
+    wget "http://reflections.googlecode.com/files/reflections-0.9.5.one-jar.jar" -O "$lTMP_REFLECTIONS_INSTALL_DIR/reflections-0.9.5.one-jar.jar" \
+    && cd $lTMP_REFLECTIONS_INSTALL_DIR \
+    && jar xf reflections-0.9.5.one-jar.jar \
+    && cp reflections-0.9.5.jar $LIB \
+    && rm -f $lTMP_REFLECTIONS_INSTALL_DIR/lib/slf4j* \
+    && cp lib/* $LIB \
+    && rm -rf $lTMP_REFLECTIONS_INSTALL_DIR
+}
 cleanup
 install_lejos
 install_bluetooth
-install_slf4j # Seems to be required for the physics demo
-##install_jbullet
+install_slf4j # Seems to be required for the physics demo and reflections
+#install_jbullet
 install_jbox2d
 install_mockito   # Mocking framework -- used in some JUnit tests
 install_joptsimple # Simple arguments parser
+install_reflections # For processing @Annotations

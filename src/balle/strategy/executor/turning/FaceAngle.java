@@ -2,6 +2,8 @@ package balle.strategy.executor.turning;
 
 import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
+
 import balle.controller.Controller;
 import balle.main.drawable.Drawable;
 import balle.strategy.executor.Executor;
@@ -9,6 +11,7 @@ import balle.world.Orientation;
 import balle.world.Snapshot;
 
 public class FaceAngle implements Executor, RotateToOrientationExecutor {
+    private static final Logger LOG = Logger.getLogger(FaceAngle.class);
     protected final static double DEFAULT_ACCURACY        = Math.PI / 16;
     protected final double        ACCURACY;
 
@@ -90,6 +93,8 @@ public class FaceAngle implements Executor, RotateToOrientationExecutor {
      */
     @Override
     public boolean isTurning() {
+        LOG.trace(System.currentTimeMillis() + " "
+                + (startedTurning + timeToTurn));
         return System.currentTimeMillis() <= startedTurning + timeToTurn;
     }
 
@@ -127,7 +132,7 @@ public class FaceAngle implements Executor, RotateToOrientationExecutor {
         }
         if (needStop) {
             stop(controller);
-			step(controller, snapshot);
+            return;
         } else if (isTurning())
             return; // If we're still turning, continue.
         else {

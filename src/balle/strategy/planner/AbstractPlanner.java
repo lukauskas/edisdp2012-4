@@ -19,7 +19,6 @@ public abstract class AbstractPlanner implements Strategy {
     @Override
 	public final void step(Controller controller, Snapshot snapshot) {
         clearDrawables();
-        
         onStep(controller, snapshot);
     }
 
@@ -54,6 +53,10 @@ public abstract class AbstractPlanner implements Strategy {
     protected void addDrawables(ArrayList<Drawable> drawables) {
         this.drawables.addAll(drawables);
     }
+
+	public boolean couldRun(Snapshot snapshot) {
+		return true;
+	}
 
 	protected abstract void onStep(Controller controller, Snapshot snapshot);
 

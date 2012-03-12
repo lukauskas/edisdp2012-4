@@ -1,6 +1,8 @@
 package balle.main;
 
-import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -23,116 +25,173 @@ import balle.world.AbstractWorld;
 public class StratTab extends JPanel implements ActionListener {
 
 	private static final Logger LOG = Logger.getLogger(StratTab.class);
-	// GUI
-	private JPanel top;
-	private JPanel southPanel;
-	private JButton button;
-	private JButton randomButton;
-	private JButton resetButton;
-	private JButton noiseButton;
+	// GUI declarations
+
+	private JPanel controlPanel;
+	private JLabel greenLabel;
+	private JLabel redLabel;
+	private JComboBox greenStrategy;
+	private JComboBox redStrategy;
+	private JButton startButton;
 	private JButton switchGoals;
 	private JButton switchRobot;
-	private JComboBox menu;
-	private JLabel label;
+	private JButton noiseButton;
+	private JButton randomButton;
+	private JButton resetButton;
 	private boolean isBlue;
-
 	private ArrayList<String> stratTabs;
 	private String[] strings = new String[0];
 
+	GridBagConstraints c = new GridBagConstraints();
 	private StrategyRunner strategyRunner;
-	private Controller controller;
-	private AbstractWorld world;
+	private AbstractWorld worldA;
 	private Simulator simulator;
+    private StrategyFactory     strategyFactory;
 
-	private final static String LABEL_TEXT = "Select strategy";
+	private final static String GREEN_LABEL_TEXT = "Select Green strategy";
+	private final static String RED_LABEL_TEXT = "Select Red strategy";
 
-	public StratTab(Controller controller, AbstractWorld world,
-			StrategyRunner strategyRunner, Simulator simulator) {
+	public StratTab(Controller controllerA, Controller controllerB,
+			AbstractWorld worldA, AbstractWorld worldB,
+			StrategyRunner strategyRunner, Simulator simulator, StrategyFactory strategyFactory) {
+
 		super();
-		this.controller = controller;
-		this.world = world;
+		this.worldA = worldA;
 		this.simulator = simulator;
 		// Initialise strategy runner
 		this.strategyRunner = strategyRunner;
+        this.strategyFactory = strategyFactory;
 
-		// Class Variables
-		top = new JPanel();
-		southPanel = new JPanel();
-		top.setLayout(new BorderLayout());
-		southPanel.setLayout(new BorderLayout());
+		// Declare layout of buttons etc
+		// Layout composed of 3 by 6 grid (0 indexed)
+		// (GridBagConstraints controls properties of grid
+		// for each component. Leftmost column is gridx = 0
+		// and topmost row is grid y = 0)
 
+		String[] names = new String[strategyFactory.availableDesignators()
+				.size()];
+		for (int count = 0; count < strategyFactory.availableDesignators()
+				.size(); count++) {
+			names[count] = strategyFactory.availableDesignators().get(count);
+		}
+
+		controlPanel = new JPanel(new GridBagLayout());
 		stratTabs = new ArrayList<String>();
+		greenLabel = new JLabel(GREEN_LABEL_TEXT);
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 0;
+		c.insets = new Insets(1, 5, 1, 5);
+		controlPanel.add(greenLabel, c);
 
-		button = new JButton("Start");
-		button.addActionListener(this);
-		button.setActionCommand("startstop");
+		greenStrategy = new JComboBox(names);
+		c.gridx = 0;
+		c.gridy = 1;
+		c.gridwidth = 2;
+		controlPanel.add(greenStrategy, c);
 
-		randomButton = new JButton("Randomise");
-		randomButton.addActionListener(this);
-		randomButton.setEnabled(simulator != null);
-		randomButton.setActionCommand("randomise");
+		redLabel = new JLabel(RED_LABEL_TEXT);
+		c.gridx = 0;
+		c.gridy = 2;
+		c.gridwidth = 1;
+		controlPanel.add(redLabel, c);
 
-		resetButton = new JButton("Reset");
-		resetButton.addActionListener(this);
-		resetButton.setEnabled(simulator != null);
-		resetButton.setActionCommand("reset");
+		redStrategy = new JComboBox(names);
+		c.gridx = 0;
+		c.gridy = 3;
+		c.gridwidth = 2;
+		redStrategy.setEnabled(simulator != null);
+		controlPanel.add(redStrategy, c);
 
-		noiseButton = new JButton("Noise: On");
-		noiseButton.addActionListener(this);
-		noiseButton.setActionCommand("noise");
+		startButton = new JButton("Start");
+		startButton.addActionListener(this);
+		startButton.setActionCommand("startstop");
+		c.gridx = 2;
+		c.gridy = 3;
+		c.gridwidth = 1;
+		controlPanel.add(startButton, c);
 
 		switchGoals = new JButton("Switch Goals");
 		switchGoals.addActionListener(this);
 		switchGoals.setActionCommand("goals");
+		c.gridx = 0;
+		c.gridy = 4;
+		controlPanel.add(switchGoals, c);
 
-		isBlue = world.isBlue();
-
+		isBlue = worldA.isBlue();
 		if (isBlue) {
 			switchRobot = new JButton("Robot: Blue");
 		} else {
 			switchRobot = new JButton("Robot: Yellow");
 		}
-
 		switchRobot.addActionListener(this);
 		switchRobot.setActionCommand("robot");
+		c.gridx = 1;
+		c.gridy = 4;
+		controlPanel.add(switchRobot, c);
 
-		southPanel.add(BorderLayout.WEST, switchGoals);
-		southPanel.add(BorderLayout.SOUTH, randomButton);
-		southPanel.add(BorderLayout.NORTH, resetButton);
-		southPanel.add(BorderLayout.EAST, noiseButton);
-		southPanel.add(BorderLayout.CENTER, switchRobot);
+		noiseButton = new JButton("Noise: On");
+		noiseButton.addActionListener(this);
+		noiseButton.setEnabled(simulator != null);
+		noiseButton.setActionCommand("noise");
+		c.gridx = 2;
+		c.gridy = 4;
+		controlPanel.add(noiseButton, c);
 
-		menu = new JComboBox(strings);
+		randomButton = new JButton("Randomise");
+		randomButton.addActionListener(this);
+		randomButton.setEnabled(simulator != null);
+		randomButton.setActionCommand("randomise");
+		c.gridx = 2;
+		c.gridy = 5;
+		controlPanel.add(randomButton, c);
 
-		label = new JLabel(LABEL_TEXT);
+		resetButton = new JButton("Reset");
+		resetButton.addActionListener(this);
+		resetButton.setEnabled(simulator != null);
+		resetButton.setActionCommand("reset");
+		c.gridx = 0;
+		c.gridy = 5;
+		controlPanel.add(resetButton, c);
 
-		top.add(BorderLayout.WEST, menu);
-		top.add(BorderLayout.EAST, button);
-		top.add(BorderLayout.NORTH, label);
-		top.add(BorderLayout.SOUTH, southPanel);
+		this.add(controlPanel);
 
-		this.add(top);
 	}
 
+	// Listener for button clicks
 	@Override
 	public final void actionPerformed(ActionEvent event) {
 		if (event.getActionCommand().equals("startstop")) {
-			if (button.getText().equals("Start")) {
-				String selectedStrategy = stratTabs
-						.get(menu.getSelectedIndex());
+			if (startButton.getText().equals("Start")) {
+
+				String selectedStrategyA = (String) greenStrategy
+						.getSelectedItem();
+
+				String selectedStrategyB;
+				if (simulator == null) {
+					selectedStrategyB = (String) "NullStrategy";
+				} else {
+					selectedStrategyB = (String) redStrategy.getSelectedItem();
+					// selectedStrategyB = (String)
+					// redStrategy.getSelectedItem();
+				}
+
 				try {
-					strategyRunner.startStrategy(StrategyFactory
-							.createClass(selectedStrategy));
+					strategyRunner.startStrategy(
+							strategyFactory.createClass(selectedStrategyA),
+							strategyFactory.createClass(selectedStrategyB));
+
 				} catch (UnknownDesignatorException e) {
-					LOG.error("Cannot start starategy \"" + selectedStrategy
+					LOG.error("Cannot start strategy \"" + selectedStrategyA
 							+ "\": " + e.toString());
+					System.out.println("Valiant effort, chaps");
 					return;
 				}
-				button.setText("Stop");
+				startButton.setText("Stop");
 				switchGoals.setEnabled(false);
 				switchRobot.setEnabled(false);
 			} else {
-				button.setText("Start");
+				startButton.setText("Start");
 				strategyRunner.stopStrategy();
 				switchGoals.setEnabled(true);
 				switchRobot.setEnabled(true);
@@ -145,7 +204,10 @@ public class StratTab extends JPanel implements ActionListener {
 						.println("No currently running Strategy. World randomised "
 								+ "\": " + e);
 			}
-			button.setText("Start");
+			startButton.setText("Start");
+			strategyRunner.stopStrategy();
+			switchGoals.setEnabled(true);
+			switchRobot.setEnabled(true);
 			randomiseRobots(simulator);
 			randomiseBall(simulator);
 		} else if (event.getActionCommand().equals("reset")) {
@@ -156,7 +218,10 @@ public class StratTab extends JPanel implements ActionListener {
 						.println("No currently running Strategy. World reset "
 								+ "\": " + e);
 			}
-			button.setText("Start");
+			startButton.setText("Start");
+			strategyRunner.stopStrategy();
+			switchGoals.setEnabled(true);
+			switchRobot.setEnabled(true);
 			resetRobots(simulator);
 			resetBall(simulator);
 		} else if (event.getActionCommand().equals("noise")) {
@@ -168,45 +233,62 @@ public class StratTab extends JPanel implements ActionListener {
 				simulator.setIsNoisy(false);
 			}
 		} else if (event.getActionCommand().equals("goals")) {
-			if (world.getGoalPosition()) {
-				world.setGoalPosition(false);
+			if (worldA.getGoalPosition()) {
+				worldA.setGoalPosition(false);
 			} else {
-				world.setGoalPosition(true);
+				worldA.setGoalPosition(true);
 			}
 		} else if (event.getActionCommand().equals("robot")) {
 
-			if (world.isBlue()) {
+			if (worldA.isBlue()) {
 				switchRobot.setText("Robot: Yellow");
-				world.setIsBlue(false);
+				worldA.setIsBlue(false);
 				if (simulator != null) {
-					strategyRunner.setController(simulator.getYellowSoft());
+					strategyRunner.setController(simulator.getYellowSoft(),
+							simulator.getBlueSoft());
 				}
 			} else {
 				switchRobot.setText("Robot: Blue");
-				world.setIsBlue(true);
+				worldA.setIsBlue(true);
 				if (simulator != null) {
-					strategyRunner.setController(simulator.getBlueSoft());
+					strategyRunner.setController(simulator.getBlueSoft(),
+							simulator.getYellowSoft());
 				}
 			}
 		}
 	}
 
-	public String[] getStrings() {
-		int size = stratTabs.size();
-		String[] out = new String[size];
-		for (int i = 0; i < size; i++) {
-			out[i] = (i + 1) + ": " + stratTabs.get(i);
-		}
-		return out;
+	public boolean isSimulator() {
+		return simulator != null;
 	}
 
-	public final void addStrategy(String designator) {
-		stratTabs.add(designator);
-		strings = getStrings();
-		this.remove(menu);
-		menu = new JComboBox(strings);
-		top.add(BorderLayout.WEST, menu);
-	}
+
+	// Jon: I struggled to get this to work with new layout
+	// and both drop down menus. I'll look into it more
+
+	// public String[] getStrings() {
+	// int size = stratTabs.size();
+	// String[] out = new String[size];
+	// for (int i = 0; i < size; i++) {
+	// out[i] = (i + 1) + ": " + stratTabs.get(i);
+	// }
+	// return out;
+	// }
+	//
+	// public final void addStrategy(String designator) {
+	// stratTabs.add(designator);
+	// strings = getStrings();
+	// this.remove(greenStrategy);
+	// greenStrategy = new JComboBox(strings);
+	// c.gridx = 0;
+	// c.gridy = 1;
+	// c.gridwidth = 2;
+	// controlPanel.add(greenStrategy, c);
+		
+		//top.add(BorderLayout.WEST, greenStrategy);
+	// }
+
+	// Called from reset/randomise buttons
 
 	public void randomiseBall(Simulator s) {
 		s.randomiseBallPosition();

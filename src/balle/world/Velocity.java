@@ -22,4 +22,5 @@ public class Velocity extends Coord {
     public Velocity adjustLength(double newTimeDelta) {
         return new Velocity(this.mult(newTimeDelta / timeDelta), newTimeDelta);
     }
+
 }

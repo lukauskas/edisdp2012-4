@@ -21,8 +21,8 @@ import balle.world.Coord;
 import balle.world.EmptySnapshot;
 import balle.world.Orientation;
 import balle.world.Snapshot;
+import balle.world.objects.FieldObject;
 import balle.world.objects.Robot;
-import balle.world.objects.StaticFieldObject;
 
 public class BezierNav implements OrientedMovementExecutor {
 
@@ -93,7 +93,7 @@ public class BezierNav implements OrientedMovementExecutor {
 	private PathFinder pathfinder;
 	private Curve c;
 
-	private StaticFieldObject target;
+    private FieldObject         target;
 
 	private Orientation orient;
 	private Coord p0, p3;
@@ -379,7 +379,7 @@ public class BezierNav implements OrientedMovementExecutor {
 	}
 
 	@Override
-	public void updateTarget(StaticFieldObject target, Orientation o) {
+    public void updateTarget(FieldObject target, Orientation o) {
 		this.target = target;
 		this.orient = o;
 	}

@@ -8,8 +8,8 @@ import balle.strategy.executor.turning.RotateToOrientationExecutor;
 import balle.world.Coord;
 import balle.world.Orientation;
 import balle.world.Snapshot;
+import balle.world.objects.FieldObject;
 import balle.world.objects.Robot;
-import balle.world.objects.StaticFieldObject;
 
 public class GoToObject implements MovementExecutor {
 
@@ -20,7 +20,7 @@ public class GoToObject implements MovementExecutor {
 
 	public final static int DEFAULT_MOVEMENT_SPEED = 500;
 
-	protected StaticFieldObject target = null;
+    protected FieldObject       target                    = null;
 	private boolean isMoving = false;
 
 	private int movementSpeed = DEFAULT_MOVEMENT_SPEED;
@@ -32,7 +32,7 @@ public class GoToObject implements MovementExecutor {
 	}
 
 	@Override
-	public void updateTarget(StaticFieldObject target) {
+    public void updateTarget(FieldObject target) {
 		this.target = target;
 	}
 

@@ -100,7 +100,8 @@ public class Robot extends RectangularObject {
      */
     public boolean isInScoringPosition(Ball ball, Goal goal, Robot otherRobot) {
         return possessesBall(ball) && isFacingGoal(goal)
-                && !otherRobot.intersects(getFacingLine());
+                && ((otherRobot.getPosition() != null) && (!otherRobot
+                        .intersects(getFacingLine())));
     }
 
     /**
@@ -227,8 +228,7 @@ public class Robot extends RectangularObject {
         return getPosition().add(rightSide);
     }
 
-    public boolean canReachTargetInStraightLine(StaticFieldObject target,
-            StaticFieldObject obstacle) {
+    public boolean canReachTargetInStraightLine(FieldObject target, FieldObject obstacle) {
         if (getPosition() == null)
             return false;
 
@@ -244,7 +244,7 @@ public class Robot extends RectangularObject {
                 .intersects(pathToTarget3));
     }
 
-    public boolean isApproachingTargetFromCorrectSide(StaticFieldObject target,
+    public boolean isApproachingTargetFromCorrectSide(FieldObject target,
             Goal opponentsGoal) {
         if (getPosition() == null)
             return false;

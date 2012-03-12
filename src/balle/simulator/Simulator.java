@@ -3,7 +3,6 @@ package balle.simulator;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
-import javax.swing.UIManager;
 
 import org.jbox2d.common.Vec2;
 import org.jbox2d.testbed.framework.TestbedFrame;
@@ -140,14 +139,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 	 * @return A new simulator object.
 	 */
 	public static Simulator createSimulator(boolean noisy) {
-		try {
-			UIManager
-					.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
-		} catch (Exception e) {
-			System.out
-					.println("Could not set the look and feel to nimbus.  "
-							+ "Hopefully you're on a mac so the window isn't ugly as crap.");
-		}
+
 		TestbedModel model = new TestbedModel();
 		TestbedPanel panel = new TestPanelJ2D(model);
 		model.addCategory("Buggy");

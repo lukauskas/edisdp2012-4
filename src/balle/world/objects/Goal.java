@@ -3,7 +3,7 @@ package balle.world.objects;
 import balle.world.Coord;
 import balle.world.Line;
 
-public class Goal implements StaticFieldObject {
+public class Goal extends StaticFieldObject {
 
     private final boolean leftGoal;
     private final double  minX, maxX, minY, maxY;

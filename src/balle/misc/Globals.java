@@ -50,7 +50,8 @@ public class Globals {
 
     public static final float ROBOT_HEIGHT = 0.19f; // Meters
 
-    public static final double OVERSHOOT_ANGLE_EPSILON = 50; // Degrees
+    // TODO: SAULIUS this is just a temp fix for M3, change back to 50 for
+    public static final double OVERSHOOT_ANGLE_EPSILON = 0; // Degrees
 
 	// static final
 	// Vec2

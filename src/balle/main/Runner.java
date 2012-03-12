@@ -89,20 +89,24 @@ public class Runner {
 
 		// Get the colour
 		boolean balleIsBlue;
-		if ("blue".equals(options.valueOf("colour")))
-			balleIsBlue = true;
-		else if ("yellow".equals(options.valueOf("colour")))
-			balleIsBlue = false;
-		else {
-			System.out
-					.println("Invalid colour provided, try one of the following:");
-			System.out.println("javac balle.main.Runner -c blue");
-			System.out.println("javac balle.main.Runner -c yellow");
-			print_usage();
-			System.exit(-1);
-			balleIsBlue = false; // This is just to fool Eclipse about
-									// balleIsBlue initialisation
-		}
+        if (options.has("colour")) {
+            if ("blue".equals(options.valueOf("colour")))
+                balleIsBlue = true;
+            else if ("yellow".equals(options.valueOf("colour")))
+                balleIsBlue = false;
+            else {
+                System.out
+                        .println("Invalid colour provided, try one of the following:");
+                System.out.println("javac balle.main.Runner -c blue");
+                System.out.println("javac balle.main.Runner -c yellow");
+                print_usage();
+                System.exit(-1);
+                balleIsBlue = false; // This is just to fool Eclipse about
+                                     // balleIsBlue initialisation
+            }
+
+        } else
+            balleIsBlue = true;
 
 		boolean isMainPitch = true;
 		if ("1".equals(options.valueOf("pitch"))) {
@@ -115,11 +119,14 @@ public class Runner {
 			System.out.println("javac balle.main.Runner -p 1");
 			print_usage();
 			System.exit(-1);
+
 		}
 
 		boolean goalIsLeft = true;
-		if ("right".equals(options.valueOf("goal"))) {
-			goalIsLeft = false;
+        if (options.has("goal")) {
+            if ("right".equals(options.valueOf("goal"))) {
+                goalIsLeft = false;
+            }
 		}
 
 		StrategyLogPane strategyLog = new StrategyLogPane();
@@ -134,20 +141,28 @@ public class Runner {
 					strategyLog);
 	}
 
-	public static void initialiseGUI(Controller controller,
-			AbstractWorld world, StrategyLogPane strategyLog,
-			Simulator simulator) {
-		SimpleWorldGUI gui;
-		gui = new SimpleWorldGUI(world);
+	public static void initialiseGUI(Controller controllerA,
+			Controller controllerB, AbstractWorld worldA, AbstractWorld worldB,
+			StrategyLogPane strategyLog, Simulator simulator) {
+		SimpleWorldGUI gui = new SimpleWorldGUI(worldA);
 		GUITab mainWindow = new GUITab();
 
-		StrategyRunner strategyRunner = new StrategyRunner(controller, world,
-				gui);
+		StrategyRunner strategyRunner = new StrategyRunner(controllerA,
+				controllerB, worldA, worldB, gui);
 
-		StratTab strategyTab = new StratTab(controller, world, strategyRunner,
-				simulator);
-		for (String strategy : StrategyFactory.availableDesignators())
-			strategyTab.addStrategy(strategy);
+        StrategyFactory sf = new StrategyFactory();
+		StratTab strategyTab = new StratTab(controllerA, controllerB, worldA,
+				worldB, strategyRunner, simulator, sf);
+
+		// Jon: I struggled to get this to work with new layout
+		// and both drop down menus. I'll look into it more
+
+		// ArrayList<String> availableDesignators = sf.availableDesignators();
+		// for (String strategy : availableDesignators) {
+		// System.out.println(strategy);
+		// strategyTab.addStrategy(strategy);
+		// }
+
 
 		mainWindow.addToSidebar(strategyTab);
 		mainWindow.addToSidebar(strategyLog);
@@ -165,7 +180,7 @@ public class Runner {
 
 		AbstractWorld world;
 		SocketVisionReader visionInput;
-		Controller controller;
+		Controller controllerA;
 
 		// Initialise world
 		world = new BasicWorld(balleIsBlue, goalIsLeft, Globals.getPitch());
@@ -185,17 +200,16 @@ public class Runner {
 		// SimpleWorldGUI start!
 
 		if (useDummyController)
-			controller = new DummyController();
+			controllerA = new DummyController();
 		else
-			controller = new BluetoothController(new Communicator());
+			controllerA = new BluetoothController(new Communicator());
 
 		// Wait for controller to initialise
-		while (!controller.isReady()) {
+		while (!controllerA.isReady()) {
 			continue;
 		}
 
-		initialiseGUI(controller, world, strategyLog, null);
-
+		initialiseGUI(controllerA, null, world, null, strategyLog, null);
 		// Create visionInput buffer
 		visionInput = new SocketVisionReader();
 		visionInput.addListener(world);
@@ -204,18 +218,27 @@ public class Runner {
 	public static void runSimulator(boolean balleIsBlue, boolean goalIsLeft,
 			StrategyLogPane strategyLog) {
 		Simulator simulator = Simulator.createSimulator();
-		BasicWorld world = new BasicWorld(balleIsBlue, goalIsLeft,
+
+		BasicWorld worldA = new BasicWorld(balleIsBlue, goalIsLeft,
 				Globals.getPitch());
-		simulator.addListener(world);
+		simulator.addListener(worldA);
 
-		SoftBot bot;
-		if (!balleIsBlue)
-			bot = simulator.getYellowSoft();
-		else
-			bot = simulator.getBlueSoft();
+		BasicWorld worldB = new BasicWorld(!balleIsBlue, !goalIsLeft,
+				Globals.getPitch());
+		simulator.addListener(worldB);
 
-		System.out.println(bot);
+		SoftBot botA, botB;
+		if (!balleIsBlue) {
+			botA = simulator.getYellowSoft();
+			botB = simulator.getBlueSoft();
+		} else {
+			botA = simulator.getBlueSoft();
+			botB = simulator.getYellowSoft();
+		}
 
-		initialiseGUI(bot, world, strategyLog, simulator);
+		System.out.println(botA);
+		System.out.println(botB);
+
+		initialiseGUI(botA, botB, worldA, worldB, strategyLog, simulator);
 	}
 }
