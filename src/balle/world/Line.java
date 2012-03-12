@@ -189,7 +189,7 @@ public class Line {
         double newX = b.getX() + rotated.getX();
         double newY = b.getY() + rotated.getY();
 
-        Coord point2 = new Coord(0, howMuch);
+        Coord point2 = new Coord(-howMuch, 0);
         Coord rotated2 = point2.rotate(angle());
 
         double newAX = a.getX() + rotated2.getX();
