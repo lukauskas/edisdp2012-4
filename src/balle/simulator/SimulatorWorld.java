@@ -254,7 +254,8 @@ public class SimulatorWorld {
 		LinkedList<VisionPackage> history = new LinkedList<VisionPackage>();
 
 		private long getTimeStamp() {
-			return System.currentTimeMillis() - startTime;
+			// Make sure relative time is not needed
+			return System.currentTimeMillis(); // - startTime;
 		}
 
 		private float convAngle(float a) {

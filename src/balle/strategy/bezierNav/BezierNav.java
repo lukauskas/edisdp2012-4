@@ -274,8 +274,9 @@ public class BezierNav implements OrientedMovementExecutor {
 							.getPitch(), 0)));
 
 		}
-		long currentTime = s.getTimestamp();
-		long simulatorTime = currentTime - Globals.SIMULATED_VISON_DELAY;
+		long currentTime = System.currentTimeMillis();
+		long simulatorTime = s.getTimestamp();
+		System.out.println(currentTime + "  " + simulatorTime);
 
 		// clean up the history (ensure there is at least one element left in
 		// history)
