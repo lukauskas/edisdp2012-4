@@ -1,8 +1,14 @@
 package balle.strategy;
 
+import java.awt.Color;
+import java.util.ArrayList;
+
 import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
+import balle.main.drawable.Drawable;
+import balle.main.drawable.Label;
+import balle.misc.Globals;
 import balle.strategy.executor.movement.GoToObjectPFN;
 import balle.strategy.executor.turning.IncFaceAngle;
 import balle.strategy.executor.turning.RotateToOrientationExecutor;
@@ -31,6 +37,26 @@ public class Game extends AbstractPlanner {
 	protected final AbstractPlanner backingOffStrategy;
 	protected final RotateToOrientationExecutor turningExecutor;
 	protected final KickToGoal kickingStrategy;
+
+    private String currentStrategy = null;
+
+    public String getCurrentStrategy() {
+        return currentStrategy;
+    }
+
+    @Override
+    public ArrayList<Drawable> getDrawables() {
+        ArrayList<Drawable> drawables = super.getDrawables();
+        if (currentStrategy != null)
+            drawables.add(new Label(currentStrategy, new Coord(
+                    Globals.PITCH_WIDTH - 0.5, Globals.PITCH_HEIGHT + 0.2),
+                    Color.WHITE));
+        return drawables;
+    }
+
+    public void setCurrentStrategy(String currentStrategy) {
+        this.currentStrategy = currentStrategy;
+    }
 
     @FactoryMethod(designator = "Game")
     public static Game gameFactory() {
@@ -83,6 +109,7 @@ public class Game extends AbstractPlanner {
         if (ourRobot.possessesBall(ball)) {
             // Kick if we are facing opponents goal
             if (!ourRobot.isFacingGoalHalf(ownGoal)) {
+                setCurrentStrategy(kickingStrategy.getClass().getName());
                 kickingStrategy.step(controller, snapshot);
                 addDrawables(kickingStrategy.getDrawables());
             } else {
@@ -122,10 +149,12 @@ public class Game extends AbstractPlanner {
         } else if ((opponent.possessesBall(ball))
                 && (opponent.isFacingGoal(ownGoal))) {
             LOG.info("Defending");
+            setCurrentStrategy(defensiveStrategy.getClass().getName());
             // Let defensiveStrategy deal with it!
 			defensiveStrategy.step(controller, snapshot);
             addDrawables(defensiveStrategy.getDrawables());
         } else if (ball.isNearWall(pitch)) {
+            setCurrentStrategy(pickBallFromWallStrategy.getClass().getName());
 			pickBallFromWallStrategy.step(controller, snapshot);
             addDrawables(pickBallFromWallStrategy.getDrawables());
         } else if (ball.isNear(ourRobot)
@@ -133,14 +162,17 @@ public class Game extends AbstractPlanner {
 						snapshot.getOpponentsGoal()))) {
             if (Math.abs(ourRobot.getAngleToTurn(targetOrientation)) > (Math.PI / 4)) {
                 LOG.info("Ball is near our robot, turning to it");
+                setCurrentStrategy(turningExecutor.getClass().getName());
                 turningExecutor.setTargetOrientation(targetOrientation);
 				turningExecutor.step(controller, snapshot);
             } else {
+                setCurrentStrategy(null);
                 // Go forward!
                 controller.setWheelSpeeds(400, 400);
             }
         } else {
             // Approach ball
+            setCurrentStrategy(goToBallStrategy.getClass().getName());
 			goToBallStrategy.step(controller, snapshot);
             addDrawables(goToBallStrategy.getDrawables());
 

@@ -19,7 +19,6 @@ public abstract class AbstractPlanner implements Strategy {
     @Override
 	public final void step(Controller controller, Snapshot snapshot) {
         clearDrawables();
-        
         onStep(controller, snapshot);
     }
 

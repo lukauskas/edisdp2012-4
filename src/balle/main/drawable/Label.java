@@ -37,10 +37,9 @@ public class Label implements Drawable {
     @Override
     public void reduceVisibility() {
         Color currentColour = getColour();
-        // Reduce the alpha by 1/10
+        // Set the alpha to 0 so we do not draw it
         Color newColour = new Color(currentColour.getRed(),
-                currentColour.getGreen(), currentColour.getBlue(),
-                currentColour.getAlpha() / 10);
+                currentColour.getGreen(), currentColour.getBlue(), 0);
 
         setColour(newColour);
     }
