@@ -105,7 +105,7 @@ public class GoToBallSafe extends GoToBall {
         if (stage == 1) {
             LOG.info("Going to BALL_SAFE target");
             setApproachTargetFromCorrectSide(correctAngle);
-            setExecutorStrategy(new GoToObjectPFN(0));
+            setExecutorStrategy(new GoToObjectPFN(0, false));
         } else {
             LOG.info("Going to the ball");
             MovementExecutor executor = new GoToObject(turnExecutor);
@@ -148,7 +148,7 @@ public class GoToBallSafe extends GoToBall {
         super.onStep(controller, snapshot);
     }
 
-    @FactoryMethod(designator = "GoToBallM3")
+    @FactoryMethod(designator = "GoToBallSafe")
     public static GoToBallSafe factoryMethod() {
         return new GoToBallSafe();
     }
