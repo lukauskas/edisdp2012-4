@@ -13,12 +13,14 @@ import balle.world.objects.Robot;
 public class PidBezierNav extends BezierNav {
 
 	// PID constants for the wheels.
-	public static final double default_P = 0.6, default_I = 0.2,
-			default_D = 0.1;
+	public static final int default_history = 3;
+	public static final double default_P = 0.5, default_I = 0.5,
+			default_D = 0.0;
 
 	// PID objects
-	protected PID pidl = new PID(default_P, default_I, default_D),
-			pidr = new PID(default_P, default_I, default_D);
+	protected PID pidl = new PID(default_history, default_P, default_I,
+			default_D), pidr = new PID(default_history, default_P, default_I,
+			default_D);
 
 	public PidBezierNav(PathFinder pathfinder) {
 		super(pathfinder);
@@ -34,18 +36,13 @@ public class PidBezierNav extends BezierNav {
 
 		Robot robot = snapshot.getBalle();
 
-		Coord prevPos = lastPos;
-		lastPos = robot.getPosition();
-
-		double vel = 0;
-		if (lastPos != null && prevPos != null) {
-			Coord diff = lastPos.sub(prevPos);
-			vel = diff.abs() * (1000 / (dT + 1));
-			// System.out.println(dT + ">>>>>>>>>\t" + vel);
-		}
-
 		if (dT > 0) {
-			if (lastAngle != null) {
+			if (lastPos != null) {
+
+				// Calculate base velocity
+				Coord diff = robot.getPosition().sub(lastPos);
+				double vel = diff.abs() * (1000 / (dT + 1));
+
 				// this uses the angular and linear velocity of the robot to
 				// find the estimated powers to the wheels
 				double dA = lastAngle.angleToatan2Radians(robot
@@ -76,13 +73,16 @@ public class PidBezierNav extends BezierNav {
 				System.out.println(left + "\t\t" + right);
 
 			}
+
 			lastAngleTime = snapshot.getTimestamp();
 			lastAngle = robot.getOrientation();
+			lastPos = robot.getPosition();
+
+			int powl = (int) (left * MAXIMUM_MOTOR_SPEED), powr = (int) (right * MAXIMUM_MOTOR_SPEED);
+			System.out.println(powl + "\t\t" + powr);
+			controller.setWheelSpeeds(powl, powr);
 		}
 
-		int powl = (int) (left * MAXIMUM_MOTOR_SPEED), powr = (int) (right * MAXIMUM_MOTOR_SPEED);
-		System.out.println(powl + "\t\t" + powr);
-		controller.setWheelSpeeds(powl, powr);
 	}
 
 }
