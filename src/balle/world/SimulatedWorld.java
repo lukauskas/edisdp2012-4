@@ -41,7 +41,9 @@ public class SimulatedWorld extends BasicWorld {
 		// Update world model with snapshot information.
 		worldModel.setWithSnapshot(prev, isBlue());
 
-		// TODO roll simulator forward until updateTimestamp time.
+		// Roll worldModel forward until current time.
+		worldModel.update(updateTimestamp - prev.getTimestamp());
+
 	}
 
 	/**
