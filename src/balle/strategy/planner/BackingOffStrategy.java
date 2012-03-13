@@ -33,9 +33,9 @@ public class BackingOffStrategy extends GoToBall {
 	/**
 	 * Velocity threshold below which we could be stuck
 	 */
-	private static final double VELOCITY_THRESH = 3E-5; // NOTE: noise renders
-														// the velocity really
-														// unreliable atm
+	private static final double VELOCITY_THRESH = 3;// 3E-5;// NOTE: noise
+													// renders the velocity
+													// really unreliable atm
 
 	/**
 	 * Distance between our front and the other robot below which we could be
@@ -46,7 +46,7 @@ public class BackingOffStrategy extends GoToBall {
 	/**
 	 * Time in milliseconds that must pass before we decide that we're stuck
 	 */
-	private static final long TIME_THRESH = 2 * 1000;
+	private static final long TIME_THRESH = 1 * 1000;
 
 	private long timeWhenMaybeStuck = -1;
 	private long timeStartedBackingOff = -1;
@@ -59,7 +59,7 @@ public class BackingOffStrategy extends GoToBall {
 	}
 
 	@Override
-	public boolean couldRun(Snapshot snapshot) {
+	public boolean shouldStealStep(Snapshot snapshot) {
 		Robot us = snapshot.getBalle();
 		Line ourFront = us.getFrontSide();
 		Robot opponent = snapshot.getOpponent();
