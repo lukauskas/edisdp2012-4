@@ -13,9 +13,13 @@ import balle.main.drawable.Dot;
 import balle.main.drawable.Drawable;
 import balle.misc.Globals;
 import balle.simulator.SimulatorWorld;
+import balle.strategy.FactoryMethod;
 import balle.strategy.curve.Curve;
+import balle.strategy.curve.CustomCHI;
 import balle.strategy.executor.movement.OrientedMovementExecutor;
 import balle.strategy.pathfinding.PathFinder;
+import balle.strategy.pathfinding.SimplePathFinder;
+import balle.strategy.planner.SimpleGoToBallFaceGoal;
 import balle.world.BasicWorld;
 import balle.world.Coord;
 import balle.world.EmptySnapshot;
@@ -102,6 +106,12 @@ public class BezierNav implements OrientedMovementExecutor {
 																	// snapshots
 																	// at the
 																	// end
+
+	@FactoryMethod(designator = "BezierNav")
+	public static SimpleGoToBallFaceGoal bezierNavFactory() {
+		return new SimpleGoToBallFaceGoal(new BezierNav(new SimplePathFinder(
+				new CustomCHI())));
+	}
 
 	public BezierNav(PathFinder pathfinder) {
 		this.pathfinder = pathfinder;
