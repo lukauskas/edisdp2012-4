@@ -91,7 +91,7 @@ public class Game extends AbstractPlanner {
         if ((ourRobot.getPosition() == null) || (ball.getPosition() == null))
             return;
         
-		if (backingOffStrategy.couldRun(snapshot)) {
+		if (backingOffStrategy.shouldStealStep(snapshot)) {
 			backingOffStrategy.step(controller, snapshot);
 			return;
 		}
