@@ -7,7 +7,10 @@ import balle.main.drawable.DrawableLine;
 import balle.misc.Globals;
 import balle.strategy.FactoryMethod;
 import balle.strategy.executor.movement.GoToObjectPFN;
+import balle.strategy.executor.turning.FaceAngle;
+import balle.strategy.executor.turning.RotateToOrientationExecutor;
 import balle.world.Line;
+import balle.world.Orientation;
 import balle.world.Snapshot;
 import balle.world.objects.Ball;
 import balle.world.objects.FieldObject;
@@ -20,8 +23,12 @@ public class GoToBallSafeProportional extends GoToBall {
 
     private static final double BALL_SAFE_GAP = 0.4;
 
+	private final AbstractPlanner turnHack;
+
     public GoToBallSafeProportional() {
         super(new GoToObjectPFN(0));
+
+		turnHack = new TurnHack();
     }
 
     protected FieldObject getOriginalTarget(Snapshot snapshot) {
@@ -74,7 +81,6 @@ public class GoToBallSafeProportional extends GoToBall {
 
         Line targetLine = new Line(targetGoal.getPosition(), ball.getPosition());
 
-        Pitch pitch = snapshot.getPitch();
         double ballSafeGap = 0.005;
         Line newTargetLine = targetLine;
 
@@ -103,6 +109,16 @@ public class GoToBallSafeProportional extends GoToBall {
         FieldObject ball = getOriginalTarget(snapshot);
         Robot ourRobot = snapshot.getBalle();
 
+		if ((snapshot == null) || (ourRobot == null) || (ball == null)) {
+			return;
+		}
+
+		if (turnHack.shouldStealStep(snapshot)) {
+			// LOG.info("Letting TurnHack handle the step");
+			turnHack.step(controller, snapshot);
+			return;
+		}
+
         if (ourRobot.isApproachingTargetFromCorrectSide(ball,
                 snapshot.getOpponentsGoal())) {
             setApproachTargetFromCorrectSide(false);
@@ -112,4 +128,73 @@ public class GoToBallSafeProportional extends GoToBall {
 
         super.onStep(controller, snapshot);
     }
+
+	/**
+	 * PFN's large turning radius mean that we usually overshoot the ball when
+	 * we're really close and trying to turn towards it. This strategy just
+	 * captures onStep() in that case and makes the robot turn normally
+	 * 
+	 * @author s0913664
+	 * 
+	 */
+	private class TurnHack extends AbstractPlanner {
+
+		private static final double ANGLE_THRESH = Math.PI / 4;
+
+		private RotateToOrientationExecutor turnExecutor;
+
+		private boolean isTurning = false;
+
+		public TurnHack() {
+			turnExecutor = new FaceAngle();
+		}
+
+		@Override
+		public boolean shouldStealStep(Snapshot snapshot) {
+
+			// Steal step when the line from the centre of the goal through the
+			// wall intersects the robot, and the robot is close to the ball
+			
+			return isTurning || needsToTurn(snapshot);
+
+		}
+
+		private boolean needsToTurn(Snapshot snapshot) {
+			Robot ourRobot = snapshot.getBalle();
+			Ball ball = snapshot.getBall();
+			Goal opponentsGoal = snapshot.getOpponentsGoal();
+			
+			Line line = new Line(opponentsGoal.getPosition(), ball.getPosition()).extend(Globals.PITCH_WIDTH);
+			boolean isOnCorrectSide = ourRobot.isApproachingTargetFromCorrectSide(ball, opponentsGoal);
+			double absAngleToTurn = Math.abs(ourRobot.getAngleToTurnToTarget(ball
+					.getPosition()));
+
+			return isOnCorrectSide && absAngleToTurn > ANGLE_THRESH
+					&& ourRobot.intersects(line);
+		}
+
+		@Override
+		protected void onStep(Controller controller, Snapshot snapshot) {
+
+			Robot ourRobot = snapshot.getBalle();
+			Ball ball = snapshot.getBall();
+
+			if (!isTurning) {
+				Orientation targetAngle = ball.getPosition()
+						.sub(ourRobot.getPosition()).orientation();
+
+				LOG.info("TurnHack: Setting target orientation");
+				turnExecutor.setTargetOrientation(targetAngle);
+
+				isTurning = true;
+			} else if (turnExecutor.isFinished(snapshot)
+					|| !needsToTurn(snapshot)) {
+				isTurning = false;
+			}
+
+			turnExecutor.step(controller, snapshot);
+
+		}
+
+	}
 }
