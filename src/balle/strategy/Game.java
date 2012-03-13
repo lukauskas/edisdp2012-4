@@ -16,6 +16,7 @@ import balle.strategy.planner.AbstractPlanner;
 import balle.strategy.planner.BackingOffStrategy;
 import balle.strategy.planner.DefensiveStrategy;
 import balle.strategy.planner.GoToBallSafeProportional;
+import balle.strategy.planner.InitialStrategy;
 import balle.strategy.planner.KickFromWall;
 import balle.strategy.planner.KickToGoal;
 import balle.world.Coord;
@@ -37,6 +38,9 @@ public class Game extends AbstractPlanner {
 	protected final AbstractPlanner backingOffStrategy;
 	protected final RotateToOrientationExecutor turningExecutor;
 	protected final KickToGoal kickingStrategy;
+    protected final InitialStrategy initialStrategy;
+
+    protected boolean initial;
 
     private String currentStrategy = null;
 
@@ -60,7 +64,12 @@ public class Game extends AbstractPlanner {
 
     @FactoryMethod(designator = "Game")
     public static Game gameFactory() {
-        return new Game();
+        return new Game(true);
+    }
+
+    @FactoryMethod(designator = "GameTesting")
+    public static Game gameFactoryTesting() {
+        return new Game(false);
     }
 
     public Game() {
@@ -70,13 +79,54 @@ public class Game extends AbstractPlanner {
 		backingOffStrategy = new BackingOffStrategy();
         turningExecutor = new IncFaceAngle();
         kickingStrategy = new KickToGoal();
+        initialStrategy = new InitialStrategy();
+        initial = false;
+    }
+
+    public boolean isInitial(Snapshot snapshot) {
+        if (initial == false)
+            return false;
+
+        // Check if we have ball
+        Ball ball = snapshot.getBall();
+        if (ball.getPosition() == null)
+            return initial; // Return whatever is set to initial if we do not
+                            // see it
+        
+        Coord centerOfPitch = new Coord(Globals.PITCH_WIDTH / 2,
+                Globals.PITCH_HEIGHT / 2);
+        Robot ourRobot = snapshot.getBalle();
+        // If we have the ball, turn off initial strategy
+        if ((ourRobot.getPosition() != null) && (ourRobot.possessesBall(ball)))
+        {
+            LOG.info("We possess the ball. Turning off initial strategy");
+            setInitial(false);
+        }
+        // else If ball has moved 5 cm, turn off initial strategy
+        else if (ball.getPosition().dist(centerOfPitch) > 0.05) {
+            LOG.info("Ball has moved. Turning off initial strategy");
+            setInitial(false);
+        }
+        
+        return initial;
 
     }
 
+    public void setInitial(boolean initial) {
+        this.initial = initial;
+    }
+
+    public Game(boolean startWithInitial) {
+        this();
+        initial = startWithInitial;
+        LOG.info("Starting game strategy with initial strategy turned on");
+    }
     @Override
     public void stop(Controller controller) {
         defensiveStrategy.stop(controller);
         goToBallStrategy.stop(controller);
+        pickBallFromWallStrategy.stop(controller);
+        backingOffStrategy.stop(controller);
     }
 
     @Override
@@ -96,8 +146,12 @@ public class Game extends AbstractPlanner {
 			return;
 		}
 
-        Orientation targetOrientation = ball.getPosition()
-                .sub(ourRobot.getPosition()).orientation();
+        if (isInitial(snapshot)) {
+            setCurrentStrategy(initialStrategy.getClass().getName());
+            initialStrategy.step(controller, snapshot);
+            addDrawables(initialStrategy.getDrawables());
+            return;
+        }
 
         if (ourRobot.possessesBall(ball)) {
             // Kick if we are facing opponents goal
