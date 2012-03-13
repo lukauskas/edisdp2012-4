@@ -25,7 +25,6 @@ import balle.strategy.StrategyFactory;
 import balle.strategy.StrategyRunner;
 import balle.world.AbstractWorld;
 import balle.world.BasicWorld;
-import balle.world.SimulatedWorld;
 import balle.world.filter.HeightFilter;
 import balle.world.filter.TimeFilter;
 
@@ -184,7 +183,7 @@ public class Runner {
 		Controller controllerA;
 
 		// Initialise world
-		world = new SimulatedWorld(balleIsBlue, goalIsLeft, Globals.getPitch());
+		world = new BasicWorld(balleIsBlue, goalIsLeft, Globals.getPitch());
 
 		world.addFilter(new TimeFilter(Globals.SIMULATED_VISON_DELAY));
 		if (isMainPitch) {
@@ -220,7 +219,7 @@ public class Runner {
 			StrategyLogPane strategyLog) {
 		Simulator simulator = Simulator.createSimulator();
 
-		BasicWorld worldA = new SimulatedWorld(balleIsBlue, goalIsLeft,
+		BasicWorld worldA = new BasicWorld(balleIsBlue, goalIsLeft,
 				Globals.getPitch());
 		simulator.addListener(worldA);
 
