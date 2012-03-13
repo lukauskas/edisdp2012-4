@@ -384,7 +384,6 @@ public class BezierNav implements OrientedMovementExecutor {
 
 	@Override
 	public void stop(Controller controller) {
-		// controller.kick();
 		controller.stop();
 	}
 
