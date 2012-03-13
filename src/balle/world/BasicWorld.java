@@ -99,7 +99,7 @@ public class BasicWorld extends AbstractWorld {
 		if (theirsPosition == null)
 			theirsPosition = estimatedPosition(prev.getOpponent(), deltaT);
 		if (ballPosition == null)
-			ballPosition = estimatedPosition(prev.getBall(), deltaT);
+			ballPosition = estimatedPosition(prev.getBall(), deltaT, true);
 
 		// Calculate how much each position has changed between frames
 		Coord oursDPos, themDPos, ballDPos;
