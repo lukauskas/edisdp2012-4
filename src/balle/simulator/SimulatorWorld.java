@@ -675,9 +675,17 @@ public class SimulatorWorld {
 				new Ball(v2C(b.getPosition()).mult(1.0/SCALE), new Velocity(v2C(b.getLinearVelocity()).mult(1.0/(SCALE)),1000)), opponentsGoal, ownGoal, p, timeStamp);
 	}
 
-	public void setWithSnapshot(Snapshot prev, boolean balleIsBlue) {
+	public void setWithSnapshot(Snapshot snapshot, boolean balleIsBlue) {
 
-		// TODO
+		balle.world.objects.Robot yRobot, bRobot;
+		if (balleIsBlue) {
+			yRobot = snapshot.getOpponent();
+			bRobot = snapshot.getBalle();
+		} else {
+			yRobot = snapshot.getBalle();
+			bRobot = snapshot.getOpponent();
+		}
+
 
 	}
 
