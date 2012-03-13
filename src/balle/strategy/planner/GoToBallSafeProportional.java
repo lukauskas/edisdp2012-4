@@ -114,7 +114,7 @@ public class GoToBallSafeProportional extends GoToBall {
 		}
 
 		if (turnHack.shouldStealStep(snapshot)) {
-			// LOG.info("Letting TurnHack handle the step");
+			LOG.info("Letting TurnHack handle the step");
 			turnHack.step(controller, snapshot);
 			return;
 		}
@@ -140,6 +140,7 @@ public class GoToBallSafeProportional extends GoToBall {
 	private class TurnHack extends AbstractPlanner {
 
 		private static final double ANGLE_THRESH = Math.PI / 4;
+		private static final double DIST_THRESH = 0.08;
 
 		private RotateToOrientationExecutor turnExecutor;
 
@@ -170,7 +171,7 @@ public class GoToBallSafeProportional extends GoToBall {
 					.getPosition()));
 
 			return isOnCorrectSide && absAngleToTurn > ANGLE_THRESH
-					&& ourRobot.intersects(line);
+					&& line.dist(ourRobot.getPosition()) < DIST_THRESH;
 		}
 
 		@Override
