@@ -227,10 +227,10 @@ public class StratTab extends JPanel implements ActionListener {
 		} else if (event.getActionCommand().equals("noise")) {
 			if (noiseButton.getText().equals("Noise: Off")) {
 				noiseButton.setText("Noise: On");
-				simulator.isNoisy(true);
+				simulator.setIsNoisy(true);
 			} else {
 				noiseButton.setText("Noise: Off");
-				simulator.isNoisy(false);
+				simulator.setIsNoisy(false);
 			}
 		} else if (event.getActionCommand().equals("goals")) {
 			if (worldA.getGoalPosition()) {

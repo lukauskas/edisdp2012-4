@@ -26,6 +26,7 @@ import balle.strategy.StrategyRunner;
 import balle.world.AbstractWorld;
 import balle.world.BasicWorld;
 import balle.world.filter.HeightFilter;
+import balle.world.filter.TimeFilter;
 
 /**
  * This is where the main executable code for 4s lies. It is responsible of
@@ -184,6 +185,7 @@ public class Runner {
 		// Initialise world
 		world = new BasicWorld(balleIsBlue, goalIsLeft, Globals.getPitch());
 
+		world.addFilter(new TimeFilter(Globals.SIMULATED_VISON_DELAY));
 		if (isMainPitch) {
 			world.addFilter(new HeightFilter(world.getPitch().getPosition(),
 					Globals.P0_CAMERA_HEIGHT));

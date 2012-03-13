@@ -7,7 +7,12 @@ package balle.strategy.bezierNav;
  * Links: http://www.societyofrobots.com/programming_PID.shtml
  */
 public class PID {
-	public static final int HISTORY = 10;
+
+	/**
+	 * Length of history to use.
+	 * 
+	 */
+	protected int HISTORY = 10;
 
 	/**
 	 * P - Proportional, I - Integral, D - Derivative,
@@ -39,7 +44,8 @@ public class PID {
 	 * @param d
 	 *            Derivative weighting,
 	 */
-	public PID(double p, double i, double d) {
+	public PID(int history, double p, double i, double d) {
+		this.HISTORY = history;
 		this.p = p;
 		this.i = i;
 		this.d = d;
@@ -72,6 +78,6 @@ public class PID {
 		kp = desX - currX;
 		kd = ((double) (x-xd))/HISTORY;
 
-		return kp * p + ki * i + kd * d;
+		return currX + (kp * p) + (ki * i) + (kd * d);
 	}
 }

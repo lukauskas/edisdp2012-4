@@ -9,7 +9,10 @@ import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
 import balle.main.drawable.Dot;
+import balle.strategy.FactoryMethod;
+import balle.strategy.curve.CustomCHI;
 import balle.strategy.executor.movement.OrientedMovementExecutor;
+import balle.strategy.pathfinding.SimplePathFinder;
 import balle.strategy.planner.AbstractPlanner;
 import balle.world.Orientation;
 import balle.world.Snapshot;
@@ -25,6 +28,12 @@ public class GameBezier extends AbstractPlanner {
 			.getLogger(GameBezier.class);
 
 	OrientedMovementExecutor executorStrategy;
+
+	@FactoryMethod(designator = "GameBezier")
+	public static GameBezier gameBezierFactory() {
+		return new GameBezier(new BezierNav(new SimplePathFinder(
+				new CustomCHI())));
+	}
 
 	public GameBezier(
 			OrientedMovementExecutor OrientedMovementExecutor) {
