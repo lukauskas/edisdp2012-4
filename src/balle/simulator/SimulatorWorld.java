@@ -29,7 +29,7 @@ public class SimulatorWorld {
 
 	private World world;
 
-	private static int robotNo = 0;
+	private int robotNo = 0;
 	private long startTime;
 
 	private Body ground;
@@ -174,19 +174,29 @@ public class SimulatorWorld {
 	}
 
 	public void setBlueRobotPosition(Coord c, Orientation o) {
-		world.destroyBody(blue.getBody());
-		world.destroyBody(blue.kicker);
-		blue = new Robot(new Vec2((float) c.getX(), (float) c.getY()),
-				(float) o.degrees());
-		blueSoft.setBody(blue.getBody());
+		if (blue != null) {
+			world.destroyBody(blue.getBody());
+			world.destroyBody(blue.kicker);
+		}
+
+		if (c != null) {
+			blue = new Robot(new Vec2((float) c.getX(), (float) c.getY()),
+					(float) o.degrees());
+			blueSoft.setBody(blue.getBody());
+		}
 	}
 
 	public void setYellowRobotPosition(Coord c, Orientation o) {
-		world.destroyBody(yellow.getBody());
-		world.destroyBody(yellow.kicker);
-		yellow = new Robot(new Vec2((float) c.getX(), (float) c.getY()),
-				(float) o.degrees());
-		yellowSoft.setBody(yellow.getBody());
+		if (yellow != null) {
+			world.destroyBody(yellow.getBody());
+			world.destroyBody(yellow.kicker);
+		}
+
+		if (c != null) {
+			yellow = new Robot(new Vec2((float) c.getX() * SCALE,
+					(float) c.getY() * SCALE), (float) o.degrees());
+			yellowSoft.setBody(yellow.getBody());
+		}
 	}
 
 	public void randomiseRobotPositions() {
@@ -688,6 +698,18 @@ public class SimulatorWorld {
 		
 		blue.getBody().setLinearVelocity(bRobot.getVelocity().vec2());
 		yellow.getBody().setLinearVelocity(yRobot.getVelocity().vec2());
+	}
+
+	/**
+	 * Factory Method.
+	 * 
+	 * @return SimulatorWorld with no noise.
+	 */
+	public static SimulatorWorld createSimulatorWorld() {
+		SimulatorWorld newSimulatorWorld = new SimulatorWorld(false);
+		newSimulatorWorld.setWorld(new World(new Vec2(), true));
+		newSimulatorWorld.initWorld();
+		return newSimulatorWorld;
 	}
 
 }

@@ -19,8 +19,10 @@ public class SimulatedWorld extends BasicWorld {
 	 */
 	protected long updateTimestamp = -1;
 
-	public SimulatedWorld(boolean balleIsBlue, boolean goalIsLeft, Pitch pitch) {
+	public SimulatedWorld(SimulatorWorld worldModel, boolean balleIsBlue,
+			boolean goalIsLeft, Pitch pitch) {
 		super(balleIsBlue, goalIsLeft, pitch);
+		this.worldModel = worldModel;
 	}
 
 	/**
