@@ -43,7 +43,6 @@ public class SimulatedWorld extends BasicWorld {
 
 		// Roll worldModel forward until current time.
 		worldModel.update(updateTimestamp - prev.getTimestamp());
-
 	}
 
 	/**
