@@ -16,6 +16,7 @@ import balle.strategy.planner.AbstractPlanner;
 import balle.strategy.planner.BackingOffStrategy;
 import balle.strategy.planner.DefensiveStrategy;
 import balle.strategy.planner.GoToBallSafeProportional;
+import balle.strategy.planner.InitialStrategy;
 import balle.strategy.planner.KickFromWall;
 import balle.strategy.planner.KickToGoal;
 import balle.world.Coord;
@@ -37,6 +38,7 @@ public class Game extends AbstractPlanner {
 	protected final AbstractPlanner backingOffStrategy;
 	protected final RotateToOrientationExecutor turningExecutor;
 	protected final KickToGoal kickingStrategy;
+    protected final InitialStrategy initialStrategy;
 
     protected boolean initial;
 
@@ -77,6 +79,7 @@ public class Game extends AbstractPlanner {
 		backingOffStrategy = new BackingOffStrategy();
         turningExecutor = new IncFaceAngle();
         kickingStrategy = new KickToGoal();
+        initialStrategy = new InitialStrategy();
         initial = false;
     }
 
@@ -92,8 +95,15 @@ public class Game extends AbstractPlanner {
         
         Coord centerOfPitch = new Coord(Globals.PITCH_WIDTH / 2,
                 Globals.PITCH_HEIGHT / 2);
-        // If ball has moved 5 cm, turn off initial strategy
-        if (ball.getPosition().dist(centerOfPitch) > 0.05) {
+        Robot ourRobot = snapshot.getBalle();
+        // If we have the ball, turn off initial strategy
+        if ((ourRobot.getPosition() != null) && (ourRobot.possessesBall(ball)))
+        {
+            LOG.info("We possess the ball. Turning off initial strategy");
+            setInitial(false);
+        }
+        // else If ball has moved 5 cm, turn off initial strategy
+        else if (ball.getPosition().dist(centerOfPitch) > 0.05) {
             LOG.info("Ball has moved. Turning off initial strategy");
             setInitial(false);
         }
@@ -115,6 +125,8 @@ public class Game extends AbstractPlanner {
     public void stop(Controller controller) {
         defensiveStrategy.stop(controller);
         goToBallStrategy.stop(controller);
+        pickBallFromWallStrategy.stop(controller);
+        backingOffStrategy.stop(controller);
     }
 
     @Override
@@ -135,7 +147,10 @@ public class Game extends AbstractPlanner {
 		}
 
         if (isInitial(snapshot)) {
-
+            setCurrentStrategy(initialStrategy.getClass().getName());
+            initialStrategy.step(controller, snapshot);
+            addDrawables(initialStrategy.getDrawables());
+            return;
         }
 
         if (ourRobot.possessesBall(ball)) {
