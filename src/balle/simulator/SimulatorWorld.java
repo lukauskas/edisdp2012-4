@@ -675,4 +675,10 @@ public class SimulatorWorld {
 				new Ball(v2C(b.getPosition()).mult(1.0/SCALE), new Velocity(v2C(b.getLinearVelocity()).mult(1.0/(SCALE)),1000)), opponentsGoal, ownGoal, p, timeStamp);
 	}
 
+	public void setWithSnapshot(Snapshot prev, boolean balleIsBlue) {
+
+		// TODO
+
+	}
+
 }
