@@ -6,7 +6,7 @@ import balle.world.objects.Robot;
 
 public class BasicWorld extends AbstractWorld {
 
-	private Snapshot prev;
+	protected Snapshot prev;
 
 	public BasicWorld(boolean balleIsBlue, boolean goalIsLeft, Pitch pitch) {
 		super(balleIsBlue, goalIsLeft, pitch);
