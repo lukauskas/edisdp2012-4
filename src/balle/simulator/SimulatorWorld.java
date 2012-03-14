@@ -17,6 +17,7 @@ import org.jbox2d.dynamics.joints.WeldJointDef;
 
 import balle.io.reader.Reader;
 import balle.misc.Globals;
+import balle.world.AngularVelocity;
 import balle.world.Coord;
 import balle.world.Orientation;
 import balle.world.Snapshot;
@@ -661,13 +662,24 @@ public class SimulatorWorld {
 		Body o = yellow.getBody();
 		Body me = blue.getBody();
 		Body b = ball;
+
 		return new Snapshot(
-				new balle.world.objects.Robot(v2C(o.getPosition()).mult(1.0/SCALE), new Velocity(v2C(b.getLinearVelocity()).mult(1.0/(SCALE)),1000), new Orientation(b.getAngle())),
+				new balle.world.objects.Robot(v2C(o.getPosition())
+				.mult(1.0 / SCALE), new Velocity(v2C(o.getLinearVelocity())
+				.mult(1.0 / (SCALE)), 1000), new AngularVelocity(
+				o.getAngularVelocity(), 1000), new Orientation(o.getAngle())),
 				
-		new balle.world.objects.Robot(v2C(me.getPosition()).mult(1.0 / SCALE),
+				new balle.world.objects.Robot(v2C(me.getPosition()).mult(1.0 / SCALE),
 				new Velocity(v2C(me.getLinearVelocity()).mult(1.0 / (SCALE)),
-						1000), new Orientation(me.getAngle())),
-				new Ball(v2C(b.getPosition()).mult(1.0/SCALE), new Velocity(v2C(b.getLinearVelocity()).mult(1.0/(SCALE)),1000)), opponentsGoal, ownGoal, p, timeStamp);
+						1000), new AngularVelocity(me.getAngularVelocity(),
+						1000), new Orientation(
+						me.getAngle())),
+
+		new Ball(v2C(
+				b.getPosition()).mult(1.0 / SCALE), new Velocity(v2C(
+				b.getLinearVelocity()).mult(1.0 / (SCALE)), 1000)),
+
+		opponentsGoal, ownGoal, p, timeStamp);
 	}
 
 	public void setWithSnapshot(Snapshot snapshot, boolean balleIsBlue) {

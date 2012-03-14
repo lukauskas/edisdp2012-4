@@ -114,17 +114,30 @@ public class BasicWorld extends AbstractWorld {
 		themVel = themDPos != null ? new Velocity(themDPos, deltaT) : null;
 		ballVel = ballDPos != null ? new Velocity(ballDPos, deltaT) : null;
 
+		AngularVelocity oursAngVel = null, themAngVel = null;
 		if (ourOrientation == null) {
 			ourOrientation = prev.getBalle().getOrientation();
+		} else if (prev.getBalle().getOrientation() != null) {
+			oursAngVel = new AngularVelocity(
+					ourOrientation.angleToatan2Radians(prev.getBalle()
+							.getOrientation()), deltaT);
 		}
 
 		if (theirsOrientation == null) {
 			theirsOrientation = prev.getOpponent().getOrientation();
+		} else if (prev.getOpponent().getOrientation() != null) {
+			themAngVel = new AngularVelocity(
+					theirsOrientation.angleToatan2Radians(prev.getOpponent()
+							.getOrientation()), deltaT);
 		}
 
+		themAngVel = (them != null) ? new AngularVelocity(
+				theirsOrientation.angleToatan2Radians(prev.getOpponent()
+						.getOrientation()), deltaT) : null;
+
 		// put it all together (almost)
-		them = new Robot(theirsPosition, themVel, theirsOrientation);
-		ours = new Robot(ourPosition, oursVel, ourOrientation);
+		them = new Robot(theirsPosition, themVel, themAngVel, theirsOrientation);
+		ours = new Robot(ourPosition, oursVel, oursAngVel, ourOrientation);
 		ball = new Ball(ballPosition, ballVel);
 
 		// pack into a snapshot
