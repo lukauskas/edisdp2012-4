@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import balle.controller.Controller;
 import balle.main.drawable.Drawable;
 import balle.misc.Globals;
+import balle.world.AngularVelocity;
 import balle.world.Snapshot;
 
 public class Calibrate implements Strategy {
@@ -15,7 +16,7 @@ public class Calibrate implements Strategy {
 	private final int SAMPLES = 10; // how many angular velocity samples to take
 	private long lastPowerChangeTime = Long.MAX_VALUE;
 	private int power = 0;
-	private double[] samples = new double[SAMPLES];
+	private AngularVelocity[] samples = new AngularVelocity[SAMPLES];
 	private int sampleIndex = 0;
 	
 	private boolean done = false;
@@ -30,7 +31,7 @@ public class Calibrate implements Strategy {
 			if (System.currentTimeMillis() - lastPowerChangeTime < ACCEL_TIME)
 				return;
 			// else collect the sample
-			samples[sampleIndex] = snapshot.getBalle().getAngularVelocity().radiansPerMs();
+			samples[sampleIndex] = snapshot.getBalle().getAngularVelocity();
 			sampleIndex++;
 			
 			// if this is the last sample for the current power
@@ -57,21 +58,23 @@ public class Calibrate implements Strategy {
 		// calculate the wheel velocity
 		double avgAngAccel = 0;
 		for(int i = 0; i < sampleIndex; i++) {
-			avgAngAccel += samples[i];
+			avgAngAccel += samples[i].radians();
 		}
 		avgAngAccel /= sampleIndex;
-		double wheelVelocity = angularVelToWheelVel(avgAngAccel);
+		double wheelVelocity = angularVelToWheelSpeed(avgAngAccel);
 		
 		// record (just print out for now)
 		System.out.println(power+"\t"+wheelVelocity);
 	}
-	
+
 	/**
-	 * assuming the robot is spinning (has no linear velocity) calculate the wheel velocity based on angular velocity
+	 * assuming the robot is spinning (has no linear velocity) calculate the
+	 * wheel speed (absolute velocity) based on angular velocity
+	 * 
 	 * @return
 	 */
-	private double angularVelToWheelVel(double angVel) {
-		
+	private double angularVelToWheelSpeed(double angVel) {
+		return angVel * Globals.ROBOT_TRACK_WIDTH / 2;
 	}
 
     /**
