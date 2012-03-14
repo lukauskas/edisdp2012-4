@@ -124,10 +124,10 @@ public class BasicWorld extends AbstractWorld {
 
 		// Recalculate the angular velocities
 		AngularVelocity oursAngVel, themAngVel;
-		oursAngVel = ours != null ? new AngularVelocity(
+		oursAngVel = (ours != null) ? new AngularVelocity(
 				ourOrientation.angleToatan2Radians(prev.getBalle()
 						.getOrientation()), deltaT) : null;
-		themAngVel = them != null ? new AngularVelocity(
+		themAngVel = (them != null) ? new AngularVelocity(
 				theirsOrientation.angleToatan2Radians(prev.getOpponent()
 						.getOrientation()), deltaT) : null;
 
