@@ -1,38 +1,46 @@
 package balle.strategy;
 
-import java.util.ArrayList;
-
 import balle.controller.Controller;
-import balle.main.drawable.Drawable;
 import balle.misc.Globals;
+import balle.strategy.planner.AbstractPlanner;
 import balle.world.AngularVelocity;
 import balle.world.Snapshot;
 
-public class Calibrate implements Strategy {
+public class Calibrate extends AbstractPlanner {
 
 	private final long ACCEL_TIME = 500; // time needed to accelerate to the
 											// terminal speed
 	private final int POWER_STEP = 10;
 	private final int SAMPLES = 10; // how many angular velocity samples to take
-	private long lastPowerChangeTime = Long.MAX_VALUE;
-	private int power = 0;
+	private long lastPowerChangeTime = System.currentTimeMillis() - ACCEL_TIME;
+	private int power = 500;
 	private AngularVelocity[] samples = new AngularVelocity[SAMPLES];
 	private int sampleIndex = 0;
 	
 	private boolean done = false;
 
+	@FactoryMethod(designator = "Calibrate")
+	public static Calibrate calibrateFactory() {
+		return new Calibrate();
+	}
+
     /**
      * Tell the strategy to do a step (e.g. move forward).
      * @param snapshot TODO
      */
-	public void step(Controller controller, Snapshot snapshot) {
+	public void onStep(Controller controller, Snapshot snapshot) {
 		if(!done) {
 			// if accelerating, just let it accelerate
 			if (System.currentTimeMillis() - lastPowerChangeTime < ACCEL_TIME)
 				return;
-			// else collect the sample
-			samples[sampleIndex] = snapshot.getBalle().getAngularVelocity();
-			sampleIndex++;
+			// else collect the sample if possible
+			if (snapshot.getBalle() != null
+					&& snapshot.getBalle().getAngularVelocity() != null) {
+				samples[sampleIndex] = snapshot.getBalle().getAngularVelocity();
+				sampleIndex++;
+			} else {
+				System.out.println(snapshot.getBalle().getAngularVelocity());
+			}
 			
 			// if this is the last sample for the current power
 			if(sampleIndex == SAMPLES) {
@@ -75,23 +83,6 @@ public class Calibrate implements Strategy {
 	 */
 	private double angularVelToWheelSpeed(double angVel) {
 		return angVel * Globals.ROBOT_TRACK_WIDTH / 2;
-	}
-
-    /**
-     * Tell the strategy to stop doing whatever it was doing.
-     * 
-     * @param controller
-     */
-	public void stop(Controller controller) {
-		/* DO NOTHING */
-	}
-
-    /**
-     * Retrieves all Drawable objects from the strategy
-     * 
-     */
-	public ArrayList<Drawable> getDrawables() {
-		return new ArrayList<Drawable>();
 	}
 
 }
