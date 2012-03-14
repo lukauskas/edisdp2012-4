@@ -42,6 +42,7 @@ public class HeightFilter implements Filter {
 		if (nBalle.getPosition() != null && !nBalle.getPosition().isEstimated()) {
 			nBalle = new Robot(filter(s.getBalle().getPosition(),
 					Globals.ROBOT_HEIGHT), s.getBalle().getVelocity(), s
+					.getBalle().getAngularVelocity(), s
 					.getBalle().getOrientation());
 		}
 
@@ -49,6 +50,7 @@ public class HeightFilter implements Filter {
 		if (nOpp.getPosition() != null && !nOpp.getPosition().isEstimated()) {
 			nOpp = new Robot(filter(s.getOpponent().getPosition(),
 					Globals.ROBOT_HEIGHT), s.getOpponent().getVelocity(), s
+					.getOpponent().getAngularVelocity(), s
 					.getOpponent().getOrientation());
 		}
 

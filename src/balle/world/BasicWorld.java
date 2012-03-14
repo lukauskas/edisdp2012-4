@@ -122,9 +122,18 @@ public class BasicWorld extends AbstractWorld {
 			theirsOrientation = prev.getOpponent().getOrientation();
 		}
 
+		// Recalculate the angular velocities
+		AngularVelocity oursAngVel, themAngVel;
+		oursAngVel = ours != null ? new AngularVelocity(
+				ourOrientation.angleToatan2Radians(prev.getBalle()
+						.getOrientation()), deltaT) : null;
+		themAngVel = them != null ? new AngularVelocity(
+				theirsOrientation.angleToatan2Radians(prev.getOpponent()
+						.getOrientation()), deltaT) : null;
+
 		// put it all together (almost)
-		them = new Robot(theirsPosition, themVel, theirsOrientation);
-		ours = new Robot(ourPosition, oursVel, ourOrientation);
+		them = new Robot(theirsPosition, themVel, themAngVel, theirsOrientation);
+		ours = new Robot(ourPosition, oursVel, oursAngVel, ourOrientation);
 		ball = new Ball(ballPosition, ballVel);
 
 		// pack into a snapshot
