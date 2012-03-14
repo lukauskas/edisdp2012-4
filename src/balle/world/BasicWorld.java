@@ -114,19 +114,23 @@ public class BasicWorld extends AbstractWorld {
 		themVel = themDPos != null ? new Velocity(themDPos, deltaT) : null;
 		ballVel = ballDPos != null ? new Velocity(ballDPos, deltaT) : null;
 
+		AngularVelocity oursAngVel = null, themAngVel = null;
 		if (ourOrientation == null) {
 			ourOrientation = prev.getBalle().getOrientation();
+		} else if (prev.getBalle().getOrientation() != null) {
+			oursAngVel = new AngularVelocity(
+					ourOrientation.angleToatan2Radians(prev.getBalle()
+							.getOrientation()), deltaT);
 		}
 
 		if (theirsOrientation == null) {
 			theirsOrientation = prev.getOpponent().getOrientation();
+		} else if (prev.getOpponent().getOrientation() != null) {
+			themAngVel = new AngularVelocity(
+					theirsOrientation.angleToatan2Radians(prev.getOpponent()
+							.getOrientation()), deltaT);
 		}
 
-		// Recalculate the angular velocities
-		AngularVelocity oursAngVel, themAngVel;
-		oursAngVel = (ours != null) ? new AngularVelocity(
-				ourOrientation.angleToatan2Radians(prev.getBalle()
-						.getOrientation()), deltaT) : null;
 		themAngVel = (them != null) ? new AngularVelocity(
 				theirsOrientation.angleToatan2Radians(prev.getOpponent()
 						.getOrientation()), deltaT) : null;

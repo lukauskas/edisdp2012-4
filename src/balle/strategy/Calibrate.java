@@ -38,10 +38,10 @@ public class Calibrate extends AbstractPlanner {
 					&& snapshot.getBalle().getAngularVelocity() != null) {
 				samples[sampleIndex] = snapshot.getBalle().getAngularVelocity();
 				sampleIndex++;
-			} else {
-				System.out.println(snapshot.getBalle().getAngularVelocity());
 			}
+			// System.out.println(snapshot.getBalle().getAngularVelocity());
 			
+
 			// if this is the last sample for the current power
 			if(sampleIndex == SAMPLES) {
 				// record the results
@@ -72,7 +72,7 @@ public class Calibrate extends AbstractPlanner {
 		double wheelVelocity = angularVelToWheelSpeed(avgAngAccel);
 		
 		// record (just print out for now)
-		System.out.println(power+"\t"+wheelVelocity);
+		System.out.println(power + ",\t" + wheelVelocity);
 	}
 
 	/**
