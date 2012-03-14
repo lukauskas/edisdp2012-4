@@ -21,6 +21,11 @@ public class Calibrate implements Strategy {
 	
 	private boolean done = false;
 
+	@FactoryMethod(designator = "Calibrate")
+	public static Calibrate calibrateFactory() {
+		return new Calibrate();
+	}
+
     /**
      * Tell the strategy to do a step (e.g. move forward).
      * @param snapshot TODO
