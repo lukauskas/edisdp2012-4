@@ -30,8 +30,7 @@ import balle.world.objects.Robot;
 public class Game extends AbstractPlanner {
 
     private static final Logger LOG = Logger.getLogger(Game.class);
-    // Strategies that we will need make sure to updateState() for each of them
-    // and stop() each of them
+	// Strategies that we will need make sure to call stop() for each of them
 	protected final Strategy defensiveStrategy;
 	protected final Strategy goToBallStrategy;
 	protected final Strategy pickBallFromWallStrategy;

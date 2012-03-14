@@ -71,10 +71,11 @@ public abstract class AbstractWorld implements Listener {
 		return balleIsBlue;
 	}
 
+	public Coord estimatedPosition(MovingPoint object, double timestep) {
+		return estimatedPosition(object, timestep, false);
+	}
+
 	/**
-	 * // TODO James: this sounds like more of a job for within strategy. NOPE!
-	 * 1) We do not want to reimplement this for all strategies 2) We DO want
-	 * the world class to use this to estimate coordinates in case vision fails!
 	 * 
 	 * Estimated position of the object after timestep (in miliseconds)
 	 * 
@@ -83,12 +84,16 @@ public abstract class AbstractWorld implements Listener {
 	 * @param timestep
 	 *            time in miliseconds after which to estiamte the position of
 	 *            the object
+	 * @param forceEstimation
+	 *            estimate the position even if MAX_ESTIMATED_FRAMES has been
+	 *            exceeded
 	 * @return new coordinate for the position of the object after timestep
 	 */
-	public Coord estimatedPosition(MovingPoint object, double timestep) {
+	public Coord estimatedPosition(MovingPoint object, double timestep,
+			boolean forceEstimation) {
 		Coord pos = object.getPosition();
 		if ((pos == null) || (object.getVelocity() == null)
-				|| pos.getEstimatedFrames() > MAX_ESTIMATED_FRAMES) {
+				|| (!forceEstimation && pos.getEstimatedFrames() > MAX_ESTIMATED_FRAMES)) {
 			return null;
 		} else if (timestep == 0) {
 			return pos;
