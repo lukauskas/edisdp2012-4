@@ -664,14 +664,17 @@ public class SimulatorWorld {
 		Body o = yellow.getBody();
 		Body me = blue.getBody();
 		Body b = ball;
+
 		return new Snapshot(
 				new balle.world.objects.Robot(v2C(o.getPosition())
-				.mult(1.0 / SCALE), new Velocity(v2C(b.getLinearVelocity())
-				.mult(1.0 / (SCALE)), 1000), new AngularVelocity(0,1),  new Orientation(b.getAngle())),
+				.mult(1.0 / SCALE), new Velocity(v2C(o.getLinearVelocity())
+				.mult(1.0 / (SCALE)), 1000), new AngularVelocity(
+				o.getAngularVelocity(), 1000), new Orientation(o.getAngle())),
 				
 				new balle.world.objects.Robot(v2C(me.getPosition()).mult(1.0 / SCALE),
 				new Velocity(v2C(me.getLinearVelocity()).mult(1.0 / (SCALE)),
-						1000), new AngularVelocity(0, 1), new Orientation(
+						1000), new AngularVelocity(me.getAngularVelocity(),
+						1000), new Orientation(
 						me.getAngle())),
 
 		new Ball(v2C(
