@@ -46,16 +46,17 @@ public class BezierNav implements OrientedMovementExecutor {
 														// target from the
 														// center front of the
 														// robot
-	private final double MIN_SAFE_RADIUS = 0.05; // the smallest turning radius
+	private final double MIN_SAFE_RADIUS = 0; // the smallest turning radius
 												// where moving at maximum speed
-												// is ok
+												// is ok (0.05)
 	private final double SAFER_SPEED_RATIO = 0.5; // ratio of (max
 													// speed)/((minimum)safe
 													// speed). when making sharp
 													// turns the speed will be
 													// slowed toward max/this
 	private final double MAX_VELOCITY = Globals
-			.powerToVelocity(Globals.MAXIMUM_MOTOR_SPEED); // the maximum
+.powerToVelocity(600); // the
+																		// maximum
 																// wheel
 															// velocity to use
 	private final double DAMPENING_POWERCHANGE = 0.7;
