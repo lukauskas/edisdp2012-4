@@ -52,6 +52,7 @@ public class StrategyRunner extends AbstractWorldProcessor {
 
 	@Override
 	protected void actionOnChange() {
+        long start = System.currentTimeMillis();
 		if (currentStrategyA != null && currentStrategyB != null) {
 			Snapshot snapshot = getSnapshot();
 			// Snapshot centered on opponent robot (Balle from snapshot
@@ -85,7 +86,12 @@ public class StrategyRunner extends AbstractWorldProcessor {
             }
             gui.setDrawables(drawables);
         }
-
+        long stop = System.currentTimeMillis();
+        long diff = stop - start;
+        if (diff == 0)
+            gui.setStrategyFps(Double.POSITIVE_INFINITY);
+        else
+            gui.setStrategyFps(1000.0 / diff);
 	}
 
 	/**
