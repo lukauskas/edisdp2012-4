@@ -13,6 +13,7 @@ SET /a install_jbullet= 0
 SET /a install_jbox2d= 1
 SET /a install_mockito= 1
 SET /a install_joptsimple= 1
+SET /a install_reflections= 1
 
 rem UTIL
 SET /a errors= 0
@@ -105,10 +106,22 @@ if %install_joptsimple%==1 (
 echo Installing JoptSimple
 
 wget -U "SomeUserAgent/1.0" -P %lib% http://repo1.maven.org/maven2/net/sf/jopt-simple/jopt-simple/4.3/jopt-simple-4.3.jar
+
+)
+
+rem INSTALL_REFLECTIONS
+if %install_reflections%==1 (
+echo Installing Reflections
+
+wget -P %tempBin% "http://reflections.googlecode.com/files/reflections-0.9.5.one-jar.jar"
+rem cd %tempBin%
+rem jar xf reflections-0.9.5.one-j
+rem cd ..
+copy %tempBin%\reflections-0.9.5.one-jar.jar %lib%
 )
 
 rem Delete tempory folder.
-RMDIR /S /Q %tempBin%
+rem RMDIR /S /Q %tempBin%
 
 cd %lib%
 dir

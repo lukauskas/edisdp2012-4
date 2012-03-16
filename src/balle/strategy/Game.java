@@ -9,16 +9,19 @@ import balle.controller.Controller;
 import balle.main.drawable.Drawable;
 import balle.main.drawable.Label;
 import balle.misc.Globals;
+import balle.strategy.bezierNav.BezierNav;
+import balle.strategy.curve.CustomCHI;
 import balle.strategy.executor.movement.GoToObjectPFN;
 import balle.strategy.executor.turning.IncFaceAngle;
 import balle.strategy.executor.turning.RotateToOrientationExecutor;
+import balle.strategy.pathfinding.SimplePathFinder;
 import balle.strategy.planner.AbstractPlanner;
 import balle.strategy.planner.BackingOffStrategy;
 import balle.strategy.planner.DefensiveStrategy;
-import balle.strategy.planner.GoToBallSafeProportional;
 import balle.strategy.planner.InitialStrategy;
 import balle.strategy.planner.KickFromWall;
 import balle.strategy.planner.KickToGoal;
+import balle.strategy.planner.SimpleGoToBallFaceGoal;
 import balle.world.Coord;
 import balle.world.Orientation;
 import balle.world.Snapshot;
@@ -73,7 +76,9 @@ public class Game extends AbstractPlanner {
 
     public Game() {
         defensiveStrategy = new DefensiveStrategy(new GoToObjectPFN(0.1f));
-        goToBallStrategy = new GoToBallSafeProportional();
+		// goToBallStrategy = new GoToBallSafeProportional();
+		goToBallStrategy = new SimpleGoToBallFaceGoal(new BezierNav(
+				new SimplePathFinder(new CustomCHI())));
         pickBallFromWallStrategy = new KickFromWall(new GoToObjectPFN(0));
 		backingOffStrategy = new BackingOffStrategy();
         turningExecutor = new IncFaceAngle();

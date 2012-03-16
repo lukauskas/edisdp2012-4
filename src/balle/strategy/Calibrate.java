@@ -1,21 +1,26 @@
 package balle.strategy;
 
+import java.util.ArrayList;
+
 import balle.controller.Controller;
 import balle.misc.Globals;
 import balle.strategy.planner.AbstractPlanner;
-import balle.world.AngularVelocity;
+import balle.world.Orientation;
 import balle.world.Snapshot;
 
 public class Calibrate extends AbstractPlanner {
 
-	private final long ACCEL_TIME = 500; // time needed to accelerate to the
+	private final long ACCEL_TIME = 1000; // time needed to accelerate to the
 											// terminal speed
-	private final int POWER_STEP = 10;
-	private final int SAMPLES = 10; // how many angular velocity samples to take
-	private long lastPowerChangeTime = System.currentTimeMillis() - ACCEL_TIME;
-	private int power = 500;
-	private AngularVelocity[] samples = new AngularVelocity[SAMPLES];
-	private int sampleIndex = 0;
+	private final int POWER_STEP = 25;
+	private final long SAMPLE_TIME = 4000; // how many angular velocity samples
+											// to
+										// take (Must be greater then 1)
+	private long lastPowerChangeTime = System.currentTimeMillis();
+	private long sampleStartTime;
+	private long sampleEndTime;
+	private int power = 0;
+	private ArrayList<Orientation> samples = new ArrayList<Orientation>();
 	
 	private boolean done = false;
 
@@ -29,25 +34,36 @@ public class Calibrate extends AbstractPlanner {
      * @param snapshot TODO
      */
 	public void onStep(Controller controller, Snapshot snapshot) {
+		if (true) {
+			controller.setWheelSpeeds(500, 500);
+			System.out.println(snapshot.getBalle().getVelocity().abs());
+			return;
+		}
 		if(!done) {
+			controller.setWheelSpeeds(power, -power);
 			// if accelerating, just let it accelerate
 			if (System.currentTimeMillis() - lastPowerChangeTime < ACCEL_TIME)
 				return;
 			// else collect the sample if possible
+			boolean isLastSample = false;
 			if (snapshot.getBalle() != null
-					&& snapshot.getBalle().getAngularVelocity() != null) {
-				samples[sampleIndex] = snapshot.getBalle().getAngularVelocity();
-				sampleIndex++;
+					&& snapshot.getBalle().getOrientation() != null) {
+				if (samples.size() == 0) {
+					sampleStartTime = snapshot.getTimestamp();
+				}
+				samples.add(snapshot.getBalle().getOrientation());
+				if (snapshot.getTimestamp() - sampleStartTime > SAMPLE_TIME) {
+					sampleEndTime = snapshot.getTimestamp();
+					isLastSample = true;
+				}
 			}
-			// System.out.println(snapshot.getBalle().getAngularVelocity());
-			
 
 			// if this is the last sample for the current power
-			if(sampleIndex == SAMPLES) {
+			if (isLastSample) {
 				// record the results
 				record();
 				// move to the next power (or stop if done)
-				sampleIndex = 0;
+				samples.clear();
 				power += POWER_STEP;
 				if(power <= Globals.MAXIMUM_MOTOR_SPEED) {
 					controller.setWheelSpeeds(power, -power);
@@ -56,6 +72,8 @@ public class Calibrate extends AbstractPlanner {
 					done = true;
 				}
 			}
+		} else {
+			controller.stop();
 		}
 	}
 	
@@ -64,15 +82,15 @@ public class Calibrate extends AbstractPlanner {
 	 */
 	private void record() {
 		// calculate the wheel velocity
-		double avgAngAccel = 0;
-		for(int i = 0; i < sampleIndex; i++) {
-			avgAngAccel += samples[i].radians();
+		double deltaA = 0;
+		for (int i = 1; i < samples.size(); i++) {
+			deltaA += samples.get(i - 1).angleToatan2Radians(samples.get(i));
 		}
-		avgAngAccel /= sampleIndex;
-		double wheelVelocity = angularVelToWheelSpeed(avgAngAccel);
+		double angVel = Math.abs(deltaA / (sampleEndTime - sampleStartTime));
+		double wheelVelocity = angularVelToWheelSpeed(angVel);
 		
 		// record (just print out for now)
-		System.out.println(power + ",\t" + wheelVelocity);
+		System.out.println(power + ";" + wheelVelocity);
 	}
 
 	/**
