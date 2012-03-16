@@ -36,8 +36,14 @@ public class SimulatedWorld extends BasicWorld implements ControllerListener {
 
 	public SimulatedWorld(SimulatorWorld worldModel, boolean balleIsBlue,
 			boolean goalIsLeft, Pitch pitch) {
+
 		super(balleIsBlue, goalIsLeft, pitch);
 		this.worldModel = worldModel;
+
+		if (balleIsBlue)
+			virtual = worldModel.getBlueSoft();
+		else
+			virtual = worldModel.getYellowSoft();
 
 		controllerHistory = new ArrayList<ControllerHistoryElement>();
 	}
@@ -91,7 +97,7 @@ public class SimulatedWorld extends BasicWorld implements ControllerListener {
 
 		virtual.setWheelSpeeds((int) lastLPower, (int) lastRPower);
 
-		worldModel.setStartTime(startTime);
+		// worldModel.setStartTime(startTime);
 
 		// use the controllerHistory to simulate the wheelspeeds
 		// // run a simulation while adjusting wheel speeds
@@ -106,12 +112,10 @@ public class SimulatedWorld extends BasicWorld implements ControllerListener {
 					+ tD, nextTime)
 					- startTime) {
 				// simulator.getBlueSoft().setWheelSpeeds(900, 900);
-				worldModel.getBlueSoft().setWheelSpeeds(curr.getPowerLeft(),
+				virtual.setWheelSpeeds(curr.getPowerLeft(),
 						curr.getPowerRight());
 				worldModel.update(tD);
 				worldModel.getWorld().step(tD / 1000f, 8, 3);
-				worldModel.getReader().update();
-				worldModel.getReader().propagate();
 				// System.out.println(tD);
 				// System.out
 				// .println(world.getSnapshot().getBalle().getPosition());

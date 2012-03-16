@@ -222,10 +222,11 @@ public class Runner {
 			StrategyLogPane strategyLog) {
 		Simulator simulator = Simulator.createSimulator();
 
-		BasicWorld worldA = new SimulatedWorld(
+		SimulatedWorld worldA = new SimulatedWorld(
 				SimulatorWorld.createSimulatorWorld(), balleIsBlue, goalIsLeft,
 				Globals.getPitch());
-		worldA.updatePitchSize(Globals.PITCH_WIDTH, Globals.PITCH_HEIGHT);
+		((BasicWorld) worldA).updatePitchSize(Globals.PITCH_WIDTH,
+				Globals.PITCH_HEIGHT);
 		simulator.addListener(worldA);
 
 		BasicWorld worldB = new BasicWorld(!balleIsBlue, !goalIsLeft,
@@ -241,6 +242,8 @@ public class Runner {
 			botA = simulator.getBlueSoft();
 			botB = simulator.getYellowSoft();
 		}
+
+		botA.addListener(worldA);
 
 		System.out.println(botA);
 		System.out.println(botB);

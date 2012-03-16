@@ -148,9 +148,9 @@ public class BezierNav implements OrientedMovementExecutor {
 
 	@Override
 	public void step(Controller controller, Snapshot snapshot) {
-		// if (!USE_PID) {
-		// snapshot = getLatencyAdjustedSnapshot(snapshot);
-		// }
+		if (!USE_PID) {
+			snapshot = getLatencyAdjustedSnapshot(snapshot);
+		}
 
 		if (isFinished(snapshot)) {
 			stop(controller);
