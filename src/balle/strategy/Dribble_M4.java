@@ -16,6 +16,7 @@ public class Dribble_M4 extends AbstractPlanner {
 	private Coord startingCoordinate = null;
 	private Coord currentCoordinate = null;
 	private static final double DISTANCE_TO_TRAVEL = 0.2;
+	private boolean active = true;
 
 	public Dribble_M4() {
 		super();
@@ -29,7 +30,7 @@ public class Dribble_M4 extends AbstractPlanner {
 
 	public boolean Dribbling(Snapshot snapshot) {
 		
-		return true;
+		return active;
 	}
 	
 	@Override
@@ -38,6 +39,9 @@ public class Dribble_M4 extends AbstractPlanner {
 		if (startingCoordinate == null) {
 			startingCoordinate = snapshot.getBalle().getPosition();
 		}
+
+		if (active = false)
+			return;
 
 		currentCoordinate = snapshot.getBalle().getPosition();
 
@@ -63,6 +67,8 @@ public class Dribble_M4 extends AbstractPlanner {
 				controller.setWheelSpeeds(current_speed, current_speed);
 				if (currentCoordinate.dist(startingCoordinate) > DISTANCE_TO_TRAVEL) {
 					controller.kick();
+					active = false;
+					controller.stop();
 				}
 			} else if ((!facingGoal) && (angle < Math.PI - threshold)) {
 				controller.setWheelSpeeds(current_speed, current_speed
@@ -80,6 +86,8 @@ public class Dribble_M4 extends AbstractPlanner {
 				controller.setWheelSpeeds(current_speed, current_speed);
 				if (currentCoordinate.dist(startingCoordinate) > DISTANCE_TO_TRAVEL) {
 					controller.kick();
+					active = false;
+					controller.stop();
 				}
 			} else if ((!facingGoal) && (angle > threshold)
 					&& (angle < Math.PI)) {
