@@ -3,10 +3,11 @@ package balle.strategy;
 import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
+import balle.strategy.planner.AbstractPlanner;
 import balle.world.Coord;
 import balle.world.Snapshot;
 
-public class Dribble_M4 extends Game {
+public class Dribble_M4 extends AbstractPlanner {
 
 	private static Logger LOG = Logger.getLogger(GameFromPenaltyDefence.class);
 
