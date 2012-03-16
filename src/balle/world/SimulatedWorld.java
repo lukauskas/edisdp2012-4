@@ -138,9 +138,12 @@ public class SimulatedWorld extends BasicWorld implements ControllerListener {
 		// FIXED
 		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+//		return worldModel.getSnapshot(updateTimestamp, prev.getPitch(),
+//				prev.getOpponentsGoal(), prev.getOwnGoal(), isBlue());
+
 		return new Snapshot(prev.getOpponent(), prev.getBalle(),
-				pred.getBall(), prev.getOpponentsGoal(), prev.getOwnGoal(),
-				prev.getPitch(), pred.getTimestamp());
+		 pred.getBall(), prev.getOpponentsGoal(), prev.getOwnGoal(),
+		 prev.getPitch(), pred.getTimestamp());
 	}
 
 	/**

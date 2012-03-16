@@ -704,6 +704,7 @@ us.getAngle())),
 		if (bRobot.getPosition() != null) {
 			blue.setPosition(bRobot.getPosition().mult(SCALE),
 					bRobot.getOrientation());
+
 			blue.getBody().setLinearVelocity(bRobot.getVelocity().vec2());
 		} else {
 			// Place blue robot miles off the pitch.

@@ -110,9 +110,12 @@ public class BasicWorld extends AbstractWorld {
 
 		// Recalculate the velocities from deltapositions above.
 		Velocity oursVel, themVel, ballVel;
-		oursVel = oursDPos != null ? new Velocity(oursDPos, deltaT) : null;
-		themVel = themDPos != null ? new Velocity(themDPos, deltaT) : null;
-		ballVel = ballDPos != null ? new Velocity(ballDPos, deltaT) : null;
+		oursVel = oursDPos != null ? new Velocity(oursDPos, deltaT)
+				: new Velocity(0, 0, 1, 1);
+		themVel = themDPos != null ? new Velocity(themDPos, deltaT)
+				: new Velocity(0, 0, 1, 1);
+		ballVel = ballDPos != null ? new Velocity(ballDPos, deltaT)
+				: new Velocity(0, 0, 1, 1);
 
 		AngularVelocity oursAngVel = null, themAngVel = null;
 		if (ourOrientation == null) {
