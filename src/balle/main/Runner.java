@@ -225,10 +225,12 @@ public class Runner {
 		BasicWorld worldA = new SimulatedWorld(
 				SimulatorWorld.createSimulatorWorld(), balleIsBlue, goalIsLeft,
 				Globals.getPitch());
+		worldA.updatePitchSize(Globals.PITCH_WIDTH, Globals.PITCH_HEIGHT);
 		simulator.addListener(worldA);
 
 		BasicWorld worldB = new BasicWorld(!balleIsBlue, !goalIsLeft,
 				Globals.getPitch());
+		worldB.updatePitchSize(Globals.PITCH_WIDTH, Globals.PITCH_HEIGHT);
 		simulator.addListener(worldB);
 
 		SoftBot botA, botB;

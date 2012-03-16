@@ -1,9 +1,13 @@
 package balle.simulator;
 
+import java.util.ArrayList;
+
 import org.jbox2d.dynamics.Body;
 
 import balle.controller.Controller;
+import balle.controller.ControllerListener;
 import balle.misc.Globals;
+import balle.strategy.bezierNav.ControllerHistoryElement;
 
 public class SoftBot implements Controller {
 
@@ -20,6 +24,8 @@ public class SoftBot implements Controller {
 
 	private boolean rotating;
 
+	protected ArrayList<ControllerListener> listeners = new ArrayList<ControllerListener>();
+
 	public float getLeftWheelSpeed() {
 		return leftWheelSpeed;
 	}
@@ -32,12 +38,14 @@ public class SoftBot implements Controller {
 	public void backward(int speed) {
 		rotating = false;
 		setWheelSpeeds(-speed, -speed);
+		propogate(-speed, -speed);
 	}
 
 	@Override
 	public void forward(int speed) {
 		rotating = false;
 		setWheelSpeeds(speed, speed);
+		propogate(speed, speed);
 	}
 
 	@Override
@@ -51,6 +59,7 @@ public class SoftBot implements Controller {
 	public void stop() {
 		rotating = false;
 		setWheelSpeeds(0,0);
+		propogate(0, 0);
 	}
 
 	/**
@@ -70,10 +79,14 @@ public class SoftBot implements Controller {
 		// turning right
 		if (deg < 0) {
 			setWheelSpeeds((int)wheelVelocity, (int)-wheelVelocity);
+			// Wheel speeds not propagated as real bluetooth controller wont
+			// either.
 		}
 		// turning left
 		else {
 			setWheelSpeeds((int)-wheelVelocity, (int)wheelVelocity);
+			// Wheel speeds not propagated as real bluetooth controller wont
+			// either.
 		}
 
 		desiredAngle = (body.getAngle() + ((float) Math.PI * deg / 180))
@@ -94,6 +107,8 @@ public class SoftBot implements Controller {
 		
 		this.leftWheelSpeed = leftWheelSpeed;
 		this.rightWheelSpeed = rightWheelSpeed;
+
+		propogate(leftWheelSpeed, rightWheelSpeed);
 		// System.out.println("setWheelSpeeds(): "+leftWheelSpeed+" "+rightWheelSpeed);
 
 	}
@@ -166,6 +181,18 @@ public class SoftBot implements Controller {
 	
     public synchronized void stopKicking() {
 		kick = false;
+	}
+
+	@Override
+	public void addListener(ControllerListener cl) {
+		listeners.add(cl);
+	}
+
+	protected void propogate(int left, int right) {
+		ControllerHistoryElement che = new ControllerHistoryElement(left,
+				right, System.currentTimeMillis());
+		for (ControllerListener cl : listeners)
+			cl.commandSent(che);
 	}
 
 }

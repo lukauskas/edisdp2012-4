@@ -1,18 +1,33 @@
 package balle.world;
 
+import java.util.ArrayList;
+
+import balle.controller.ControllerListener;
 import balle.simulator.SimulatorWorld;
+import balle.simulator.SoftBot;
+import balle.strategy.bezierNav.ControllerHistoryElement;
 import balle.world.objects.Pitch;
 
 /**
  * Uses a simulator to account for latency in system.
  * 
  */
-public class SimulatedWorld extends BasicWorld {
+public class SimulatedWorld extends BasicWorld implements ControllerListener {
 
 	/**
 	 * The simulator for this simulated world.
 	 */
 	protected SimulatorWorld worldModel;
+
+	/**
+	 * Our robots history
+	 */
+	protected ArrayList<ControllerHistoryElement> controllerHistory;
+
+	/**
+	 * Our robots virtual duplicate
+	 */
+	protected SoftBot virtual;
 
 	/**
 	 * Time that the update method was called.
@@ -23,6 +38,8 @@ public class SimulatedWorld extends BasicWorld {
 			boolean goalIsLeft, Pitch pitch) {
 		super(balleIsBlue, goalIsLeft, pitch);
 		this.worldModel = worldModel;
+
+		controllerHistory = new ArrayList<ControllerHistoryElement>();
 	}
 
 	/**
@@ -44,7 +61,63 @@ public class SimulatedWorld extends BasicWorld {
 		worldModel.setWithSnapshot(prev, isBlue());
 
 		// Roll worldModel forward until current time.
-		worldModel.update(updateTimestamp - prev.getTimestamp());
+		simulate(updateTimestamp, prev.getTimestamp());
+	}
+
+	/**
+	 * Roll the world simulation forward from the startTime, to the end time.
+	 * 
+	 * @param endTime
+	 *            Time to pause the simulation.
+	 * @param startTime
+	 *            Time to start the simulation.
+	 */
+	protected void simulate(long endTime, long startTime) {
+
+		// clean up the history (ensure there is at least one element left in
+		// history)
+		while (controllerHistory.size() > 1
+				&& controllerHistory.get(0).getTimestamp() < startTime) {
+			controllerHistory.remove(0);
+		}
+
+		// setup a simulator using the current snapshot (assume we are blue)
+		float lastLPower = 0, lastRPower = 0;
+		if (controllerHistory.size() > 0) {
+			ControllerHistoryElement lastState = controllerHistory.get(0);
+			lastLPower = lastState.getPowerLeft();
+			lastRPower = lastState.getPowerRight();
+		}
+
+		virtual.setWheelSpeeds((int) lastLPower, (int) lastRPower);
+
+		worldModel.setStartTime(startTime);
+
+		// use the controllerHistory to simulate the wheelspeeds
+		// // run a simulation while adjusting wheel speeds
+		long maxTD = 50; // low values may make this less accurate
+		for (int i = 0; i < controllerHistory.size(); i++) {
+			ControllerHistoryElement curr = controllerHistory.get(i);
+			long nextTime = endTime;
+
+			if (i < controllerHistory.size() - 1)
+				nextTime = controllerHistory.get(i + 1).getTimestamp();
+			for (long tD = maxTD; startTime < nextTime; tD = Math.min(startTime
+					+ tD, nextTime)
+					- startTime) {
+				// simulator.getBlueSoft().setWheelSpeeds(900, 900);
+				worldModel.getBlueSoft().setWheelSpeeds(curr.getPowerLeft(),
+						curr.getPowerRight());
+				worldModel.update(tD);
+				worldModel.getWorld().step(tD / 1000f, 8, 3);
+				worldModel.getReader().update();
+				worldModel.getReader().propagate();
+				// System.out.println(tD);
+				// System.out
+				// .println(world.getSnapshot().getBalle().getPosition());
+				startTime += tD;
+			}
+		}
 	}
 
 	/**
@@ -54,9 +127,16 @@ public class SimulatedWorld extends BasicWorld {
 	@Override
 	public Snapshot getSnapshot() {
 		return worldModel.getSnapshot(updateTimestamp, prev.getPitch(),
-				prev.getOpponentsGoal(), prev.getOwnGoal());
+				prev.getOpponentsGoal(), prev.getOwnGoal(), isBlue());
 	}
 
-
+	/**
+	 * 
+	 * @param che
+	 */
+	@Override
+	public void commandSent(ControllerHistoryElement che) {
+		controllerHistory.add(che);
+	}
 
 }

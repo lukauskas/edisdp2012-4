@@ -3,6 +3,7 @@ package balle.brick;
 import lejos.nxt.Motor;
 import lejos.robotics.navigation.TachoPilot;
 import balle.controller.Controller;
+import balle.controller.ControllerListener;
 import balle.misc.Globals;
 
 /**
@@ -167,5 +168,10 @@ public class BrickController implements Controller {
     public boolean isReady() {
         return true;
     }
+
+	@Override
+	public void addListener(ControllerListener cl) {
+		// TODO make STUB
+	}
 
 }

@@ -22,7 +22,6 @@ import balle.strategy.pathfinding.SimplePathFinder;
 import balle.strategy.planner.SimpleGoToBallFaceGoal;
 import balle.world.BasicWorld;
 import balle.world.Coord;
-import balle.world.EmptySnapshot;
 import balle.world.Orientation;
 import balle.world.Snapshot;
 import balle.world.objects.FieldObject;
@@ -149,9 +148,9 @@ public class BezierNav implements OrientedMovementExecutor {
 
 	@Override
 	public void step(Controller controller, Snapshot snapshot) {
-		if (!USE_PID) {
-			snapshot = getLatencyAdjustedSnapshot(snapshot);
-		}
+		// if (!USE_PID) {
+		// snapshot = getLatencyAdjustedSnapshot(snapshot);
+		// }
 
 		if (isFinished(snapshot)) {
 			stop(controller);
@@ -259,7 +258,7 @@ public class BezierNav implements OrientedMovementExecutor {
 
 		controller.setWheelSpeeds((int) left, (int) right);
 		controllerHistory.add(new ControllerHistoryElement((int) left,
-				(int) right, snapshot));
+				(int) right, System.currentTimeMillis()));
 	}
 
 	/**
@@ -278,9 +277,8 @@ public class BezierNav implements OrientedMovementExecutor {
 			simulator.getReader().addListener(world);
 			simulator.getReader().propagateGoals();
 			simulator.getReader().propagatePitchSize();
-			controllerHistory.add(new ControllerHistoryElement(0, 0,
-					new EmptySnapshot(s.getOpponentsGoal(), s.getOwnGoal(), s
-							.getPitch(), 0)));
+			controllerHistory.add(new ControllerHistoryElement(0, 0, System
+					.currentTimeMillis()));
 
 		}
 		long currentTime = System.currentTimeMillis();
@@ -290,7 +288,7 @@ public class BezierNav implements OrientedMovementExecutor {
 		// clean up the history (ensure there is at least one element left in
 		// history)
 		while (controllerHistory.size() > 1
-				&& controllerHistory.get(0).getSnapshot().getTimestamp() < simulatorTime) {
+				&& controllerHistory.get(0).getTimestamp() < simulatorTime) {
 			controllerHistory.remove(0);
 		}
 
@@ -314,7 +312,7 @@ public class BezierNav implements OrientedMovementExecutor {
 
 
 			if(i < controllerHistory.size() - 1)
-				nextTime = controllerHistory.get(i + 1).getSnapshot().getTimestamp();
+				nextTime = controllerHistory.get(i + 1).getTimestamp();
 			for (long tD = maxTD; simulatorTime < nextTime; tD = Math.min(
 					simulatorTime + tD, nextTime) - simulatorTime) {
 				//simulator.getBlueSoft().setWheelSpeeds(900, 900);
@@ -333,7 +331,7 @@ public class BezierNav implements OrientedMovementExecutor {
 
 		// retrieve the new snapshot
 		return simulator.getSnapshot(s.getTimestamp(), s.getPitch(),
-				s.getOpponentsGoal(), s.getOwnGoal());
+				s.getOpponentsGoal(), s.getOwnGoal(), true);
 	}
 
 	@Override

@@ -658,26 +658,32 @@ public class SimulatorWorld {
 		return new Coord(v.x, v.y);
 	}
 
-	public Snapshot getSnapshot(long timeStamp, Pitch p, Goal opponentsGoal, Goal ownGoal) {
-		Body o = yellow.getBody();
-		Body me = blue.getBody();
-		Body b = ball;
+	public Snapshot getSnapshot(long timeStamp, Pitch p, Goal opponentsGoal,
+			Goal ownGoal, boolean balleIsBlue) {
+		Body us, them, b = ball;
+		if (balleIsBlue) {
+			us = blue.getBody();
+			them = yellow.getBody();
+		} else {
+			us = yellow.getBody();
+			them = blue.getBody();
+		}
 
 		return new Snapshot(
-				new balle.world.objects.Robot(v2C(o.getPosition())
-				.mult(1.0 / SCALE), new Velocity(v2C(o.getLinearVelocity())
-				.mult(1.0 / (SCALE)), 1000), new AngularVelocity(
-				o.getAngularVelocity(), 1000), new Orientation(o.getAngle())),
+new balle.world.objects.Robot(v2C(
+				them.getPosition()).div(SCALE), new Velocity(v2C(
+				them.getLinearVelocity()).div(SCALE), 1000),
+				new AngularVelocity(them.getAngularVelocity(), 1000),
+				new Orientation(them.getAngle())),
 				
-				new balle.world.objects.Robot(v2C(me.getPosition()).mult(1.0 / SCALE),
-				new Velocity(v2C(me.getLinearVelocity()).mult(1.0 / (SCALE)),
-						1000), new AngularVelocity(me.getAngularVelocity(),
+				new balle.world.objects.Robot(v2C(us.getPosition()).div(SCALE),
+				new Velocity(v2C(us.getLinearVelocity()).div(SCALE), 1000),
+				new AngularVelocity(us.getAngularVelocity(),
 						1000), new Orientation(
-						me.getAngle())),
+us.getAngle())),
 
-		new Ball(v2C(
-				b.getPosition()).mult(1.0 / SCALE), new Velocity(v2C(
-				b.getLinearVelocity()).mult(1.0 / (SCALE)), 1000)),
+								new Ball(v2C(b.getPosition()).div(SCALE), new Velocity(v2C(
+				b.getLinearVelocity()).div(SCALE), 1000)),
 
 		opponentsGoal, ownGoal, p, timeStamp);
 	}
@@ -696,7 +702,8 @@ public class SimulatorWorld {
 
 		// Can see blue robot.
 		if (bRobot.getPosition() != null) {
-			blue.setPosition(bRobot.getPosition(), bRobot.getOrientation());
+			blue.setPosition(bRobot.getPosition().mult(SCALE),
+					bRobot.getOrientation());
 			blue.getBody().setLinearVelocity(bRobot.getVelocity().vec2());
 		} else {
 			// Place blue robot miles off the pitch.
@@ -706,7 +713,8 @@ public class SimulatorWorld {
 
 		// Can see yellow robot.
 		if (yRobot.getPosition() != null) {
-			yellow.setPosition(yRobot.getPosition(), yRobot.getOrientation());
+			yellow.setPosition(yRobot.getPosition().mult(SCALE),
+					yRobot.getOrientation());
 			yellow.getBody().setLinearVelocity(yRobot.getVelocity().vec2());
 		} else {
 			// Place yellow robot miles off the pitch.
@@ -714,7 +722,7 @@ public class SimulatorWorld {
 			yellow.getBody().setLinearVelocity(new Vec2(0, 0));
 		}
 
-		setBallPosition(snapshot.getBall().getPosition());
+		setBallPosition(snapshot.getBall().getPosition().mult(SCALE));
 	}
 
 	/**
@@ -727,8 +735,6 @@ public class SimulatorWorld {
 		newSimulatorWorld.setWorld(new World(new Vec2(), true));
 		newSimulatorWorld.initWorld();
 		newSimulatorWorld.setVisionDelay(0);
-		newSimulatorWorld.getReader().propagateGoals();
-		newSimulatorWorld.getReader().propagatePitchSize();
 		return newSimulatorWorld;
 	}
 
