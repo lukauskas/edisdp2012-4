@@ -278,8 +278,7 @@ public class BezierNav implements OrientedMovementExecutor {
 			simulator.getReader().addListener(world);
 			simulator.getReader().propagateGoals();
 			simulator.getReader().propagatePitchSize();
-			controllerHistory.add(new ControllerHistoryElement(0, 0, System
-					.currentTimeMillis()));
+			controllerHistory.add(new ControllerHistoryElement(0, 0, 0));
 
 		}
 		long currentTime = System.currentTimeMillis();
