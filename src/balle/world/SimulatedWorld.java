@@ -130,8 +130,17 @@ public class SimulatedWorld extends BasicWorld implements ControllerListener {
 	 */
 	@Override
 	public Snapshot getSnapshot() {
-		return worldModel.getSnapshot(updateTimestamp, prev.getPitch(),
+		Snapshot pred = worldModel.getSnapshot(updateTimestamp, prev.getPitch(),
 				prev.getOpponentsGoal(), prev.getOwnGoal(), isBlue());
+
+		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		// ONLY USE BALL POSITION FROM SIMULATOR, TILL ROBOT PREDICITION IS
+		// FIXED
+		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+		return new Snapshot(prev.getOpponent(), prev.getBalle(),
+				pred.getBall(), prev.getOpponentsGoal(), prev.getOwnGoal(),
+				prev.getPitch(), pred.getTimestamp());
 	}
 
 	/**
