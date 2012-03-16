@@ -89,7 +89,7 @@ public class StrategyRunner extends AbstractWorldProcessor {
         long stop = System.currentTimeMillis();
         long diff = stop - start;
         if (diff == 0)
-            gui.setStrategyFps(Double.POSITIVE_INFINITY);
+			gui.setStrategyFps(Double.POSITIVE_INFINITY);
         else
             gui.setStrategyFps(1000.0 / diff);
 	}

@@ -48,7 +48,16 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 
     public void setStrategyFps(double strategyFps) {
         this.strategyFps = strategyFps;
-        fpsStrategy.setText(Double.toString(this.strategyFps));
+		String s = String.format("%1$5.3f", this.strategyFps);
+		double visionFps = 1000.0 / getFPS();
+
+		if (this.strategyFps >= visionFps) {
+			fpsStrategy.setForeground(new Color(50, 150, 50));
+		} else {
+			fpsStrategy.setForeground(Color.RED);
+		}
+
+		fpsStrategy.setText(s);
     }
 
     private static final Logger LOG = Logger.getLogger(SimpleWorldGUI.class);
