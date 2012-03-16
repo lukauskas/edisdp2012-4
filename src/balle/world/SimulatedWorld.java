@@ -170,6 +170,9 @@ public class SimulatedWorld extends BasicWorld implements ControllerListener {
 			simulate(time);
 			return getSnapshotFromWorldModel(time);
 		} else {
+
+			// TODO caching or similar?
+
 			return null;
 		}
 	}
