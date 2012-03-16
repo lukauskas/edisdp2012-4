@@ -1,5 +1,6 @@
 package balle.world.filter;
 
+import balle.world.MutableSnapshot;
 import balle.world.Snapshot;
 
 /**
@@ -18,8 +19,8 @@ public class TimeFilter implements Filter {
 	}
 
 	public Snapshot filter(Snapshot s) {
-		return new Snapshot(s.getOpponent(), s.getBalle(), s.getBall(),
-				s.getOpponentsGoal(), s.getOwnGoal(), s.getPitch(),
-				s.getTimestamp() - delay);
+		MutableSnapshot ms = s.unpack();
+		ms.setTimestamp(s.getTimestamp() - delay);
+		return ms.pack();
 	}
 }

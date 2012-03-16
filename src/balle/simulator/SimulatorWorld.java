@@ -669,7 +669,7 @@ public class SimulatorWorld {
 			them = blue.getBody();
 		}
 
-		return new Snapshot(
+		return new Snapshot(null,
 new balle.world.objects.Robot(v2C(
 				them.getPosition()).div(SCALE), new Velocity(v2C(
 				them.getLinearVelocity()).div(SCALE), 1000),

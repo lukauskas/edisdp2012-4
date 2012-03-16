@@ -30,10 +30,22 @@ public class SimulatedWorld extends BasicWorld implements ControllerListener {
 	protected SoftBot virtual;
 
 	/**
-	 * Time that the update method was called.
+	 * Time that the update method was called
 	 */
 	protected long updateTimestamp = -1;
 
+	/**
+	 * Current time in the worldModel
+	 */
+	protected long simulatorTimestamp = -1;
+
+	/**
+	 * 
+	 * @param worldModel
+	 * @param balleIsBlue
+	 * @param goalIsLeft
+	 * @param pitch
+	 */
 	public SimulatedWorld(SimulatorWorld worldModel, boolean balleIsBlue,
 			boolean goalIsLeft, Pitch pitch) {
 
@@ -62,12 +74,13 @@ public class SimulatedWorld extends BasicWorld implements ControllerListener {
 
 		// Record time.
 		updateTimestamp = System.currentTimeMillis();
+		simulatorTimestamp = prev.getTimestamp();
 
 		// Update world model with snapshot information.
 		worldModel.setWithSnapshot(prev, isBlue());
 
 		// Roll worldModel forward until current time.
-		simulate(updateTimestamp, prev.getTimestamp());
+		simulate(updateTimestamp);
 	}
 
 	/**
@@ -78,7 +91,8 @@ public class SimulatedWorld extends BasicWorld implements ControllerListener {
 	 * @param startTime
 	 *            Time to start the simulation.
 	 */
-	protected void simulate(long endTime, long startTime) {
+	protected void simulate(long endTime) {
+		long startTime = simulatorTimestamp;
 
 		// clean up the history (ensure there is at least one element left in
 		// history)
@@ -141,7 +155,7 @@ public class SimulatedWorld extends BasicWorld implements ControllerListener {
 //		return worldModel.getSnapshot(updateTimestamp, prev.getPitch(),
 //				prev.getOpponentsGoal(), prev.getOwnGoal(), isBlue());
 
-		return new Snapshot(prev.getOpponent(), prev.getBalle(),
+		return new Snapshot(this, prev.getOpponent(), prev.getBalle(),
 		 pred.getBall(), prev.getOpponentsGoal(), prev.getOwnGoal(),
 		 prev.getPitch(), pred.getTimestamp());
 	}

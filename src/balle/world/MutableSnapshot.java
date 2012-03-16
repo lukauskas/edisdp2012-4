@@ -5,24 +5,21 @@ import balle.world.objects.Goal;
 import balle.world.objects.Pitch;
 import balle.world.objects.Robot;
 
-/**
- * Immutable
- */
-public class Snapshot {
-	
+public class MutableSnapshot {
+
 	private final AbstractWorld world;
 
-	private final Robot opponent;
-	private final Robot bot;
-	private final Ball ball;
+	private Robot opponent;
+	private Robot bot;
+	private Ball ball;
 
-	private final Goal opponentsGoal;
-	private final Goal ownGoal;
+	private Goal opponentsGoal;
+	private Goal ownGoal;
 
-	private final Pitch pitch;
-	private final long timestamp;
+	private Pitch pitch;
+	private long timestamp;
 
-	public Snapshot(AbstractWorld world, Robot opponent, Robot balle,
+	public MutableSnapshot(AbstractWorld world, Robot opponent, Robot balle,
 			Ball ball, Goal opponentsGoal, Goal ownGoal, Pitch pitch,
 			long timestamp) {
 
@@ -36,46 +33,74 @@ public class Snapshot {
 		this.ownGoal = ownGoal;
 		this.pitch = pitch;
 	}
-	
-	public Snapshot getEstimateAfter(long dTime) {
-		return world.estimateAt(dTime);
+
+	public Snapshot estimateAt(long time) {
+		return world.estimateAt(time);
 	}
 
 	public Pitch getPitch() {
 		return pitch;
 	}
 
+	public void setPitch(Pitch p) {
+		pitch = p;
+	}
+
 	public Goal getOpponentsGoal() {
 		return opponentsGoal;
+	}
+
+	public void setOpponentsGoal(Goal g) {
+		opponentsGoal = g;
 	}
 
 	public Goal getOwnGoal() {
 		return ownGoal;
 	}
 
+	public void setOwnGoal(Goal g) {
+		ownGoal = g;
+	}
+
 	public Robot getOpponent() {
 		return opponent;
+	}
+
+	public void setOpponent(Robot r) {
+		opponent = r;
 	}
 
 	public Robot getBalle() {
 		return bot;
 	}
 
+	public void setBalle(Robot r) {
+		bot = r;
+	}
+
 	public Ball getBall() {
 		return ball;
+	}
+
+	public void setBall(Ball b) {
+		ball = b;
 	}
 
 	public long getTimestamp() {
 		return timestamp;
 	}
 
-	public Snapshot duplicate() {
-		return new Snapshot(world, getOpponent(), getBalle(), getBall(),
+	public void setTimestamp(long t) {
+		timestamp = t;
+	}
+
+	public MutableSnapshot duplicate() {
+		return new MutableSnapshot(world, getOpponent(), getBalle(), getBall(),
 				getOpponentsGoal(), getOwnGoal(), getPitch(), getTimestamp());
 	}
 
-	public MutableSnapshot unpack() {
-		return new MutableSnapshot(world, getOpponent(), getBalle(), getBall(),
+	public Snapshot pack() {
+		return new Snapshot(world, getOpponent(), getBalle(), getBall(),
 				getOpponentsGoal(), getOwnGoal(), getPitch(), getTimestamp());
 	}
 

@@ -144,7 +144,7 @@ public class BasicWorld extends AbstractWorld {
 		ball = new Ball(ballPosition, ballVel);
 
 		// pack into a snapshot
-		Snapshot nextSnapshot = filter(new Snapshot(them, ours, ball,
+		Snapshot nextSnapshot = filter(new Snapshot(this, them, ours, ball,
 				getOpponentsGoal(), getOwnGoal(), getPitch(), timestamp));
 		synchronized (this) {
 			this.prev = nextSnapshot;
@@ -158,6 +158,12 @@ public class BasicWorld extends AbstractWorld {
 			this.prev = new EmptySnapshot(getOpponentsGoal(), getOwnGoal(),
 					getPitch());
 		}
+	}
+
+	@Override
+	public Snapshot estimateAt(long time) {
+		System.err.println("Basic world used to estimate snapshot.");
+		return null;
 	}
 
 }
