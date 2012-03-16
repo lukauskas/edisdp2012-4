@@ -40,9 +40,20 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 	private final JLabel fpsStrategy;
 	private final JPanel fpsStrategyPanel;
 
-	private static final Logger LOG = Logger.getLogger(SimpleWorldGUI.class);
+    private double strategyFps;
 
-	public SimpleWorldGUI(AbstractWorld world) {
+    public double getStrategyFps() {
+        return strategyFps;
+    }
+
+    public void setStrategyFps(double strategyFps) {
+        this.strategyFps = strategyFps;
+        fpsStrategy.setText(Double.toString(this.strategyFps));
+    }
+
+    private static final Logger LOG = Logger.getLogger(SimpleWorldGUI.class);
+
+    public SimpleWorldGUI(AbstractWorld world) {
 		super(world);
 		panel = new JPanel();
 		panel.setLayout(new BorderLayout());
