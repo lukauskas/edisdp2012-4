@@ -38,7 +38,7 @@ public class Snapshot {
 	}
 	
 	public Snapshot getEstimateAfter(long dTime) {
-		return world.estimateAt(dTime);
+		return world.estimateAt(dTime + System.currentTimeMillis());
 	}
 
 	public Pitch getPitch() {

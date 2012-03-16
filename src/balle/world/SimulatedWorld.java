@@ -138,6 +138,11 @@ public class SimulatedWorld extends BasicWorld implements ControllerListener {
 		}
 	}
 
+	protected Snapshot getSnapshotFromWorldModel(long timestamp) {
+		return worldModel.getSnapshot(timestamp, prev.getPitch(),
+				prev.getOpponentsGoal(), prev.getOwnGoal(), isBlue());
+	}
+
 	/**
 	 * Gets a snapshot of the predicted world state last time the world
 	 * information was propagated.
@@ -160,6 +165,15 @@ public class SimulatedWorld extends BasicWorld implements ControllerListener {
 		 prev.getPitch(), pred.getTimestamp());
 	}
 
+	public Snapshot estimateAt(long time) {
+		if (time > simulatorTimestamp) {
+			simulate(time);
+			return getSnapshotFromWorldModel(time);
+		} else {
+			return null;
+		}
+	}
+
 	/**
 	 * 
 	 * @param che
@@ -168,5 +182,4 @@ public class SimulatedWorld extends BasicWorld implements ControllerListener {
 	public void commandSent(ControllerHistoryElement che) {
 		controllerHistory.add(che);
 	}
-
 }
