@@ -8,6 +8,7 @@ import balle.controller.Controller;
 import balle.main.SimpleWorldGUI;
 import balle.main.drawable.Drawable;
 import balle.world.AbstractWorld;
+import balle.world.MutableSnapshot;
 import balle.world.Snapshot;
 import balle.world.processing.AbstractWorldProcessor;
 
@@ -55,12 +56,14 @@ public class StrategyRunner extends AbstractWorldProcessor {
         long start = System.currentTimeMillis();
 		if (currentStrategyA != null && currentStrategyB != null) {
 			Snapshot snapshot = getSnapshot();
+			MutableSnapshot mSnapshot = snapshot.unpack();
+			mSnapshot.setOpponent(snapshot.getBalle());
+			mSnapshot.setBalle(snapshot.getOpponent());
+
 			// Snapshot centered on opponent robot (Balle from snapshot
 			// becomes opponent in snapshot2 etc
-			Snapshot snapshot2 = new Snapshot(snapshot.getBalle(),
-					snapshot.getOpponent(), snapshot.getBall(),
-					snapshot.getOwnGoal(), snapshot.getOpponentsGoal(),
-					snapshot.getPitch(), snapshot.getTimestamp());
+			Snapshot snapshot2 = mSnapshot.pack();
+
 			try {
 				currentStrategyA.step(controllerA, snapshot);
 				if (controllerB != null) {

@@ -110,9 +110,12 @@ public class BasicWorld extends AbstractWorld {
 
 		// Recalculate the velocities from deltapositions above.
 		Velocity oursVel, themVel, ballVel;
-		oursVel = oursDPos != null ? new Velocity(oursDPos, deltaT) : null;
-		themVel = themDPos != null ? new Velocity(themDPos, deltaT) : null;
-		ballVel = ballDPos != null ? new Velocity(ballDPos, deltaT) : null;
+		oursVel = oursDPos != null ? new Velocity(oursDPos, deltaT)
+				: new Velocity(0, 0, 1, 1);
+		themVel = themDPos != null ? new Velocity(themDPos, deltaT)
+				: new Velocity(0, 0, 1, 1);
+		ballVel = ballDPos != null ? new Velocity(ballDPos, deltaT)
+				: new Velocity(0, 0, 1, 1);
 
 		AngularVelocity oursAngVel = null, themAngVel = null;
 		if (ourOrientation == null) {
@@ -141,7 +144,7 @@ public class BasicWorld extends AbstractWorld {
 		ball = new Ball(ballPosition, ballVel);
 
 		// pack into a snapshot
-		Snapshot nextSnapshot = filter(new Snapshot(them, ours, ball,
+		Snapshot nextSnapshot = filter(new Snapshot(this, them, ours, ball,
 				getOpponentsGoal(), getOwnGoal(), getPitch(), timestamp));
 		synchronized (this) {
 			this.prev = nextSnapshot;
@@ -155,6 +158,12 @@ public class BasicWorld extends AbstractWorld {
 			this.prev = new EmptySnapshot(getOpponentsGoal(), getOwnGoal(),
 					getPitch());
 		}
+	}
+
+	@Override
+	public Snapshot estimateAt(long time) {
+		System.err.println("Basic world used to estimate snapshot.");
+		return null;
 	}
 
 }

@@ -72,4 +72,6 @@ public interface Controller {
     public abstract void penaltyKick();
     
     //public abstract void gentleKick(int speed, int angle);
+
+	public abstract void addListener(ControllerListener cl);
 }

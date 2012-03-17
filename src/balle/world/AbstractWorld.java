@@ -151,7 +151,8 @@ public abstract class AbstractWorld implements Listener {
 
 		if ((pitchWidth < 0) || (pitchHeight < 0)) {
 			System.err
-					.println("Cannot update locations as pitch size is not set properly. Restart vision");
+					.println(this
+							+ "Cannot update locations as pitch size is not set properly. Restart vision");
 			return;
 		}
 
@@ -279,4 +280,6 @@ public abstract class AbstractWorld implements Listener {
 			out = each.filter(out);
 		return out;
 	}
+
+	public abstract Snapshot estimateAt(long time);
 }

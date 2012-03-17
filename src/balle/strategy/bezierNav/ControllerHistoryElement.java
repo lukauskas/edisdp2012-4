@@ -1,31 +1,37 @@
 package balle.strategy.bezierNav;
 
-import balle.world.Snapshot;
 
 
 public class ControllerHistoryElement {
 
-	private int powerLeft;
-	private int powerRight;
-	private Snapshot snapshot;
+	private final int powerLeft;
+	private final int powerRight;
+
+	// private Snapshot snapshot;
+	private final long timestamp;
 
 	public ControllerHistoryElement(int powerLeft, int powerRight,
-			Snapshot snapshot) {
+			long timestamp) {
 		this.powerLeft = powerLeft;
 		this.powerRight = powerRight;
-		this.snapshot = snapshot;
+		// this.snapshot = snapshot;
+		this.timestamp = timestamp;
 	}
 
-	protected int getPowerLeft() {
+	public int getPowerLeft() {
 		return powerLeft;
 	}
 
-	protected int getPowerRight() {
+	public int getPowerRight() {
 		return powerRight;
 	}
 
-	protected Snapshot getSnapshot() {
-		return snapshot;
+	// public Snapshot getSnapshot() {
+	// return snapshot;
+	// }
+
+	public long getTimestamp() {
+		return timestamp;
 	}
 
 }

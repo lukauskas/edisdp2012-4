@@ -12,7 +12,8 @@ import balle.world.objects.Robot;
 public class EmptySnapshot extends Snapshot {
 
 	public EmptySnapshot(Goal opponentsGoal, Goal ownGoal, Pitch pitch) {
-		super(new Robot(null, null, null, null), new Robot(null, null, null,
+		super(null, new Robot(null, null, null, null), new Robot(null, null,
+				null,
 				null),
 				new Ball(null, null), opponentsGoal, ownGoal, pitch, System
 						.currentTimeMillis());
@@ -20,7 +21,8 @@ public class EmptySnapshot extends Snapshot {
 
 	public EmptySnapshot(Goal opponentsGoal, Goal ownGoal, Pitch pitch,
 			long timeStamp) {
-		super(new Robot(null, null, null, null), new Robot(null, null, null,
+		super(null, new Robot(null, null, null, null), new Robot(null, null,
+				null,
 				null),
 				new Ball(null, null), opponentsGoal, ownGoal, pitch, timeStamp);
 	}
