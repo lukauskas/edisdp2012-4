@@ -144,7 +144,7 @@ public class BasicWorld extends AbstractWorld {
 		ball = new Ball(ballPosition, ballVel);
 
 		// pack into a snapshot
-		Snapshot nextSnapshot = filter(new Snapshot(this, them, ours, ball,
+        Snapshot nextSnapshot = filter(new Snapshot(them, ours, ball,
 				getOpponentsGoal(), getOwnGoal(), getPitch(), timestamp));
 		synchronized (this) {
 			this.prev = nextSnapshot;

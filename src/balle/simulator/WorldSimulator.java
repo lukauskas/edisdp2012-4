@@ -17,14 +17,9 @@ import org.jbox2d.dynamics.joints.WeldJointDef;
 
 import balle.io.reader.Reader;
 import balle.misc.Globals;
-import balle.world.AngularVelocity;
 import balle.world.Coord;
 import balle.world.Orientation;
 import balle.world.Snapshot;
-import balle.world.Velocity;
-import balle.world.objects.Ball;
-import balle.world.objects.Goal;
-import balle.world.objects.Pitch;
 
 public class WorldSimulator {
 
@@ -50,6 +45,7 @@ public class WorldSimulator {
 	private boolean noisy;
 
 	private long visionDelay = Globals.SIMULATED_VISON_DELAY;
+	private long simulatorTimestamp;
 
 	// Increases sizes, but keeps real-world SCALE; jbox2d acts unrealistically
 	// at a small SCALE
@@ -654,77 +650,7 @@ public class WorldSimulator {
 				(float) o.getOrientation().radians());
 	}
 
-	private Coord v2C(Vec2 v) {
-		return new Coord(v.x, v.y);
-	}
 
-	public Snapshot getSnapshot(long timeStamp, Pitch p, Goal opponentsGoal,
-			Goal ownGoal, boolean balleIsBlue) {
-		Body us, them, b = ball;
-		if (balleIsBlue) {
-			us = blue.getBody();
-			them = yellow.getBody();
-		} else {
-			us = yellow.getBody();
-			them = blue.getBody();
-		}
-
-		return new Snapshot(null,
-new balle.world.objects.Robot(v2C(
-				them.getPosition()).div(SCALE), new Velocity(v2C(
-				them.getLinearVelocity()).div(SCALE), 1000),
-				new AngularVelocity(them.getAngularVelocity(), 1000),
-				new Orientation(them.getAngle())),
-				
-				new balle.world.objects.Robot(v2C(us.getPosition()).div(SCALE),
-				new Velocity(v2C(us.getLinearVelocity()).div(SCALE), 1000),
-				new AngularVelocity(us.getAngularVelocity(),
-						1000), new Orientation(
-us.getAngle())),
-
-								new Ball(v2C(b.getPosition()).div(SCALE), new Velocity(v2C(
-				b.getLinearVelocity()).div(SCALE), 1000)),
-
-		opponentsGoal, ownGoal, p, timeStamp);
-	}
-
-	public void setWithSnapshot(Snapshot snapshot, boolean balleIsBlue) {
-
-		// Convert from our/their to coloured robots.
-		balle.world.objects.Robot yRobot, bRobot;
-		if (balleIsBlue) {
-			yRobot = snapshot.getOpponent();
-			bRobot = snapshot.getBalle();
-		} else {
-			yRobot = snapshot.getBalle();
-			bRobot = snapshot.getOpponent();
-		}
-
-		// Can see blue robot.
-		if (bRobot.getPosition() != null) {
-			blue.setPosition(bRobot.getPosition().mult(SCALE),
-					bRobot.getOrientation());
-
-			blue.getBody().setLinearVelocity(bRobot.getVelocity().vec2());
-		} else {
-			// Place blue robot miles off the pitch.
-			blue.setPosition(new Coord(0, -100), new Orientation(0));
-			blue.getBody().setLinearVelocity(new Vec2(0, 0));
-		}
-
-		// Can see yellow robot.
-		if (yRobot.getPosition() != null) {
-			yellow.setPosition(yRobot.getPosition().mult(SCALE),
-					yRobot.getOrientation());
-			yellow.getBody().setLinearVelocity(yRobot.getVelocity().vec2());
-		} else {
-			// Place yellow robot miles off the pitch.
-			yellow.setPosition(new Coord(0, -100), new Orientation(0));
-			yellow.getBody().setLinearVelocity(new Vec2(0, 0));
-		}
-
-		setBallPosition(snapshot.getBall().getPosition().mult(SCALE));
-	}
 
 	/**
 	 * Factory Method.

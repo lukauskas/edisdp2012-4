@@ -1,5 +1,9 @@
 package balle.world;
 
+import java.util.ArrayList;
+
+import balle.simulator.SnapshotPredictor;
+import balle.strategy.bezierNav.ControllerHistoryElement;
 import balle.world.objects.Ball;
 import balle.world.objects.Goal;
 import balle.world.objects.Pitch;
@@ -10,9 +14,14 @@ import balle.world.objects.Robot;
  */
 public class Snapshot {
 	
-	private final AbstractWorld world;
+    private final ArrayList<ControllerHistoryElement> controllerHistory;
 
-	private final Robot opponent;
+    public ArrayList<ControllerHistoryElement> getControllerHistory() {
+        // Clone so we do not break the immutability assumption
+        return (ArrayList<ControllerHistoryElement>) controllerHistory.clone();
+    }
+
+    private final Robot opponent;
 	private final Robot bot;
 	private final Ball ball;
 
@@ -22,12 +31,11 @@ public class Snapshot {
 	private final Pitch pitch;
 	private final long timestamp;
 
-	public Snapshot(AbstractWorld world, Robot opponent, Robot balle,
+    public Snapshot(Robot opponent, Robot balle,
 			Ball ball, Goal opponentsGoal, Goal ownGoal, Pitch pitch,
-			long timestamp) {
+ long timestamp, ArrayList<ControllerHistoryElement> controllerHistory) {
 
 		super();
-		this.world = world;
 		this.opponent = opponent;
 		this.bot = balle;
 		this.ball = ball;
@@ -35,13 +43,27 @@ public class Snapshot {
 		this.opponentsGoal = opponentsGoal;
 		this.ownGoal = ownGoal;
 		this.pitch = pitch;
-	}
-	
-	public Snapshot getEstimateAfter(long dTime) {
-		return world.estimateAt(dTime + System.currentTimeMillis());
+        this.controllerHistory = controllerHistory;
 	}
 
-	public Pitch getPitch() {
+    public Snapshot(Robot opponent, Robot balle, Ball ball, Goal opponentsGoal, Goal ownGoal,
+            Pitch pitch, long timestamp) {
+
+        // Create a new snapshot predictor based on the information provided
+        this(opponent, balle, ball, opponentsGoal, ownGoal, pitch, timestamp,
+                new ArrayList<ControllerHistoryElement>());
+                
+    }
+	
+    public SnapshotPredictor getSnapshotPredictor() {
+        // Always create new in order not to break the immutability
+        return new SnapshotPredictor(getOpponent(), getBalle(), getBall(), getOpponentsGoal(),
+                getOwnGoal(), getPitch(), getTimestamp(),
+ getControllerHistory());
+
+    }
+
+    public Pitch getPitch() {
 		return pitch;
 	}
 
@@ -70,13 +92,13 @@ public class Snapshot {
 	}
 
 	public Snapshot duplicate() {
-		return new Snapshot(world, getOpponent(), getBalle(), getBall(),
-				getOpponentsGoal(), getOwnGoal(), getPitch(), getTimestamp());
+        return new Snapshot(getOpponent(), getBalle(), getBall(), getOpponentsGoal(), getOwnGoal(),
+                getPitch(), getTimestamp(), getControllerHistory());
 	}
 
 	public MutableSnapshot unpack() {
-		return new MutableSnapshot(world, getOpponent(), getBalle(), getBall(),
-				getOpponentsGoal(), getOwnGoal(), getPitch(), getTimestamp());
+        return new MutableSnapshot(getOpponent(), getBalle(), getBall(), getOpponentsGoal(),
+                getOwnGoal(), getPitch(), getTimestamp(), getControllerHistory());
 	}
 
 	@Override

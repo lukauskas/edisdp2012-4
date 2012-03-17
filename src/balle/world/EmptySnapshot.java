@@ -12,19 +12,14 @@ import balle.world.objects.Robot;
 public class EmptySnapshot extends Snapshot {
 
 	public EmptySnapshot(Goal opponentsGoal, Goal ownGoal, Pitch pitch) {
-		super(null, new Robot(null, null, null, null), new Robot(null, null,
-				null,
-				null),
-				new Ball(null, null), opponentsGoal, ownGoal, pitch, System
-						.currentTimeMillis());
+        super(new Robot(null, null, null, null), new Robot(null, null, null, null), new Ball(null,
+                null), opponentsGoal, ownGoal, pitch, System.currentTimeMillis(), null);
 	}
 
 	public EmptySnapshot(Goal opponentsGoal, Goal ownGoal, Pitch pitch,
 			long timeStamp) {
-		super(null, new Robot(null, null, null, null), new Robot(null, null,
-				null,
-				null),
-				new Ball(null, null), opponentsGoal, ownGoal, pitch, timeStamp);
+        super(new Robot(null, null, null, null), new Robot(null, null, null, null), new Ball(null,
+                null), opponentsGoal, ownGoal, pitch, timeStamp, null);
 	}
 
 }
