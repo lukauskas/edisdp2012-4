@@ -146,9 +146,11 @@ public class BasicWorld extends AbstractWorld {
 		// pack into a snapshot
         Snapshot nextSnapshot = filter(new Snapshot(them, ours, ball,
 				getOpponentsGoal(), getOwnGoal(), getPitch(), timestamp));
-		synchronized (this) {
-			this.prev = nextSnapshot;
-		}
+        updateSnapshot(nextSnapshot);
+    }
+
+    protected synchronized void updateSnapshot(Snapshot nextSnapshot) {
+        this.prev = nextSnapshot;
 	}
 
 	@Override

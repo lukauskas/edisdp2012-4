@@ -18,8 +18,10 @@ import balle.main.drawable.Drawable;
 import balle.main.drawable.DrawableLine;
 import balle.main.drawable.Label;
 import balle.misc.Globals;
+import balle.simulator.SnapshotPredictor;
 import balle.world.AbstractWorld;
 import balle.world.Coord;
+import balle.world.Line;
 import balle.world.Scaler;
 import balle.world.Snapshot;
 import balle.world.objects.Ball;
@@ -168,20 +170,19 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 			if (s != null) {
 				drawRobot(g, Color.GREEN, s.getBalle());
 				drawRobot(g, Color.RED, s.getOpponent());
-				drawBall(g, Color.RED, s.getBall());
+                drawBall(g, Color.RED, s);
 				drawGoals(g);
 			}
 		}
 
-		private void drawBall(Graphics g, Color c, Ball ball) {
+        private void drawBall(Graphics g, Color c, Snapshot snapshot) {
 			// TODO: Use ball.getRadius() instead of constants here
 
 			// Daniel: There is no method getRadius() for ball because its a
 			// MovingPoint object?
 			// For the mean time I've changed the object to Ball
 
-			// TODO: draw the velocity vector.
-
+            Ball ball = snapshot.getBall();
 			if ((ball == null) || (ball.getPosition() == null)) {
 				return;
 			}
@@ -202,6 +203,16 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
                     .getX(), ball
                     .getPosition().getY() - ball.getRadius() * 3), Color.RED);
             ballSpeedLabel.draw(g, scaler);
+
+            SnapshotPredictor sp = snapshot.getSnapshotPredictor();
+            Snapshot laterSnapshot = sp.getSnapshotAfterTime(200);
+            Coord newBallPos = laterSnapshot.getBall().getPosition();
+            if (newBallPos == null)
+                return;
+
+            DrawableLine directionLine = new DrawableLine(new Line(pos, newBallPos), Color.WHITE);
+            directionLine.draw(g, scaler);
+
 		}
 
 		private void drawRobot(Graphics g, Color c, Robot robot) {

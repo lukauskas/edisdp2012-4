@@ -10,9 +10,6 @@ import balle.world.objects.Robot;
 
 public class MutableSnapshot {
 
-    public ArrayList<ControllerHistoryElement> getControllerHistory() {
-        return (ArrayList<ControllerHistoryElement>) controllerHistory.clone();
-    }
 
     private Robot             opponent;
 	private Robot bot;
@@ -23,8 +20,17 @@ public class MutableSnapshot {
 
 	private Pitch pitch;
 
-    private final ArrayList<ControllerHistoryElement> controllerHistory;
-	private long timestamp;
+    private ArrayList<ControllerHistoryElement> controllerHistory;
+
+    private long                                timestamp;
+
+    public void setControllerHistory(ArrayList<ControllerHistoryElement> controllerHistory) {
+        this.controllerHistory = controllerHistory;
+    }
+
+    public ArrayList<ControllerHistoryElement> getControllerHistory() {
+        return (ArrayList<ControllerHistoryElement>) controllerHistory.clone();
+    }
 
     public MutableSnapshot(Robot opponent, Robot balle,
 			Ball ball, Goal opponentsGoal, Goal ownGoal, Pitch pitch,

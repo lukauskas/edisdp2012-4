@@ -113,6 +113,16 @@ public class SnapshotPredictor extends WorldSimulator {
             }
         }
 
+
+
+        // Finish simulation off if we run out of controller commands
+        if (startTime < endTime) {
+            getWorld().step((endTime - startTime) / 1000f, 8, 3);
+            // TODO: this does not seem to simulate the ball movement if it is
+            // not
+            // moved by the other robots.
+            // WTF?
+        }
         // Update the timestamp
         simulatorTimestamp = endTime;
     }
@@ -151,11 +161,11 @@ public class SnapshotPredictor extends WorldSimulator {
         setBallPosition(ball.getPosition().mult(SCALE));
     }
 
-    public void getSnapshotAfterTime(long deltaTime) {
+    public Snapshot getSnapshotAfterTime(long deltaTime) {
         if (deltaTime > 0) {
             simulate(deltaTime);
         }
-        getSnapshot();
+        return getSnapshot();
     }
 
     private Coord v2C(Vec2 v) {
@@ -184,7 +194,7 @@ public class SnapshotPredictor extends WorldSimulator {
         balle.world.objects.Ball ball = new Ball(v2C(ballBody.getPosition()).div(SCALE),
                 new Velocity(v2C(ballBody.getLinearVelocity()).div(SCALE), 1000));
         
-        return new Snapshot(ourRobot, opponent, ball, getOpponentsGoal(), getOwnGoal(), getPitch(),
+        return new Snapshot(opponent, ourRobot, ball, getOpponentsGoal(), getOwnGoal(), getPitch(),
                 getSimulatorTimestamp(), getControllerHistory());
     }
 

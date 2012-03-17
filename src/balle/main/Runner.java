@@ -20,7 +20,6 @@ import balle.io.reader.SocketVisionReader;
 import balle.logging.StrategyLogAppender;
 import balle.misc.Globals;
 import balle.simulator.Simulator;
-import balle.simulator.WorldSimulator;
 import balle.simulator.SoftBot;
 import balle.strategy.StrategyFactory;
 import balle.strategy.StrategyRunner;
@@ -185,8 +184,7 @@ public class Runner {
 		Controller controllerA;
 
 		// Initialise world
-		world = new SimulatedWorld(WorldSimulator.createSimulatorWorld(),
-				balleIsBlue, goalIsLeft, Globals.getPitch());
+        world = new SimulatedWorld(balleIsBlue, goalIsLeft, Globals.getPitch());
 
 		world.addFilter(new TimeFilter(Globals.SIMULATED_VISON_DELAY));
 		if (isMainPitch) {
@@ -222,8 +220,7 @@ public class Runner {
 			StrategyLogPane strategyLog) {
 		Simulator simulator = Simulator.createSimulator();
 
-		SimulatedWorld worldA = new SimulatedWorld(
-				WorldSimulator.createSimulatorWorld(), balleIsBlue, goalIsLeft,
+        SimulatedWorld worldA = new SimulatedWorld(balleIsBlue, goalIsLeft,
 				Globals.getPitch());
 		((BasicWorld) worldA).updatePitchSize(Globals.PITCH_WIDTH,
 				Globals.PITCH_HEIGHT);
@@ -243,7 +240,8 @@ public class Runner {
 			botB = simulator.getYellowSoft();
 		}
 
-		botA.addListener(worldA);
+        // TODO: THIS WILL BREAK THE SWITCH COLOURS BUTTON!!!!!!!!!!!??
+        botA.addListener(worldA);
 
 		System.out.println(botA);
 		System.out.println(botB);
