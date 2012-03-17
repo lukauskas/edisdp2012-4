@@ -26,7 +26,7 @@ import balle.world.objects.Ball;
 import balle.world.objects.Goal;
 import balle.world.objects.Pitch;
 
-public class SimulatorWorld {
+public class WorldSimulator {
 
 	private World world;
 
@@ -55,7 +55,7 @@ public class SimulatorWorld {
 	// at a small SCALE
 	protected final static float SCALE = 10;
 
-	public SimulatorWorld(boolean noisy) {
+	public WorldSimulator(boolean noisy) {
 		this.noisy = noisy;
 	}
 
@@ -253,8 +253,8 @@ public class SimulatorWorld {
 
 		private Vec2 convPos(Vec2 a) {
 			Vec2 output = new Vec2();
-			output.x = a.x / SimulatorWorld.SCALE;
-			output.y = a.y / SimulatorWorld.SCALE;
+			output.x = a.x / WorldSimulator.SCALE;
+			output.y = a.y / WorldSimulator.SCALE;
 			return output;
 		}
 
@@ -389,14 +389,14 @@ public class SimulatorWorld {
 
 		private final Body robot;
 		private final float robotWidth = Globals.ROBOT_WIDTH
-				* SimulatorWorld.SCALE / 2;
+				* WorldSimulator.SCALE / 2;
 		private final float robotLength = Globals.ROBOT_LENGTH
-				* SimulatorWorld.SCALE / 2;
+				* WorldSimulator.SCALE / 2;
 
 		private final float kickerWidth = Globals.ROBOT_WIDTH
-				* SimulatorWorld.SCALE / 2;
+				* WorldSimulator.SCALE / 2;
 		private final float kickerLength = Globals.ROBOT_POSSESS_DISTANCE
-				* SimulatorWorld.SCALE / 2;
+				* WorldSimulator.SCALE / 2;
 		private Vec2 kickPos = new Vec2((robotLength + kickerLength), 0);
 		private final PolygonShape kickerShape;
 		private static final float kickForce = 20f;
@@ -414,7 +414,7 @@ public class SimulatorWorld {
 
 			robotBodyDef.angle = 0.0174532925f * angle;
 			kickerBodyDef.angle = 0.0174532925f * angle;
-			float x = 0.12f * SimulatorWorld.SCALE;
+			float x = 0.12f * WorldSimulator.SCALE;
 			float y = 0f;
 			float newx = x * (float) Math.cos(0.0174532925f * angle) - y
 					* (float) Math.sin(0.0174532925f * angle);
@@ -433,7 +433,7 @@ public class SimulatorWorld {
 			robot = world.createBody(robotBodyDef);
 			FixtureDef robotF = new FixtureDef();
 			robotF.shape = robotShape;
-			robotF.density = (1f / 0.36f) / SimulatorWorld.SCALE;
+			robotF.density = (1f / 0.36f) / WorldSimulator.SCALE;
 			// Stops wheels and body colliding
 			robotF.filter.groupIndex = -robotIndex - 20;
 			robot.createFixture(robotF);
@@ -445,7 +445,7 @@ public class SimulatorWorld {
 			FixtureDef kickF = new FixtureDef();
 			kickF.filter.maskBits = 0x0;
 			kickF.filter.groupIndex = -robotIndex - 20;
-			kickF.density = (1f / 0.36f) / SimulatorWorld.SCALE;
+			kickF.density = (1f / 0.36f) / WorldSimulator.SCALE;
 			kickF.shape = kickerShape;
 
 			kickerBodyDef.position.set(robot.getWorldCenter().clone()
@@ -482,7 +482,7 @@ public class SimulatorWorld {
 				}
 			}
 
-			float vl = linearVelocity(bot, dt) * SimulatorWorld.SCALE; // linear
+			float vl = linearVelocity(bot, dt) * WorldSimulator.SCALE; // linear
 																		// velocity
 			float va = angularVelocityRadians(bot, dt); // angular velocity
 			robot.setLinearVelocity(new Vec2((float) (vl * Math.cos(blueAng)),
@@ -515,7 +515,7 @@ public class SimulatorWorld {
 					.getAngle()), (float) Math.sin(bot.getBody().getAngle()));
 			float vi = Vec2.dot(
 					bot.getBody().getLinearVelocityFromLocalPoint(wheelPos),
-					unitForward) / SimulatorWorld.SCALE;
+					unitForward) / WorldSimulator.SCALE;
 
 			// no-slip velocity
 			float vf = nonSlipVelocity;
@@ -731,8 +731,8 @@ us.getAngle())),
 	 * 
 	 * @return SimulatorWorld with no noise.
 	 */
-	public static SimulatorWorld createSimulatorWorld() {
-		SimulatorWorld newSimulatorWorld = new SimulatorWorld(false);
+	public static WorldSimulator createSimulatorWorld() {
+		WorldSimulator newSimulatorWorld = new WorldSimulator(false);
 		newSimulatorWorld.setWorld(new World(new Vec2(), true));
 		newSimulatorWorld.initWorld();
 		newSimulatorWorld.setVisionDelay(0);

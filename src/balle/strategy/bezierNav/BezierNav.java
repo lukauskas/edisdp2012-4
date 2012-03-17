@@ -12,7 +12,7 @@ import balle.main.drawable.Circle;
 import balle.main.drawable.Dot;
 import balle.main.drawable.Drawable;
 import balle.misc.Globals;
-import balle.simulator.SimulatorWorld;
+import balle.simulator.WorldSimulator;
 import balle.strategy.FactoryMethod;
 import balle.strategy.curve.Curve;
 import balle.strategy.curve.CustomCHI;
@@ -79,7 +79,7 @@ public class BezierNav implements OrientedMovementExecutor {
 	private PID pid = new PID(11, 0.25, 4, 1);
 	private final boolean USE_PID = false;
 
-	SimulatorWorld simulator;
+	WorldSimulator simulator;
 	BasicWorld world;
 
 	private Orientation lastAngle;
@@ -115,7 +115,7 @@ public class BezierNav implements OrientedMovementExecutor {
 
 	public BezierNav(PathFinder pathfinder) {
 		this.pathfinder = pathfinder;
-		simulator = new SimulatorWorld(false);
+		simulator = new WorldSimulator(false);
 		simulator.setWorld(new World(new Vec2(), true));
 		simulator.initWorld();
 		simulator.setVisionDelay(0);

@@ -3,7 +3,7 @@ package balle.world;
 import java.util.ArrayList;
 
 import balle.controller.ControllerListener;
-import balle.simulator.SimulatorWorld;
+import balle.simulator.WorldSimulator;
 import balle.simulator.SoftBot;
 import balle.strategy.bezierNav.ControllerHistoryElement;
 import balle.world.objects.Pitch;
@@ -17,7 +17,7 @@ public class SimulatedWorld extends BasicWorld implements ControllerListener {
 	/**
 	 * The simulator for this simulated world.
 	 */
-	protected SimulatorWorld worldModel;
+	protected WorldSimulator worldModel;
 
 	/**
 	 * Our robots history
@@ -46,7 +46,7 @@ public class SimulatedWorld extends BasicWorld implements ControllerListener {
 	 * @param goalIsLeft
 	 * @param pitch
 	 */
-	public SimulatedWorld(SimulatorWorld worldModel, boolean balleIsBlue,
+	public SimulatedWorld(WorldSimulator worldModel, boolean balleIsBlue,
 			boolean goalIsLeft, Pitch pitch) {
 
 		super(balleIsBlue, goalIsLeft, pitch);

@@ -20,7 +20,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 	private long lastStepTime;
 	private long lastFrameTime;
 
-	private SimulatorWorld worldWrapper = new SimulatorWorld(false);;
+	private WorldSimulator worldWrapper = new WorldSimulator(false);;
 
 	public SoftBot getBlueSoft() {
 		return worldWrapper.getBlueSoft();
@@ -53,8 +53,8 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 		addBufferedListeners();
 
 		// centre the camera
-		setCamera(new Vec2(1.22f * SimulatorWorld.SCALE,
-				1.22f * SimulatorWorld.SCALE),
+		setCamera(new Vec2(1.22f * WorldSimulator.SCALE,
+				1.22f * WorldSimulator.SCALE),
 				getCachedCameraScale());
 		// // No Gravity
 		// World w = getWorld();

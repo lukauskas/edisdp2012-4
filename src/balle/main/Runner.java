@@ -20,7 +20,7 @@ import balle.io.reader.SocketVisionReader;
 import balle.logging.StrategyLogAppender;
 import balle.misc.Globals;
 import balle.simulator.Simulator;
-import balle.simulator.SimulatorWorld;
+import balle.simulator.WorldSimulator;
 import balle.simulator.SoftBot;
 import balle.strategy.StrategyFactory;
 import balle.strategy.StrategyRunner;
@@ -185,7 +185,7 @@ public class Runner {
 		Controller controllerA;
 
 		// Initialise world
-		world = new SimulatedWorld(SimulatorWorld.createSimulatorWorld(),
+		world = new SimulatedWorld(WorldSimulator.createSimulatorWorld(),
 				balleIsBlue, goalIsLeft, Globals.getPitch());
 
 		world.addFilter(new TimeFilter(Globals.SIMULATED_VISON_DELAY));
@@ -223,7 +223,7 @@ public class Runner {
 		Simulator simulator = Simulator.createSimulator();
 
 		SimulatedWorld worldA = new SimulatedWorld(
-				SimulatorWorld.createSimulatorWorld(), balleIsBlue, goalIsLeft,
+				WorldSimulator.createSimulatorWorld(), balleIsBlue, goalIsLeft,
 				Globals.getPitch());
 		((BasicWorld) worldA).updatePitchSize(Globals.PITCH_WIDTH,
 				Globals.PITCH_HEIGHT);
