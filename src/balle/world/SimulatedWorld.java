@@ -144,7 +144,7 @@ public class SimulatedWorld extends BasicWorld implements ControllerListener {
 	}
 
 	protected Snapshot getSnapshotFromWorldModel(long timestamp) {
-		return worldModel.getSnapshot(timestamp, prev.getPitch(),
+		return worldModel.getSnapshot(this, timestamp, prev.getPitch(),
 				prev.getOpponentsGoal(), prev.getOwnGoal(), isBlue());
 	}
 
@@ -154,7 +154,8 @@ public class SimulatedWorld extends BasicWorld implements ControllerListener {
 	 */
 	@Override
 	public Snapshot getSnapshot() {
-		Snapshot pred = worldModel.getSnapshot(updateTimestamp, prev.getPitch(),
+		Snapshot pred = worldModel.getSnapshot(this, updateTimestamp,
+				prev.getPitch(),
 				prev.getOpponentsGoal(), prev.getOwnGoal(), isBlue());
 
 		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

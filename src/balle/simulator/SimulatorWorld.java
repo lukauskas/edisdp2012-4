@@ -17,6 +17,7 @@ import org.jbox2d.dynamics.joints.WeldJointDef;
 
 import balle.io.reader.Reader;
 import balle.misc.Globals;
+import balle.world.AbstractWorld;
 import balle.world.AngularVelocity;
 import balle.world.Coord;
 import balle.world.Orientation;
@@ -658,7 +659,8 @@ public class SimulatorWorld {
 		return new Coord(v.x, v.y);
 	}
 
-	public Snapshot getSnapshot(long timeStamp, Pitch p, Goal opponentsGoal,
+	public Snapshot getSnapshot(AbstractWorld ref, long timeStamp, Pitch p,
+			Goal opponentsGoal,
 			Goal ownGoal, boolean balleIsBlue) {
 		Body us, them, b = ball;
 		if (balleIsBlue) {
@@ -669,7 +671,7 @@ public class SimulatorWorld {
 			them = blue.getBody();
 		}
 
-		return new Snapshot(null,
+		return new Snapshot(ref,
 new balle.world.objects.Robot(v2C(
 				them.getPosition()).div(SCALE), new Velocity(v2C(
 				them.getLinearVelocity()).div(SCALE), 1000),
