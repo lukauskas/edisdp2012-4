@@ -330,7 +330,7 @@ public class BezierNav implements OrientedMovementExecutor {
 		}
 
 		// retrieve the new snapshot
-		return simulator.getSnapshot(s.getTimestamp(), s.getPitch(),
+		return simulator.getSnapshot(world, s.getTimestamp(), s.getPitch(),
 				s.getOpponentsGoal(), s.getOwnGoal(), true);
 	}
 
