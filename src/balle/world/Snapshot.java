@@ -38,8 +38,12 @@ public class Snapshot {
 	}
 	
 	public Snapshot getEstimateAfter(long dTime) {
-		return world.estimateAt(dTime + System.currentTimeMillis());
+        return world.estimateAt(dTime + timestamp);
 	}
+
+    public Snapshot getEstimateAtCurrentTime() {
+        return world.estimateAt(System.currentTimeMillis());
+    }
 
 	public Pitch getPitch() {
 		return pitch;
