@@ -77,10 +77,15 @@ public class SimulatedWorld extends BasicWorld implements ControllerListener {
 		simulatorTimestamp = prev.getTimestamp();
 
 		// Update world model with snapshot information.
-		worldModel.setWithSnapshot(prev, isBlue());
+		reset();
 
 		// Roll worldModel forward until current time.
 		simulate(updateTimestamp);
+	}
+
+	protected void reset() {
+		worldModel.setWithSnapshot(prev, isBlue());
+		simulatorTimestamp = prev.getTimestamp();
 	}
 
 	/**
@@ -172,15 +177,12 @@ public class SimulatedWorld extends BasicWorld implements ControllerListener {
 	}
 
 	public Snapshot estimateAt(long time) {
-		if (time > simulatorTimestamp) {
-			simulate(time);
-			return getSnapshotFromWorldModel(time);
-		} else {
+		if (time < simulatorTimestamp)
+			reset();
+		// Caching or similar ?
 
-			// TODO caching or similar?
-
-			return null;
-		}
+		simulate(time);
+		return getSnapshotFromWorldModel(time);
 	}
 
 	/**
