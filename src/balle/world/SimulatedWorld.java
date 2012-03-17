@@ -160,9 +160,15 @@ public class SimulatedWorld extends BasicWorld implements ControllerListener {
 //		return worldModel.getSnapshot(updateTimestamp, prev.getPitch(),
 //				prev.getOpponentsGoal(), prev.getOwnGoal(), isBlue());
 
-		return new Snapshot(this, prev.getOpponent(), prev.getBalle(),
-		 pred.getBall(), prev.getOpponentsGoal(), prev.getOwnGoal(),
-		 prev.getPitch(), pred.getTimestamp());
+		// return new Snapshot(this, prev.getOpponent(), prev.getBalle(),
+		// pred.getBall(), prev.getOpponentsGoal(), prev.getOwnGoal(),
+		// prev.getPitch(), pred.getTimestamp());
+
+		// James:
+		// Was getting bugs because updating the timestamp caused trouble with
+		// bezier navigation (it tries to remove the latency as well).
+
+		return prev;
 	}
 
 	public Snapshot estimateAt(long time) {
