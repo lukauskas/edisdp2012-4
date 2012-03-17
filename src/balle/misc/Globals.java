@@ -1,5 +1,7 @@
 package balle.misc;
 
+import java.util.ArrayList;
+
 import org.jbox2d.common.Vec2;
 
 import balle.world.objects.Pitch;
@@ -11,7 +13,7 @@ public class Globals {
     public static final float ROBOT_LENGTH = 0.2f;
     public static final float ROBOT_TRACK_WIDTH = 0.155f; // Meters
     public static final float ROBOT_WHEEL_DIAMETER = 0.0816f; // Meters
-
+	public static ArrayList<Powers> powervelo = new ArrayList<Powers>();
 	public static final Vec2 ROBOT_LEFT_WHEEL_POS = new Vec2(0,
 			-ROBOT_TRACK_WIDTH / 2);
 
@@ -51,8 +53,6 @@ public class Globals {
     public static final float ROBOT_HEIGHT = 0.19f; // Meters
 
     // TODO: SAULIUS this is just a temp fix for M3, change back to 50 for
-    // friendly
-    // yeah, I know this is BAD
     public static final double OVERSHOOT_ANGLE_EPSILON = 0; // Degrees
 
 	// static final
@@ -83,6 +83,34 @@ public class Globals {
         // absVelocity /= (1f+Math.exp(-0.1f*(p-50)));
         // return isNeg?-absVelocity:absVelocity;
     }
+
+	public static float powerToVelocity2(float p) {
+		Powers powerAbove = null;
+		Powers powerBelow = null;
+		float velo = 0;
+		if (p > MAXIMUM_MOTOR_SPEED) {
+			p = MAXIMUM_MOTOR_SPEED;
+			return p * (0.4f / 720f);
+		} else if (p < -MAXIMUM_MOTOR_SPEED) {
+			p = -MAXIMUM_MOTOR_SPEED;
+			return p * (0.4f / 720f);
+		} else {
+			int index = 0;
+			for (int i = 0; i < powervelo.size(); i++) {
+				if (powervelo.get(i).getPower() < p) {
+					index = i;
+				} else {
+					break;
+				}
+			}
+			powerBelow = powervelo.get(index);
+			powerAbove = powervelo.get(index + 1);
+		}
+		float m = powerAbove.getVelocity() - powerBelow.getVelocity();
+		m /= (powerAbove.getPower() - powerBelow.getPower());
+		velo = m * (p - powerBelow.getPower()) + powerBelow.getVelocity();
+		return velo;
+	}
 
     public static float velocityToPower(float v) {
         return v * (720f / 0.4f);

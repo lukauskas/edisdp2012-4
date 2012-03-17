@@ -9,6 +9,8 @@ import balle.world.objects.Robot;
  * Immutable
  */
 public class Snapshot {
+	
+	private final AbstractWorld world;
 
 	private final Robot opponent;
 	private final Robot bot;
@@ -20,9 +22,12 @@ public class Snapshot {
 	private final Pitch pitch;
 	private final long timestamp;
 
-	public Snapshot(Robot opponent, Robot balle, Ball ball, Goal opponentsGoal,
-			Goal ownGoal, Pitch pitch, long timestamp) {
+	public Snapshot(AbstractWorld world, Robot opponent, Robot balle,
+			Ball ball, Goal opponentsGoal, Goal ownGoal, Pitch pitch,
+			long timestamp) {
+
 		super();
+		this.world = world;
 		this.opponent = opponent;
 		this.bot = balle;
 		this.ball = ball;
@@ -30,6 +35,10 @@ public class Snapshot {
 		this.opponentsGoal = opponentsGoal;
 		this.ownGoal = ownGoal;
 		this.pitch = pitch;
+	}
+	
+	public Snapshot getEstimateAfter(long dTime) {
+		return world.estimateAt(dTime + System.currentTimeMillis());
 	}
 
 	public Pitch getPitch() {
@@ -58,6 +67,16 @@ public class Snapshot {
 
 	public long getTimestamp() {
 		return timestamp;
+	}
+
+	public Snapshot duplicate() {
+		return new Snapshot(world, getOpponent(), getBalle(), getBall(),
+				getOpponentsGoal(), getOwnGoal(), getPitch(), getTimestamp());
+	}
+
+	public MutableSnapshot unpack() {
+		return new MutableSnapshot(world, getOpponent(), getBalle(), getBall(),
+				getOpponentsGoal(), getOwnGoal(), getPitch(), getTimestamp());
 	}
 
 	@Override

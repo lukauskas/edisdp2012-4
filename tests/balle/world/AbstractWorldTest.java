@@ -28,6 +28,10 @@ class AbstractWorldConcrete extends AbstractWorld {
 
 	}
 
+	public Snapshot estimateAt(long t) {
+		return null;
+	}
+
 }
 
 public class AbstractWorldTest {

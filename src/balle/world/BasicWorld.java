@@ -6,7 +6,7 @@ import balle.world.objects.Robot;
 
 public class BasicWorld extends AbstractWorld {
 
-	private Snapshot prev;
+	protected Snapshot prev;
 
 	public BasicWorld(boolean balleIsBlue, boolean goalIsLeft, Pitch pitch) {
 		super(balleIsBlue, goalIsLeft, pitch);
@@ -99,7 +99,7 @@ public class BasicWorld extends AbstractWorld {
 		if (theirsPosition == null)
 			theirsPosition = estimatedPosition(prev.getOpponent(), deltaT);
 		if (ballPosition == null)
-			ballPosition = estimatedPosition(prev.getBall(), deltaT);
+			ballPosition = estimatedPosition(prev.getBall(), deltaT, true);
 
 		// Calculate how much each position has changed between frames
 		Coord oursDPos, themDPos, ballDPos;
@@ -110,25 +110,41 @@ public class BasicWorld extends AbstractWorld {
 
 		// Recalculate the velocities from deltapositions above.
 		Velocity oursVel, themVel, ballVel;
-		oursVel = oursDPos != null ? new Velocity(oursDPos, deltaT) : null;
-		themVel = themDPos != null ? new Velocity(themDPos, deltaT) : null;
-		ballVel = ballDPos != null ? new Velocity(ballDPos, deltaT) : null;
+		oursVel = oursDPos != null ? new Velocity(oursDPos, deltaT)
+				: new Velocity(0, 0, 1, 1);
+		themVel = themDPos != null ? new Velocity(themDPos, deltaT)
+				: new Velocity(0, 0, 1, 1);
+		ballVel = ballDPos != null ? new Velocity(ballDPos, deltaT)
+				: new Velocity(0, 0, 1, 1);
 
+		AngularVelocity oursAngVel = null, themAngVel = null;
 		if (ourOrientation == null) {
 			ourOrientation = prev.getBalle().getOrientation();
+		} else if (prev.getBalle().getOrientation() != null) {
+			oursAngVel = new AngularVelocity(
+					ourOrientation.angleToatan2Radians(prev.getBalle()
+							.getOrientation()), deltaT);
 		}
 
 		if (theirsOrientation == null) {
 			theirsOrientation = prev.getOpponent().getOrientation();
+		} else if (prev.getOpponent().getOrientation() != null) {
+			themAngVel = new AngularVelocity(
+					theirsOrientation.angleToatan2Radians(prev.getOpponent()
+							.getOrientation()), deltaT);
 		}
 
+		themAngVel = (them != null) ? new AngularVelocity(
+				theirsOrientation.angleToatan2Radians(prev.getOpponent()
+						.getOrientation()), deltaT) : null;
+
 		// put it all together (almost)
-		them = new Robot(theirsPosition, themVel, theirsOrientation);
-		ours = new Robot(ourPosition, oursVel, ourOrientation);
+		them = new Robot(theirsPosition, themVel, themAngVel, theirsOrientation);
+		ours = new Robot(ourPosition, oursVel, oursAngVel, ourOrientation);
 		ball = new Ball(ballPosition, ballVel);
 
 		// pack into a snapshot
-		Snapshot nextSnapshot = filter(new Snapshot(them, ours, ball,
+		Snapshot nextSnapshot = filter(new Snapshot(this, them, ours, ball,
 				getOpponentsGoal(), getOwnGoal(), getPitch(), timestamp));
 		synchronized (this) {
 			this.prev = nextSnapshot;
@@ -142,6 +158,12 @@ public class BasicWorld extends AbstractWorld {
 			this.prev = new EmptySnapshot(getOpponentsGoal(), getOwnGoal(),
 					getPitch());
 		}
+	}
+
+	@Override
+	public Snapshot estimateAt(long time) {
+		System.err.println("Basic world used to estimate snapshot.");
+		return null;
 	}
 
 }

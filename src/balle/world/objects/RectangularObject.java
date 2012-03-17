@@ -3,6 +3,7 @@ package balle.world.objects;
 import org.apache.log4j.Logger;
 
 import balle.misc.Globals;
+import balle.world.AngularVelocity;
 import balle.world.Coord;
 import balle.world.Line;
 import balle.world.Orientation;
@@ -14,14 +15,18 @@ public class RectangularObject extends MovingPoint implements FieldObject {
 
     private final double width;
     private final double height;
+    
     private final Orientation orientation;
+	private final AngularVelocity angularVelocity;
 
     public RectangularObject(Coord position, Velocity velocity,
+			AngularVelocity angularVelocity,
             Orientation orientation, double width, double height) {
         super(position, velocity);
         this.width = width;
         this.height = height;
         this.orientation = orientation;
+		this.angularVelocity = angularVelocity;
     }
 
     public double getWidth() {
@@ -35,6 +40,10 @@ public class RectangularObject extends MovingPoint implements FieldObject {
     public Orientation getOrientation() {
         return orientation;
     }
+
+	public AngularVelocity getAngularVelocity() {
+		return angularVelocity;
+	}
 
     @Override
     public boolean containsCoord(Coord point) {
@@ -146,6 +155,8 @@ public class RectangularObject extends MovingPoint implements FieldObject {
     @Override
     public boolean intersects(Line line) {
         if (line == null)
+            return false;
+        if (getPosition() == null)
             return false;
 
         if (containsCoord(line.getA()) || containsCoord(line.getB()))

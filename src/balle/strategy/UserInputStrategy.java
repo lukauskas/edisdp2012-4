@@ -3,6 +3,8 @@ package balle.strategy;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 
 import javax.swing.JFrame;
@@ -18,9 +20,16 @@ public class UserInputStrategy extends AbstractPlanner {
     private Screen screen;
     private int    mouseXPos = 10, mouseYPos = 4;
     private float  leftWheelPower = 0, rightWheelPower = 0;
+	private Controller controller;
+
+	@FactoryMethod(designator = "UserInput")
+	public static UserInputStrategy gameFactory() {
+		return new UserInputStrategy();
+	}
 
     public UserInputStrategy() {
-        Listener l = new Listener();
+		MouseListener ml = new MouseListener();
+		KeyListener kl = new KeyboardListener();
 
         JFrame frame = new JFrame("Controller");
         frame.setSize(500, 500);
@@ -29,8 +38,9 @@ public class UserInputStrategy extends AbstractPlanner {
 
         screen = new Screen();
         frame.getContentPane().add(BorderLayout.CENTER, screen);
-        screen.addMouseMotionListener(l);
-        screen.addMouseListener(l);
+		screen.addMouseMotionListener(ml);
+		screen.addMouseListener(ml);
+		screen.addKeyListener(kl);
     }
 
     // TODO: Saulius: I have removed aiStep() from strategy for now...
@@ -48,7 +58,7 @@ public class UserInputStrategy extends AbstractPlanner {
     @Override
     // TODO Change to rely on and react to JPanel thing
     public void onStep(Controller controller, Snapshot snapshot) {
-        System.out.println(leftWheelPower + " " + rightWheelPower);
+		this.controller = controller;
         controller.setWheelSpeeds(Math.round(leftWheelPower),
                 Math.round(rightWheelPower));
 
@@ -59,7 +69,7 @@ public class UserInputStrategy extends AbstractPlanner {
     // int dY = (screen.getHeight()-mouseYPos)-(screen.getHeight()/2) )
 
     // Used to get coordinates of where the user clicked
-    class Listener implements MouseInputListener {
+	class MouseListener implements MouseInputListener {
 
         @Override
         public void mouseClicked(MouseEvent arg0) {
@@ -82,8 +92,8 @@ public class UserInputStrategy extends AbstractPlanner {
             int dX = (mouseXPos - screen.getWidth() / 2);
             int dY = (screen.getHeight() - mouseYPos)
                     - (screen.getHeight() / 2);
-            leftWheelPower = leftWheelTurn(dX, dY) * 100;
-            rightWheelPower = rightWheelTurn(dX, dY) * 100;
+			leftWheelPower = leftWheelTurn(dX, dY) * 500;
+			rightWheelPower = rightWheelTurn(dX, dY) * 500;
 
         }
 
@@ -97,6 +107,9 @@ public class UserInputStrategy extends AbstractPlanner {
 
         @Override
         public void mousePressed(MouseEvent arg0) {
+			if (arg0.getButton() == MouseEvent.BUTTON3) {
+				controller.kick();
+			}
 
         }
 
@@ -141,6 +154,30 @@ public class UserInputStrategy extends AbstractPlanner {
         }
 
     }
+
+	class KeyboardListener implements KeyListener {
+
+		@Override
+		public void keyPressed(KeyEvent arg0) {
+			int pressed = arg0.getKeyCode();
+			if (pressed == KeyEvent.VK_SPACE) {
+				System.out.println("pretend ive kicked");
+			}
+		}
+
+		@Override
+		public void keyReleased(KeyEvent arg0) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void keyTyped(KeyEvent arg0) {
+			// TODO Auto-generated method stub
+
+		}
+
+	}
 
     // Where the user clicks to control robot. Robot drawn in blue.
     // Mouse click shows in red

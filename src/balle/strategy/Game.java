@@ -1,16 +1,29 @@
 package balle.strategy;
 
+import java.awt.Color;
+import java.util.ArrayList;
+
 import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
+import balle.main.drawable.Drawable;
+import balle.main.drawable.Label;
+import balle.misc.Globals;
+import balle.strategy.bezierNav.BezierNav;
+import balle.strategy.curve.CustomCHI;
 import balle.strategy.executor.movement.GoToObjectPFN;
 import balle.strategy.executor.turning.IncFaceAngle;
 import balle.strategy.executor.turning.RotateToOrientationExecutor;
+import balle.strategy.pathfinding.SimplePathFinder;
 import balle.strategy.planner.AbstractPlanner;
+import balle.strategy.planner.BackingOffStrategy;
 import balle.strategy.planner.DefensiveStrategy;
 import balle.strategy.planner.GoToBall;
+import balle.strategy.planner.InitialStrategy;
 import balle.strategy.planner.KickFromWall;
 import balle.strategy.planner.KickToGoal;
+import balle.strategy.planner.SimpleGoToBallFaceGoal;
+import balle.world.Coord;
 import balle.world.Orientation;
 import balle.world.Snapshot;
 import balle.world.objects.Ball;
@@ -21,38 +34,115 @@ import balle.world.objects.Robot;
 public class Game extends AbstractPlanner {
 
     private static final Logger LOG = Logger.getLogger(Game.class);
-    // Strategies that we will need make sure to updateState() for each of them
-    // and stop() each of them
-    Strategy defensiveStrategy;
-    Strategy goToBallStrategy;
-    Strategy pickBallFromWallStrategy;
-    RotateToOrientationExecutor turningExecutor;
-    KickToGoal                  kickingStrategy;
+	// Strategies that we will need make sure to call stop() for each of them
+	protected final Strategy defensiveStrategy;
+	protected final Strategy goToBallStrategy;
+	protected final Strategy pickBallFromWallStrategy;
+	protected final AbstractPlanner backingOffStrategy;
+	protected final RotateToOrientationExecutor turningExecutor;
+	protected final KickToGoal kickingStrategy;
+    protected final InitialStrategy initialStrategy;
 
-    @FactoryMethod(designator = "Game")
-    public static Game gameFactory() {
-        return new Game();
+    protected boolean initial;
+
+    private String currentStrategy = null;
+
+    public String getCurrentStrategy() {
+        return currentStrategy;
     }
 
-    public Game() {
+    @Override
+    public ArrayList<Drawable> getDrawables() {
+        ArrayList<Drawable> drawables = super.getDrawables();
+        if (currentStrategy != null)
+            drawables.add(new Label(currentStrategy, new Coord(
+                    Globals.PITCH_WIDTH - 0.5, Globals.PITCH_HEIGHT + 0.2),
+                    Color.WHITE));
+        return drawables;
+    }
+
+    public void setCurrentStrategy(String currentStrategy) {
+        this.currentStrategy = currentStrategy;
+    }
+
+    @FactoryMethod(designator = "Game (Bezier)")
+    public static Game gameFactory() {
+        return new Game(new SimpleGoToBallFaceGoal(new BezierNav(
+                new SimplePathFinder(new CustomCHI()))), true);
+    }
+
+    @FactoryMethod(designator = "Game (Bezier,NoInit)")
+    public static Game gameFactoryTesting() {
+        return new Game(new SimpleGoToBallFaceGoal(new BezierNav(
+                new SimplePathFinder(new CustomCHI()))), false);
+    }
+
+    @FactoryMethod(designator = "Game (PFN)")
+    public static Game gameFactory2() {
+        return new Game(new GoToBall(new GoToObjectPFN(0)), true);
+    }
+
+    @FactoryMethod(designator = "Game (PFN,NoInit)")
+    public static Game gameFactoryTesting2() {
+        return new Game(new GoToBall(new GoToObjectPFN(0)), false);
+    }
+
+    public Game(Strategy goToBallStrategy) {
         defensiveStrategy = new DefensiveStrategy(new GoToObjectPFN(0.1f));
-        // TODO: implement a new strategy that inherits from GoToBall but always
-        // approaches the ball from correct angle. (This can be done by always
-        // pointing robot
-        // to a location that is say 0.2 m before the ball in correct direction
-        // and then, once the robot reaches it, pointing it to the ball itself
-        // so it reaches it.
-        goToBallStrategy = new GoToBall(new GoToObjectPFN(0.15f));
-        pickBallFromWallStrategy = new KickFromWall(new GoToObjectPFN(0.15f));
+		// goToBallStrategy = new GoToBallSafeProportional();
+        this.goToBallStrategy = goToBallStrategy;
+        pickBallFromWallStrategy = new KickFromWall(new GoToObjectPFN(0));
+		backingOffStrategy = new BackingOffStrategy();
         turningExecutor = new IncFaceAngle();
         kickingStrategy = new KickToGoal();
+        initialStrategy = new InitialStrategy();
+        initial = false;
+    }
+
+    public boolean isInitial(Snapshot snapshot) {
+        if (initial == false)
+            return false;
+
+        // Check if we have ball
+        Ball ball = snapshot.getBall();
+        if (ball.getPosition() == null)
+            return initial; // Return whatever is set to initial if we do not
+                            // see it
+        
+        Coord centerOfPitch = new Coord(Globals.PITCH_WIDTH / 2,
+                Globals.PITCH_HEIGHT / 2);
+        Robot ourRobot = snapshot.getBalle();
+        // If we have the ball, turn off initial strategy
+        if ((ourRobot.getPosition() != null) && (ourRobot.possessesBall(ball)))
+        {
+            LOG.info("We possess the ball. Turning off initial strategy");
+            setInitial(false);
+        }
+        // else If ball has moved 5 cm, turn off initial strategy
+        else if (ball.getPosition().dist(centerOfPitch) > 0.05) {
+            LOG.info("Ball has moved. Turning off initial strategy");
+            setInitial(false);
+        }
+        
+        return initial;
 
     }
 
+    public void setInitial(boolean initial) {
+        this.initial = initial;
+    }
+
+    public Game(Strategy goToBallStrategy, boolean startWithInitial) {
+        this(goToBallStrategy);
+        initial = startWithInitial;
+        LOG.info("Starting game strategy with initial strategy turned on");
+    }
     @Override
     public void stop(Controller controller) {
         defensiveStrategy.stop(controller);
         goToBallStrategy.stop(controller);
+        pickBallFromWallStrategy.stop(controller);
+        backingOffStrategy.stop(controller);
     }
 
     @Override
@@ -64,40 +154,89 @@ public class Game extends AbstractPlanner {
         Goal ownGoal = snapshot.getOwnGoal();
         Pitch pitch = snapshot.getPitch();
 
-        Orientation targetOrientation = ball.getPosition()
-                .sub(ourRobot.getPosition()).orientation();
+        if ((ourRobot.getPosition() == null) || (ball.getPosition() == null))
+            return;
+        
+		if (backingOffStrategy.shouldStealStep(snapshot)) {
+			backingOffStrategy.step(controller, snapshot);
+			return;
+		}
+
+        if (isInitial(snapshot)) {
+            setCurrentStrategy(initialStrategy.getClass().getName());
+            initialStrategy.step(controller, snapshot);
+            addDrawables(initialStrategy.getDrawables());
+            return;
+        }
 
         if (ourRobot.possessesBall(ball)) {
             // Kick if we are facing opponents goal
             if (!ourRobot.isFacingGoalHalf(ownGoal)) {
+                setCurrentStrategy(kickingStrategy.getClass().getName());
                 kickingStrategy.step(controller, snapshot);
                 addDrawables(kickingStrategy.getDrawables());
             } else {
                 LOG.warn("We need to go around the ball");
-                // TODO: go around the ball here
+             // TODO: turn the robot slightly so we face away from our
+                // own goal.
+                // Implement a turning executor that would use
+                // setWheelSpeeds to some arbitrary low
+                // number (say -300,300 and 300,-300) to turn to correct
+                // direction and use it here.
+                // it has to be similar to FaceAngle executor but should not
+                // use the controller.rotate()
+                // command that is blocking.
+
+                Coord r, b, g;
+                r = ourRobot.getPosition();
+                b = ball.getPosition();
+                g = ownGoal.getPosition();
+
+                if (r.angleBetween(g, b).atan2styleradians() < 0) {
+                    // Clockwise.
+                    Orientation orien = ourRobot
+                            .findMaxRotationMaintaintingPossession(ball, true);
+                    System.out.println(orien);
+                    turningExecutor.setTargetOrientation(orien);
+					turningExecutor.step(controller, snapshot);
+                } else {
+                    // Anti-Clockwise
+                    Orientation orien = ourRobot
+                            .findMaxRotationMaintaintingPossession(ball, false);
+                    System.out.println(orien);
+                    turningExecutor.setTargetOrientation(orien);
+					turningExecutor.step(controller, snapshot);
+                }
+
             }
         } else if ((opponent.possessesBall(ball))
                 && (opponent.isFacingGoal(ownGoal))) {
             LOG.info("Defending");
+            setCurrentStrategy(defensiveStrategy.getClass().getName());
             // Let defensiveStrategy deal with it!
 			defensiveStrategy.step(controller, snapshot);
             addDrawables(defensiveStrategy.getDrawables());
         } else if (ball.isNearWall(pitch)) {
+            setCurrentStrategy(pickBallFromWallStrategy.getClass().getName());
 			pickBallFromWallStrategy.step(controller, snapshot);
             addDrawables(pickBallFromWallStrategy.getDrawables());
-        } else if (ball.isNear(ourRobot)
-                && (ourRobot.isApproachingTargetFromCorrectSide(ball,
-						snapshot.getOpponentsGoal()))) {
-            if (Math.abs(ourRobot.getAngleToTurn(targetOrientation)) > (Math.PI / 4)) {
-                LOG.info("Ball is near our robot, turning to it");
-                turningExecutor.setTargetOrientation(targetOrientation);
-				turningExecutor.step(controller, snapshot);
-            } else {
-                // Go forward!
-                controller.setWheelSpeeds(400, 400);
-            }
+            // } else if (ball.isNear(ourRobot)
+            // && (ourRobot.isApproachingTargetFromCorrectSide(ball,
+            // snapshot.getOpponentsGoal()))) {
+            // if (Math.abs(ourRobot.getAngleToTurn(targetOrientation)) >
+            // (Math.PI / 4)) {
+            // LOG.info("Ball is near our robot, turning to it");
+            // setCurrentStrategy(turningExecutor.getClass().getName());
+            // turningExecutor.setTargetOrientation(targetOrientation);
+            // turningExecutor.step(controller, snapshot);
+            // } else {
+            // setCurrentStrategy(null);
+            // // Go forward!
+            // controller.setWheelSpeeds(400, 400);
+            // }
         } else {
             // Approach ball
+            setCurrentStrategy(goToBallStrategy.getClass().getName());
 			goToBallStrategy.step(controller, snapshot);
             addDrawables(goToBallStrategy.getDrawables());
 

@@ -61,7 +61,19 @@ public abstract class AbstractWorldProcessor extends Thread {
                 }
             }
             actionOnStep();
-        }
+
+			waitForNextSnapshot();
+		}
+	}
+
+	private void waitForNextSnapshot() {
+		synchronized (world.snapshotWaitLock) {
+			try {
+				world.snapshotWaitLock.wait();
+			} catch (InterruptedException e) {
+				// Nothing
+			}
+		}
     }
 
     private final void registerSnapshotReceived() {

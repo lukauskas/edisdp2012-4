@@ -68,4 +68,9 @@ public abstract class SimpleCurve implements Curve {
 
 	}
 
+    @Override
+    public void reduceVisibility() {
+        // TODO: implement!!!
+    }
+
 }

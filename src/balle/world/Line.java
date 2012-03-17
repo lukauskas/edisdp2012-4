@@ -25,7 +25,9 @@ public class Line {
 	}
 
     public double dist(Coord a) {
-        return getLine2DVersion().ptLineDist(a.getX(), a.getY());
+        if (a == null)
+            return Double.MAX_VALUE;
+        return getLine2DVersion().ptSegDist(a.getX(), a.getY());
     }
 
 	public boolean contains(Coord a) {
@@ -168,15 +170,41 @@ public class Line {
 				b.getX() - a.getX()));
 	}
 
-	public Line extend(double ballSafeGap) {
+	public Line extend(double howMuch) {
 		
-		Coord point = new Coord(ballSafeGap, 0);
+		Coord point = new Coord(howMuch, 0);
 		Coord rotated = point.rotate(angle());
 
 		double newX = b.getX() + rotated.getX();
 		double newY = b.getY() + rotated.getY();
 
 		return new Line(a, new Coord(newX, newY));
+	}
+
+    public Line extendBothDirections(double howMuch) {
+
+        Coord point = new Coord(howMuch, 0);
+        Coord rotated = point.rotate(angle());
+
+        double newX = b.getX() + rotated.getX();
+        double newY = b.getY() + rotated.getY();
+
+        Coord point2 = new Coord(-howMuch, 0);
+        Coord rotated2 = point2.rotate(angle());
+
+        double newAX = a.getX() + rotated2.getX();
+        double newAY = a.getY() + rotated2.getY();
+
+        return new Line(new Coord(newAX, newAY), new Coord(newX, newY));
+    }
+
+	/**
+	 * Get a new line with direction opposite to this one
+	 * 
+	 * @return the new line
+	 */
+	public Line flip() {
+		return new Line(b, a);
 	}
 
 	@Override

@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import balle.misc.Globals;
+import balle.world.AngularVelocity;
 import balle.world.Coord;
 import balle.world.Line;
 import balle.world.Orientation;
@@ -19,6 +20,7 @@ public class RobotTest {
 	@Test
 	public void testPossessesBall() {
 		Robot robot = new Robot(new Coord(0.5, 0.5), new Velocity(0, 0, 1),
+				new AngularVelocity(0, 1),
 				new Orientation(0, true));
 
 		Ball ball = new Ball(new Coord(0.5 + robot.getHeight() / 2
@@ -36,6 +38,7 @@ public class RobotTest {
 	@Test
 	public void testPossessesBallOtherWayAround() {
 		Robot robot = new Robot(new Coord(0.5, 0.5), new Velocity(0, 0, 1),
+				new AngularVelocity(0, 1),
 				new Orientation(-Math.PI, true));
 
 		Ball ball = new Ball(new Coord(0.5 - robot.getHeight() / 2
@@ -53,6 +56,7 @@ public class RobotTest {
 	public void testFacingLine() {
 
 		Robot robot = new Robot(new Coord(0.5, 0.5), new Velocity(0, 0, 1),
+				new AngularVelocity(0, 1),
 				new Orientation(0, true));
 		Line facingLine = robot.getFacingLine();
 		Coord testPoint = new Coord(0.5 + robot.getHeight() / 2, 0.5);
@@ -69,6 +73,7 @@ public class RobotTest {
 	public void testFacingLineOtherwayAround() {
 
 		Robot robot = new Robot(new Coord(0.5, 0.5), new Velocity(0, 0, 1),
+				new AngularVelocity(0, 1),
 				new Orientation(Math.PI, true));
 		Line facingLine = robot.getFacingLine();
 		Coord testPoint = new Coord(0.5 - robot.getHeight() / 2, 0.5);
@@ -85,6 +90,7 @@ public class RobotTest {
 	public void testBallKickLine() {
 
 		Robot robot = new Robot(new Coord(0.5, 0.5), new Velocity(0, 0, 1),
+				new AngularVelocity(0, 1),
 				new Orientation(0, true));
 
 		Ball ball = new Ball(new Coord(0.5 + robot.getHeight() / 2
@@ -108,6 +114,7 @@ public class RobotTest {
 	public void testBallKickLineOtherWayAround() {
 
 		Robot robot = new Robot(new Coord(0.5, 0.5), new Velocity(0, 0, 1),
+				new AngularVelocity(0, 1),
 				new Orientation(Math.PI, true));
 
 		Ball ball = new Ball(new Coord(0.5 - robot.getHeight() / 2
@@ -128,6 +135,7 @@ public class RobotTest {
 	public void testFacingLineBothWay() {
 
 		Robot robot = new Robot(new Coord(0.5, 0.5), new Velocity(0, 0, 1),
+				new AngularVelocity(0, 1),
 				new Orientation(-Math.PI, true));
 		Line facingLine = robot.getFacingLineBothWays();
 		// Just back of
@@ -151,6 +159,7 @@ public class RobotTest {
 	public void testFacingLineBothWaysOtherWayAround() {
 
 		Robot robot = new Robot(new Coord(0.5, 0.5), new Velocity(0, 0, 1),
+				new AngularVelocity(0, 1),
 				new Orientation(0, true));
 		Line facingLine = robot.getFacingLineBothWays();
 		// Just in front
@@ -167,6 +176,7 @@ public class RobotTest {
 	@Test
 	public void testFindMaxRotationMaintainingPossession() {
 		Robot r = new Robot(new Coord(0, 0), new Velocity(0, 0, 1),
+				new AngularVelocity(0, 1),
 				new Orientation(0, true));
 		Ball b = new Ball(new Coord(0.12, 0.2), new Velocity(0, 0, 1));
 

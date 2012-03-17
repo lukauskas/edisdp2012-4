@@ -4,14 +4,23 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.World;
+
 import balle.controller.Controller;
 import balle.main.drawable.Circle;
 import balle.main.drawable.Dot;
 import balle.main.drawable.Drawable;
 import balle.misc.Globals;
+import balle.simulator.SimulatorWorld;
+import balle.strategy.FactoryMethod;
 import balle.strategy.curve.Curve;
+import balle.strategy.curve.CustomCHI;
 import balle.strategy.executor.movement.OrientedMovementExecutor;
 import balle.strategy.pathfinding.PathFinder;
+import balle.strategy.pathfinding.SimplePathFinder;
+import balle.strategy.planner.SimpleGoToBallFaceGoal;
+import balle.world.BasicWorld;
 import balle.world.Coord;
 import balle.world.Orientation;
 import balle.world.Snapshot;
@@ -36,20 +45,25 @@ public class BezierNav implements OrientedMovementExecutor {
 														// target from the
 														// center front of the
 														// robot
-	private final double MIN_SAFE_RADIUS = 0.3; // the smallest turning radius
+	private final double MIN_SAFE_RADIUS = 0; // the smallest turning radius
 												// where moving at maximum speed
-												// is ok
-	private final double SAFER_SPEED_RATIO = 0.2; // ratio of (max
+												// is ok (0.05)
+	private final double SAFER_SPEED_RATIO = 0.5; // ratio of (max
 													// speed)/((minimum)safe
 													// speed). when making sharp
 													// turns the speed will be
 													// slowed toward max/this
 	private final double MAX_VELOCITY = Globals
-			.powerToVelocity(Globals.MAXIMUM_MOTOR_SPEED) / 4; // the maximum
+.powerToVelocity(600); // the
+																		// maximum
 																// wheel
 															// velocity to use
+	private final double DAMPENING_POWERCHANGE = 0.7;
+	private final double DAMPENING_POWERRATIO = 0; // increase towards 1 to make
+													// the robot move more
+													// strait
 
-	private static final double SUBTARGET_RADIUS = 0.05; // how close the robot
+	private static final double SUBTARGET_RADIUS = 0.08; // how close the robot
 															// has
 														// to be to intermitent
 														// points befor it try
@@ -62,6 +76,15 @@ public class BezierNav implements OrientedMovementExecutor {
 	private double stopAngle = Math.PI / 13; // angle of robot vs desired final
 												// angle (orient)
 
+	private PID pid = new PID(11, 0.25, 4, 1);
+	private final boolean USE_PID = false;
+
+	SimulatorWorld simulator;
+	BasicWorld world;
+
+	private Orientation lastAngle;
+	private long lastAngleTime;
+
 
 
 	private ArrayList<Coord> targetPoints = new ArrayList<Coord>(
@@ -71,7 +94,6 @@ public class BezierNav implements OrientedMovementExecutor {
 
 			}));
 	
-	
 	private PathFinder pathfinder;
 	private Curve c;
 
@@ -80,9 +102,24 @@ public class BezierNav implements OrientedMovementExecutor {
 	private Orientation orient;
 	private Coord p0, p3;
 
+	private ArrayList<ControllerHistoryElement> controllerHistory; // newer
+																	// snapshots
+																	// at the
+																	// end
+
+	@FactoryMethod(designator = "BezierNav")
+	public static SimpleGoToBallFaceGoal bezierNavFactory() {
+		return new SimpleGoToBallFaceGoal(new BezierNav(new SimplePathFinder(
+				new CustomCHI())));
+	}
 
 	public BezierNav(PathFinder pathfinder) {
 		this.pathfinder = pathfinder;
+		simulator = new SimulatorWorld(false);
+		simulator.setWorld(new World(new Vec2(), true));
+		simulator.initWorld();
+		simulator.setVisionDelay(0);
+		controllerHistory = new ArrayList<ControllerHistoryElement>();
 	}
 
 	private boolean isMoveStraitFinished(Orientation botOrient) {
@@ -112,7 +149,10 @@ public class BezierNav implements OrientedMovementExecutor {
 
 	@Override
 	public void step(Controller controller, Snapshot snapshot) {
-		// controller.kick();
+		if (!USE_PID) {
+			snapshot = getLatencyAdjustedSnapshot(snapshot);
+		}
+
 		if (isFinished(snapshot)) {
 			stop(controller);
 			return;
@@ -163,7 +203,6 @@ public class BezierNav implements OrientedMovementExecutor {
 				robot.getOrientation().getUnitCoord(), a)
 				.atan2styleradians() > 0;
 		double r = c.rad(0);
-		System.out.println(r);
 
 		// throttle speed (slow when doing sharp turns)
 		double max = MAX_VELOCITY;
@@ -174,20 +213,125 @@ public class BezierNav implements OrientedMovementExecutor {
 		}
 
 		// calculate wheel speeds/powers
-		int v1, v2;
-		v1 = (int) Globals
-				.velocityToPower((float) (max * getMinVelocityRato(r)));
-		v2 = (int) Globals.velocityToPower((float) max);
-		System.out.println(v2);
-		controller.setWheelSpeeds(isLeft ? v1 : v2, isLeft ? v2 : v1);
+		double v1, v2, left, right;
+		v1 = Globals.velocityToPower((float) (max * getMinVelocityRato(r)));
+		v2 = Globals.velocityToPower((float) max);
+		left = isLeft ? v1 : v2;
+		right = isLeft ? v2 : v1;
+		// find current wheel powers
+		long dT = snapshot.getTimestamp() - lastAngleTime;
+		if (USE_PID && dT > 0) {
+			if (lastAngle != null) {
+				// this uses the angular and linear velocity of the robot to
+				// find the estimated powers to the wheels
+				double dA = lastAngle.angleToatan2Radians(robot
+						.getOrientation());
+				double basicV = (dA * Globals.ROBOT_TRACK_WIDTH / 2) / dT;
+				int flipper = robot.getVelocity().dot(
+						robot.getOrientation().getUnitCoord()) <= 0 ? -1 : 1;
+				double curentLeftP = Globals
+						.velocityToPower((float) ((flipper * robot
+								.getVelocity().abs()) - basicV));
+				double curentRightP = Globals
+						.velocityToPower((float) ((flipper * robot
+								.getVelocity().abs()) + basicV));
+				// use PID
+				left = pid.convert(left, curentLeftP);
+				right = pid.convert(right, curentRightP);
+			}
+			lastAngleTime = snapshot.getTimestamp();
+			lastAngle = robot.getOrientation();
+		}
 
-		// apply wheel speeds using sum movement executer
-		// if (false) {
-		// movementExecutor.updateState(state);
-		// movementExecutor.updateTarget(pos(stepDist).getPoint());
-		// movementExecutor.step(controller);
-		// }
+		// dampen
+		if (controllerHistory.size() > 0) {
+			double invDampening = 1 - DAMPENING_POWERCHANGE;
 
+			left = (invDampening * left)
+					+ (DAMPENING_POWERCHANGE * controllerHistory.get(
+							controllerHistory.size() - 1).getPowerLeft());
+			right = (invDampening * right)
+					+ (DAMPENING_POWERCHANGE * controllerHistory.get(
+							controllerHistory.size() - 1).getPowerRight());
+		}
+
+		System.out.println(left + "\t\t" + right);
+
+		controller.setWheelSpeeds((int) left, (int) right);
+		controllerHistory.add(new ControllerHistoryElement((int) left,
+				(int) right, System.currentTimeMillis()));
+	}
+
+	/**
+	 * Use the simulator to predict where the robot is after the latency
+	 * Globals.SIMULATED_VISON_DELAY. This relies on controllerHistory being up
+	 * to date;
+	 * 
+	 * @param s
+	 *            Snapshot representing the world Globals.SIMULATED_VISON_DELAY
+	 *            ms ago
+	 * @return Estimated snapshot of where the robots actually are
+	 */
+	private Snapshot getLatencyAdjustedSnapshot(Snapshot s) {
+		if(world == null) {
+			world = new BasicWorld(true, false, s.getPitch());
+			simulator.getReader().addListener(world);
+			simulator.getReader().propagateGoals();
+			simulator.getReader().propagatePitchSize();
+			controllerHistory.add(new ControllerHistoryElement(0, 0, 0));
+
+		}
+		long currentTime = System.currentTimeMillis();
+		long simulatorTime = s.getTimestamp();
+		System.out.println(currentTime + "  " + simulatorTime);
+
+		// clean up the history (ensure there is at least one element left in
+		// history)
+		while (controllerHistory.size() > 1
+				&& controllerHistory.get(0).getTimestamp() < simulatorTime) {
+			controllerHistory.remove(0);
+		}
+
+		// setup a simulator using the current snapshot (assume we are blue)
+		float lastLPower = 0, lastRPower = 0;
+		if (controllerHistory.size() > 0) {
+			ControllerHistoryElement lastState = controllerHistory.get(0);
+			lastLPower = lastState.getPowerLeft();
+			lastRPower = lastState.getPowerRight();
+		}
+		simulator.setRobotStatesFromSnapshot(s, true, lastLPower,
+				lastRPower);
+		simulator.setStartTime(simulatorTime);
+
+		// use the controllerHistory to simulate the wheelspeeds
+		//// run a simulation while adjusting wheel speeds
+		long maxTD = 50; // low values may make this less accurate
+		for (int i = 0; i < controllerHistory.size(); i++) {
+			ControllerHistoryElement curr = controllerHistory.get(i);
+			long nextTime = currentTime;
+
+
+			if(i < controllerHistory.size() - 1)
+				nextTime = controllerHistory.get(i + 1).getTimestamp();
+			for (long tD = maxTD; simulatorTime < nextTime; tD = Math.min(
+					simulatorTime + tD, nextTime) - simulatorTime) {
+				//simulator.getBlueSoft().setWheelSpeeds(900, 900);
+				simulator.getBlueSoft().setWheelSpeeds(curr.getPowerLeft(),
+						curr.getPowerRight());
+				simulator.update(tD);
+				simulator.getWorld().step(tD / 1000f, 8, 3);
+				simulator.getReader().update();
+				simulator.getReader().propagate();
+				// System.out.println(tD);
+				// System.out
+				// .println(world.getSnapshot().getBalle().getPosition());
+				simulatorTime += tD;
+			}
+		}
+
+		// retrieve the new snapshot
+		return simulator.getSnapshot(s.getTimestamp(), s.getPitch(),
+				s.getOpponentsGoal(), s.getOwnGoal(), true);
 	}
 
 	@Override
@@ -232,12 +376,12 @@ public class BezierNav implements OrientedMovementExecutor {
 
 	private double getMinVelocityRato(double radius) {
 		double rtw = Globals.ROBOT_TRACK_WIDTH / 2;
-		return ((radius - rtw) / (radius + rtw));
+		double ratio = ((radius - rtw) / (radius + rtw));
+		return ratio + ((1 - ratio) * DAMPENING_POWERRATIO);
 	}
 
 	@Override
 	public void stop(Controller controller) {
-		// controller.kick();
 		controller.stop();
 	}
 

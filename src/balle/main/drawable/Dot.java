@@ -55,4 +55,16 @@ public class Dot implements Drawable {
 
     }
 
+    @Override
+    public void reduceVisibility() {
+        Color currentColour = getColour();
+        // Reduce the alpha by 1/10
+        Color newColour = new Color(currentColour.getRed(),
+                currentColour.getGreen(), currentColour.getBlue(),
+                currentColour.getAlpha() / 10);
+
+        setColour(newColour);
+
+    }
+
 }

@@ -35,6 +35,11 @@ public abstract class AbstractWorld implements Listener {
 
 	private final Pitch pitch;
 
+	/**
+	 * Wait on this to be notified when a new snapshot is ready
+	 */
+	public final Object snapshotWaitLock = new Object();
+
 	public AbstractWorld(boolean isBalleBlue, boolean goalIsLeft, Pitch pitch) {
 		this.balleIsBlue = isBalleBlue;
 		this.pitch = pitch;
@@ -66,10 +71,11 @@ public abstract class AbstractWorld implements Listener {
 		return balleIsBlue;
 	}
 
+	public Coord estimatedPosition(MovingPoint object, double timestep) {
+		return estimatedPosition(object, timestep, false);
+	}
+
 	/**
-	 * // TODO James: this sounds like more of a job for within strategy. NOPE!
-	 * 1) We do not want to reimplement this for all strategies 2) We DO want
-	 * the world class to use this to estimate coordinates in case vision fails!
 	 * 
 	 * Estimated position of the object after timestep (in miliseconds)
 	 * 
@@ -78,12 +84,16 @@ public abstract class AbstractWorld implements Listener {
 	 * @param timestep
 	 *            time in miliseconds after which to estiamte the position of
 	 *            the object
+	 * @param forceEstimation
+	 *            estimate the position even if MAX_ESTIMATED_FRAMES has been
+	 *            exceeded
 	 * @return new coordinate for the position of the object after timestep
 	 */
-	public Coord estimatedPosition(MovingPoint object, double timestep) {
+	public Coord estimatedPosition(MovingPoint object, double timestep,
+			boolean forceEstimation) {
 		Coord pos = object.getPosition();
 		if ((pos == null) || (object.getVelocity() == null)
-				|| pos.getEstimatedFrames() > MAX_ESTIMATED_FRAMES) {
+				|| (!forceEstimation && pos.getEstimatedFrames() > MAX_ESTIMATED_FRAMES)) {
 			return null;
 		} else if (timestep == 0) {
 			return pos;
@@ -141,7 +151,8 @@ public abstract class AbstractWorld implements Listener {
 
 		if ((pitchWidth < 0) || (pitchHeight < 0)) {
 			System.err
-					.println("Cannot update locations as pitch size is not set properly. Restart vision");
+					.println(this
+							+ "Cannot update locations as pitch size is not set properly. Restart vision");
 			return;
 		}
 
@@ -172,6 +183,14 @@ public abstract class AbstractWorld implements Listener {
 		else
 			updateScaled(yPos, yOrientation, bPos, bOrientation, ballPos,
 					timestamp);
+
+		publishSnapshotUpdate();
+	}
+
+	private final void publishSnapshotUpdate() {
+		synchronized (snapshotWaitLock) {
+			snapshotWaitLock.notifyAll();
+		}
 	}
 
 	@Override
@@ -261,4 +280,6 @@ public abstract class AbstractWorld implements Listener {
 			out = each.filter(out);
 		return out;
 	}
+
+	public abstract Snapshot estimateAt(long time);
 }

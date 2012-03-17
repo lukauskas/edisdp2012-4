@@ -1,5 +1,7 @@
 package balle.controller;
 
+import java.util.ArrayList;
+
 import balle.bluetooth.Communicator;
 import balle.bluetooth.messages.InvalidArgumentException;
 import balle.bluetooth.messages.InvalidOpcodeException;
@@ -8,9 +10,12 @@ import balle.bluetooth.messages.MessageMove;
 import balle.bluetooth.messages.MessageRotate;
 import balle.bluetooth.messages.MessageStop;
 import balle.brick.BrickController;
+import balle.strategy.bezierNav.ControllerHistoryElement;
 
 public class BluetoothController implements Controller {
     Communicator connection;
+
+	protected ArrayList<ControllerListener> listeners = new ArrayList<ControllerListener>();
 
     public BluetoothController(Communicator communicator) {
         connection = communicator;
@@ -33,6 +38,7 @@ public class BluetoothController implements Controller {
     public void stop() {
         try {
             connection.send(new MessageStop(0).hash());
+			propogate(0, 0);
         } catch (InvalidOpcodeException e) {
             System.err.println("Failed to send message STOP -- invalid opcode");
         } catch (InvalidArgumentException e) {
@@ -62,6 +68,7 @@ public class BluetoothController implements Controller {
     public void backward(int speed) {
         try {
             connection.send(new MessageMove(-speed, -speed).hash());
+			propogate(-speed, -speed);
         } catch (InvalidOpcodeException e) {
             System.err
                     .println("Failed to send message BACKWARD -- invalid opcode");
@@ -81,6 +88,7 @@ public class BluetoothController implements Controller {
     public void forward(int speed) {
         try {
             connection.send(new MessageMove(speed, speed).hash());
+			propogate(speed, speed);
         } catch (InvalidOpcodeException e) {
             System.err
                     .println("Failed to send message FORWARD -- invalid opcode");
@@ -109,6 +117,7 @@ public class BluetoothController implements Controller {
         try {
             connection.send(new MessageMove(leftWheelSpeed, rightWheelSpeed)
                     .hash());
+			propogate(leftWheelSpeed, rightWheelSpeed);
         } catch (InvalidOpcodeException e) {
             System.err
                     .println("Failed to send message SETWHEELSPEEDS -- invalid opcode");
@@ -141,6 +150,18 @@ public class BluetoothController implements Controller {
     public boolean isReady() {
         return connection.isConnected();
     }
+
+	@Override
+	public void addListener(ControllerListener cl) {
+		listeners.add(cl);
+	}
+
+	protected void propogate(int left, int right) {
+		ControllerHistoryElement che = new ControllerHistoryElement(left,
+				right, System.currentTimeMillis());
+		for (ControllerListener cl : listeners)
+			cl.commandSent(che);
+	}
 
 /*	@Override
 	public void gentleKick(int speed, int angle) {

@@ -2,6 +2,7 @@ package balle.world.filter;
 
 import balle.misc.Globals;
 import balle.world.Coord;
+import balle.world.MutableSnapshot;
 import balle.world.Snapshot;
 import balle.world.objects.Robot;
 
@@ -38,22 +39,26 @@ public class HeightFilter implements Filter {
 
 	@Override
 	public Snapshot filter(Snapshot s) {
+		MutableSnapshot ms = s.unpack();
 		Robot nBalle = s.getBalle();
 		if (nBalle.getPosition() != null && !nBalle.getPosition().isEstimated()) {
-			nBalle = new Robot(filter(s.getBalle().getPosition(),
+			ms.setBalle(new Robot(filter(s.getBalle().getPosition(),
 					Globals.ROBOT_HEIGHT), s.getBalle().getVelocity(), s
-					.getBalle().getOrientation());
+					.getBalle().getAngularVelocity(), s
+.getBalle()
+					.getOrientation()));
 		}
 
 		Robot nOpp = s.getOpponent();
 		if (nOpp.getPosition() != null && !nOpp.getPosition().isEstimated()) {
-			nOpp = new Robot(filter(s.getOpponent().getPosition(),
+			ms.setOpponent(new Robot(filter(s.getOpponent().getPosition(),
 					Globals.ROBOT_HEIGHT), s.getOpponent().getVelocity(), s
-					.getOpponent().getOrientation());
+					.getOpponent().getAngularVelocity(), s
+.getOpponent()
+					.getOrientation()));
 		}
 
-		return new Snapshot(nOpp, nBalle, s.getBall(), s.getOpponentsGoal(),
-				s.getOwnGoal(), s.getPitch(), s.getTimestamp());
+		return ms.pack();
 	}
 
 	public Coord filter(Coord in, double height) {

@@ -1,6 +1,7 @@
 package balle.world.objects;
 
 import balle.misc.Globals;
+import balle.world.AngularVelocity;
 import balle.world.Coord;
 import balle.world.Line;
 import balle.world.Orientation;
@@ -8,8 +9,10 @@ import balle.world.Velocity;
 
 public class Robot extends RectangularObject {
 
-    public Robot(Coord position, Velocity velocity, Orientation orientation) {
-        super(position, velocity, orientation, Globals.ROBOT_WIDTH,
+	public Robot(Coord position, Velocity velocity,
+			AngularVelocity angularVelocity, Orientation orientation) {
+		super(position, velocity, angularVelocity, orientation,
+				Globals.ROBOT_WIDTH,
                 Globals.ROBOT_LENGTH);
     }
 
@@ -100,7 +103,8 @@ public class Robot extends RectangularObject {
      */
     public boolean isInScoringPosition(Ball ball, Goal goal, Robot otherRobot) {
         return possessesBall(ball) && isFacingGoal(goal)
-                && !otherRobot.intersects(getFacingLine());
+                && ((otherRobot.getPosition() != null) && (!otherRobot
+                        .intersects(getFacingLine())));
     }
 
     /**
