@@ -281,5 +281,4 @@ public abstract class AbstractWorld implements Listener {
 		return out;
 	}
 
-	public abstract Snapshot estimateAt(long time);
 }
