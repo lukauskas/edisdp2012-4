@@ -167,10 +167,4 @@ public class BasicWorld extends AbstractWorld {
 		}
 	}
 
-	@Override
-	public Snapshot estimateAt(long time) {
-		System.err.println("Basic world used to estimate snapshot.");
-		return null;
-	}
-
 }
