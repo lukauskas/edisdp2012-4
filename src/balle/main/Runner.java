@@ -179,7 +179,7 @@ public class Runner {
 			boolean goalIsLeft,
 			boolean useDummyController, StrategyLogPane strategyLog) {
 
-		AbstractWorld world;
+        SimulatedWorld world;
 		SocketVisionReader visionInput;
 		Controller controllerA;
 
@@ -210,10 +210,13 @@ public class Runner {
 			continue;
 		}
 
-		initialiseGUI(controllerA, null, world, null, strategyLog, null);
+
+        controllerA.addListener(world);
 		// Create visionInput buffer
 		visionInput = new SocketVisionReader();
 		visionInput.addListener(world);
+
+        initialiseGUI(controllerA, null, world, null, strategyLog, null);
 	}
 
 	public static void runSimulator(boolean balleIsBlue, boolean goalIsLeft,

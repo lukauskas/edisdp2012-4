@@ -16,6 +16,7 @@ import org.apache.log4j.Logger;
 
 import balle.main.drawable.Drawable;
 import balle.main.drawable.DrawableLine;
+import balle.main.drawable.DrawableVector;
 import balle.main.drawable.Label;
 import balle.misc.Globals;
 import balle.simulator.SnapshotPredictor;
@@ -24,6 +25,7 @@ import balle.world.Coord;
 import balle.world.Line;
 import balle.world.Scaler;
 import balle.world.Snapshot;
+import balle.world.Velocity;
 import balle.world.objects.Ball;
 import balle.world.objects.Goal;
 import balle.world.objects.Robot;
@@ -192,14 +194,6 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 				drawRobot(g, Color.RED, s.getOpponent());
                 drawBall(g, Color.RED, s);
 				drawGoals(g);
-
-
-				// Draw predicted ball pos.
-				Snapshot ss = getSnapshot().getSnapshotPredictor()
-						.getSnapshotAfterTime(4000);
-				if (ss != null) {
-					drawBall(g, Color.PINK, ss);
-				}
 			}
 		}
 
@@ -234,15 +228,13 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 
 
 
-            // Velocity vel = ball.getVelocity();
-            // DrawableVector velocityVec = new
-            // DrawableVector(ball.getPosition(),
-            // vel.mult(4000),
-            // Color.CYAN);
-            // velocityVec.draw(g, scaler);
+            Velocity vel = ball.getVelocity();
+            DrawableVector velocityVec = new DrawableVector(ball.getPosition(),
+                    vel.mult(4000), Color.CYAN);
+            velocityVec.draw(g, scaler);
 
             SnapshotPredictor sp = snapshot.getSnapshotPredictor();
-            Snapshot laterSnapshot = sp.getSnapshotAfterTime(40);
+			Snapshot laterSnapshot = sp.getSnapshotAfterTime(200);
 
             Coord newBallPos = laterSnapshot.getBall().getPosition();
             if (newBallPos == null)
@@ -250,6 +242,10 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 
             DrawableLine directionLine = new DrawableLine(new Line(pos, newBallPos), Color.WHITE);
             directionLine.draw(g, scaler);
+			g.setColor(Color.PINK);
+			g.fillOval((int) (scaler.m2PX(newBallPos.getX()) - (w / 2)),
+					(int) (scaler.m2PY(newBallPos.getY()) - (w / 2)), (int) w,
+					(int) w);
 
 		}
 
