@@ -192,6 +192,14 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 				drawRobot(g, Color.RED, s.getOpponent());
                 drawBall(g, Color.RED, s);
 				drawGoals(g);
+
+
+				// Draw predicted ball pos.
+				Snapshot ss = getSnapshot().getSnapshotPredictor()
+						.getSnapshotAfterTime(4000);
+				if (ss != null) {
+					drawBall(g, Color.PINK, ss);
+				}
 			}
 		}
 

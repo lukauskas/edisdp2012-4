@@ -161,7 +161,13 @@ public class SnapshotPredictor extends WorldSimulator {
             yellow.setPosition(new Coord(0, -100), new Orientation(0));
             yellow.getBody().setLinearVelocity(new Vec2(0, 0));
         }
-        setBallPosition(ball.getPosition().mult(SCALE), ball.getVelocity());
+
+		// Can see ball.
+		if (ball != null) {
+			setBallPosition(ball.getPosition().mult(SCALE), ball.getVelocity());
+		} else {
+			setBallPosition(new Coord(0, 0), new Velocity(0, 0, 1));
+		}
     }
 
     public Snapshot getSnapshotAfterTime(long deltaTime) {
