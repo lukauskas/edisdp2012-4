@@ -66,6 +66,21 @@ public class Velocity extends Coord {
         return ans;
     }
 
+    public Velocity div(double scalar) {
+        return mult(1 / scalar);
+    }
+
+    public Velocity add(Velocity v) {
+        Velocity adjustedV = v.adjustLength(getTimeDelta());
+        double x1 = getX() * getTimeDelta();
+        double y1 = getY() * getTimeDelta();
+        double x2 = adjustedV.getX() * getTimeDelta();
+        double y2 = adjustedV.getY() * getTimeDelta();
+        
+        return new Velocity(x1 + x2, y1 + y2, getTimeDelta(),
+                getEstimatedFrames());
+    }
+
     public double getTimeDelta() {
         return timeDelta;
     }

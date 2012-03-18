@@ -185,7 +185,7 @@ public class WorldSimulator {
         setBallPosition(pos);
         Vec2 vel2 = vel.vec2(SCALE);
 		ball.setLinearVelocity(vel2.mul(Globals.ARBITRARY_BALL_VEL_SCALING));
-        LOG.trace("Set ball velocity: " + vel2);
+
     }
 	public void randomiseBallPosition() {
 		setBallPosition(new Coord(Math.random() * Globals.PITCH_WIDTH * SCALE,
@@ -357,8 +357,6 @@ public class WorldSimulator {
 			Vec2 ballPos = convPos(ball.getPosition());
 			ballPosX = ballPos.x;
 			ballPosY = ballPos.y;
-
-            LOG.trace("Ball linear velocity: " + ball.getLinearVelocity());
 
 			long timestamp = getTimeStamp();
 
