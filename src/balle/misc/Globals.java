@@ -69,6 +69,7 @@ public class Globals {
 	public static final float MAX_ROBOT_LINEAR_ACCEL = 4f; // m/s^2
 	public static final float MAX_ROBOT_ANG_ACCEL = 700f; // r/s^2
 	public static final float MAX_MOTOR_POWER_ACCEL = 5000f; // p/s^2
+	public static final float arbitary_ball_vel_scaling = 0;
 
     public static float powerToVelocity(float p) {
         if (p > MAXIMUM_MOTOR_SPEED)
