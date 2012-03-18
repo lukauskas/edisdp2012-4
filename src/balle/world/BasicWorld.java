@@ -10,16 +10,22 @@ public class BasicWorld extends AbstractWorld {
 
     private static final Logger LOG = Logger.getLogger(BasicWorld.class);
 
-	protected Snapshot prev;
+	protected Snapshot prev, prevRaw;
 
 	public BasicWorld(boolean balleIsBlue, boolean goalIsLeft, Pitch pitch) {
 		super(balleIsBlue, goalIsLeft, pitch);
 		prev = new EmptySnapshot(getOpponentsGoal(), getOwnGoal(), getPitch());
+		prevRaw = new EmptySnapshot(getOpponentsGoal(), getOwnGoal(),
+				getPitch());
 	}
 
 	@Override
 	public synchronized Snapshot getSnapshot() {
 		return prev;
+	}
+
+	public synchronized Snapshot getSnapshotRaw() {
+		return prevRaw;
 	}
 
 	private Coord subtractOrNull(Coord a, Coord b) {
@@ -73,7 +79,7 @@ public class BasicWorld extends AbstractWorld {
 		Robot them = null;
 		Ball ball = null;
 
-		Snapshot prev = getSnapshot();
+		Snapshot prev = getSnapshotRaw();
 
 		// Check if the new positions make sense. For instance, discard
 		// the ones that are unreasonably far away from the previous one
@@ -120,7 +126,7 @@ public class BasicWorld extends AbstractWorld {
 				: new Velocity(0, 0, 1, 1);
 		ballVel = ballDPos != null ? new Velocity(ballDPos, deltaT)
 				: new Velocity(0, 0, 1, 1);
-
+		LOG.trace("Ball velocity (BW): " + ballVel);
 
 		AngularVelocity oursAngVel = null, themAngVel = null;
 		if (ourOrientation == null) {
@@ -148,9 +154,11 @@ public class BasicWorld extends AbstractWorld {
 		ours = new Robot(ourPosition, oursVel, oursAngVel, ourOrientation);
 		ball = new Ball(ballPosition, ballVel);
 
-		// pack into a snapshot
-        Snapshot nextSnapshot = filter(new Snapshot(them, ours, ball,
-				getOpponentsGoal(), getOwnGoal(), getPitch(), timestamp));
+		// pack into a snapshot, and update prev/prevRaw
+		Snapshot nextSnapshot = new Snapshot(them, ours, ball,
+				getOpponentsGoal(), getOwnGoal(), getPitch(), timestamp);
+		nextSnapshot = filter(nextSnapshot);
+		this.prevRaw = nextSnapshot;
         updateSnapshot(nextSnapshot);
     }
 
@@ -163,6 +171,8 @@ public class BasicWorld extends AbstractWorld {
 		super.updatePitchSize(width, height);
 		synchronized (this) {
 			this.prev = new EmptySnapshot(getOpponentsGoal(), getOwnGoal(),
+					getPitch());
+			this.prevRaw = new EmptySnapshot(getOpponentsGoal(), getOwnGoal(),
 					getPitch());
 		}
 	}
