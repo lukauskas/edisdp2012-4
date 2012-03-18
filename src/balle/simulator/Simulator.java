@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
+import org.apache.log4j.Logger;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.testbed.framework.TestbedFrame;
 import org.jbox2d.testbed.framework.TestbedModel;
@@ -21,6 +22,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 	private long lastFrameTime;
 
     private WorldSimulator worldWrapper = new WorldSimulator(false);
+    private static final Logger LOG = Logger.getLogger(Simulator.class);
 
 	public SoftBot getBlueSoft() {
 		return worldWrapper.getBlueSoft();

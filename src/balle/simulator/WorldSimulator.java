@@ -3,6 +3,7 @@ package balle.simulator;
 import java.util.LinkedList;
 import java.util.Random;
 
+import org.apache.log4j.Logger;
 import org.jbox2d.collision.Collision;
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
@@ -20,6 +21,7 @@ import balle.misc.Globals;
 import balle.world.Coord;
 import balle.world.Orientation;
 import balle.world.Snapshot;
+import balle.world.Velocity;
 
 public class WorldSimulator {
 
@@ -46,6 +48,8 @@ public class WorldSimulator {
 
 	private long visionDelay = Globals.SIMULATED_VISON_DELAY;
 	private long simulatorTimestamp;
+
+    private static final Logger LOG = Logger.getLogger(WorldSimulator.class);
 
 	// Increases sizes, but keeps real-world SCALE; jbox2d acts unrealistically
 	// at a small SCALE
@@ -168,6 +172,12 @@ public class WorldSimulator {
 		}
 	}
 
+    protected void setBallPosition(Coord pos, Velocity vel) {
+        setBallPosition(pos);
+        Vec2 vel2 = vel.vec2(SCALE);
+        ball.setLinearVelocity(vel2.mul(10));
+        LOG.trace("Set ball velocity: " + vel2);
+    }
 	public void randomiseBallPosition() {
 		setBallPosition(new Coord(Math.random() * Globals.PITCH_WIDTH * SCALE,
 				Math.random() * Globals.PITCH_HEIGHT * SCALE));
@@ -236,6 +246,8 @@ public class WorldSimulator {
 	 * here.
 	 */
 	public class SimulatorReader extends Reader {
+
+
 		LinkedList<VisionPackage> history = new LinkedList<VisionPackage>();
 
 		private long getTimeStamp() {
@@ -311,6 +323,8 @@ public class WorldSimulator {
 			Vec2 ballPos = convPos(ball.getPosition());
 			ballPosX = ballPos.x;
 			ballPosY = ballPos.y;
+
+            LOG.trace("Ball linear velocity: " + ball.getLinearVelocity());
 
 			long timestamp = getTimeStamp();
 

@@ -1,10 +1,14 @@
 package balle.world;
 
+import org.apache.log4j.Logger;
+
 import balle.world.objects.Ball;
 import balle.world.objects.Pitch;
 import balle.world.objects.Robot;
 
 public class BasicWorld extends AbstractWorld {
+
+    private static final Logger LOG = Logger.getLogger(BasicWorld.class);
 
 	protected Snapshot prev;
 
@@ -116,6 +120,7 @@ public class BasicWorld extends AbstractWorld {
 				: new Velocity(0, 0, 1, 1);
 		ballVel = ballDPos != null ? new Velocity(ballDPos, deltaT)
 				: new Velocity(0, 0, 1, 1);
+        LOG.trace("Ball velocity (BW): " + ballVel);
 
 		AngularVelocity oursAngVel = null, themAngVel = null;
 		if (ourOrientation == null) {

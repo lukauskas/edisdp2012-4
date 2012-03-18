@@ -2,6 +2,7 @@ package balle.simulator;
 
 import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.World;
@@ -26,6 +27,8 @@ public class SnapshotPredictor extends WorldSimulator {
     private final Goal                                ownGoal;
 
     private final Pitch                               pitch;
+
+    private final Logger LOG = Logger.getLogger(SnapshotPredictor.class);
 
     /**
      * Create new snapshot predictor
@@ -139,7 +142,7 @@ public class SnapshotPredictor extends WorldSimulator {
         if (bRobot.getPosition() != null) {
             blue.setPosition(bRobot.getPosition().mult(SCALE), bRobot.getOrientation());
 
-            blue.getBody().setLinearVelocity(bRobot.getVelocity().vec2());
+            blue.getBody().setLinearVelocity(bRobot.getVelocity().vec2(SCALE));
         } else {
             // Place blue robot miles off the pitch.
             // TODO: I DON'T LIKE THIS -- find a way to fix it - Saulius
@@ -150,15 +153,15 @@ public class SnapshotPredictor extends WorldSimulator {
         // Can see yellow robot.
         if (yRobot.getPosition() != null) {
             yellow.setPosition(yRobot.getPosition().mult(SCALE), yRobot.getOrientation());
-            yellow.getBody().setLinearVelocity(yRobot.getVelocity().vec2());
+            yellow.getBody()
+                    .setLinearVelocity(yRobot.getVelocity().vec2(SCALE));
         } else {
             // Place yellow robot miles off the pitch.
             // TODO: I DON'T LIKE THIS -- find a way to fix it - Saulius
             yellow.setPosition(new Coord(0, -100), new Orientation(0));
             yellow.getBody().setLinearVelocity(new Vec2(0, 0));
         }
-
-        setBallPosition(ball.getPosition().mult(SCALE));
+        setBallPosition(ball.getPosition().mult(SCALE), ball.getVelocity());
     }
 
     public Snapshot getSnapshotAfterTime(long deltaTime) {
@@ -191,8 +194,9 @@ public class SnapshotPredictor extends WorldSimulator {
         balle.world.objects.Robot ourRobot = getRobotFromBody(getBlueSoft().getBody());
         balle.world.objects.Robot opponent = getRobotFromBody(getYellowSoft().getBody());
       
-        balle.world.objects.Ball ball = new Ball(v2C(ballBody.getPosition()).div(SCALE),
-                new Velocity(v2C(ballBody.getLinearVelocity()).div(SCALE), 1000));
+        balle.world.objects.Ball ball = new Ball(v2C(ballBody.getPosition())
+                .div(SCALE), Velocity.fromVec2(ballBody.getLinearVelocity(),
+                SCALE));
         
         return new Snapshot(opponent, ourRobot, ball, getOpponentsGoal(), getOwnGoal(), getPitch(),
                 getSimulatorTimestamp(), getControllerHistory());

@@ -224,8 +224,18 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
                     .getPosition().getY() - ball.getRadius() * 3), Color.RED);
             ballSpeedLabel.draw(g, scaler);
 
+
+
+            // Velocity vel = ball.getVelocity();
+            // DrawableVector velocityVec = new
+            // DrawableVector(ball.getPosition(),
+            // vel.mult(4000),
+            // Color.CYAN);
+            // velocityVec.draw(g, scaler);
+
             SnapshotPredictor sp = snapshot.getSnapshotPredictor();
-            Snapshot laterSnapshot = sp.getSnapshotAfterTime(200);
+            Snapshot laterSnapshot = sp.getSnapshotAfterTime(40);
+
             Coord newBallPos = laterSnapshot.getBall().getPosition();
             if (newBallPos == null)
                 return;
