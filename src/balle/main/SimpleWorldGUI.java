@@ -234,7 +234,7 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
             velocityVec.draw(g, scaler);
 
             SnapshotPredictor sp = snapshot.getSnapshotPredictor();
-			Snapshot laterSnapshot = sp.getSnapshotAfterTime(200);
+			Snapshot laterSnapshot = sp.getSnapshotAfterTime(1000);
 
             Coord newBallPos = laterSnapshot.getBall().getPosition();
             if (newBallPos == null)
