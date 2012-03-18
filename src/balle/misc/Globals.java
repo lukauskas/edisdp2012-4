@@ -55,6 +55,9 @@ public class Globals {
     // TODO: SAULIUS this is just a temp fix for M3, change back to 50 for
     public static final double OVERSHOOT_ANGLE_EPSILON = 0; // Degrees
 
+    public static final long BALL_POSITION_ESTIMATE_MAX_STEP = 1000; // ms
+    public static final long BALL_POSITION_ESTIMATE_DRAW_STEP = 100; // ms
+
 	// static final
 	// Vec2
 	// ROBOT_LEFT_WHEEL_POS
@@ -69,7 +72,7 @@ public class Globals {
 	public static final float MAX_ROBOT_LINEAR_ACCEL = 4f; // m/s^2
 	public static final float MAX_ROBOT_ANG_ACCEL = 700f; // r/s^2
 	public static final float MAX_MOTOR_POWER_ACCEL = 5000f; // p/s^2
-	public static final float arbitary_ball_vel_scaling = 0;
+    public static final float ARBITRARY_BALL_VEL_SCALING = 100;
 
     public static float powerToVelocity(float p) {
         if (p > MAXIMUM_MOTOR_SPEED)

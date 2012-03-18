@@ -184,7 +184,7 @@ public class WorldSimulator {
     protected void setBallPosition(Coord pos, Velocity vel) {
         setBallPosition(pos);
         Vec2 vel2 = vel.vec2(SCALE);
-		ball.setLinearVelocity(vel2.mul(Globals.arbitary_ball_vel_scaling));
+		ball.setLinearVelocity(vel2.mul(Globals.ARBITRARY_BALL_VEL_SCALING));
         LOG.trace("Set ball velocity: " + vel2);
     }
 	public void randomiseBallPosition() {

@@ -14,6 +14,7 @@ import javax.swing.UIManager;
 
 import org.apache.log4j.Logger;
 
+import balle.main.drawable.Dot;
 import balle.main.drawable.Drawable;
 import balle.main.drawable.DrawableLine;
 import balle.main.drawable.DrawableVector;
@@ -197,6 +198,12 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 			}
 		}
 
+        private Color changeAlpha(Color color, double ratio) {
+            Color newColor = new Color(color.getRed(), color.getGreen(),
+                    color.getBlue(), (int) (color.getAlpha() * ratio));
+            return newColor;
+        }
+
         private void drawBall(Graphics g, Color c, Snapshot snapshot) {
 			// TODO: Use ball.getRadius() instead of constants here
 
@@ -234,19 +241,29 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
             velocityVec.draw(g, scaler);
 
             SnapshotPredictor sp = snapshot.getSnapshotPredictor();
-			Snapshot laterSnapshot = sp.getSnapshotAfterTime(1000);
+            Coord lastPos = pos;
+            Color lineColor = Color.WHITE;
+            Color ballColor = changeAlpha(c, 0.8);
 
-            Coord newBallPos = laterSnapshot.getBall().getPosition();
-            if (newBallPos == null)
-                return;
+            for (int lastEstimateAfter = 0; lastEstimateAfter < Globals.BALL_POSITION_ESTIMATE_MAX_STEP; lastEstimateAfter += Globals.BALL_POSITION_ESTIMATE_DRAW_STEP) {
+                Snapshot laterSnapshot = sp
+                        .getSnapshotAfterTime(Globals.BALL_POSITION_ESTIMATE_DRAW_STEP);
+                Coord newBallPos = laterSnapshot.getBall().getPosition();
+                if (newBallPos == null)
+                    break;
 
-            DrawableLine directionLine = new DrawableLine(new Line(pos, newBallPos), Color.WHITE);
-            directionLine.draw(g, scaler);
-			g.setColor(Color.PINK);
-			g.fillOval((int) (scaler.m2PX(newBallPos.getX()) - (w / 2)),
-					(int) (scaler.m2PY(newBallPos.getY()) - (w / 2)), (int) w,
-					(int) w);
+                DrawableLine directionLine = new DrawableLine(new Line(lastPos,
+                        newBallPos), lineColor);
+                directionLine.draw(g, scaler);
+                lastPos = newBallPos;
 
+                Dot ballDot = new Dot(newBallPos, ballColor);
+                ballDot.draw(g, scaler);
+
+                // Fade the colours
+                lineColor = changeAlpha(lineColor, 0.7);
+                ballColor = changeAlpha(ballColor, 0.8);
+            }
 		}
 
 		private void drawRobot(Graphics g, Color c, Robot robot) {
