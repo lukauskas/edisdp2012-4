@@ -192,16 +192,41 @@ public class WorldSimulator {
 				Math.random() * Globals.PITCH_HEIGHT * SCALE));
 	}
 
-	public void randomiseRobotPositions() {
-		yellow.setPosition(new Coord((Math.random() * Globals.PITCH_WIDTH)
-				* SCALE, (Math.random() * Globals.PITCH_HEIGHT) * SCALE),
-				new Orientation(Math.random() * 360, false));
-		blue.setPosition(new Coord((Math.random() * Globals.PITCH_WIDTH)
-				* SCALE, (Math.random() * Globals.PITCH_HEIGHT) * SCALE),
-				new Orientation(Math.random() * 360, false));
-	}
+    public void setBlueRobotPosition(Coord c, Orientation o) {
+        if (blue != null) {
+            destroyRobot(blue, blueSoft);
+        }
 
-	public void resetBallPosition() {
+        if (c != null) {
+            blue = new Robot(new Vec2((float) c.getX(), (float) c.getY()),
+                    (float) o.degrees());
+            blueSoft.setBody(blue.getBody());
+        }
+    }
+
+    public void setYellowRobotPosition(Coord c, Orientation o) {
+        if (yellow != null) {
+            destroyRobot(yellow, yellowSoft);
+        }
+
+        if (c != null) {
+            yellow = new Robot(new Vec2((float) c.getX(), (float) c.getY()),
+                    (float) o.degrees());
+            yellowSoft.setBody(yellow.getBody());
+        }
+    }
+
+    public void randomiseRobotPositions() {
+        setBlueRobotPosition(new Coord((Math.random() * Globals.PITCH_WIDTH)
+                * SCALE, (Math.random() * Globals.PITCH_HEIGHT) * SCALE),
+                new Orientation(Math.random() * 360, false));
+
+        setYellowRobotPosition(new Coord((Math.random() * Globals.PITCH_WIDTH)
+                * SCALE, (Math.random() * Globals.PITCH_HEIGHT) * SCALE),
+                new Orientation(Math.random() * 360, false));
+    }
+
+    public void resetBallPosition() {
 
 		if (ball != null) {
 			world.destroyBody(ball);
