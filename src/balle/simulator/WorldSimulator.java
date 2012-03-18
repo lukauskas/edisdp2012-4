@@ -275,7 +275,7 @@ public class WorldSimulator {
 		yellowSoft.setBody(yellow.getBody());
 	}
 
-	/*
+	/**
 	 * Output to World: All code refering to the output from the simulator goes
 	 * here.
 	 */
@@ -665,7 +665,9 @@ public class WorldSimulator {
 	/**
 	 * sets the robot positions and linear velocities from a given snapshot
 	 * (ball is taken off the field)
+	 * 
 	 */
+	@Deprecated
 	public void setRobotStatesFromSnapshot(Snapshot s, boolean balleIsBlue,
 			float lastLPower, float lastRPower) {
 
@@ -695,20 +697,4 @@ public class WorldSimulator {
 				new Vec2((float) op.getX(), (float) op.getY()),
 				(float) o.getOrientation().radians());
 	}
-
-
-
-	/**
-	 * Factory Method.
-	 * 
-	 * @return SimulatorWorld with no noise.
-	 */
-	public static WorldSimulator createSimulatorWorld() {
-		WorldSimulator newSimulatorWorld = new WorldSimulator(false);
-		newSimulatorWorld.setWorld(new World(new Vec2(), true));
-		newSimulatorWorld.initWorld();
-		newSimulatorWorld.setVisionDelay(0);
-		return newSimulatorWorld;
-	}
-
 }
