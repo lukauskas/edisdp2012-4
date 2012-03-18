@@ -47,6 +47,7 @@ public class SimulatedWorld extends BasicWorld implements ControllerListener {
     @Override
     protected void updateSnapshot(Snapshot nextSnapshot) {
         MutableSnapshot unpackedSnapshot = nextSnapshot.unpack();
+        // TODO: move this to basic world!
         unpackedSnapshot
                 .setControllerHistory((ArrayList<ControllerHistoryElement>) controllerHistory
                         .clone());

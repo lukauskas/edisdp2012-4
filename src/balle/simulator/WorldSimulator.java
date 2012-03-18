@@ -36,8 +36,8 @@ public class WorldSimulator {
 	public Robot blue;
 	protected Robot yellow;
 
-	private final SoftBot blueSoft = new SoftBot();
-	private final SoftBot yellowSoft = new SoftBot();
+    protected final SoftBot blueSoft = new SoftBot();
+    protected final SoftBot yellowSoft = new SoftBot();
 
 	private SimulatorReader reader = new SimulatorReader();
 
@@ -152,6 +152,15 @@ public class WorldSimulator {
 
 	}
 
+    protected void destroyBody(Body body) {
+        world.destroyBody(body);
+    }
+
+    protected void destroyRobot(Robot robot, SoftBot softBot) {
+        world.destroyBody(robot.getBody());
+        world.destroyBody(robot.kicker);
+        softBot.setBody(null);
+    }
 	protected void setBallPosition(Coord pos) {
 		if (ball != null)
 			world.destroyBody(ball);
