@@ -1,7 +1,7 @@
 import math
 
 import cv
-from SimpleCV import Image, Features, DrawingLayer, BlobMaker
+from SimpleCV import Image, Features, DrawingLayer, BlobMaker, Color
 from threshold import Threshold
 
 class Features:
@@ -119,7 +119,9 @@ class Entity:
         if self._angle is None:
             # Use moments to do magic things.
             # (finds precise line through blob)
-            mask = feature.crop().getGrayscaleMatrix()
+            #mask = feature.crop().getGrayscaleMatrix()
+
+            mask = feature.getHullMask().getGrayscaleMatrix()
 
             m = cv.Moments(mask, 1)
 
