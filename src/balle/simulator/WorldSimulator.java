@@ -3,6 +3,7 @@ package balle.simulator;
 import java.util.LinkedList;
 import java.util.Random;
 
+import org.apache.log4j.Logger;
 import org.jbox2d.collision.Collision;
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
@@ -20,6 +21,7 @@ import balle.misc.Globals;
 import balle.world.Coord;
 import balle.world.Orientation;
 import balle.world.Snapshot;
+import balle.world.Velocity;
 
 public class WorldSimulator {
 
@@ -34,8 +36,8 @@ public class WorldSimulator {
 	public Robot blue;
 	protected Robot yellow;
 
-	private final SoftBot blueSoft = new SoftBot();
-	private final SoftBot yellowSoft = new SoftBot();
+    protected final SoftBot blueSoft = new SoftBot();
+    protected final SoftBot yellowSoft = new SoftBot();
 
 	private SimulatorReader reader = new SimulatorReader();
 
@@ -46,6 +48,8 @@ public class WorldSimulator {
 
 	private long visionDelay = Globals.SIMULATED_VISON_DELAY;
 	private long simulatorTimestamp;
+
+    private static final Logger LOG = Logger.getLogger(WorldSimulator.class);
 
 	// Increases sizes, but keeps real-world SCALE; jbox2d acts unrealistically
 	// at a small SCALE
@@ -89,8 +93,10 @@ public class WorldSimulator {
 	}
 
 	public void update(long dt) {
-		blue.updateRobot(blueSoft, dt);
-		yellow.updateRobot(yellowSoft, dt);
+		if ((blue != null) && (blueSoft.getBody() != null))
+			blue.updateRobot(blueSoft, dt);
+		if ((yellow != null) && (yellowSoft.getBody() != null))
+			yellow.updateRobot(yellowSoft, dt);
 	}
 
 	public void initWorld() {
@@ -148,6 +154,15 @@ public class WorldSimulator {
 
 	}
 
+    protected void destroyBody(Body body) {
+        world.destroyBody(body);
+    }
+
+    protected void destroyRobot(Robot robot, SoftBot softBot) {
+        world.destroyBody(robot.getBody());
+        world.destroyBody(robot.kicker);
+        softBot.setBody(null);
+    }
 	protected void setBallPosition(Coord pos) {
 		if (ball != null)
 			world.destroyBody(ball);
@@ -168,21 +183,52 @@ public class WorldSimulator {
 		}
 	}
 
+    protected void setBallPosition(Coord pos, Velocity vel) {
+        setBallPosition(pos);
+        Vec2 vel2 = vel.vec2(SCALE);
+		ball.setLinearVelocity(vel2.mul(Globals.ARBITRARY_BALL_VEL_SCALING));
+
+    }
 	public void randomiseBallPosition() {
 		setBallPosition(new Coord(Math.random() * Globals.PITCH_WIDTH * SCALE,
 				Math.random() * Globals.PITCH_HEIGHT * SCALE));
 	}
 
-	public void randomiseRobotPositions() {
-		yellow.setPosition(new Coord((Math.random() * Globals.PITCH_WIDTH)
-				* SCALE, (Math.random() * Globals.PITCH_HEIGHT) * SCALE),
-				new Orientation(Math.random() * 360, false));
-		blue.setPosition(new Coord((Math.random() * Globals.PITCH_WIDTH)
-				* SCALE, (Math.random() * Globals.PITCH_HEIGHT) * SCALE),
-				new Orientation(Math.random() * 360, false));
-	}
+	protected void setBlueRobotPosition(Coord c, Orientation o) {
+        if (blue != null) {
+            destroyRobot(blue, blueSoft);
+        }
 
-	public void resetBallPosition() {
+        if (c != null) {
+            blue = new Robot(new Vec2((float) c.getX(), (float) c.getY()),
+                    (float) o.degrees());
+            blueSoft.setBody(blue.getBody());
+        }
+    }
+
+	protected void setYellowRobotPosition(Coord c, Orientation o) {
+        if (yellow != null) {
+            destroyRobot(yellow, yellowSoft);
+        }
+
+        if (c != null) {
+            yellow = new Robot(new Vec2((float) c.getX(), (float) c.getY()),
+                    (float) o.degrees());
+            yellowSoft.setBody(yellow.getBody());
+        }
+    }
+
+	protected void randomiseRobotPositions() {
+        setBlueRobotPosition(new Coord((Math.random() * Globals.PITCH_WIDTH)
+                * SCALE, (Math.random() * Globals.PITCH_HEIGHT) * SCALE),
+                new Orientation(Math.random() * 360, false));
+
+        setYellowRobotPosition(new Coord((Math.random() * Globals.PITCH_WIDTH)
+                * SCALE, (Math.random() * Globals.PITCH_HEIGHT) * SCALE),
+                new Orientation(Math.random() * 360, false));
+    }
+
+	protected void resetBallPosition() {
 
 		if (ball != null) {
 			world.destroyBody(ball);
@@ -231,11 +277,13 @@ public class WorldSimulator {
 		yellowSoft.setBody(yellow.getBody());
 	}
 
-	/*
+	/**
 	 * Output to World: All code refering to the output from the simulator goes
 	 * here.
 	 */
 	public class SimulatorReader extends Reader {
+
+
 		LinkedList<VisionPackage> history = new LinkedList<VisionPackage>();
 
 		private long getTimeStamp() {
@@ -619,7 +667,9 @@ public class WorldSimulator {
 	/**
 	 * sets the robot positions and linear velocities from a given snapshot
 	 * (ball is taken off the field)
+	 * 
 	 */
+	@Deprecated
 	public void setRobotStatesFromSnapshot(Snapshot s, boolean balleIsBlue,
 			float lastLPower, float lastRPower) {
 
@@ -649,20 +699,4 @@ public class WorldSimulator {
 				new Vec2((float) op.getX(), (float) op.getY()),
 				(float) o.getOrientation().radians());
 	}
-
-
-
-	/**
-	 * Factory Method.
-	 * 
-	 * @return SimulatorWorld with no noise.
-	 */
-	public static WorldSimulator createSimulatorWorld() {
-		WorldSimulator newSimulatorWorld = new WorldSimulator(false);
-		newSimulatorWorld.setWorld(new World(new Vec2(), true));
-		newSimulatorWorld.initWorld();
-		newSimulatorWorld.setVisionDelay(0);
-		return newSimulatorWorld;
-	}
-
 }

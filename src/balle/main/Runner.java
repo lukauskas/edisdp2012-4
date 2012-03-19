@@ -27,6 +27,7 @@ import balle.world.AbstractWorld;
 import balle.world.BasicWorld;
 import balle.world.SimulatedWorld;
 import balle.world.filter.HeightFilter;
+import balle.world.filter.SmoothingFilter;
 import balle.world.filter.TimeFilter;
 
 /**
@@ -179,7 +180,7 @@ public class Runner {
 			boolean goalIsLeft,
 			boolean useDummyController, StrategyLogPane strategyLog) {
 
-		AbstractWorld world;
+        SimulatedWorld world;
 		SocketVisionReader visionInput;
 		Controller controllerA;
 
@@ -194,6 +195,7 @@ public class Runner {
 			world.addFilter(new HeightFilter(world.getPitch().getPosition(),
 					Globals.P1_CAMERA_HEIGHT));
 		}
+		world.addFilter(new SmoothingFilter());
 
 		// Moving this forward so we do not start a GUI until controller is
 		// initialised
@@ -210,10 +212,13 @@ public class Runner {
 			continue;
 		}
 
-		initialiseGUI(controllerA, null, world, null, strategyLog, null);
+
+        controllerA.addListener(world);
 		// Create visionInput buffer
 		visionInput = new SocketVisionReader();
 		visionInput.addListener(world);
+
+        initialiseGUI(controllerA, null, world, null, strategyLog, null);
 	}
 
 	public static void runSimulator(boolean balleIsBlue, boolean goalIsLeft,
@@ -226,10 +231,7 @@ public class Runner {
 				Globals.PITCH_HEIGHT);
 		simulator.addListener(worldA);
 
-		BasicWorld worldB = new BasicWorld(!balleIsBlue, !goalIsLeft,
-				Globals.getPitch());
-		worldB.updatePitchSize(Globals.PITCH_WIDTH, Globals.PITCH_HEIGHT);
-		simulator.addListener(worldB);
+		worldA.addFilter(new SmoothingFilter());
 
 		SoftBot botA, botB;
 		if (!balleIsBlue) {
@@ -246,6 +248,6 @@ public class Runner {
 		System.out.println(botA);
 		System.out.println(botB);
 
-		initialiseGUI(botA, botB, worldA, worldB, strategyLog, simulator);
+		initialiseGUI(botA, botB, worldA, null, strategyLog, simulator);
 	}
 }

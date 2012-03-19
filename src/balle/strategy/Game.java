@@ -18,6 +18,7 @@ import balle.strategy.pathfinding.SimplePathFinder;
 import balle.strategy.planner.AbstractPlanner;
 import balle.strategy.planner.BackingOffStrategy;
 import balle.strategy.planner.DefensiveStrategy;
+import balle.strategy.planner.GoToBall;
 import balle.strategy.planner.InitialStrategy;
 import balle.strategy.planner.KickFromWall;
 import balle.strategy.planner.KickToGoal;
@@ -64,21 +65,32 @@ public class Game extends AbstractPlanner {
         this.currentStrategy = currentStrategy;
     }
 
-    @FactoryMethod(designator = "Game")
+    @FactoryMethod(designator = "Game (Bezier)")
     public static Game gameFactory() {
-        return new Game(true);
+        return new Game(new SimpleGoToBallFaceGoal(new BezierNav(
+                new SimplePathFinder(new CustomCHI()))), true);
     }
 
-    @FactoryMethod(designator = "GameTesting")
+    @FactoryMethod(designator = "Game (Bezier,NoInit)")
     public static Game gameFactoryTesting() {
-        return new Game(false);
+        return new Game(new SimpleGoToBallFaceGoal(new BezierNav(
+                new SimplePathFinder(new CustomCHI()))), false);
     }
 
-    public Game() {
+    @FactoryMethod(designator = "Game (PFN)")
+    public static Game gameFactory2() {
+        return new Game(new GoToBall(new GoToObjectPFN(0)), true);
+    }
+
+    @FactoryMethod(designator = "Game (PFN,NoInit)")
+    public static Game gameFactoryTesting2() {
+        return new Game(new GoToBall(new GoToObjectPFN(0)), false);
+    }
+
+    public Game(Strategy goToBallStrategy) {
         defensiveStrategy = new DefensiveStrategy(new GoToObjectPFN(0.1f));
 		// goToBallStrategy = new GoToBallSafeProportional();
-		goToBallStrategy = new SimpleGoToBallFaceGoal(new BezierNav(
-				new SimplePathFinder(new CustomCHI())));
+        this.goToBallStrategy = goToBallStrategy;
         pickBallFromWallStrategy = new KickFromWall(new GoToObjectPFN(0));
 		backingOffStrategy = new BackingOffStrategy();
         turningExecutor = new IncFaceAngle();
@@ -120,8 +132,8 @@ public class Game extends AbstractPlanner {
         this.initial = initial;
     }
 
-    public Game(boolean startWithInitial) {
-        this();
+    public Game(Strategy goToBallStrategy, boolean startWithInitial) {
+        this(goToBallStrategy);
         initial = startWithInitial;
         LOG.info("Starting game strategy with initial strategy turned on");
     }

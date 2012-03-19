@@ -3,6 +3,8 @@ package balle.strategy;
 import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
+import balle.strategy.executor.movement.GoToObjectPFN;
+import balle.strategy.planner.GoToBall;
 import balle.world.Snapshot;
 
 public class GameFromPenaltyKick extends Game {
@@ -13,13 +15,13 @@ public class GameFromPenaltyKick extends Game {
 	public long timeToKick = 0;
 	public long timeToGame = 0;
 
-    public GameFromPenaltyKick() {
-		super();
+    public GameFromPenaltyKick(Strategy goToBallStrategy) {
+        super(goToBallStrategy);
 	}
 
     @FactoryMethod(designator = "Game (Penalty Kick)")
     public static GameFromPenaltyKick gameFromPenaltyKickFactory() {
-        return new GameFromPenaltyKick();
+        return new GameFromPenaltyKick(new GoToBall(new GoToObjectPFN(0)));
     }
 
 	@Override

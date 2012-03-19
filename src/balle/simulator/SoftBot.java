@@ -74,6 +74,8 @@ public class SoftBot implements Controller {
 	 */
 	@Override
 	public void rotate(int deg, int speed) {
+        if (body == null)
+            return;
 		float wheelVelocity = Globals.velocityToPower((speed
 				* Globals.ROBOT_TRACK_WIDTH * (float) Math.PI) / 360f);
 		// turning right
@@ -157,7 +159,10 @@ public class SoftBot implements Controller {
 	 * 
 	 * @return
 	 */
-	public float deltaDesiredAngle() {
+    public float deltaDesiredAngle() {
+        if (body == null) {
+            return 0;
+        }
 		float d = (float) ((body.getAngle()% (2 * (float)Math.PI)) - getDesiredAngle());
 		// -2PI <= d <= 2PI
 		// if |d| > PI then change direction of the angle

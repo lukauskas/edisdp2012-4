@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.apache.log4j.Logger;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.World;
 
@@ -37,6 +38,7 @@ public class BezierNav implements OrientedMovementExecutor {
 	private final double TARGET_PERIMETER = (Math.sqrt(Math.pow(
 			Globals.ROBOT_LENGTH, 2) + Math.pow(Globals.ROBOT_WIDTH, 2)) / 2) + 0.01;
 
+    public static final Logger LOG = Logger.getLogger(BezierNav.class);
 
 	private final double TARGET_OFF_CENTER_TOLERANCE = 0.01; // (ROBOTWIDTH/2)-
 														// TARGET_OFF_CENTER_TOLERANCE
@@ -329,9 +331,11 @@ public class BezierNav implements OrientedMovementExecutor {
 			}
 		}
 
+        LOG.error("BezierNav is broken -- Saulius. TODO: FIXME");
+		return null;
 		// retrieve the new snapshot
-		return simulator.getSnapshot(s.getTimestamp(), s.getPitch(),
-				s.getOpponentsGoal(), s.getOwnGoal(), true);
+		//return simulator.getSnapshot(s.getTimestamp(), s.getPitch(),
+        // s.getOpponentsGoal(), s.getOwnGoal(), true);
 	}
 
 	@Override

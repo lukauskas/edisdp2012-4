@@ -68,7 +68,6 @@ public class Coord {
 	public double dist(Coord c) {
 		return c.sub(this).abs();
 	}
-
 	public Orientation orientation() {
 		double orientation_atan2 = Math.atan2(this.getY(), this.getX());
 		if (orientation_atan2 < 0)

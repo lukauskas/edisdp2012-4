@@ -14,8 +14,10 @@ import javax.swing.UIManager;
 
 import org.apache.log4j.Logger;
 
+import balle.main.drawable.Dot;
 import balle.main.drawable.Drawable;
 import balle.main.drawable.DrawableLine;
+import balle.main.drawable.DrawableVector;
 import balle.main.drawable.Label;
 import balle.misc.Globals;
 import balle.simulator.SnapshotPredictor;
@@ -24,6 +26,7 @@ import balle.world.Coord;
 import balle.world.Line;
 import balle.world.Scaler;
 import balle.world.Snapshot;
+import balle.world.Velocity;
 import balle.world.objects.Ball;
 import balle.world.objects.Goal;
 import balle.world.objects.Robot;
@@ -42,9 +45,29 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 	private final JLabel fpsStrategy;
 	private final JPanel fpsStrategyPanel;
 
-	private static final Logger LOG = Logger.getLogger(SimpleWorldGUI.class);
+    private double strategyFps;
 
-	public SimpleWorldGUI(AbstractWorld world) {
+    public double getStrategyFps() {
+        return strategyFps;
+    }
+
+    public void setStrategyFps(double strategyFps) {
+        this.strategyFps = strategyFps;
+		String s = String.format("%1$5.3f", this.strategyFps);
+		double visionFps = 1000.0 / getFPS();
+
+		if (this.strategyFps >= visionFps) {
+			fpsStrategy.setForeground(new Color(50, 150, 50));
+		} else {
+			fpsStrategy.setForeground(Color.RED);
+		}
+
+		fpsStrategy.setText(s);
+    }
+
+    private static final Logger LOG = Logger.getLogger(SimpleWorldGUI.class);
+
+    public SimpleWorldGUI(AbstractWorld world) {
 		super(world);
 		panel = new JPanel();
 		panel.setLayout(new BorderLayout());
@@ -175,6 +198,12 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 			}
 		}
 
+        private Color changeAlpha(Color color, double ratio) {
+            Color newColor = new Color(color.getRed(), color.getGreen(),
+                    color.getBlue(), (int) (color.getAlpha() * ratio));
+            return newColor;
+        }
+
         private void drawBall(Graphics g, Color c, Snapshot snapshot) {
 			// TODO: Use ball.getRadius() instead of constants here
 
@@ -204,15 +233,49 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
                     .getPosition().getY() - ball.getRadius() * 3), Color.RED);
             ballSpeedLabel.draw(g, scaler);
 
+
+
+            Velocity vel = ball.getVelocity();
+            DrawableVector velocityVec = new DrawableVector(ball.getPosition(),
+                    vel.mult(4000), Color.CYAN);
+            velocityVec.draw(g, scaler);
+
             SnapshotPredictor sp = snapshot.getSnapshotPredictor();
-            Snapshot laterSnapshot = sp.getSnapshotAfterTime(200);
-            Coord newBallPos = laterSnapshot.getBall().getPosition();
-            if (newBallPos == null)
-                return;
+            Coord lastPos = pos;
+            Color lineColor = Color.WHITE;
+            Color ballColor = changeAlpha(c, 0.8);
 
-            DrawableLine directionLine = new DrawableLine(new Line(pos, newBallPos), Color.WHITE);
-            directionLine.draw(g, scaler);
 
+            for (int lastEstimateAfter = 0; lastEstimateAfter < Globals.BALL_POSITION_ESTIMATE_MAX_STEP; lastEstimateAfter += Globals.BALL_POSITION_ESTIMATE_DRAW_STEP) {
+                Snapshot laterSnapshot = sp
+                        .getSnapshotAfterTime(Globals.BALL_POSITION_ESTIMATE_DRAW_STEP);
+                Coord newBallPos = laterSnapshot.getBall().getPosition();
+                if (newBallPos == null)
+                    break;
+
+                DrawableLine directionLine = new DrawableLine(new Line(lastPos,
+                        newBallPos), lineColor);
+                directionLine.draw(g, scaler);
+                lastPos = newBallPos;
+
+                Dot ballDot = new Dot(newBallPos, ballColor);
+                ballDot.draw(g, scaler);
+
+                // Fade the colours
+                lineColor = changeAlpha(lineColor, 0.7);
+                ballColor = changeAlpha(ballColor, 0.8);
+
+				if (lastEstimateAfter == 0) {
+					Label nextBallSpeedLabel = new Label(String.format(
+							"%.5fE-3", laterSnapshot.getBall().getVelocity()
+									.abs() * 1000),
+							new Coord(ball.getPosition().getX(), ball
+									.getPosition().getY()
+									- ball.getRadius()
+									* 6), changeAlpha(Color.pink, 0.8));
+					nextBallSpeedLabel.draw(g, scaler);
+				}
+            }
 		}
 
 		private void drawRobot(Graphics g, Color c, Robot robot) {
