@@ -51,10 +51,9 @@ public class SmoothingFilter implements Filter {
 
         for (Snapshot qS : queue) {
             Velocity prevVelocity = qS.getBall().getVelocity();
-            if (prevVelocity.abs() < Globals.VELOCITY_NOISE_THRESHOLD) {
-                LOG.trace("NoiseVelocity: " + prevVelocity.abs());
-                continue; // Just treat it as a (0,0,1) velocity.
-            }
+			if (prevVelocity.abs() < Globals.VELOCITY_NOISE_THRESHOLD) {
+				continue; // Just treat it as a (0,0,1) velocity.
+			}
             avgBallVelocity = avgBallVelocity.add(prevVelocity);
         }
         avgBallVelocity = avgBallVelocity.div(queue.size());
