@@ -93,8 +93,10 @@ public class WorldSimulator {
 	}
 
 	public void update(long dt) {
-		blue.updateRobot(blueSoft, dt);
-		yellow.updateRobot(yellowSoft, dt);
+		if ((blue != null) && (blueSoft.getBody() != null))
+			blue.updateRobot(blueSoft, dt);
+		if ((yellow != null) && (yellowSoft.getBody() != null))
+			yellow.updateRobot(yellowSoft, dt);
 	}
 
 	public void initWorld() {
