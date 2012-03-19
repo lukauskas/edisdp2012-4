@@ -1,5 +1,8 @@
 package balle.world;
 
+import java.util.ArrayList;
+
+import balle.strategy.bezierNav.ControllerHistoryElement;
 import balle.world.objects.Ball;
 import balle.world.objects.Goal;
 import balle.world.objects.Pitch;
@@ -7,9 +10,8 @@ import balle.world.objects.Robot;
 
 public class MutableSnapshot {
 
-	private final AbstractWorld world;
 
-	private Robot opponent;
+    private Robot             opponent;
 	private Robot bot;
 	private Ball ball;
 
@@ -17,14 +19,26 @@ public class MutableSnapshot {
 	private Goal ownGoal;
 
 	private Pitch pitch;
-	private long timestamp;
 
-	public MutableSnapshot(AbstractWorld world, Robot opponent, Robot balle,
+    private ArrayList<ControllerHistoryElement> controllerHistory;
+
+    private long                                timestamp;
+
+    public void setControllerHistory(ArrayList<ControllerHistoryElement> controllerHistory) {
+        this.controllerHistory = controllerHistory;
+    }
+
+    public ArrayList<ControllerHistoryElement> getControllerHistory() {
+        return (ArrayList<ControllerHistoryElement>) controllerHistory.clone();
+    }
+
+    public MutableSnapshot(Robot opponent, Robot balle,
 			Ball ball, Goal opponentsGoal, Goal ownGoal, Pitch pitch,
-			long timestamp) {
+ long timestamp,
+            ArrayList<ControllerHistoryElement> controllerHistory) {
 
 		super();
-		this.world = world;
+        this.controllerHistory = controllerHistory;
 		this.opponent = opponent;
 		this.bot = balle;
 		this.ball = ball;
@@ -34,9 +48,6 @@ public class MutableSnapshot {
 		this.pitch = pitch;
 	}
 
-	public Snapshot estimateAt(long time) {
-		return world.estimateAt(time);
-	}
 
 	public Pitch getPitch() {
 		return pitch;
@@ -95,13 +106,13 @@ public class MutableSnapshot {
 	}
 
 	public MutableSnapshot duplicate() {
-		return new MutableSnapshot(world, getOpponent(), getBalle(), getBall(),
-				getOpponentsGoal(), getOwnGoal(), getPitch(), getTimestamp());
+        return new MutableSnapshot(getOpponent(), getBalle(), getBall(), getOpponentsGoal(),
+                getOwnGoal(), getPitch(), getTimestamp(), getControllerHistory());
 	}
 
 	public Snapshot pack() {
-		return new Snapshot(world, getOpponent(), getBalle(), getBall(),
-				getOpponentsGoal(), getOwnGoal(), getPitch(), getTimestamp());
+        return new Snapshot(getOpponent(), getBalle(), getBall(), getOpponentsGoal(), getOwnGoal(),
+                getPitch(), getTimestamp(), getControllerHistory());
 	}
 
 	@Override

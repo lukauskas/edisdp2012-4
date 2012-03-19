@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
+import org.apache.log4j.Logger;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.testbed.framework.TestbedFrame;
 import org.jbox2d.testbed.framework.TestbedModel;
@@ -20,7 +21,8 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 	private long lastStepTime;
 	private long lastFrameTime;
 
-	private SimulatorWorld worldWrapper = new SimulatorWorld(false);;
+    private WorldSimulator worldWrapper = new WorldSimulator(false);
+    private static final Logger LOG = Logger.getLogger(Simulator.class);
 
 	public SoftBot getBlueSoft() {
 		return worldWrapper.getBlueSoft();
@@ -53,48 +55,9 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 		addBufferedListeners();
 
 		// centre the camera
-		setCamera(new Vec2(1.22f * SimulatorWorld.SCALE,
-				1.22f * SimulatorWorld.SCALE),
+		setCamera(new Vec2(1.22f * WorldSimulator.SCALE,
+				1.22f * WorldSimulator.SCALE),
 				getCachedCameraScale());
-		// // No Gravity
-		// World w = getWorld();
-		// w.setGravity(new Vec2(0, 0));
-		//
-		// // create ground
-		// PolygonShape groundShape = new PolygonShape();
-		// groundShape.setAsBox(2.64f * SCALE, 1.42f * SCALE);
-		// BodyDef groundBodyDef = new BodyDef();
-		// groundBodyDef.type = BodyType.STATIC;
-		// groundBodyDef.position.set(1.22f * SCALE, 0.61f * SCALE);
-		// ground = w.createBody(groundBodyDef);
-		// FixtureDef groundF = new FixtureDef();
-		// groundF.shape = groundShape;
-		// groundF.density = (1f / 0.36f) / SCALE;
-		// groundF.filter.maskBits = 0;
-		// ground.createFixture(groundF);
-		//
-		// // Create edge of field
-		// // Main Pitch
-		// addEdge(0f * SCALE, 0f * SCALE, 2.44f * SCALE, 0f * SCALE);
-		// addEdge(0f * SCALE, 1.22f * SCALE, 2.44f * SCALE, 1.22f * SCALE);
-		// addEdge(0f * SCALE, 0f * SCALE, 0f * SCALE, 0.31f * SCALE);
-		// addEdge(2.44f * SCALE, 0f * SCALE, 2.44f * SCALE, 0.31f * SCALE);
-		// addEdge(0f * SCALE, 1.22f * SCALE, 0f * SCALE, 0.91f * SCALE);
-		// addEdge(2.44f * SCALE, 1.22f * SCALE, 2.44f * SCALE, 0.91f * SCALE);
-		// // Left-hand goal area
-		// addEdge(0f * SCALE, 0.31f * SCALE, -0.1f * SCALE, 0.31f * SCALE);
-		// addEdge(-0.1f * SCALE, 0.31f * SCALE, -0.1f * SCALE, 0.91f * SCALE);
-		// addEdge(2.44f * SCALE, 0.31f * SCALE, 2.54f * SCALE, 0.31f * SCALE);
-		// // Right-hand goal area
-		// addEdge(2.44f * SCALE, 0.91f * SCALE, 2.54f * SCALE, 0.91f * SCALE);
-		// addEdge(0f * SCALE, 0.91f * SCALE, -0.1f * SCALE, 0.91f * SCALE);
-		// addEdge(2.54f * SCALE, 0.31f * SCALE, 2.54f * SCALE, 0.91f * SCALE);
-		//
-		// // Create ball
-		// resetBallPosition();
-		//
-		// // create robots at either end of pitch
-		// resetRobotPositions();
 
 		// Send the size of the pitch to the world
 		worldWrapper.getReader().propagatePitchSize();

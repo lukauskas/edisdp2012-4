@@ -59,6 +59,8 @@ public class StrategyRunner extends AbstractWorldProcessor {
 			MutableSnapshot mSnapshot = snapshot.unpack();
 			mSnapshot.setOpponent(snapshot.getBalle());
 			mSnapshot.setBalle(snapshot.getOpponent());
+            mSnapshot.setOpponentsGoal(snapshot.getOwnGoal());
+            mSnapshot.setOwnGoal(snapshot.getOpponentsGoal());
 
 			// Snapshot centered on opponent robot (Balle from snapshot
 			// becomes opponent in snapshot2 etc

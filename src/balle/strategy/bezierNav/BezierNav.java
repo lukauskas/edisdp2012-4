@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.apache.log4j.Logger;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.World;
 
@@ -12,7 +13,7 @@ import balle.main.drawable.Circle;
 import balle.main.drawable.Dot;
 import balle.main.drawable.Drawable;
 import balle.misc.Globals;
-import balle.simulator.SimulatorWorld;
+import balle.simulator.WorldSimulator;
 import balle.strategy.FactoryMethod;
 import balle.strategy.curve.Curve;
 import balle.strategy.curve.CustomCHI;
@@ -37,6 +38,7 @@ public class BezierNav implements OrientedMovementExecutor {
 	private final double TARGET_PERIMETER = (Math.sqrt(Math.pow(
 			Globals.ROBOT_LENGTH, 2) + Math.pow(Globals.ROBOT_WIDTH, 2)) / 2) + 0.01;
 
+    public static final Logger LOG = Logger.getLogger(BezierNav.class);
 
 	private final double TARGET_OFF_CENTER_TOLERANCE = 0.01; // (ROBOTWIDTH/2)-
 														// TARGET_OFF_CENTER_TOLERANCE
@@ -79,7 +81,7 @@ public class BezierNav implements OrientedMovementExecutor {
 	private PID pid = new PID(11, 0.25, 4, 1);
 	private final boolean USE_PID = false;
 
-	SimulatorWorld simulator;
+	WorldSimulator simulator;
 	BasicWorld world;
 
 	private Orientation lastAngle;
@@ -115,7 +117,7 @@ public class BezierNav implements OrientedMovementExecutor {
 
 	public BezierNav(PathFinder pathfinder) {
 		this.pathfinder = pathfinder;
-		simulator = new SimulatorWorld(false);
+		simulator = new WorldSimulator(false);
 		simulator.setWorld(new World(new Vec2(), true));
 		simulator.initWorld();
 		simulator.setVisionDelay(0);
@@ -329,9 +331,11 @@ public class BezierNav implements OrientedMovementExecutor {
 			}
 		}
 
+        LOG.error("BezierNav is broken -- Saulius. TODO: FIXME");
+		return null;
 		// retrieve the new snapshot
-		return simulator.getSnapshot(world, s.getTimestamp(), s.getPitch(),
-				s.getOpponentsGoal(), s.getOwnGoal(), true);
+		//return simulator.getSnapshot(s.getTimestamp(), s.getPitch(),
+        // s.getOpponentsGoal(), s.getOwnGoal(), true);
 	}
 
 	@Override

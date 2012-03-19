@@ -145,7 +145,7 @@ public abstract class AbstractWorld implements Listener {
 	}
 
 	@Override
-	public void update(double yPosX, double yPosY, double yDeg, double bPosX,
+    public final void update(double yPosX, double yPosY, double yDeg, double bPosX,
 			double bPosY, double bDeg, double ballPosX, double ballPosY,
 			long timestamp) {
 
@@ -281,5 +281,4 @@ public abstract class AbstractWorld implements Listener {
 		return out;
 	}
 
-	public abstract Snapshot estimateAt(long time);
 }
