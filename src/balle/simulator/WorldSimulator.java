@@ -388,8 +388,8 @@ public class WorldSimulator {
 					ballPosX = -1;
 					ballPosY = -1;
 				} else {
-					ballPosX = genRand(posSd, ballPosX);
-					ballPosY = genRand(posSd, ballPosY);
+                    ballPosX = genRandRounded(posSd, ballPosX);
+                    ballPosY = genRandRounded(posSd, ballPosY);
 				}
 
 				// add noise to angles
@@ -405,6 +405,12 @@ public class WorldSimulator {
 		private float genRand(float sd, float mean) {
 			return ((float) rand.nextGaussian() * sd) + mean;
 		}
+
+        private float genRandRounded(float sd, float mean) {
+            // Round the gaussian noise to centimeters
+            return (Math.round((float) rand.nextGaussian() * sd) * 100) / 100
+                    + mean;
+        }
 
 		private float genRandDeg(float sd, float mean) {
 			return genRand(sd, mean) % 360;

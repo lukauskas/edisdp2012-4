@@ -34,7 +34,8 @@ public class Interception extends AbstractPlanner {
 
     private static Logger LOG                = Logger.getLogger(Interception.class);
 
-    private MovementExecutor movementExecutor   = new GoToObjectPFN(Globals.ROBOT_LENGTH / 2);
+    private MovementExecutor movementExecutor = new GoToObjectPFN(
+            Globals.ROBOT_LENGTH / 2, false);
 
     protected void setIAmDoing(String message) {
         LOG.info(message);
