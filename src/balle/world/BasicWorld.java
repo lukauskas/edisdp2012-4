@@ -126,7 +126,6 @@ public class BasicWorld extends AbstractWorld {
 				: new Velocity(0, 0, 1, 1);
 		ballVel = ballDPos != null ? new Velocity(ballDPos, deltaT)
 				: new Velocity(0, 0, 1, 1);
-		LOG.trace("Ball velocity (BW): " + ballVel);
 
 		AngularVelocity oursAngVel = null, themAngVel = null;
 		if (ourOrientation == null) {
