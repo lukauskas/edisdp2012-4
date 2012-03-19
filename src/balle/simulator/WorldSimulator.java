@@ -192,7 +192,7 @@ public class WorldSimulator {
 				Math.random() * Globals.PITCH_HEIGHT * SCALE));
 	}
 
-    public void setBlueRobotPosition(Coord c, Orientation o) {
+	protected void setBlueRobotPosition(Coord c, Orientation o) {
         if (blue != null) {
             destroyRobot(blue, blueSoft);
         }
@@ -204,7 +204,7 @@ public class WorldSimulator {
         }
     }
 
-    public void setYellowRobotPosition(Coord c, Orientation o) {
+	protected void setYellowRobotPosition(Coord c, Orientation o) {
         if (yellow != null) {
             destroyRobot(yellow, yellowSoft);
         }
@@ -216,7 +216,7 @@ public class WorldSimulator {
         }
     }
 
-    public void randomiseRobotPositions() {
+	protected void randomiseRobotPositions() {
         setBlueRobotPosition(new Coord((Math.random() * Globals.PITCH_WIDTH)
                 * SCALE, (Math.random() * Globals.PITCH_HEIGHT) * SCALE),
                 new Orientation(Math.random() * 360, false));
@@ -226,7 +226,7 @@ public class WorldSimulator {
                 new Orientation(Math.random() * 360, false));
     }
 
-    public void resetBallPosition() {
+	protected void resetBallPosition() {
 
 		if (ball != null) {
 			world.destroyBody(ball);

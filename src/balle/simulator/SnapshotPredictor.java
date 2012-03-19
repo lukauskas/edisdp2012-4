@@ -147,8 +147,8 @@ public class SnapshotPredictor extends WorldSimulator {
 
         // Can see blue robot.
         if (bRobot.getPosition() != null) {
-            blue.setPosition(bRobot.getPosition().mult(SCALE), bRobot.getOrientation());
-
+			setBlueRobotPosition(bRobot.getPosition().mult(SCALE),
+					bRobot.getOrientation());
             blue.getBody().setLinearVelocity(bRobot.getVelocity().vec2(SCALE));
         } else {
             destroyRobot(blue, getBlueSoft());
@@ -156,7 +156,8 @@ public class SnapshotPredictor extends WorldSimulator {
 
         // Can see yellow robot.
         if (yRobot.getPosition() != null) {
-            yellow.setPosition(yRobot.getPosition().mult(SCALE), yRobot.getOrientation());
+			setYellowRobotPosition(yRobot.getPosition().mult(SCALE),
+					yRobot.getOrientation());
             yellow.getBody()
                     .setLinearVelocity(yRobot.getVelocity().vec2(SCALE));
         } else {
