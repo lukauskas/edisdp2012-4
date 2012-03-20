@@ -27,7 +27,8 @@ public class CustomCHI extends CubicHermiteInterpolator {
 
 			// Calculate p0.
 			if (inc == null)
-				p[2] = p[3].add(end.getOpposite().getUnitCoord().mult(distS));
+				p[2] = p[3].add(end.getOpposite().getUnitCoord()
+						.mult(distS * 2));
 			else
 				p[2] = p[3].add(inc.getOpposite().getUnitCoord().mult(distS));
 
