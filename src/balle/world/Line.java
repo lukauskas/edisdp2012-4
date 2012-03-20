@@ -182,6 +182,9 @@ public class Line {
          }
 	}
 
+    public double length() {
+        return getA().dist(getB());
+    }
 	public Coord getCenter() {
 		return new Coord((getA().getX() + getB().getX()) / 2,
 				(getA().getY() + getB().getY()) / 2);

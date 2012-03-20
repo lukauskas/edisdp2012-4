@@ -1,11 +1,13 @@
 package balle.strategy.executor.movement;
 
+import java.awt.Color;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
 import balle.main.drawable.Drawable;
+import balle.main.drawable.Label;
 import balle.misc.Globals;
 import balle.strategy.pFStrategy.PFPlanning;
 import balle.strategy.pFStrategy.Point;
@@ -14,6 +16,7 @@ import balle.strategy.pFStrategy.RectObject;
 import balle.strategy.pFStrategy.RobotConf;
 import balle.strategy.pFStrategy.Vector;
 import balle.strategy.pFStrategy.VelocityVec;
+import balle.world.Coord;
 import balle.world.Snapshot;
 import balle.world.objects.FieldObject;
 
@@ -27,6 +30,8 @@ public class GoToObjectPFN implements MovementExecutor {
 
     private double stopDistance; // meters
     private boolean slowDownCloseToTarget;
+
+    private final ArrayList<Drawable> drawables = new ArrayList<Drawable>();
 
     public boolean shouldSlowDownCloseToTarget() {
         return slowDownCloseToTarget;
@@ -122,6 +127,7 @@ public class GoToObjectPFN implements MovementExecutor {
 
     @Override
 	public void step(Controller controller, Snapshot snapshot) {
+        drawables.clear();
         if (!isPossible(snapshot))
             return;
 
@@ -156,13 +162,15 @@ public class GoToObjectPFN implements MovementExecutor {
 
         left = Math.toDegrees(res.getLeft());
         right = Math.toDegrees(res.getRight());
-        LOG.trace("Left speed: " + left + " right speed: " + right);
+        drawables.add(new Label(String.format("(%d, %d)", (int) left,
+                (int) right),
+                new Coord(1, Globals.PITCH_HEIGHT + 0.3), Color.BLACK));
 
         controller.setWheelSpeeds((int) left, (int) right);
     }
 
     @Override
     public ArrayList<Drawable> getDrawables() {
-        return new ArrayList<Drawable>();
+        return drawables;
     }
 }
