@@ -368,7 +368,7 @@ public class WorldSimulator {
 				float angSd = Globals.VISION_ANGLE_NOISE_SD;
 
 				// add noise to positions
-				if (rand.nextDouble() < 0.02) {
+                if (rand.nextDouble() < 1) {
 					yPosX = -1;
 					yPosY = -1;
 				} else {

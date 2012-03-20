@@ -82,52 +82,76 @@ public class Globals {
     public static final float ARBITRARY_BALL_VEL_SCALING = 100;
     public static final double VELOCITY_NOISE_THRESHOLD = 1e-8;
 
-    public static float powerToVelocity(float p) {
-        if (p > MAXIMUM_MOTOR_SPEED)
-            p = MAXIMUM_MOTOR_SPEED;
-        else if (p < -MAXIMUM_MOTOR_SPEED)
-            p = -MAXIMUM_MOTOR_SPEED;
-        return p * (0.4f / 720f);
-        // if(p==0) return 0;
-        // boolean isNeg = p < 0;
-        // if(isNeg) p = -p;
-        // float absVelocity = (float)(2f / Math.exp(-0.0025f * p + 3.1187));
-        // absVelocity /= (1f+Math.exp(-0.1f*(p-50)));
-        // return isNeg?-absVelocity:absVelocity;
-    }
-
-	public static float powerToVelocity2(float p) {
+	public static float powerToVelocity(float p) {
 		Powers powerAbove = null;
 		Powers powerBelow = null;
 		float velo = 0;
 		if (p > MAXIMUM_MOTOR_SPEED) {
 			p = MAXIMUM_MOTOR_SPEED;
-			return p * (0.4f / 720f);
-		} else if (p < -MAXIMUM_MOTOR_SPEED) {
+
+        }
+        if (p < -MAXIMUM_MOTOR_SPEED) {
 			p = -MAXIMUM_MOTOR_SPEED;
-			return p * (0.4f / 720f);
-		} else {
-			int index = 0;
-			for (int i = 0; i < powervelo.size(); i++) {
-				if (powervelo.get(i).getPower() < p) {
-					index = i;
-				} else {
-					break;
-				}
+
+        }
+
+        int index = 0;
+        for (int i = 0; i < powervelo.size(); i++) {
+            if (powervelo.get(i).getPower() < p) {
+                index = i;
+            } else {
+                break;
 			}
-			powerBelow = powervelo.get(index);
-			powerAbove = powervelo.get(index + 1);
 		}
+        powerBelow = powervelo.get(index);
+        powerAbove = powervelo.get(index + 1);
+
 		float m = powerAbove.getVelocity() - powerBelow.getVelocity();
 		m /= (powerAbove.getPower() - powerBelow.getPower());
 		velo = m * (p - powerBelow.getPower()) + powerBelow.getVelocity();
-		return velo;
+        return velo;
 	}
 
     public static float velocityToPower(float v) {
-        return v * (720f / 0.4f);
-        // if(v==0) return 0;
-        // return (float) (Math.log(((1f/(v))*2))-3.1187)/-0.0025f
+
+        Powers powerAbove = null;
+        Powers powerBelow = null;
+        float power = 0;
+
+        float maxVelocity = powerToVelocity(MAXIMUM_MOTOR_SPEED);
+        if (v > maxVelocity) {
+            v = maxVelocity;
+
+        }
+        if (v < -maxVelocity) {
+            v = -maxVelocity;
+
+        }
+        for (Powers pp : powervelo) {
+            if ((pp.getVelocity() <= v)
+                    && ((powerBelow == null) || (pp.getVelocity() > powerBelow
+                            .getVelocity()))) {
+                powerBelow = pp;
+            }
+            if ((pp.getVelocity() >= v)
+                    && ((powerAbove == null) || (pp.getVelocity() > powerAbove
+                            .getVelocity()))) {
+                powerAbove = pp;
+            }
+
+
+        }
+        if (powerBelow == null)
+            powerBelow = powervelo.get(0);
+        if (powerAbove == null)
+            powerAbove = powervelo.get(powervelo.size() - 1);
+
+        float m = powerAbove.getPower() - powerBelow.getPower();
+        m /= (powerAbove.getPower() - powerBelow.getPower());
+        power = m * (v - powerBelow.getVelocity()) + powerBelow.getPower();
+
+        return power;
+
     };
 
     public static Pitch getPitch() {

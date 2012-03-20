@@ -10,9 +10,12 @@ import balle.main.drawable.Dot;
 import balle.main.drawable.DrawableLine;
 import balle.main.drawable.DrawableVector;
 import balle.misc.Globals;
+import balle.strategy.bezierNav.BezierNav;
+import balle.strategy.curve.CustomCHI;
 import balle.strategy.executor.movement.GoToObjectPFN;
 import balle.strategy.executor.movement.MovementExecutor;
 import balle.strategy.executor.movement.OrientedMovementExecutor;
+import balle.strategy.pathfinding.SimplePathFinder;
 import balle.strategy.planner.AbstractPlanner;
 import balle.world.Coord;
 import balle.world.Line;
@@ -145,14 +148,15 @@ public class Interception extends AbstractPlanner {
 
     @FactoryMethod(designator = "InterceptsM4-CP-BZR")
     public static final Interception factoryCPBZR() {
-        return new Interception(true, new GoToObjectPFN(
-                Globals.ROBOT_LENGTH / 3), null);
+        return new Interception(true, null, new BezierNav(new SimplePathFinder(
+                new CustomCHI())));
     }
 
     @FactoryMethod(designator = "InterceptsM4-NCP-BZR")
     public static final Interception factoryNCPBZR() {
-        return new Interception(false, new GoToObjectPFN(
-                Globals.ROBOT_LENGTH / 3), null);
+        return new Interception(false, null, new BezierNav(
+                new SimplePathFinder(
+                new CustomCHI())));
     }
 
     /**

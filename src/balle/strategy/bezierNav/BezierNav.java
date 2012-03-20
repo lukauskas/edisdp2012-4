@@ -58,7 +58,7 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 													// turns the speed will be
 													// slowed toward max/this
 	private final double MAX_VELOCITY = Globals
-.powerToVelocity(600); // the
+.powerToVelocity(900); // the
 																		// maximum
 																// wheel
 															// velocity to use
