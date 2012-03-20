@@ -144,7 +144,6 @@ class Entity:
             self._centroid = centroid
 
             roughAngle = math.atan2(center[1] - centroid[1], center[0] - centroid[0]) 
-            self._roughAngle = roughAngle
 
             if abs(self._angle - roughAngle) > (math.pi / 2):
                 self._angle += math.pi
@@ -171,11 +170,5 @@ class Entity:
                 degrees = abs(self._angle - math.pi)  / math.pi * 180 
 
                 layer.line(center, (endx, endy), antialias=False);
-
-                angle = self._roughAngle
-                endx = center[0] + 30 * math.cos(angle)
-                endy = center[1] + 30 * math.sin(angle)
-                layer.line(center, (endx, endy), color=Color.RED, antialias=False);
-
 
 
