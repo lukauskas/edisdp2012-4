@@ -102,6 +102,7 @@ class Entity:
         self._hasAngle = hasAngle
         self._angle = None
         self._feature = None
+        self._roughAngle = None
     
     def coordinates(self):
         return self._coordinates
@@ -138,32 +139,16 @@ class Entity:
             self._angle = math.atan2(2 * b, a - c + e)
                         
             # Crudely find direction.          
-            m00 = cv.GetSpatialMoment(m, 0, 0)
-            m10 = cv.GetSpatialMoment(m, 1, 0)
-            m01 = cv.GetSpatialMoment(m, 0, 1)
-            if m00 == 0.0:
-                 m00 = 0.1
+            centroid = (m.m10 / m.m00, m.m01 / m.m00)
+            center = (mask.width / 2, mask.height / 2)
 
-            centroid1 = (round(m10/m00), round(m01/m00))
-            # cv.Circle is really fussy with what it takes
-            centroid1 = tuple(map(int, centroid1))
-            cv.Circle(mask, centroid1, 14, cv.RGB(0,0,0), -1)
-            
-            m = cv.Moments(mask, 1)
-            m00 = cv.GetSpatialMoment(m, 0, 0)
-            m10 = cv.GetSpatialMoment(m, 1, 0)
-            m01 = cv.GetSpatialMoment(m, 0, 1)
-            if m00 == 0:
-                 m00 = 0.1
+            roughAngle = math.atan2(center[0] - centroid[0], center[1] - centroid[1]) 
+            self._roughAngle = roughAngle
 
-            centroid2 = (round(m10/m00), round(m01/m00))
-            roughAngle = math.atan2(centroid1[1] - centroid2[1], centroid1[0] - centroid2[0])
-            
-            pi2 = math.pi*2
-            roughAngle = min( (roughAngle-self._angle)%pi2, (self._angle-roughAngle)%pi2 )
-
-            if roughAngle < (math.pi/2):
+            if abs(roughAngle - self._angle) > (math.pi / 2):
                 self._angle += math.pi
+
+
 
         return self._angle
 
@@ -185,4 +170,10 @@ class Entity:
                 endy = center[1] + 30 * math.sin(angle)
 
                 layer.line(center, (endx, endy), antialias=False);
+
+                angle = self._roughAngle
+                endx = center[0] + 30 * math.cos(angle)
+                endy = center[1] + 30 * math.sin(angle)
+                layer.line(center, (endx, endy), color=Color.RED, antialias=False);
+
 
