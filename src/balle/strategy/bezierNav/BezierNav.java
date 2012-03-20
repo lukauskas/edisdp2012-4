@@ -58,7 +58,7 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 													// turns the speed will be
 													// slowed toward max/this
 	private final double MAX_VELOCITY = Globals
-.powerToVelocity(600); // the
+.powerToVelocity(900); // the
 																		// maximum
 																// wheel
 															// velocity to use
@@ -126,12 +126,12 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 		controllerHistory = new ArrayList<ControllerHistoryElement>();
 	}
 
-	private boolean isMoveStraitFinished(Orientation botOrient) {
-		Coord n = botOrient.getUnitCoord()
+	private boolean isMoveStraitFinished(Robot bot) {
+		Coord n = bot.getOrientation().getUnitCoord()
 				.rotate(new Orientation(Math.PI / 2));
-		double da = Math
-				.abs(botOrient.angleToatan2Radians(orient));
-		double dd = Math.abs(n.dot(target.getPosition().sub(p0)));
+		double da = Math.abs(bot.getOrientation().angleToatan2Radians(orient));
+		double dd = Math
+				.abs(n.dot(target.getPosition().sub(bot.getPosition())));
 		return (da <= stopAngle && dd < (Globals.ROBOT_WIDTH / 2)
 				- TARGET_OFF_CENTER_TOLERANCE);
 	}
@@ -143,7 +143,7 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 			return false;
 		}
 		return snapshot.getBalle().getPosition().dist(getAdjustedP3()) <= stopDistance
-				&& isMoveStraitFinished(snapshot.getBalle().getOrientation());
+				&& isMoveStraitFinished(snapshot.getBalle());
 	}
 
 	@Override
@@ -153,6 +153,15 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 
 	@Override
 	public void step(Controller controller, Snapshot snapshot) {
+		if (isMoveStraitFinished(snapshot.getBalle())) {
+			if (isFinished(snapshot)) {
+				controller.stop();
+			} else {
+				controller.forward(Globals.MAXIMUM_MOTOR_SPEED);
+			}
+			return;
+		}
+
 		if (!USE_PID) {
 			// snapshot = getLatencyAdjustedSnapshot(snapshot);
 
