@@ -2,7 +2,7 @@ package balle.misc;
 
 public class VtoPData {
 
-	public Powers[] getData() {
+	public static Powers[] getData() {
 		return new Powers[] { new Powers(0, 3.54E-007f),
 				new Powers(25, 1.75E-005f), new Powers(50, 4.05E-005f),
 				new Powers(75, 5.83E-005f), new Powers(100, 8.14E-005f),
