@@ -415,6 +415,8 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 	@Override
 	public void updateTarget(FieldObject target) {
 		this.target = target;
+        // TODO: Fix FIX FIX
+        LOG.error("Beziernav::updateTarget");
 		this.orient = null;
 	}
 }
