@@ -1,7 +1,7 @@
 import math
 
 import cv
-from SimpleCV import Image, Features, DrawingLayer, BlobMaker
+from SimpleCV import Image, Features, DrawingLayer, BlobMaker, Color
 from threshold import Threshold
 
 class Features:
@@ -25,9 +25,9 @@ class Features:
 
         hsv = frame.toHSV()
         ents = {'yellow': None, 'blue': None, 'ball': None}
-        yellow = self.threshold.yellowT(hsv)
-        blue = self.threshold.blueT(hsv)
-        ball = self.threshold.ball(hsv)
+        yellow = self.threshold.yellowT(hsv).smooth(grayscale=True)
+        blue = self.threshold.blueT(hsv).smooth(grayscale=True)
+        ball = self.threshold.ball(hsv).smooth(grayscale=True)
 
         self._display.updateLayer('threshY', yellow)
         self._display.updateLayer('threshB', blue)
@@ -119,7 +119,9 @@ class Entity:
         if self._angle is None:
             # Use moments to do magic things.
             # (finds precise line through blob)
-            mask = feature.crop().getGrayscaleMatrix()
+            #mask = feature.crop().getGrayscaleMatrix()
+
+            mask = feature.getHullMask().getGrayscaleMatrix()
 
             m = cv.Moments(mask, 1)
 
