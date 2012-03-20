@@ -66,22 +66,22 @@ public class StrategyRunner extends AbstractWorldProcessor {
 			// becomes opponent in snapshot2 etc
 			Snapshot snapshot2 = mSnapshot.pack();
 
-			try {
+            try {
 				currentStrategyA.step(controllerA, snapshot);
 				if (controllerB != null) {
 					currentStrategyB.step(controllerB, snapshot2);
 				}
-			} catch (Exception e) {
-				LOG.error("Strategy raised exception" + e.toString());
+            } catch (Exception e) {
+                LOG.error("Strategy raised exception" + e.toString());
 
-				for (StackTraceElement se : e.getStackTrace())
-					LOG.debug(se.toString());
+                for (StackTraceElement se : e.getStackTrace())
+                    LOG.debug(se.toString());
 
-				controllerA.stop();
-				if (controllerB != null) {
-					controllerB.stop();
-				}
-			}
+                controllerA.stop();
+                if (controllerB != null) {
+                    controllerB.stop();
+                }
+            }
             ArrayList<Drawable> drawables = currentStrategyA.getDrawables();
             ArrayList<Drawable> opponentDrawables = currentStrategyB
                     .getDrawables();

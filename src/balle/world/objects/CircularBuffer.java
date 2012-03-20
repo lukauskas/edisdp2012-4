@@ -1,159 +1,73 @@
 package balle.world.objects;
 
-import balle.world.Coord;
+import java.util.AbstractQueue;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 
-public class CircularBuffer {
-    /**
-     * The variable to hold the buffer
-     */
-    public double[][]       circularBuffer;
+public class CircularBuffer<T> extends AbstractQueue<T> {
 
-    /**
-     * Holds the length of the buffer
-     */
-    private final int       bufferLength;
+    public final int size;
+    public final T[] buffer;
 
-    /**
-     * Current position is the place in the buffer where the last point was
-     * added
-     */
-    private final int       currentPos;
+    public int insertToIndex;
+    public int elementCount;
 
-    public static final int X_POS    = 0;
-    public static final int Y_POS    = 1;
+    @SuppressWarnings("unchecked")
+    public CircularBuffer(int size) {
+        super();
+        this.size = size;
+        this.buffer = (T[]) new Object[size];
 
-    public static final int POSITION = 0;
-
-    /**
-     * Constructor for CircularBuffer
-     * 
-     * @param bufferLength
-     */
-    public CircularBuffer(int bufferLength) {
-        this.bufferLength = bufferLength;
-        this.currentPos = bufferLength;
-        // 2-dimensional array to hold x and y values
-        circularBuffer = new double[2][bufferLength + 1];
-        // initialize position of buffer to 0
-        circularBuffer[POSITION][currentPos] = 0;
+        insertToIndex = 0;
+        elementCount = 0;
     }
 
-    /**
-     * Add a point (x, y) to the current position of the buffer and increment
-     * the current position
-     * 
-     * @param xPos
-     * @param yPos
-     */
-    public void addCoord(double xPos, double yPos) {
-        circularBuffer[X_POS][getCurrentPosition()] = xPos;
-        circularBuffer[Y_POS][getCurrentPosition()] = yPos;
-        incrementCurrentPosition();
+    @Override
+    public boolean offer(T c) {
+        buffer[insertToIndex] = c;
+        insertToIndex = (insertToIndex + 1) % size;
+        elementCount = Math.max(elementCount + 1, size);
+        return true;
     }
 
-    /**
-     * Add a point (x, y) to the current position of the buffer and increment
-     * the current position
-     * 
-     * @param xPos
-     * @param yPos
-     */
-    public void addCoord(Coord point) {
-        circularBuffer[X_POS][getCurrentPosition()] = point.getX();
-        circularBuffer[Y_POS][getCurrentPosition()] = point.getY();
-        incrementCurrentPosition();
-    }
-
-    /**
-     * Returns the length of the buffer
-     * 
-     * @return
-     */
-    public int getBufferLength() {
-        return bufferLength;
-    }
-
-    /**
-     * Get all the x values of the buffer
-     * 
-     * @return
-     */
-    public double[] getXBuffer() {
-        double[] xBuffer = new double[getBufferLength()];
-        for (int i = 0; i < getBufferLength(); i++) {
-            xBuffer[i] = getXPosAt(i);
+    @Override
+    public T peek() {
+        if (elementCount > 0) {
+            int head = (insertToIndex - 1) % size;
+            return buffer[head];
+        } else {
+            return null;
         }
-        return xBuffer;
     }
 
-    /**
-     * Get all the y values of the buffer
-     * 
-     * @return
-     */
-    public double[] getYBuffer() {
-        double[] yBuffer = new double[getBufferLength()];
-        for (int i = 0; i < getBufferLength(); i++) {
-            yBuffer[i] = getYPosAt(i);
+    @Override
+    public T poll() {
+        if (elementCount > 0) {
+            insertToIndex = (insertToIndex - 1) % size;
+            elementCount -= 1;
+            return buffer[insertToIndex];
+        } else {
+            return null;
         }
-        return yBuffer;
     }
 
-    /**
-     * Get the x coordinate of a point stored at position
-     * 
-     * @param position
-     * @return
-     */
-    public double getXPosAt(int position) {
-        return circularBuffer[X_POS][position];
+    @Override
+    public Iterator<T> iterator() {
+        ArrayList<T> items = new ArrayList<T>(elementCount);
+
+        for (int i = 0; i < elementCount; i++) {
+            int index = (insertToIndex - (i + 1)) % size;
+            if (index < 0)
+                index += size;
+            items.add(buffer[index]);
+        }
+        return items.iterator();
     }
 
-    /**
-     * Get the y coordinate of a point stored at position
-     * 
-     * @param position
-     * @return
-     */
-    public double getYPosAt(int position) {
-        return circularBuffer[Y_POS][position];
+    @Override
+    public int size() {
+        return elementCount;
     }
 
-    /**
-     * Get the point stored at position
-     * 
-     * @param position
-     * @return
-     */
-    public Coord getCoordAt(int position) {
-        return new Coord(getXPosAt(position), getYPosAt(position));
-    }
-
-    /**
-     * Get the current position of the buffer
-     * 
-     * @return
-     */
-    public int getCurrentPosition() {
-        return (int) circularBuffer[POSITION][currentPos];
-    }
-
-    /**
-     * Get the last position of the buffer Should be the one in front of the
-     * current If it is the end of the buffer it wraps around
-     * 
-     * @return
-     */
-    public int getLastPosition() {
-        return (int) (circularBuffer[POSITION][currentPos] + 1) % getBufferLength();
-    }
-
-    /**
-     * Increment the position to point to the next one
-     */
-    public void incrementCurrentPosition() {
-        circularBuffer[POSITION][currentPos]++;
-        circularBuffer[POSITION][currentPos] = circularBuffer[POSITION][currentPos] % bufferLength;
-    }
 }

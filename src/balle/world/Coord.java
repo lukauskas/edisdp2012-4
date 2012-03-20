@@ -190,7 +190,8 @@ public class Coord {
 		Coord a = from.sub(this);
 		Coord b = to.sub(this);
 
-		return b.getOrientation().sub(a.getOrientation());
+        return new Orientation(b.getOrientation().radians()
+                - a.getOrientation().radians());
 
 		/*
 		 * Orientation out;
