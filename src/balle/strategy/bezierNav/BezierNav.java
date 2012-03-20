@@ -18,6 +18,7 @@ import balle.simulator.WorldSimulator;
 import balle.strategy.FactoryMethod;
 import balle.strategy.curve.Curve;
 import balle.strategy.curve.CustomCHI;
+import balle.strategy.executor.movement.MovementExecutor;
 import balle.strategy.executor.movement.OrientedMovementExecutor;
 import balle.strategy.pathfinding.PathFinder;
 import balle.strategy.pathfinding.SimplePathFinder;
@@ -29,7 +30,7 @@ import balle.world.Snapshot;
 import balle.world.objects.FieldObject;
 import balle.world.objects.Robot;
 
-public class BezierNav implements OrientedMovementExecutor {
+public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 
 
 	// this is how far away from the target that the robot (center) should land
@@ -160,10 +161,20 @@ public class BezierNav implements OrientedMovementExecutor {
 					- snapshot.getTimestamp());
 		}
 
+		// Get orientation.
+		Orientation angle = this.orient;
+		if (angle == null) {
+			// If orient is null, then behave like a a movement executor
+			Coord c = target.getPosition().sub(
+					snapshot.getBalle().getPosition());
+			angle = c.getOrientation();
+		}
+
 		if (isFinished(snapshot)) {
 			stop(controller);
 			return;
 		}
+
 		// calculate bezier points 0 to 3
 		Robot robot = snapshot.getBalle();
 		Coord rP = robot.getPosition(), tP = getAdjustedP3();
@@ -181,7 +192,7 @@ public class BezierNav implements OrientedMovementExecutor {
 				.rotate(new Orientation(Math.PI / 2));
 		double da = Math
 				.abs(robot.getOrientation()
-				.angleToatan2Radians(orient));
+.angleToatan2Radians(angle));
 		double dd = Math.abs(n.dot(target.getPosition().sub(p0)));
 		if ((da <= Math.PI / 2 && dd < (Globals.ROBOT_WIDTH / 2)
 				- TARGET_OFF_CENTER_TOLERANCE)) {
@@ -202,7 +213,7 @@ public class BezierNav implements OrientedMovementExecutor {
 		}
 
 		c = pathfinder.getPath(snapshot, robot.getPosition(),
-				robot.getOrientation(), tP, orient);
+				robot.getOrientation(), tP, angle);
 		
 		// calculate turning radius
 		Coord a = c.acc(0);
@@ -399,5 +410,11 @@ public class BezierNav implements OrientedMovementExecutor {
     public void updateTarget(FieldObject target, Orientation o) {
 		this.target = target;
 		this.orient = o;
+	}
+
+	@Override
+	public void updateTarget(FieldObject target) {
+		this.target = target;
+		this.orient = null;
 	}
 }
