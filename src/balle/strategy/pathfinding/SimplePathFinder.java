@@ -124,6 +124,10 @@ public class SimplePathFinder implements PathFinder {
 	}
 
 	protected Obstacle isClear(Curve c, Snapshot s) {
+        // TODO: Review
+        if (s.getOpponent().getPosition() == null)
+            return null;
+
 		Obstacle[] obstacles = new Obstacle[] {
 
 		new Obstacle(s.getOpponent(), Math.min(Obstacle.ROBOT_CLEARANCE, s
