@@ -102,7 +102,6 @@ class Entity:
         self._hasAngle = hasAngle
         self._angle = None
         self._feature = None
-        self._roughAngle = None
     
     def coordinates(self):
         return self._coordinates
@@ -138,17 +137,17 @@ class Entity:
 
             self._angle = math.atan2(2 * b, a - c + e)
                         
-            # Crudely find direction.          
-            centroid = (m.m10 / m.m00, m.m01 / m.m00)
-            center = (mask.width / 2, mask.height / 2)
+            # Crudely find direction.
 
-            roughAngle = math.atan2(center[0] - centroid[0], center[1] - centroid[1]) 
+            center = (feature.minRectX(), feature.minRectY())
+            centroid = feature.centroid()
+            self._centroid = centroid
+
+            roughAngle = math.atan2(center[1] - centroid[1], center[0] - centroid[0]) 
             self._roughAngle = roughAngle
 
-            if abs(roughAngle - self._angle) > (math.pi / 2):
+            if abs(self._angle - roughAngle) > (math.pi / 2):
                 self._angle += math.pi
-
-
 
         return self._angle
 
@@ -169,11 +168,14 @@ class Entity:
                 endx = center[0] + 30 * math.cos(angle)
                 endy = center[1] + 30 * math.sin(angle)
 
+                degrees = abs(self._angle - math.pi)  / math.pi * 180 
+
                 layer.line(center, (endx, endy), antialias=False);
 
                 angle = self._roughAngle
                 endx = center[0] + 30 * math.cos(angle)
                 endy = center[1] + 30 * math.sin(angle)
                 layer.line(center, (endx, endy), color=Color.RED, antialias=False);
+
 
 
