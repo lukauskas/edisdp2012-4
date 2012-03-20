@@ -13,6 +13,7 @@ import balle.main.drawable.Circle;
 import balle.main.drawable.Dot;
 import balle.main.drawable.Drawable;
 import balle.misc.Globals;
+import balle.simulator.SnapshotPredictor;
 import balle.simulator.WorldSimulator;
 import balle.strategy.FactoryMethod;
 import balle.strategy.curve.Curve;
@@ -152,7 +153,11 @@ public class BezierNav implements OrientedMovementExecutor {
 	@Override
 	public void step(Controller controller, Snapshot snapshot) {
 		if (!USE_PID) {
-			snapshot = getLatencyAdjustedSnapshot(snapshot);
+			// snapshot = getLatencyAdjustedSnapshot(snapshot);
+
+			SnapshotPredictor sp = snapshot.getSnapshotPredictor();
+			snapshot = sp.getSnapshotAfterTime(System.currentTimeMillis()
+					- snapshot.getTimestamp());
 		}
 
 		if (isFinished(snapshot)) {
@@ -274,6 +279,7 @@ public class BezierNav implements OrientedMovementExecutor {
 	 *            ms ago
 	 * @return Estimated snapshot of where the robots actually are
 	 */
+	@Deprecated
 	private Snapshot getLatencyAdjustedSnapshot(Snapshot s) {
 		if(world == null) {
 			world = new BasicWorld(true, false, s.getPitch());
