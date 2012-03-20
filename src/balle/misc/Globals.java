@@ -13,7 +13,14 @@ public class Globals {
     public static final float ROBOT_LENGTH = 0.2f;
     public static final float ROBOT_TRACK_WIDTH = 0.155f; // Meters
     public static final float ROBOT_WHEEL_DIAMETER = 0.0816f; // Meters
-	public static ArrayList<Powers> powervelo = new ArrayList<Powers>();
+	public static ArrayList<Powers> powervelo;
+	static {
+		Powers[] data = VtoPData.getData();
+		powervelo = new ArrayList<Powers>();
+		for (Powers p : data)
+			powervelo.add(p);
+	}
+	
 	public static final Vec2 ROBOT_LEFT_WHEEL_POS = new Vec2(0,
 			-ROBOT_TRACK_WIDTH / 2);
 
