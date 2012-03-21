@@ -4,6 +4,9 @@ import java.util.ArrayList;
 
 import org.jbox2d.common.Vec2;
 
+import balle.world.AngularVelocity;
+import balle.world.Orientation;
+import balle.world.Velocity;
 import balle.world.objects.Pitch;
 
 public class Globals {
@@ -157,6 +160,27 @@ public class Globals {
     public static Pitch getPitch() {
         return new Pitch(0, PITCH_WIDTH, 0, PITCH_HEIGHT);
     }
+
+	public static double[] getWheelVels(Velocity lv, AngularVelocity av,
+			Orientation forward) {
+		// this uses the angular and linear velocity of the robot to
+		// find the estimated powers to the wheels
+		// basicV is the velocity of each wheel assuming the robot is just
+		// spinning
+		double curentLeftV;
+		double curentRightV;
+		if (lv != null && av != null) {
+			double basicV = av.radians() * Globals.ROBOT_TRACK_WIDTH / 2;
+			int flipper = lv.dot(forward.getUnitCoord()) <= 0 ? -1
+					: 1;
+			curentLeftV = (flipper * lv.abs()) - basicV;
+			curentRightV = (flipper * lv.abs()) + basicV;
+
+		} else {
+			curentLeftV = curentRightV = 0;
+		}
+		return new double[] { curentLeftV, curentRightV };
+	}
 
 
 }

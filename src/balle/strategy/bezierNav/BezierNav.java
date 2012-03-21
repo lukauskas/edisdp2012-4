@@ -2,7 +2,6 @@ package balle.strategy.bezierNav;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import org.apache.log4j.Logger;
 import org.jbox2d.common.Vec2;
@@ -18,7 +17,9 @@ import balle.simulator.WorldSimulator;
 import balle.strategy.FactoryMethod;
 import balle.strategy.curve.Curve;
 import balle.strategy.curve.CustomCHI;
+import balle.strategy.curve.path.AbstractPath;
 import balle.strategy.curve.path.MaxSpeedPath;
+import balle.strategy.curve.path.ReversePath;
 import balle.strategy.executor.movement.MovementExecutor;
 import balle.strategy.executor.movement.OrientedMovementExecutor;
 import balle.strategy.pathfinding.PathFinder;
@@ -68,20 +69,14 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 	BasicWorld world;
 
 
-	private ArrayList<Coord> targetPoints = new ArrayList<Coord>(
-			Arrays.asList(new Coord[] {
- new Coord(0.5, 0.3), new Coord(1, 1),
-					new Coord(0.2, 0.4), new Coord(0.5, 0.3),
-
-			}));
-	
 	private PathFinder pathfinder;
 	private Curve c;
+	private ArrayList<Curve> altCurves = new ArrayList<Curve>();
 
     private FieldObject         target;
 
 	private Orientation orient;
-	private Coord p0, p3;
+	private Coord pi, pf;
 
 	private ArrayList<ControllerHistoryElement> controllerHistory; // newer
 																	// snapshots
@@ -115,7 +110,7 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 
 	@Override
 	public boolean isFinished(Snapshot snapshot) {
-		if (p0 == null || p3 == null) {
+		if (pi == null || pf == null) {
 			// haven't even started
 			return false;
 		}
@@ -135,14 +130,14 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 		snapshot = sp.getSnapshotAfterTime(System.currentTimeMillis()
 				- snapshot.getTimestamp());
 
-		if (isMoveStraitFinished(snapshot.getBalle())) {
-			if (isFinished(snapshot)) {
-				controller.stop();
-			} else {
-				controller.forward(Globals.MAXIMUM_MOTOR_SPEED);
-			}
-			return;
-		}
+		// if (isMoveStraitFinished(snapshot.getBalle())) {
+		// if (isFinished(snapshot)) {
+		// controller.stop();
+		// } else {
+		// controller.forward(Globals.MAXIMUM_MOTOR_SPEED);
+		// }
+		// return;
+		// }
 
 		// Get orientation.
 		Orientation angle = this.orient;
@@ -165,41 +160,29 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 			return;
 		}
 
-		p0 = rP;
-		p3 = tP;
+		pi = rP;
+		pf = tP;
 
-		// if we are close to the target and facing the correct orientation
-		// (orient)
-		// just go strait to ball
-		Coord n = robot.getOrientation().getUnitCoord()
-				.rotate(new Orientation(Math.PI / 2));
-		double da = Math
-				.abs(robot.getOrientation()
-.angleToatan2Radians(angle));
-		double dd = Math.abs(n.dot(target.getPosition().sub(p0)));
-		if ((da <= Math.PI / 2 && dd < (Globals.ROBOT_WIDTH / 2)
-				- TARGET_OFF_CENTER_TOLERANCE)) {
-			p3 = target.getPosition();
-		}
+		// // if we are close to the target and facing the correct orientation
+		// // (orient)
+		// // just go strait to ball
+		// Coord n = robot.getOrientation().getUnitCoord()
+		// .rotate(new Orientation(Math.PI / 2));
+		// double da = Math
+		// .abs(robot.getOrientation()
+		// .angleToatan2Radians(angle));
+		// double dd = Math.abs(n.dot(target.getPosition().sub(pi)));
+		// if ((da <= Math.PI / 2 && dd < (Globals.ROBOT_WIDTH / 2)
+		// - TARGET_OFF_CENTER_TOLERANCE)) {
+		// pf = target.getPosition();
+		// }
 
-		// remove current target point if close
-		if (targetPoints.size() > 0
-				&& p0.dist(targetPoints.get(0)) <= SUBTARGET_RADIUS) {
-			targetPoints.remove(0);
-		}
-
-		Coord[] tpa = new Coord[targetPoints.size() + 2];
-		tpa[0] = p0;
-		tpa[tpa.length - 1] = p3;
-		for (int i = 0; i < targetPoints.size(); i++) {
-			tpa[i + 1] = targetPoints.get(i);
-		}
-
-		c = pathfinder.getPath(snapshot, robot.getPosition(),
-				robot.getOrientation(), tP, angle);
+		// decide on a path to take
+		AbstractPath pathToTake = getBestPath(snapshot, angle);
+		c = pathToTake.getCurve();
 
 		// calculate wheel speeds/powers
-		int[] pows = new MaxSpeedPath(c).getPowers(robot, 0);
+		int[] pows = pathToTake.getPowers(robot, 0);
 		int left, right;
 		left = pows[0]; // Globals.velocityToPower((float) (max *
 						// getMinVelocityRato(r)));
@@ -209,6 +192,43 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 		controller.setWheelSpeeds(left, right);
 		controllerHistory.add(new ControllerHistoryElement((int) left,
 				(int) right, System.currentTimeMillis()));
+	}
+	
+	private AbstractPath[] getPathCandidates(Snapshot s, Orientation finalOrient) {
+		Robot robot = s.getBalle();
+		return new AbstractPath[] {
+				// full backwards
+				new ReversePath(new MaxSpeedPath(pathfinder.getPath(s, robot.getPosition(), robot.getOrientation().getOpposite(), pf, finalOrient))),
+				// full forwards
+				new MaxSpeedPath(pathfinder.getPath(s, robot.getPosition(), robot.getOrientation(), pf, finalOrient))
+ };
+	}
+	
+	private AbstractPath getBestPath(Snapshot s, Orientation finalOrient) {
+		// get candidate paths
+		AbstractPath[] paths = getPathCandidates(s, finalOrient);
+		AbstractPath best = paths[0];
+		// look for the quickest time path
+		Robot bot = s.getBalle();
+		double[] iv = Globals.getWheelVels(bot.getVelocity(),
+				bot.getAngularVelocity(), bot.getOrientation());
+		double bestTime = best.getTimeToDrive(iv[0], iv[1]);
+		for(int i = 1; i < paths.length; i++) {
+			AbstractPath curr = paths[i];
+			double currTime = curr.getTimeToDrive(iv[0], iv[1]);
+			if (bestTime > currTime) {
+				best = curr;
+				bestTime = currTime;
+			}
+		}
+		// save the unused paths for drawing
+		altCurves.clear();
+		for (AbstractPath p : paths) {
+			if (p != best) {
+				altCurves.add(p.getCurve());
+			}
+		}
+		return best;
 	}
 
 	/**
@@ -233,7 +253,7 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 		}
 		long currentTime = System.currentTimeMillis();
 		long simulatorTime = s.getTimestamp();
-		System.out.println(currentTime + "  " + simulatorTime);
+		// System.out.println(currentTime + "  " + simulatorTime);
 
 		// clean up the history (ensure there is at least one element left in
 		// history)
@@ -289,7 +309,7 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 	@Override
 	public ArrayList<Drawable> getDrawables() {
 		ArrayList<Drawable> l = new ArrayList<Drawable>();
-		if (p0 == null) {
+		if (pi == null) {
 			return l;
 		}
 
@@ -303,9 +323,14 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 			// .dist(snapshot.getBalle().getPosition()),
 			// Color.yellow));
 		}
+		l.addAll(altCurves);
+		for(Curve c : altCurves) {
+			l.add(c);
+			l.add(new Dot(c.pos(0.1), Color.RED));
+		}
 
-		l.add(new Circle(p0, 0.03, Color.pink));
-		l.add(new Circle(p3, 0.03, Color.pink));
+		l.add(new Circle(pi, 0.03, Color.pink));
+		l.add(new Circle(pf, 0.03, Color.pink));
 
 		return l;
 	}
