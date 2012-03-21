@@ -6,6 +6,7 @@ import java.util.Iterator;
 import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
+import balle.main.drawable.Circle;
 import balle.main.drawable.Dot;
 import balle.main.drawable.DrawableLine;
 import balle.main.drawable.DrawableVector;
@@ -15,6 +16,7 @@ import balle.strategy.curve.CustomCHI;
 import balle.strategy.executor.movement.GoToObjectPFN;
 import balle.strategy.executor.movement.MovementExecutor;
 import balle.strategy.executor.movement.OrientedMovementExecutor;
+import balle.strategy.friendly1.GoToBall;
 import balle.strategy.pathfinding.SimplePathFinder;
 import balle.strategy.planner.AbstractPlanner;
 import balle.world.Coord;
@@ -33,9 +35,11 @@ public class Interception extends AbstractPlanner {
     private int     ballCount          = 0;
     private int     countNeeded        = 6;              // require 6 readings
                                                           // of ball position
-    private boolean predictionCoordSet = false;
+    private boolean ballHasMoved = false;
     private Coord   intercept          = new Coord(0, 0);
     private double  lineLength         = 200;
+    private boolean shouldPlayGame;
+    private static final double STRATEGY_STOP_DISTANCE = Globals.ROBOT_LENGTH + 0.05;
 
     protected final boolean useCpOnly;
     protected CircularBuffer<Coord> ballCoordBuffer;
@@ -44,6 +48,7 @@ public class Interception extends AbstractPlanner {
 
     private MovementExecutor movementExecutor;
     private OrientedMovementExecutor orientedMovementExecutor;
+    private AbstractPlanner gameStrategy;
 
     protected void setIAmDoing(String message) {
         LOG.info(message);
@@ -57,6 +62,8 @@ public class Interception extends AbstractPlanner {
         
         this.movementExecutor = movementExecutor;
         this.orientedMovementExecutor = orientedMovementExecutor;
+        shouldPlayGame = false;
+        this.gameStrategy = new Game(new GoToBall(new GoToObjectPFN(0)), false);
     }
 
 
@@ -69,37 +76,26 @@ public class Interception extends AbstractPlanner {
         if (ball.getPosition() == null)
             return;
 
-        Robot opponent = snapshot.getOpponent();
-        Robot robot = snapshot.getBalle();
-
         ballCoordBuffer.add(ball.getPosition());
 
-        // run kicker to get ball moving - comment out when testing on pitch
-        // executor.kick();
-
         if (ballIsMoving(ball) /* && !predictionCoordSet */) {
-            // read a certain number of values
-
-            // ballCount += 1;
-            // if (ballCount > countNeeded) {
-            // lineLength = 4 * distanceOfMovingBall(ball);
-            // intercept = getPredictionCoord(snapshot.getPitch(), ball,
-            // lineLength, ballBuffer);
-            // predictionCoordSet = true;
-            // }
             intercept = getPredictionCoordVelocityvector(snapshot, useCpOnly);
-            predictionCoordSet = true;
-            // setIAmDoing("Getting ball positions");
-            /*
-             * } else if (robot.isInCoord(intercept)){ //reset to find new
-             * prediction point predictionCoordSet = false; ballCount = 0;
-             * executor.stop(); setIAmDoing("Predict point reached - stopping");
-             */
-        } else {
-            if (!predictionCoordSet)
-                controller.stop();
+            ballHasMoved = true;
+
+            if (!shouldPlayGame) {
+                addDrawable(new Circle(snapshot.getBalle().getPosition(),
+                        STRATEGY_STOP_DISTANCE, Color.red));
+            }
+            if (snapshot.getBalle().getPosition()
+                    .dist(snapshot.getBall().getPosition()) < STRATEGY_STOP_DISTANCE)
+                shouldPlayGame = true;
+
         }
-        if (predictionCoordSet) {
+
+        if (shouldPlayGame) {
+            setIAmDoing("GAME!");
+            gameStrategy.step(controller, snapshot);
+        } else if (ballHasMoved) {
             setIAmDoing("Going to point - predict");
             addDrawable(new Dot(intercept, Color.BLACK));
             if (movementExecutor != null) {
@@ -113,13 +109,10 @@ public class Interception extends AbstractPlanner {
                 addDrawables(orientedMovementExecutor.getDrawables());
                 orientedMovementExecutor.step(controller, snapshot);
             }
-
-            //addDrawable(new Label("Go go go", new Coord(-0.05, -0.05),
-            // Color.BLUE));
-        } else {}
-            //addDrawable(new Label("Not yet", new Coord(-0.05, -0.05), Color.RED));
-
-
+        } else {
+            setIAmDoing("Waiting");
+            controller.stop();
+        }
     }
 
     @FactoryMethod(designator = "InterceptsM4-CP-PFN")
