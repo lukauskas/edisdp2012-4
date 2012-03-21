@@ -13,7 +13,6 @@ import balle.main.drawable.Circle;
 import balle.main.drawable.Dot;
 import balle.main.drawable.Drawable;
 import balle.misc.Globals;
-import balle.simulator.SnapshotPredictor;
 import balle.simulator.WorldSimulator;
 import balle.strategy.FactoryMethod;
 import balle.strategy.curve.Curve;
@@ -64,15 +63,8 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 	private double stopAngle = Math.PI / 13; // angle of robot vs desired final
 												// angle (orient)
 
-	private PID pid = new PID(11, 0.25, 4, 1);
-	private final boolean USE_PID = false;
-
 	WorldSimulator simulator;
 	BasicWorld world;
-
-	private Orientation lastAngle;
-	private long lastAngleTime;
-
 
 
 	private ArrayList<Coord> targetPoints = new ArrayList<Coord>(
@@ -144,14 +136,6 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 				controller.forward(Globals.MAXIMUM_MOTOR_SPEED);
 			}
 			return;
-		}
-
-		if (!USE_PID) {
-			// snapshot = getLatencyAdjustedSnapshot(snapshot);
-
-			SnapshotPredictor sp = snapshot.getSnapshotPredictor();
-			snapshot = sp.getSnapshotAfterTime(System.currentTimeMillis()
-					- snapshot.getTimestamp());
 		}
 
 		// Get orientation.
