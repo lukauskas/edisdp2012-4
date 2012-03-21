@@ -83,17 +83,22 @@ public class SnapshotPredictor extends WorldSimulator {
         // TODO: add the wheelspeeds again
         // clean up the history (ensure there is at least one element left in
         // history)
-        while (controllerHistory.size() > 1 && controllerHistory.get(0).getTimestamp() < startTime) {
-            controllerHistory.remove(0);
+		if (controllerHistory.size() <= 1) {
+			controllerHistory.add(new ControllerHistoryElement(0, 0, 0));
+		}
+		while (controllerHistory.size() > 2
+				&& controllerHistory.get(0).getTimestamp() <= startTime) {
+			if (controllerHistory.get(1).getTimestamp() > startTime)
+				break;
+			else
+				controllerHistory.remove(0);
         }
         //
         // // setup a simulator using the current snapshot (assume we are blue)
-        float lastLPower = 0, lastRPower = 0;
-        if (controllerHistory.size() > 0) {
-            ControllerHistoryElement lastState = controllerHistory.get(0);
-            lastLPower = lastState.getPowerLeft();
-            lastRPower = lastState.getPowerRight();
-        }
+		float lastLPower, lastRPower;
+        ControllerHistoryElement lastState = controllerHistory.get(0);
+        lastLPower = lastState.getPowerLeft();
+        lastRPower = lastState.getPowerRight();
 
         // Assume we are always blue
         SoftBot virtual = getBlueSoft();
