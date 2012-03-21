@@ -61,8 +61,6 @@ public class MaxSpeedPath extends AbstractPath {
 		right = ((invDampening * right) + (DAMPENING_POWERCHANGE * Globals
 				.velocityToPower((float) rightWheelVel)));
 
-		System.out.println(max);
-		System.out.println(leftWheelVel + "\t\t" + rightWheelVel);
 		return new double[] { left, right };
 	}
 
