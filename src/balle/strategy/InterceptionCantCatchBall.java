@@ -178,10 +178,7 @@ public class InterceptionCantCatchBall extends AbstractPlanner {
 		Coord pos = robot.getPosition();
 	
         Coord bp = ball.getPosition();
-        Coord bv = ball.getVelocity();
-        if(bv.abs() == 0) {
-        	bv = bp.sub(s.getOpponent().getPosition());
-        }
+		Coord bv = bp.sub(s.getOpponent().getPosition());
         bv = bv.getUnitCoord();
 		Coord relToBall = bv.mult(bv.dot(pos.sub(bp)));
 		return bp.add(relToBall.getUnitCoord().mult(relToBall.abs() - 0.4));
