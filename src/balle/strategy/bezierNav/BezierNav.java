@@ -56,6 +56,17 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 														// points befor it try
 														// to get to the next
 														// point
+	private static final double CHANGEPATH_IMPROVEMENT_THRESHHOLD = 1.2; // only
+																			// change
+																			// paths
+																			// if
+																			// there
+																			// is
+																			// an
+																			// improvement
+																			// above
+																			// this
+																			// percentage
 
 	// these 2 must moth be satisfied before this movement is finished
 	private double stopDistance = 0.03; // distance to target (centre of robot
@@ -63,9 +74,11 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 	private double stopAngle = Math.PI / 13; // angle of robot vs desired final
 												// angle (orient)
 
+
 	WorldSimulator simulator;
 	BasicWorld world;
 
+	private int lastPathIndexUsed = -1;
 
 	private PathFinder pathfinder;
 	private Curve c;
@@ -202,12 +215,19 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 	private AbstractPath getBestPath(Snapshot s, Orientation finalOrient) {
 		// get candidate paths
 		AbstractPath[] paths = pathfinder.getPaths(s, pf, finalOrient);
-		AbstractPath best = paths[0];
+		boolean hasLastPathUsed = lastPathIndexUsed != -1;
+		AbstractPath best = paths[hasLastPathUsed ? lastPathIndexUsed : 0];
 		// look for the quickest time path
 		Robot bot = s.getBalle();
 		double[] iv = Globals.getWheelVels(bot.getVelocity(),
 				bot.getAngularVelocity(), bot.getOrientation());
-		double bestTime = best.getTimeToDrive(iv[0], iv[1]);
+		double bestTime = best.getTimeToDrive(iv[0], iv[1])
+				* (hasLastPathUsed ? (1 / CHANGEPATH_IMPROVEMENT_THRESHHOLD)
+						: 1); // make it seem
+															// better than it is
+															// to amke the path
+															// choice more
+															// consistent
 		for(int i = 1; i < paths.length; i++) {
 			AbstractPath curr = paths[i];
 			if (curr != null) {
@@ -215,6 +235,7 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 				if (bestTime > currTime) {
 					best = curr;
 					bestTime = currTime;
+					lastPathIndexUsed = i;
 				}
 			}
 		}
