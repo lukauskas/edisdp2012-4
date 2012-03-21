@@ -43,26 +43,11 @@ public abstract class AbstractPath {
 	 * @return [left, right] powers
 	 */
 	public int[] getPowers(Robot robot, double t) {
-		// this uses the angular and linear velocity of the robot to
-		// find the estimated powers to the wheels
-		// basicV is the velocity of each wheel assuming the robot is just
-		// spinning
-		double curentLeftV;
-		double curentRightV;
-		if (robot.getVelocity() != null && robot.getAngularVelocity() != null) {
-			double basicV = robot.getAngularVelocity().radians()
-					* Globals.ROBOT_TRACK_WIDTH / 2;
-			int flipper = robot.getVelocity().dot(
-					robot.getOrientation().getUnitCoord()) <= 0 ? -1 : 1;
-			curentLeftV = (flipper * robot
-							.getVelocity().abs()) - basicV;
-			curentRightV = (flipper * robot
-							.getVelocity().abs()) + basicV;
-			
-		} else {
-			curentLeftV = curentRightV = 0;
-		}
-		double[] vels = getVelocities(t, curve, curentLeftV, curentRightV);
+		double[] currVels = Globals.getWheelVels(robot.getVelocity(),
+				robot.getAngularVelocity(), robot.getOrientation());
+		double currentLeftV = currVels[0];
+		double currentRightV = currVels[1];
+		double[] vels = getVelocities(t, curve, currentLeftV, currentRightV);
 		return new int[] { (int) Globals.velocityToPower((float) vels[0]),
 				(int) Globals.velocityToPower((float) vels[1]) };
 	}
@@ -76,5 +61,33 @@ public abstract class AbstractPath {
 			double leftWheelVel,
 			double rightWheelVel);
 
+	/**
+	 * get an approximation of the time it will take for the robot to drive this
+	 * path.
+	 * 
+	 * note that this assumes the path is not stupid and actually gives powers
+	 * that move along the curve
+	 * 
+	 * @param lv
+	 *            initial left wheel velocity
+	 * @param lr
+	 *            initial right wheel velocity
+	 * @return
+	 */
+	public double getTimeToDrive(double lv, double rv) {
+		Curve c = getCurve();
+		double t = 0;
+		final double STEP = 1.0 / 20.0;
+		for (double i = 0; i < 1; i += STEP) {
+			// find the time for this step t = d/v
+			double dist = c.pos(i).dist(c.pos(i + STEP));
+			double[] vels = getVelocities(i, c, lv, rv);
+			double vel = Math.abs((vels[0] + vels[1]) / 2);
+			t += dist / vel;
+			lv = vels[0]; // set the left and right velocities of the wheels
+			rv = vels[1]; // used for the next step
+		}
+		return t;
+	}
 
 }
