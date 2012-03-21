@@ -12,6 +12,7 @@ import balle.strategy.curve.Interpolator;
 import balle.world.Coord;
 import balle.world.Orientation;
 import balle.world.Snapshot;
+import balle.world.objects.Robot;
 
 public class SimplePathFinder implements PathFinder {
 
@@ -27,8 +28,19 @@ public class SimplePathFinder implements PathFinder {
 	}
 
 	@Override
-	public Curve getPath(Snapshot s, Coord start, Orientation startAngle,
-			Coord end, Orientation endAngle) {
+	public AbstractPath[] getPaths(Snapshot s, Coord end,
+			Orientation endAngle) {
+		
+		Robot robot = s.getBalle();
+		Coord start = robot.getPosition();
+		Orientation startAngle = robot.getOrientation();
+
+		return getPaths(s, start, startAngle, end, endAngle);
+	}
+
+	protected AbstractPath[] getPaths(Snapshot s, Coord start,
+			Orientation startAngle, Coord end, Orientation endAngle) {
+		
 		drawables = new ArrayList<Drawable>();
 		// Initialise temporary variables.
 		this.start = start;
@@ -48,8 +60,8 @@ public class SimplePathFinder implements PathFinder {
 			last = list.get(i);
 		}
 
-		// Convert to a curve.
-		return getCurve(list);
+		// Convert to a path.
+		return new AbstractPath[] { new MaxSpeedPath(getCurve(list)) };
 	}
 
 	/**

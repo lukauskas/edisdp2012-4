@@ -17,13 +17,11 @@ import balle.simulator.WorldSimulator;
 import balle.strategy.FactoryMethod;
 import balle.strategy.curve.Curve;
 import balle.strategy.curve.CustomCHI;
-import balle.strategy.curve.path.AbstractPath;
-import balle.strategy.curve.path.MaxSpeedPath;
-import balle.strategy.curve.path.ReversePath;
 import balle.strategy.executor.movement.MovementExecutor;
 import balle.strategy.executor.movement.OrientedMovementExecutor;
+import balle.strategy.pathfinding.AbstractPath;
+import balle.strategy.pathfinding.ForwardAndReversePathFinder;
 import balle.strategy.pathfinding.PathFinder;
-import balle.strategy.pathfinding.SimplePathFinder;
 import balle.strategy.planner.SimpleGoToBallFaceGoal;
 import balle.world.BasicWorld;
 import balle.world.Coord;
@@ -82,15 +80,22 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 																	// snapshots
 																	// at the
 																	// end
+	private boolean endInfront;
 
 	@FactoryMethod(designator = "BezierNav")
 	public static SimpleGoToBallFaceGoal bezierNavFactory() {
-		return new SimpleGoToBallFaceGoal(new BezierNav(new SimplePathFinder(
-				new CustomCHI())));
+		return new SimpleGoToBallFaceGoal(new BezierNav(
+				new ForwardAndReversePathFinder(
+				new CustomCHI()), true));
 	}
 
 	public BezierNav(PathFinder pathfinder) {
+		this(pathfinder, false);
+	}
+
+	public BezierNav(PathFinder pathfinder, boolean endInfront) {
 		this.pathfinder = pathfinder;
+		this.endInfront = endInfront;
 		simulator = new WorldSimulator(false);
 		simulator.setWorld(new World(new Vec2(), true));
 		simulator.initWorld();
@@ -194,19 +199,9 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 				(int) right, System.currentTimeMillis()));
 	}
 	
-	private AbstractPath[] getPathCandidates(Snapshot s, Orientation finalOrient) {
-		Robot robot = s.getBalle();
-		return new AbstractPath[] {
-				// full backwards
-				new ReversePath(new MaxSpeedPath(pathfinder.getPath(s, robot.getPosition(), robot.getOrientation().getOpposite(), pf, finalOrient))),
-				// full forwards
-				new MaxSpeedPath(pathfinder.getPath(s, robot.getPosition(), robot.getOrientation(), pf, finalOrient))
- };
-	}
-	
 	private AbstractPath getBestPath(Snapshot s, Orientation finalOrient) {
 		// get candidate paths
-		AbstractPath[] paths = getPathCandidates(s, finalOrient);
+		AbstractPath[] paths = pathfinder.getPaths(s, pf, finalOrient);
 		AbstractPath best = paths[0];
 		// look for the quickest time path
 		Robot bot = s.getBalle();
@@ -215,10 +210,12 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 		double bestTime = best.getTimeToDrive(iv[0], iv[1]);
 		for(int i = 1; i < paths.length; i++) {
 			AbstractPath curr = paths[i];
-			double currTime = curr.getTimeToDrive(iv[0], iv[1]);
-			if (bestTime > currTime) {
-				best = curr;
-				bestTime = currTime;
+			if (curr != null) {
+				double currTime = curr.getTimeToDrive(iv[0], iv[1]);
+				if (bestTime > currTime) {
+					best = curr;
+					bestTime = currTime;
+				}
 			}
 		}
 		// save the unused paths for drawing
@@ -342,8 +339,11 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 	 * @return
 	 */
 	private Coord getAdjustedP3() {
-		return target.getPosition().add(
+		if (endInfront) {
+			return target.getPosition().add(
 				new Coord(-TARGET_PERIMETER, 0).rotate(orient));
+		}
+		return target.getPosition();
 	}
 
 	@Override
