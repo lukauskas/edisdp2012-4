@@ -10,6 +10,7 @@ import balle.main.drawable.Circle;
 import balle.main.drawable.Dot;
 import balle.main.drawable.DrawableLine;
 import balle.main.drawable.DrawableVector;
+import balle.main.drawable.Label;
 import balle.misc.Globals;
 import balle.strategy.bezierNav.BezierNav;
 import balle.strategy.curve.CustomCHI;
@@ -188,18 +189,22 @@ public class Interception extends AbstractPlanner {
 		ballPos = ball.getPosition();
 		currPos = ourRobot.getPosition();
 
-		if (mirror
-				&& (s.getPitch().getHalf(ourRobot.getPosition()) == s
-						.getPitch().getHalf(s.getOpponentsGoal().getPosition()))) {
+		double dist = (new Line(currPos, s.getOwnGoal().getPosition()))
+				.length();
+		if (mirror && dist > (Globals.PITCH_WIDTH / 2)) {
 
-			// Mirror X position.
-			double dX = currPos.getX() - s.getPitch().getPosition().getX();
-			currPos = new Coord(s.getPitch().getPosition().getX() - dX,
-					currPos.getY());
+			// // Mirror X position.
+			// double dX = currPos.getX() - s.getPitch().getPosition().getX();
+			// currPos = new Coord(s.getPitch().getPosition().getX() - dX,
+			// currPos.getY());
+
+			addDrawable(new Label("length = " + dist, new Coord(0, 0),
+					Color.ORANGE));
+
+			return s.getOwnGoal().getPosition();
 
 		}
 
-		addDrawable(new Dot(currPos, Color.ORANGE));
 
         Velocity vel = ball.getVelocity();
         Coord vec = new Coord(vel.getX(), vel.getY());
