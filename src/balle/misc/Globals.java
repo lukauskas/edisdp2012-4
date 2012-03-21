@@ -147,7 +147,7 @@ public class Globals {
             powerAbove = powervelo.get(powervelo.size() - 1);
 
         float m = powerAbove.getPower() - powerBelow.getPower();
-        m /= (powerAbove.getPower() - powerBelow.getPower());
+		m /= (powerAbove.getVelocity() - powerBelow.getVelocity());
         power = m * (v - powerBelow.getVelocity()) + powerBelow.getPower();
 
         return power;

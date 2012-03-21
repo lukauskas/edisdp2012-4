@@ -77,11 +77,9 @@ public class InterceptionCantCatchBall extends AbstractPlanner {
 		if (snapshot.getBalle().getPosition() == null) {
 			return;
 		}
-		if (ballIsMoving(ball)
-				&& intercept.dist(snapshot.getBalle().getPosition()) > 0.1/*
-																		 * && !
-																		 * predictionCoordSet
-																		 */) {
+		if (!shouldPlayGame && ballIsMoving(ball)/*
+												 * && ! predictionCoordSet
+												 */) {
 			intercept = getPredictionCoordVelocityvector(snapshot,
 					mirror);
             ballHasMoved = true;
@@ -108,8 +106,8 @@ public class InterceptionCantCatchBall extends AbstractPlanner {
                 movementExecutor.step(controller, snapshot);
             } else if (orientedMovementExecutor != null) {
                 orientedMovementExecutor.updateTarget(new Point(intercept),
-                        snapshot.getOpponentsGoal().getGoalLine().midpoint()
-                                .sub(intercept).orientation());
+						snapshot.getOpponent().getPosition().sub(intercept)
+								.getOrientation());
                 addDrawables(orientedMovementExecutor.getDrawables());
                 orientedMovementExecutor.step(controller, snapshot);
             }
