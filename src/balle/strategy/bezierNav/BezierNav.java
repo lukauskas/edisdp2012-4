@@ -18,6 +18,7 @@ import balle.simulator.WorldSimulator;
 import balle.strategy.FactoryMethod;
 import balle.strategy.curve.Curve;
 import balle.strategy.curve.CustomCHI;
+import balle.strategy.curve.path.MaxSpeedPath;
 import balle.strategy.executor.movement.MovementExecutor;
 import balle.strategy.executor.movement.OrientedMovementExecutor;
 import balle.strategy.pathfinding.PathFinder;
@@ -49,23 +50,6 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 														// target from the
 														// center front of the
 														// robot
-	private final double MIN_SAFE_RADIUS = 0; // the smallest turning radius
-												// where moving at maximum speed
-												// is ok (0.05)
-	private final double SAFER_SPEED_RATIO = 0.5; // ratio of (max
-													// speed)/((minimum)safe
-													// speed). when making sharp
-													// turns the speed will be
-													// slowed toward max/this
-	private final double MAX_VELOCITY = Globals
-.powerToVelocity(600); // the
-																		// maximum
-																// wheel
-															// velocity to use
-	private final double DAMPENING_POWERCHANGE = 0.7;
-	private final double DAMPENING_POWERRATIO = 0; // increase towards 1 to make
-													// the robot move more
-													// strait
 
 	private static final double SUBTARGET_RADIUS = 0.08; // how close the robot
 															// has
@@ -223,68 +207,16 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 
 		c = pathfinder.getPath(snapshot, robot.getPosition(),
 				robot.getOrientation(), tP, angle);
-		
-		// calculate turning radius
-		Coord a = c.acc(0);
-		boolean isLeft = new Coord(0, 0).angleBetween(
-				robot.getOrientation().getUnitCoord(), a)
-				.atan2styleradians() > 0;
-		double r = c.rad(0);
-
-		// throttle speed (slow when doing sharp turns)
-		double max = MAX_VELOCITY;
-		// // maximum speed is ok
-		if (r < MIN_SAFE_RADIUS) {
-			double min = max * SAFER_SPEED_RATIO;
-			max = min + ((r / MIN_SAFE_RADIUS) * (max - min));
-		}
 
 		// calculate wheel speeds/powers
-		double v1, v2, left, right;
-		v1 = Globals.velocityToPower((float) (max * getMinVelocityRato(r)));
-		v2 = Globals.velocityToPower((float) max);
-		left = isLeft ? v1 : v2;
-		right = isLeft ? v2 : v1;
-		// find current wheel powers
-		long dT = snapshot.getTimestamp() - lastAngleTime;
-		if (USE_PID && dT > 0) {
-			if (lastAngle != null) {
-				// this uses the angular and linear velocity of the robot to
-				// find the estimated powers to the wheels
-				double dA = lastAngle.angleToatan2Radians(robot
-						.getOrientation());
-				double basicV = (dA * Globals.ROBOT_TRACK_WIDTH / 2) / dT;
-				int flipper = robot.getVelocity().dot(
-						robot.getOrientation().getUnitCoord()) <= 0 ? -1 : 1;
-				double curentLeftP = Globals
-						.velocityToPower((float) ((flipper * robot
-								.getVelocity().abs()) - basicV));
-				double curentRightP = Globals
-						.velocityToPower((float) ((flipper * robot
-								.getVelocity().abs()) + basicV));
-				// use PID
-				left = pid.convert(left, curentLeftP);
-				right = pid.convert(right, curentRightP);
-			}
-			lastAngleTime = snapshot.getTimestamp();
-			lastAngle = robot.getOrientation();
-		}
+		int[] pows = new MaxSpeedPath(c).getPowers(robot, 0);
+		int left, right;
+		left = pows[0]; // Globals.velocityToPower((float) (max *
+						// getMinVelocityRato(r)));
+		right = pows[1]; // Globals.velocityToPower((float) max);
 
-		// dampen
-		if (controllerHistory.size() > 0) {
-			double invDampening = 1 - DAMPENING_POWERCHANGE;
 
-			left = (invDampening * left)
-					+ (DAMPENING_POWERCHANGE * controllerHistory.get(
-							controllerHistory.size() - 1).getPowerLeft());
-			right = (invDampening * right)
-					+ (DAMPENING_POWERCHANGE * controllerHistory.get(
-							controllerHistory.size() - 1).getPowerRight());
-		}
-
-		System.out.println(left + "\t\t" + right);
-
-		controller.setWheelSpeeds((int) left, (int) right);
+		controller.setWheelSpeeds(left, right);
 		controllerHistory.add(new ControllerHistoryElement((int) left,
 				(int) right, System.currentTimeMillis()));
 	}
@@ -402,12 +334,6 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 	@Override
 	public void setStopDistance(double stopDistance) {
 		this.stopDistance = stopDistance;
-	}
-
-	private double getMinVelocityRato(double radius) {
-		double rtw = Globals.ROBOT_TRACK_WIDTH / 2;
-		double ratio = ((radius - rtw) / (radius + rtw));
-		return ratio + ((1 - ratio) * DAMPENING_POWERRATIO);
 	}
 
 	@Override
