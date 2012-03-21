@@ -113,7 +113,7 @@ public class InterceptionCantCatchBall extends AbstractPlanner {
     }
 
 
-	@FactoryMethod(designator = "Slow Intercepts BZR")
+	@FactoryMethod(designator = "AAAAAA Fast Intercepts BZR")
     public static final InterceptionCantCatchBall factoryNCPBZR() {
 		return new InterceptionCantCatchBall(true, null, new BezierNav(
                 new SimplePathFinder(
