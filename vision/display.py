@@ -281,6 +281,9 @@ class ThresholdGui:
         self.currentEntity = name
         self.setTrackbarValues(self.threshold._values[name])
 
+        # Make sure trackbars update immediately
+        cv.WaitKey(2)
+
         if self._showOnGui:
             self._gui.switchLayerset(name)
 
