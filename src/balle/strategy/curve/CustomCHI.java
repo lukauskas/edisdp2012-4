@@ -8,6 +8,8 @@ import balle.world.Orientation;
 
 public class CustomCHI extends CubicHermiteInterpolator {
 
+	private static final double MAX_DISTS = 0.2;
+
 	@Override
 	public ArrayList<Bezier4> getCurves(Stack<Coord> controlPoints,
 			Orientation start,
@@ -24,11 +26,12 @@ public class CustomCHI extends CubicHermiteInterpolator {
 			p[0] = controlPoints.peek();
 
 			double distS = p[0].dist(p[3]) / 4;
+			// distS = Math.min(MAX_DISTS, distS);
 
 			// Calculate p0.
 			if (inc == null)
 				p[2] = p[3].add(end.getOpposite().getUnitCoord()
-						.mult(distS * 2));
+.mult(distS));
 			else
 				p[2] = p[3].add(inc.getOpposite().getUnitCoord().mult(distS));
 
