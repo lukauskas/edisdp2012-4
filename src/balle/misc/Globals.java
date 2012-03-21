@@ -44,9 +44,9 @@ public class Globals {
 
     public static final float METERS_PER_PIXEL = PITCH_WIDTH / 605f;
 
-    public static final float VISION_COORD_NOISE_SD = 0.49f * METERS_PER_PIXEL; // in
+	public static final float VISION_COORD_NOISE_SD = 0.29f * METERS_PER_PIXEL; // in
                                                                                 // meters
-    public static final float VISION_ANGLE_NOISE_SD = 1.53f; // in
+	public static final float VISION_ANGLE_NOISE_SD = 0.53f; // in
                                                              // degrees
     public static final float SIMULATED_VISON_FRAMERATE = 25f;
 	public static final long SIMULATED_VISON_DELAY = 450;

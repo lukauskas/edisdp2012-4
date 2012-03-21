@@ -38,6 +38,7 @@ public class Interception extends AbstractPlanner {
     private static final double GO_DIRECTLY_TO_BALL_DISTANCE = STRATEGY_STOP_DISTANCE * 1.75;
 
     protected final boolean useCpOnly;
+	protected final boolean mirror;
     protected CircularBuffer<Coord> ballCoordBuffer;
 
     private static Logger LOG                = Logger.getLogger(Interception.class);
@@ -54,10 +55,10 @@ public class Interception extends AbstractPlanner {
 
     public Interception(boolean useCpOnly, MovementExecutor movementExecutor,
             OrientedMovementExecutor orientedMovementExecutor,
-            boolean startGameAfterwards) {
-        super();
+    super();
         ballCoordBuffer = new CircularBuffer<Coord>(6);
         this.useCpOnly = useCpOnly;
+		this.mirror = mirror;
         
         this.movementExecutor = movementExecutor;
         this.orientedMovementExecutor = orientedMovementExecutor;
@@ -82,7 +83,8 @@ public class Interception extends AbstractPlanner {
         ballCoordBuffer.add(ball.getPosition());
 
         if (ballIsMoving(ball) /* && !predictionCoordSet */) {
-            intercept = getPredictionCoordVelocityvector(snapshot, useCpOnly);
+			intercept = getPredictionCoordVelocityvector(snapshot, useCpOnly,
+					mirror);
             ballHasMoved = true;
         }
 
@@ -150,8 +152,7 @@ public class Interception extends AbstractPlanner {
     @FactoryMethod(designator = "InterceptsM4-CP-PFNF-NG")
     public static final Interception factoryCPPFNFNG() {
         return new Interception(true, new GoToObjectPFN(
-                Globals.ROBOT_LENGTH / 3, false), null, false);
-    }
+                Globals.ROBOT_LENGTH / 3, false), null, false);}
 
     @FactoryMethod(designator = "InterceptsM4-NCP-PFNF")
     public static final Interception factoryNCPPFNF() {
@@ -169,7 +170,7 @@ public class Interception extends AbstractPlanner {
     public static final Interception factoryCPBZRNG() {
         return new Interception(true, null, new BezierNav(new SimplePathFinder(
                 new CustomCHI())), false);
-    }
+}
 
     @FactoryMethod(designator = "InterceptsM4-NCP-BZR")
     public static final Interception factoryNCPBZR() {
@@ -199,21 +200,37 @@ public class Interception extends AbstractPlanner {
     }
 
 
-    protected Coord getPredictionCoordVelocityvector(Snapshot s, boolean useCPOnly) {
+	protected Coord getPredictionCoordVelocityvector(Snapshot s,
+			boolean useCPOnly, boolean mirror) {
         Ball ball = s.getBall();
         Robot ourRobot = s.getBalle();
+
+		Coord ballPos, currPos;
+		ballPos = ball.getPosition();
+		currPos = ourRobot.getPosition();
+
+		if (mirror
+				&& (s.getPitch().getHalf(ourRobot.getPosition()) == s
+						.getPitch().getHalf(s.getOpponentsGoal().getPosition()))) {
+
+			// Mirror X position.
+			double dX = currPos.getX() - s.getPitch().getPosition().getX();
+			currPos = new Coord(s.getPitch().getPosition().getX() - dX,
+					currPos.getY());
+
+		}
+
+		addDrawable(new Dot(currPos, Color.ORANGE));
 
         Velocity vel = ball.getVelocity();
         Coord vec = new Coord(vel.getX(), vel.getY());
         vec = vec.mult(0.5 / vec.abs());
         
-        Line ballRobotLine = new Line(ball.getPosition(),
-                ourRobot.getPosition());
+		Line ballRobotLine = new Line(ballPos, currPos);
         // .extendBothDirections(Globals.PITCH_WIDTH);
         //addDrawable(new DrawableLine(ballRobotLine, Color.WHITE));
 
-        Line ballDirectionLine = new Line(ball.getPosition(), ball
-                .getPosition().add(vec));
+		Line ballDirectionLine = new Line(ballPos, currPos.add(vec));
         ballDirectionLine = ballDirectionLine.extend(Globals.PITCH_WIDTH);
         //addDrawable(new DrawableLine(ballDirectionLine, Color.WHITE));
 
@@ -225,17 +242,21 @@ public class Interception extends AbstractPlanner {
 
         Coord pivot = rotatedRobotBallLine.getIntersect(ballDirectionLine);
        
-        Coord CP = ballDirectionLine.closestPoint(ourRobot.getPosition());
+		Coord CP = ballDirectionLine.closestPoint(currPos);
         addDrawable(new DrawableLine(ballDirectionLine, Color.WHITE));
         addDrawable(new Dot(CP, Color.WHITE));
-        addDrawable(new DrawableLine(new Line(CP, ourRobot.getPosition()),
+		addDrawable(new DrawableLine(new Line(CP, currPos),
                 Color.CYAN));
         // addDrawable(new DrawableLine(new Line(CP, ball.getPosition()),
         // Color.ORANGE));
 
         
-        if (useCPOnly)
-            return CP;
+		if (useCPOnly) {
+			// Coord earlier = CP.add(ball.getPosition().sub(CP).getUnitCoord()
+			// .mult(0.4));
+//			return earlier;
+			return CP;
+		}
         
         if (pivot == null)
             return CP;
@@ -243,10 +264,8 @@ public class Interception extends AbstractPlanner {
         //addDrawable(new Dot(pivot, Color.RED));
 
         Coord scaler = CP.sub(pivot);
-         Orientation theta = ball.getPosition().angleBetween(
-         ourRobot.getPosition(), CP);
-         Orientation theta2 = ball.getPosition().angleBetween(CP,
-         ourRobot.getPosition());
+		Orientation theta = ballPos.angleBetween(currPos, CP);
+		Orientation theta2 = ballPos.angleBetween(CP, currPos);
         
          double minTheta = Math.min(theta.radians(), theta2.radians());
         
@@ -256,8 +275,8 @@ public class Interception extends AbstractPlanner {
 
         scaler = scaler.mult(Math.abs(minTheta) / (Math.PI / 2));
         
-         Coord predictCoord = pivot.add(scaler);
-        Line robotPredictLine = new Line(ourRobot.getPosition(), predictCoord);
+		Coord predictCoord = pivot.sub(scaler);
+		Line robotPredictLine = new Line(currPos, predictCoord);
         // robotPredictLine = robotPredictLine.extend(0.5);
         addDrawable(new DrawableLine(robotPredictLine, Color.PINK));
         predictCoord = robotPredictLine.getB();

@@ -449,7 +449,7 @@ public class WorldSimulator {
 				* WorldSimulator.SCALE / 2;
 		private Vec2 kickPos = new Vec2((robotLength + kickerLength), 0);
 		private final PolygonShape kickerShape;
-        private static final float kickForce = 30f;
+		private static final float kickForce = 30f;
 
 		private float lastRPower;
 		private float lastLPower;
