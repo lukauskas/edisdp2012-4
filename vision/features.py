@@ -137,32 +137,15 @@ class Entity:
 
             self._angle = math.atan2(2 * b, a - c + e)
                         
-            # Crudely find direction.          
-            m00 = cv.GetSpatialMoment(m, 0, 0)
-            m10 = cv.GetSpatialMoment(m, 1, 0)
-            m01 = cv.GetSpatialMoment(m, 0, 1)
-            if m00 == 0.0:
-                 m00 = 0.1
+            # Crudely find direction.
 
-            centroid1 = (round(m10/m00), round(m01/m00))
-            # cv.Circle is really fussy with what it takes
-            centroid1 = tuple(map(int, centroid1))
-            cv.Circle(mask, centroid1, 14, cv.RGB(0,0,0), -1)
-            
-            m = cv.Moments(mask, 1)
-            m00 = cv.GetSpatialMoment(m, 0, 0)
-            m10 = cv.GetSpatialMoment(m, 1, 0)
-            m01 = cv.GetSpatialMoment(m, 0, 1)
-            if m00 == 0:
-                 m00 = 0.1
+            center = (feature.minRectX(), feature.minRectY())
+            centroid = feature.centroid()
+            self._centroid = centroid
 
-            centroid2 = (round(m10/m00), round(m01/m00))
-            roughAngle = math.atan2(centroid1[1] - centroid2[1], centroid1[0] - centroid2[0])
-            
-            pi2 = math.pi*2
-            roughAngle = min( (roughAngle-self._angle)%pi2, (self._angle-roughAngle)%pi2 )
+            roughAngle = math.atan2(center[1] - centroid[1], center[0] - centroid[0]) 
 
-            if roughAngle < (math.pi/2):
+            if abs(self._angle - roughAngle) > (math.pi / 2):
                 self._angle += math.pi
 
         return self._angle
@@ -184,5 +167,8 @@ class Entity:
                 endx = center[0] + 30 * math.cos(angle)
                 endy = center[1] + 30 * math.sin(angle)
 
+                degrees = abs(self._angle - math.pi)  / math.pi * 180 
+
                 layer.line(center, (endx, endy), antialias=False);
+
 
