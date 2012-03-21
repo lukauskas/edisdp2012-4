@@ -13,6 +13,7 @@ import balle.main.drawable.Circle;
 import balle.main.drawable.Dot;
 import balle.main.drawable.Drawable;
 import balle.misc.Globals;
+import balle.simulator.SnapshotPredictor;
 import balle.simulator.WorldSimulator;
 import balle.strategy.FactoryMethod;
 import balle.strategy.curve.Curve;
@@ -129,6 +130,11 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 
 	@Override
 	public void step(Controller controller, Snapshot snapshot) {
+		// adjust for latency
+		SnapshotPredictor sp = snapshot.getSnapshotPredictor();
+		snapshot = sp.getSnapshotAfterTime(System.currentTimeMillis()
+				- snapshot.getTimestamp());
+
 		if (isMoveStraitFinished(snapshot.getBalle())) {
 			if (isFinished(snapshot)) {
 				controller.stop();
