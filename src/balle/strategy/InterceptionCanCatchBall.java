@@ -74,6 +74,10 @@ public class InterceptionCanCatchBall extends AbstractPlanner {
 
         ballCoordBuffer.add(ball.getPosition());
 
+		if (snapshot.getBalle().getPosition() == null) {
+			return;
+		}
+
 		if (ballIsMoving(ball)
 				&& intercept.dist(snapshot.getBalle().getPosition()) > 0.1 /*
 																			 * &&
