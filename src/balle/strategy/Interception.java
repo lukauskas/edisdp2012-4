@@ -54,8 +54,9 @@ public class Interception extends AbstractPlanner {
     }
 
     public Interception(boolean useCpOnly, MovementExecutor movementExecutor,
-            OrientedMovementExecutor orientedMovementExecutor,
-    super();
+            OrientedMovementExecutor orientedMovementExecutor, boolean mirror,
+            boolean startGameAfterwards) {
+        super();
         ballCoordBuffer = new CircularBuffer<Coord>(6);
         this.useCpOnly = useCpOnly;
 		this.mirror = mirror;
@@ -134,48 +135,49 @@ public class Interception extends AbstractPlanner {
     @FactoryMethod(designator = "InterceptsM4-CP-PFN")
     public static final Interception factoryCPPFN() {
         return new Interception(true, new GoToObjectPFN(
-                Globals.ROBOT_LENGTH / 3), null, true);
+                Globals.ROBOT_LENGTH / 3), null, true, true);
     }
 
     @FactoryMethod(designator = "InterceptsM4-NCP-PFN")
     public static final Interception factoryNCPPFN() {
         return new Interception(false, new GoToObjectPFN(
-                Globals.ROBOT_LENGTH / 3), null, true);
+                Globals.ROBOT_LENGTH / 3), null, true, true);
     }
 
     @FactoryMethod(designator = "InterceptsM4-CP-PFNF")
     public static final Interception factoryCPPFNF() {
         return new Interception(true, new GoToObjectPFN(
-                Globals.ROBOT_LENGTH / 3, false), null, true);
+                Globals.ROBOT_LENGTH / 3, false), null, true, true);
     }
 
     @FactoryMethod(designator = "InterceptsM4-CP-PFNF-NG")
     public static final Interception factoryCPPFNFNG() {
         return new Interception(true, new GoToObjectPFN(
-                Globals.ROBOT_LENGTH / 3, false), null, false);}
+                Globals.ROBOT_LENGTH / 3, false), null, true, false);
+    }
 
     @FactoryMethod(designator = "InterceptsM4-NCP-PFNF")
     public static final Interception factoryNCPPFNF() {
         return new Interception(false, new GoToObjectPFN(
-                Globals.ROBOT_LENGTH / 3, false), null, true);
+                Globals.ROBOT_LENGTH / 3, false), null, true, true);
     }
 
     @FactoryMethod(designator = "InterceptsM4-CP-BZR")
     public static final Interception factoryCPBZR() {
         return new Interception(true, null, new BezierNav(new SimplePathFinder(
-                new CustomCHI())), true);
+                new CustomCHI())), true, true);
     }
 
     @FactoryMethod(designator = "InterceptsM4-CP-BZR-NG")
     public static final Interception factoryCPBZRNG() {
         return new Interception(true, null, new BezierNav(new SimplePathFinder(
-                new CustomCHI())), false);
+                new CustomCHI())), true, false);
 }
 
     @FactoryMethod(designator = "InterceptsM4-NCP-BZR")
     public static final Interception factoryNCPBZR() {
         return new Interception(false, null, new BezierNav(
-                new SimplePathFinder(new CustomCHI())), true);
+                new SimplePathFinder(new CustomCHI())), true, true);
     }
 
     /**
