@@ -17,9 +17,9 @@ import balle.strategy.curve.CustomCHI;
 import balle.strategy.executor.movement.GoToObjectPFN;
 import balle.strategy.executor.movement.MovementExecutor;
 import balle.strategy.executor.movement.OrientedMovementExecutor;
-import balle.strategy.friendly1.GoToBall;
 import balle.strategy.pathfinding.SimplePathFinder;
 import balle.strategy.planner.AbstractPlanner;
+import balle.strategy.planner.GoToBall;
 import balle.world.Coord;
 import balle.world.Line;
 import balle.world.Orientation;
@@ -32,15 +32,11 @@ import balle.world.objects.Point;
 import balle.world.objects.Robot;
 
 public class Interception extends AbstractPlanner {
-
-    private int     ballCount          = 0;
-    private int     countNeeded        = 6;              // require 6 readings
-                                                          // of ball position
     private boolean ballHasMoved = false;
     private Coord   intercept          = new Coord(0, 0);
-    private double  lineLength         = 200;
     private boolean shouldPlayGame;
-    private static final double STRATEGY_STOP_DISTANCE = Globals.ROBOT_LENGTH + 0.05;
+    private static final double STRATEGY_STOP_DISTANCE = 0.3;
+    private static final double GO_DIRECTLY_TO_BALL_DISTANCE = STRATEGY_STOP_DISTANCE * 1.75;
 
     protected final boolean useCpOnly;
 	protected final boolean mirror;
@@ -52,13 +48,15 @@ public class Interception extends AbstractPlanner {
     private OrientedMovementExecutor orientedMovementExecutor;
     private AbstractPlanner gameStrategy;
 
+    private boolean startGameAfterwards;
+
     protected void setIAmDoing(String message) {
         LOG.info(message);
     }
 
-	public Interception(boolean useCpOnly, boolean mirror,
-			MovementExecutor movementExecutor,
-            OrientedMovementExecutor orientedMovementExecutor) {
+    public Interception(boolean useCpOnly, MovementExecutor movementExecutor,
+            OrientedMovementExecutor orientedMovementExecutor, boolean mirror,
+            boolean startGameAfterwards) {
         super();
         ballCoordBuffer = new CircularBuffer<Coord>(6);
         this.useCpOnly = useCpOnly;
@@ -68,6 +66,10 @@ public class Interception extends AbstractPlanner {
         this.orientedMovementExecutor = orientedMovementExecutor;
         shouldPlayGame = false;
         this.gameStrategy = new Game(new GoToBall(new GoToObjectPFN(0)), false);
+        this.startGameAfterwards = startGameAfterwards;
+
+        // new Game(new SimpleGoToBallFaceGoal(new BezierNav(
+        // new SimplePathFinder(new CustomCHI()))), false);
     }
 
 
@@ -86,29 +88,40 @@ public class Interception extends AbstractPlanner {
 			intercept = getPredictionCoordVelocityvector(snapshot, useCpOnly,
 					mirror);
             ballHasMoved = true;
+        }
 
-            if (!shouldPlayGame) {
-                addDrawable(new Circle(snapshot.getBalle().getPosition(),
-                        STRATEGY_STOP_DISTANCE, Color.red));
-            }
-            if (snapshot.getBalle().getPosition()
-                    .dist(snapshot.getBall().getPosition()) < STRATEGY_STOP_DISTANCE)
+        if (!shouldPlayGame) {
+            addDrawable(new Circle(snapshot.getBalle().getPosition(),
+                    STRATEGY_STOP_DISTANCE, Color.red));
+            addDrawable(new Circle(snapshot.getBalle().getPosition(),
+                    STRATEGY_STOP_DISTANCE * 1.75, Color.red));
+        }
+        if (snapshot.getBalle().getPosition()
+                .dist(snapshot.getBall().getPosition()) < STRATEGY_STOP_DISTANCE) {
+            if (startGameAfterwards)
                 shouldPlayGame = true;
-
         }
 
         if (shouldPlayGame) {
             setIAmDoing("GAME!");
             gameStrategy.step(controller, snapshot);
+            addDrawables(gameStrategy.getDrawables());
         } else if (ballHasMoved) {
             setIAmDoing("Going to point - predict");
-            addDrawable(new Dot(intercept, Color.BLACK));
+
+            Coord goToCoord = intercept;
+            if (snapshot.getBalle().getPosition()
+                    .dist(snapshot.getBall().getPosition()) < GO_DIRECTLY_TO_BALL_DISTANCE) {
+                goToCoord = snapshot.getBall().getPosition();
+            }
+            addDrawable(new Dot(goToCoord, Color.BLACK));
+            addDrawable(new Dot(intercept, new Color(0, 0, 0, 100)));
             if (movementExecutor != null) {
-                movementExecutor.updateTarget(new Point(intercept));
+                movementExecutor.updateTarget(new Point(goToCoord));
                 addDrawables(movementExecutor.getDrawables());
                 movementExecutor.step(controller, snapshot);
             } else if (orientedMovementExecutor != null) {
-                orientedMovementExecutor.updateTarget(new Point(intercept),
+                orientedMovementExecutor.updateTarget(new Point(goToCoord),
                         snapshot.getOpponentsGoal().getGoalLine().midpoint()
                                 .sub(intercept).orientation());
                 addDrawables(orientedMovementExecutor.getDrawables());
@@ -122,40 +135,50 @@ public class Interception extends AbstractPlanner {
 
     @FactoryMethod(designator = "InterceptsM4-CP-PFN")
     public static final Interception factoryCPPFN() {
-		return new Interception(true, true, new GoToObjectPFN(
-                Globals.ROBOT_LENGTH / 3), null);
+        return new Interception(true, new GoToObjectPFN(
+                Globals.ROBOT_LENGTH / 3), null, true, true);
     }
 
     @FactoryMethod(designator = "InterceptsM4-NCP-PFN")
     public static final Interception factoryNCPPFN() {
-		return new Interception(false, true, new GoToObjectPFN(
-                Globals.ROBOT_LENGTH / 3), null);
+        return new Interception(false, new GoToObjectPFN(
+                Globals.ROBOT_LENGTH / 3), null, true, true);
     }
 
     @FactoryMethod(designator = "InterceptsM4-CP-PFNF")
     public static final Interception factoryCPPFNF() {
-		return new Interception(true, true, new GoToObjectPFN(
-                Globals.ROBOT_LENGTH / 3, false), null);
+        return new Interception(true, new GoToObjectPFN(
+                Globals.ROBOT_LENGTH / 3, false), null, true, true);
+    }
+
+    @FactoryMethod(designator = "InterceptsM4-CP-PFNF-NG")
+    public static final Interception factoryCPPFNFNG() {
+        return new Interception(true, new GoToObjectPFN(
+                Globals.ROBOT_LENGTH / 3, false), null, true, false);
     }
 
     @FactoryMethod(designator = "InterceptsM4-NCP-PFNF")
     public static final Interception factoryNCPPFNF() {
-		return new Interception(false, true, new GoToObjectPFN(
-                Globals.ROBOT_LENGTH / 3, false), null);
+        return new Interception(false, new GoToObjectPFN(
+                Globals.ROBOT_LENGTH / 3, false), null, true, true);
     }
 
     @FactoryMethod(designator = "InterceptsM4-CP-BZR")
     public static final Interception factoryCPBZR() {
-		return new Interception(true, true, null, new BezierNav(
-				new SimplePathFinder(
-                new CustomCHI())));
+        return new Interception(true, null, new BezierNav(new SimplePathFinder(
+                new CustomCHI())), true, true);
     }
+
+    @FactoryMethod(designator = "InterceptsM4-CP-BZR-NG")
+    public static final Interception factoryCPBZRNG() {
+        return new Interception(true, null, new BezierNav(new SimplePathFinder(
+                new CustomCHI())), true, false);
+}
 
     @FactoryMethod(designator = "InterceptsM4-NCP-BZR")
     public static final Interception factoryNCPBZR() {
-		return new Interception(false, true, null, new BezierNav(
-                new SimplePathFinder(
-                new CustomCHI())));
+        return new Interception(false, null, new BezierNav(
+                new SimplePathFinder(new CustomCHI())), true, true);
     }
 
     /**
