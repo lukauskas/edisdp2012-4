@@ -189,14 +189,17 @@ public class Interception extends AbstractPlanner {
 		currPos = ourRobot.getPosition();
 
 		if (mirror
-				&& (s.getPitch().getHalf(ourRobot.getPosition()) != s
-						.getPitch().getHalf(ball.getPosition()))) {
+				&& (s.getPitch().getHalf(ourRobot.getPosition()) == s
+						.getPitch().getHalf(s.getOpponentsGoal().getPosition()))) {
 
 			// Mirror X position.
 			double dX = currPos.getX() - s.getPitch().getPosition().getX();
-			currPos = new Coord(currPos.getX() - dX, currPos.getY());
+			currPos = new Coord(s.getPitch().getPosition().getX() - dX,
+					currPos.getY());
 
 		}
+
+		addDrawable(new Dot(currPos, Color.ORANGE));
 
         Velocity vel = ball.getVelocity();
         Coord vec = new Coord(vel.getX(), vel.getY());
@@ -240,10 +243,8 @@ public class Interception extends AbstractPlanner {
         //addDrawable(new Dot(pivot, Color.RED));
 
         Coord scaler = CP.sub(pivot);
-		Orientation theta = ballPos.angleBetween(
-         ourRobot.getPosition(), CP);
-		Orientation theta2 = ballPos.angleBetween(CP,
-         ourRobot.getPosition());
+		Orientation theta = ballPos.angleBetween(currPos, CP);
+		Orientation theta2 = ballPos.angleBetween(CP, currPos);
         
          double minTheta = Math.min(theta.radians(), theta2.radians());
         
