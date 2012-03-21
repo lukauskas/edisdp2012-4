@@ -74,7 +74,11 @@ public class InterceptionCantCatchBall extends AbstractPlanner {
 
         ballCoordBuffer.add(ball.getPosition());
 
-        if (ballIsMoving(ball) /* && !predictionCoordSet */) {
+		if (ballIsMoving(ball)
+				&& intercept.dist(snapshot.getBalle().getPosition()) > 0.1/*
+																		 * && !
+																		 * predictionCoordSet
+																		 */) {
 			intercept = getPredictionCoordVelocityvector(snapshot,
 					mirror);
             ballHasMoved = true;
