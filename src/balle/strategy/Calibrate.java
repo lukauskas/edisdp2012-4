@@ -34,13 +34,8 @@ public class Calibrate extends AbstractPlanner {
      * @param snapshot TODO
      */
 	public void onStep(Controller controller, Snapshot snapshot) {
-		if (true) {
-			controller.setWheelSpeeds(500, 500);
-			System.out.println(snapshot.getBalle().getVelocity().abs());
-			return;
-		}
 		if(!done) {
-			controller.setWheelSpeeds(power, -power);
+			controller.setWheelSpeeds(power, 0);
 			// if accelerating, just let it accelerate
 			if (System.currentTimeMillis() - lastPowerChangeTime < ACCEL_TIME)
 				return;
@@ -100,7 +95,7 @@ public class Calibrate extends AbstractPlanner {
 	 * @return
 	 */
 	private double angularVelToWheelSpeed(double angVel) {
-		return angVel * Globals.ROBOT_TRACK_WIDTH / 2;
+		return angVel * Globals.ROBOT_TRACK_WIDTH;
 	}
 
 }
