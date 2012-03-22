@@ -43,14 +43,6 @@ public class Velocity extends Coord {
         return ans;
     }
 
-    /**
-     * @return A vec2 representing this velocity, scaled to the jbox2d units.
-     */
-    public Vec2 vec2(float SCALE) {
-        Velocity ans = adjustLength(1000).mult(SCALE * 1000);
-
-        return new Vec2((float) (ans.getX()), (float) (ans.getY()));
-	}
 
     public static Velocity fromVec2(Vec2 velocity, float SCALE) {
         Vec2 ans = velocity.mul(1 / (SCALE));
@@ -92,4 +84,19 @@ public class Velocity extends Coord {
         return new Velocity(x, y, getTimeDelta(), getEstimatedFrames());
     }
 
+	// --------
+	// Simulator
+
+	public Velocity(Vec2 vec2, float SCALE) {
+		this(vec2.x, vec2.y, 1);
+	}
+
+	/**
+	 * @return A vec2 representing this velocity, scaled to the jbox2d units.
+	 */
+	public Vec2 vec2(float SCALE) {
+		Velocity ans = adjustLength(1000).mult(SCALE * 1000);
+
+		return new Vec2((float) (ans.getX()), (float) (ans.getY()));
+	}
 }
