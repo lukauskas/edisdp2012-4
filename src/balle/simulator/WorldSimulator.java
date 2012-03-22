@@ -133,9 +133,7 @@ public class WorldSimulator {
 		addEdge(0f * SCALE, 0.91f * SCALE, -0.1f * SCALE, 0.91f * SCALE);
 		addEdge(2.54f * SCALE, 0.31f * SCALE, 2.54f * SCALE, 0.91f * SCALE);
 
-		// Create ball
-		resetBallPosition();
-
+		resetBallPosition(0, 0);
 		// create robots at either end of pitch
 		resetRobotPositions();
 	}
@@ -228,7 +226,7 @@ public class WorldSimulator {
                 new Orientation(Math.random() * 360, false));
     }
 
-	protected void resetBallPosition() {
+	protected void resetBallPosition(float x, float y) {
 
 		if (ball != null) {
 			world.destroyBody(ball);
@@ -241,7 +239,11 @@ public class WorldSimulator {
 		f.density = (1f / 0.36f) / SCALE;
 		BodyDef bd = new BodyDef();
 		bd.type = BodyType.DYNAMIC;
-		bd.position.set(1.22f * SCALE, 0.61f * SCALE);
+		if (x != 0 && y != 0) {
+			bd.position.set(x * SCALE, y * SCALE);
+		} else {
+			bd.position.set(1.22f * SCALE, 0.61f * SCALE);
+		}
 		bd.bullet = true;
 		ball = world.createBody(bd);
 		ball.createFixture(f);
@@ -359,6 +361,10 @@ public class WorldSimulator {
 			Vec2 ballPos = convPos(ball.getPosition());
 			ballPosX = ballPos.x;
 			ballPosY = ballPos.y;
+
+			if (ballPos.x < 0f || ballPos.x > 2.44f) {
+				resetBallPosition(ballPosX, ballPosY);
+			}
 
 			long timestamp = getTimeStamp();
 
