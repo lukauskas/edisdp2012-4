@@ -16,6 +16,9 @@ public class Calibrate extends AbstractPlanner {
 	private final long SAMPLE_TIME = 4000; // how many angular velocity samples
 											// to
 										// take (Must be greater then 1)
+
+	private final boolean PIVOT = true; // true if to just pivot on one wheel
+
 	private long lastPowerChangeTime = System.currentTimeMillis();
 	private long sampleStartTime;
 	private long sampleEndTime;
@@ -35,7 +38,7 @@ public class Calibrate extends AbstractPlanner {
      */
 	public void onStep(Controller controller, Snapshot snapshot) {
 		if(!done) {
-			controller.setWheelSpeeds(power, 0);
+			controller.setWheelSpeeds(power, (PIVOT ? 0 : -power));
 			// if accelerating, just let it accelerate
 			if (System.currentTimeMillis() - lastPowerChangeTime < ACCEL_TIME)
 				return;
@@ -95,7 +98,7 @@ public class Calibrate extends AbstractPlanner {
 	 * @return
 	 */
 	private double angularVelToWheelSpeed(double angVel) {
-		return angVel * Globals.ROBOT_TRACK_WIDTH;
+		return (angVel * Globals.ROBOT_TRACK_WIDTH) / (PIVOT ? 1 : 2);
 	}
 
 }
