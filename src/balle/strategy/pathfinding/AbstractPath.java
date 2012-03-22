@@ -74,7 +74,11 @@ public abstract class AbstractPath {
 	 *            initial right wheel velocity
 	 * @return
 	 */
-	public double getTimeToDrive(double lv, double rv) {
+	public double getTimeToDrive(Robot r) {
+		double lv, rv;
+		double[] vis = Globals.getWheelVels(r);
+		lv = vis[0];
+		rv = vis[1];
 		Curve c = getCurve();
 		double t = 0;
 		final double STEP = 1.0 / 20.0;
@@ -88,6 +92,31 @@ public abstract class AbstractPath {
 			rv = vels[1]; // used for the next step
 		}
 		return t;
+	}
+	
+	/**
+	 * convert from real time to curve time such the pos( realTimeToCurveTime(1) ) is the position of the robot after 1 second
+	 */
+	public double realTimeToCurveTime(double time, Robot r) {
+		double lv, rv;
+		double[] vis = Globals.getWheelVels(r);
+		lv = vis[0];
+		rv = vis[1];
+		Curve c = getCurve();
+		double t = 0;
+		final double STEP = 1.0 / 20.0;
+		for (double i = 0; i < 1; i += STEP) {
+			// find the time for this step t = d/v
+			double dist = c.pos(i).dist(c.pos(i + STEP));
+			double[] vels = getVelocities(i, c, lv, rv);
+			double vel = Math.abs((vels[0] + vels[1]) / 2);
+			t += dist / vel;
+			lv = vels[0]; // set the left and right velocities of the wheels
+			rv = vels[1]; // used for the next step
+			if (t >= time)
+				return i;
+		}
+		return 1;
 	}
 
 }

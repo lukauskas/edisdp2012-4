@@ -8,6 +8,7 @@ import balle.world.AngularVelocity;
 import balle.world.Orientation;
 import balle.world.Velocity;
 import balle.world.objects.Pitch;
+import balle.world.objects.Robot;
 
 public class Globals {
 
@@ -79,7 +80,7 @@ public class Globals {
 													// around
 	// 0.005 ish
 	public static final float SlipWheelAccel = MaxWheelAccel * 0.6f;
-	public static final float MAX_ROBOT_LINEAR_ACCEL = 4f; // m/s^2
+	public static final float MAX_ROBOT_LINEAR_ACCEL = 40f; // m/s^2
 	public static final float MAX_ROBOT_ANG_ACCEL = 700f; // r/s^2
 	public static final float MAX_MOTOR_POWER_ACCEL = 500f; // p/s^2
     public static final float ARBITRARY_BALL_VEL_SCALING = 100;
@@ -160,6 +161,11 @@ public class Globals {
     public static Pitch getPitch() {
         return new Pitch(0, PITCH_WIDTH, 0, PITCH_HEIGHT);
     }
+
+	public static double[] getWheelVels(Robot r) {
+		return getWheelVels(r.getVelocity(), r.getAngularVelocity(),
+				r.getOrientation());
+	}
 
 	public static double[] getWheelVels(Velocity lv, AngularVelocity av,
 			Orientation forward) {

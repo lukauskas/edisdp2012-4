@@ -17,7 +17,7 @@ public class Calibrate extends AbstractPlanner {
 											// to
 										// take (Must be greater then 1)
 
-	private final boolean PIVOT = true; // true if to just pivot on one wheel
+	private final boolean PIVOT = false; // true if to just pivot on one wheel
 
 	private long lastPowerChangeTime = System.currentTimeMillis();
 	private long sampleStartTime;
@@ -37,6 +37,10 @@ public class Calibrate extends AbstractPlanner {
      * @param snapshot TODO
      */
 	public void onStep(Controller controller, Snapshot snapshot) {
+		// if (true) {
+		// controller.setWheelSpeeds(900, 900);
+		// return;
+		// }
 		if(!done) {
 			controller.setWheelSpeeds(power, (PIVOT ? 0 : -power));
 			// if accelerating, just let it accelerate

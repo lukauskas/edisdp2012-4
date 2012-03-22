@@ -209,6 +209,10 @@ new SimplePathFinder(
 
 		// calculate wheel speeds/powers
 		int[] pows = pathToTake.getPowers(robot, 0);
+		// int[] stepPows = pathToTake.getPowers(robot,
+		// pathToTake.realTimeToCurveTime(0.1, robot));
+		// pows[0] *= stepPows[0] / 2;
+		// pows[1] *= stepPows[1] / 2;
 		int left, right;
 		left = pows[0]; // Globals.velocityToPower((float) (max *
 						// getMinVelocityRato(r)));
@@ -227,9 +231,7 @@ new SimplePathFinder(
 		AbstractPath best = paths[hasLastPathUsed ? lastPathIndexUsed : 0];
 		// look for the quickest time path
 		Robot bot = s.getBalle();
-		double[] iv = Globals.getWheelVels(bot.getVelocity(),
-				bot.getAngularVelocity(), bot.getOrientation());
-		double bestTime = best.getTimeToDrive(iv[0], iv[1])
+		double bestTime = best.getTimeToDrive(bot)
 				* (hasLastPathUsed ? (1 / CHANGEPATH_IMPROVEMENT_THRESHHOLD)
 						: 1); // make it seem
 															// better than it is
@@ -239,7 +241,7 @@ new SimplePathFinder(
 		for(int i = 1; i < paths.length; i++) {
 			AbstractPath curr = paths[i];
 			if (curr != null) {
-				double currTime = curr.getTimeToDrive(iv[0], iv[1]);
+				double currTime = curr.getTimeToDrive(bot);
 				if (bestTime > currTime) {
 					best = curr;
 					bestTime = currTime;
