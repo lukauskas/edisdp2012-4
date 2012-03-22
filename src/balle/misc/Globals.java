@@ -81,7 +81,7 @@ public class Globals {
 	public static final float SlipWheelAccel = MaxWheelAccel * 0.6f;
 	public static final float MAX_ROBOT_LINEAR_ACCEL = 4f; // m/s^2
 	public static final float MAX_ROBOT_ANG_ACCEL = 700f; // r/s^2
-	public static final float MAX_MOTOR_POWER_ACCEL = 5000f; // p/s^2
+	public static final float MAX_MOTOR_POWER_ACCEL = 500f; // p/s^2
     public static final float ARBITRARY_BALL_VEL_SCALING = 100;
     public static final double VELOCITY_NOISE_THRESHOLD = 1e-8;
 

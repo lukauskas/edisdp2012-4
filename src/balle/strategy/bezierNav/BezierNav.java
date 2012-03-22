@@ -22,6 +22,7 @@ import balle.strategy.executor.movement.OrientedMovementExecutor;
 import balle.strategy.pathfinding.AbstractPath;
 import balle.strategy.pathfinding.ForwardAndReversePathFinder;
 import balle.strategy.pathfinding.PathFinder;
+import balle.strategy.pathfinding.SimplePathFinder;
 import balle.strategy.planner.SimpleGoToBallFaceGoal;
 import balle.world.BasicWorld;
 import balle.world.Coord;
@@ -97,6 +98,13 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 
 	@FactoryMethod(designator = "BezierNav")
 	public static SimpleGoToBallFaceGoal bezierNavFactory() {
+		return new SimpleGoToBallFaceGoal(new BezierNav(
+new SimplePathFinder(
+				new CustomCHI()), true));
+	}
+
+	@FactoryMethod(designator = "BezierNav (Forwards and backwards)")
+	public static SimpleGoToBallFaceGoal bezierNavFactoryFAB() {
 		return new SimpleGoToBallFaceGoal(new BezierNav(
 				new ForwardAndReversePathFinder(
 				new CustomCHI()), true));

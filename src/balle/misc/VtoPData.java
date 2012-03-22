@@ -3,10 +3,20 @@ package balle.misc;
 public class VtoPData {
 
 	public static Powers[] getData() {
-		return new Powers[] { new Powers(0, 3.54E-007f),
-				new Powers(25, 1.75E-002f), new Powers(0, 0),
-				new Powers(75, 5.83E-002f), new Powers(600, 4.39E-001f),
-				new Powers(875, 4.78E-001f), new Powers(900, 4.81E-001f),
+		return new Powers[] {
+				
+
+				// these are for the crazy fast gear ratios {71302349 start
+				new Powers(0, 0), new Powers(75, 2.88E-003f),
+				new Powers(100, 3.61E-002f), new Powers(500, 7.92E-001f),
+				new Powers(900, 8.25E-001f),
+		// //end 71302349}
+				
+		// for 1:1 gear ratio {893457 start
+//				new Powers(0, 0),
+//				new Powers(600, 4.39E-001f),
+//				new Powers(900, 4.81E-001f),
+		// end 893457}
 
 		// new Powers(25, 1.75E-002f), new Powers(50, 4.05E-002f),
 		// new Powers(75, 5.83E-002f), new Powers(100, 8.14E-002f),
