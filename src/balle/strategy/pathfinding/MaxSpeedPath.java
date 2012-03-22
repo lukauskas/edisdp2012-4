@@ -14,7 +14,7 @@ public class MaxSpeedPath extends AbstractPath {
 													// speed). when making sharp
 													// turns the speed will be
 													// slowed toward max/this
-	private final double MAX_VELOCITY = Globals.powerToVelocity(600); // the
+	private final double MAX_VELOCITY = Globals.powerToVelocity(300); // the
 																		// maximum
 																		// wheel
 																		// velocity
