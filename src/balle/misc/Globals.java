@@ -98,22 +98,21 @@ public class Globals {
 			p = -MAXIMUM_MOTOR_SPEED;
 
         }
+		boolean isNegative = p < 0;
+		p = Math.abs(p);
 
-        int index = 0;
-        for (int i = 0; i < powervelo.size(); i++) {
-            if (powervelo.get(i).getPower() < p) {
-                index = i;
-            } else {
+		for (int i = 1; i < powervelo.size(); i++) {
+			powerBelow = powervelo.get(i - 1);
+			powerAbove = powervelo.get(i);
+			if (powerBelow.getPower() <= p && powerAbove.getPower() >= p) {
                 break;
 			}
 		}
-        powerBelow = powervelo.get(index);
-        powerAbove = powervelo.get(index + 1);
 
 		float m = powerAbove.getVelocity() - powerBelow.getVelocity();
 		m /= (powerAbove.getPower() - powerBelow.getPower());
 		velo = m * (p - powerBelow.getPower()) + powerBelow.getVelocity();
-        return velo;
+		return isNegative ? -velo : velo;
 	}
 
     public static float velocityToPower(float v) {
@@ -131,30 +130,22 @@ public class Globals {
             v = -maxVelocity;
 
         }
-        for (Powers pp : powervelo) {
-            if ((pp.getVelocity() <= v)
-                    && ((powerBelow == null) || (pp.getVelocity() > powerBelow
-                            .getVelocity()))) {
-                powerBelow = pp;
-            }
-            if ((pp.getVelocity() >= v)
-                    && ((powerAbove == null) || (pp.getVelocity() > powerAbove
-                            .getVelocity()))) {
-                powerAbove = pp;
-            }
+		boolean isNegative = v < 0;
+		v = Math.abs(v);
 
-
-        }
-        if (powerBelow == null)
-            powerBelow = powervelo.get(0);
-        if (powerAbove == null)
-            powerAbove = powervelo.get(powervelo.size() - 1);
+		for (int i = 1; i < powervelo.size(); i++) {
+			powerBelow = powervelo.get(i - 1);
+			powerAbove = powervelo.get(i);
+			if (powerBelow.getVelocity() <= v && powerAbove.getVelocity() >= v) {
+				break;
+			}
+		}
 
         float m = powerAbove.getPower() - powerBelow.getPower();
 		m /= (powerAbove.getVelocity() - powerBelow.getVelocity());
         power = m * (v - powerBelow.getVelocity()) + powerBelow.getPower();
 
-        return power;
+		return isNegative ? -power : power;
 
     };
 

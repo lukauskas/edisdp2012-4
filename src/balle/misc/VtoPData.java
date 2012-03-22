@@ -1,9 +1,12 @@
 package balle.misc;
 
+import java.util.Arrays;
+import java.util.Comparator;
+
 public class VtoPData {
 
 	public static Powers[] getData() {
-		return new Powers[] {
+		Powers[] powers = new Powers[] {
 				
 
 				// these are for the crazy fast gear ratios {71302349 start
@@ -46,13 +49,17 @@ public class VtoPData {
 				new Powers(650, 6.87133308015843E-1f),
 				new Powers(675, 6.949623218007021E-1f),
 				new Powers(700, 7.005919249978846E-1f),
-				new Powers(725, 7.045040363665344E-1f),
-				new Powers(750, 7.031940619511138E-1f),
-				new Powers(775, 7.080022415823777E-1f),
+
+				// new Powers(725, 7.045040363665344E-1f),
+				// new Powers(750, 7.031940619511138E-1f),
+				// new Powers(775, 7.080022415823777E-1f),
+
 				new Powers(800, 7.030352575295477E-1f),
-				new Powers(825, 7.071186789416736E-1f),
-				new Powers(850, 7.069356054893757E-1f),
-				new Powers(875, 7.027000719049154E-1f),
+
+				// new Powers(825, 7.071186789416736E-1f),
+				// new Powers(850, 7.069356054893757E-1f),
+				// new Powers(875, 7.027000719049154E-1f),
+
 				new Powers(900, 7.035865910478905E-1f)
 		// end
 
@@ -75,6 +82,15 @@ public class VtoPData {
 		// new Powers(825, 4.81E-001f), new Powers(850, 4.77E-001f),
 		// new Powers(875, 4.78E-001f), new Powers(900, 4.81E-001f),
 		};
+		Arrays.sort(powers, new Comparator<Powers>() {
+
+			@Override
+			public int compare(Powers o1, Powers o2) {
+				return o1.getPower() - o2.getPower();
+			}
+
+		});
+		return powers;
 	}
 
 }
