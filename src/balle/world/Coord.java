@@ -6,8 +6,8 @@ import balle.world.objects.Point;
 
 public class Coord {
 
-	private final double x;
-	private final double y;
+	public final double x;
+	public final double y;
 
 	private final int estimatedFrames;
 
