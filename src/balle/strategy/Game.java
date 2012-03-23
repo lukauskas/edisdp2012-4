@@ -20,14 +20,17 @@ import balle.strategy.planner.AbstractPlanner;
 import balle.strategy.planner.BackingOffStrategy;
 import balle.strategy.planner.DefensiveStrategy;
 import balle.strategy.planner.GoToBall;
+import balle.strategy.planner.GoToBallSafeProportional;
 import balle.strategy.planner.InitialStrategy;
 import balle.strategy.planner.KickFromWall;
 import balle.strategy.planner.SimpleGoToBallFaceGoal;
 import balle.world.Coord;
+import balle.world.Line;
 import balle.world.Snapshot;
 import balle.world.objects.Ball;
 import balle.world.objects.Goal;
 import balle.world.objects.Pitch;
+import balle.world.objects.RectangularObject;
 import balle.world.objects.Robot;
 
 public class Game extends AbstractPlanner {
@@ -97,8 +100,7 @@ public class Game extends AbstractPlanner {
         turningExecutor = new IncFaceAngle();
         kickingStrategy = new Dribble_M4();
         initialStrategy = new InitialStrategy();
-		goToBallPFN = new GoToBall(new GoToObjectPFN(0));
-		((GoToBall) goToBallPFN).setApproachTargetFromCorrectSide(true);
+		goToBallPFN = new GoToBallSafeProportional();
 		goToBallBezier = new SimpleGoToBallFaceGoal(new BezierNav(
 				new SimplePathFinder(new CustomCHI())));
         initial = false;
@@ -142,6 +144,7 @@ public class Game extends AbstractPlanner {
         initial = startWithInitial;
         LOG.info("Starting game strategy with initial strategy turned on");
     }
+
     @Override
     public void stop(Controller controller) {
         defensiveStrategy.stop(controller);
@@ -188,23 +191,59 @@ public class Game extends AbstractPlanner {
             } else {
                 LOG.warn("We need to go around the ball");
             }
-		} else if (!ourRobot.isApproachingTargetFromCorrectSide(ball,
-				opponentsGoal)) {
-			// let pfn get us on the right side of the pitch
-			setCurrentStrategy(goToBallPFN.getClass().getName());
-			goToBallPFN.step(controller, snapshot);
-			addDrawables(goToBallPFN.getDrawables());
-			// } else if (ball.isNearWall(pitch)) {
+			// } else if (!ourRobot.isApproachingTargetFromCorrectSide(ball,
+			// opponentsGoal)) {
+			// // let pfn get us on the right side of the pitch
+			// setCurrentStrategy(goToBallPFN.getClass().getName());
+			// goToBallPFN.step(controller, snapshot);
+			// addDrawables(goToBallPFN.getDrawables());
+			// // } else if (ball.isNearWall(pitch)) {
+			// //
 			// setCurrentStrategy(pickBallFromWallStrategy.getClass().getName());
-			// pickBallFromWallStrategy.step(controller, snapshot);
-			// addDrawables(pickBallFromWallStrategy.getDrawables());
+			// // pickBallFromWallStrategy.step(controller, snapshot);
+			// // addDrawables(pickBallFromWallStrategy.getDrawables());
+			// } else {
+			// // Approach ball
+			// setCurrentStrategy(goToBallBezier.getClass().getName());
+			// goToBallBezier.step(controller, snapshot);
+			// addDrawables(goToBallBezier.getDrawables());
         } else {
-            // Approach ball
-			setCurrentStrategy(goToBallBezier.getClass().getName());
-			goToBallBezier.step(controller, snapshot);
-			addDrawables(goToBallBezier.getDrawables());
-
+			Strategy strategy = getStrategy(snapshot);
+			setCurrentStrategy(strategy.getClass().getName());
+			strategy.step(controller, snapshot);
+			addDrawables(strategy.getDrawables());
         }
-
     }
+
+	private Strategy getStrategy(Snapshot snapshot) {
+		Robot ourRobot = snapshot.getBalle();
+		Robot opponent = snapshot.getOpponent();
+		Ball ball = snapshot.getBall();
+		Goal ownGoal = snapshot.getOwnGoal();
+		Goal opponentsGoal = snapshot.getOpponentsGoal();
+		Pitch pitch = snapshot.getPitch();
+
+		// Could the opponent be in the way? use pfn if so
+		RectangularObject corridor = new Line(ourRobot.getPosition(),
+				ball.getPosition()).widen(0.5);
+
+		if (corridor.containsCoord(opponent.getPosition())) {
+			return goToBallBezier;
+		}
+
+		if (!ourRobot.isApproachingTargetFromCorrectSide(ball, opponentsGoal)) {
+			return goToBallPFN;
+		}
+
+		if (ourRobot.getPosition().dist(ball.getPosition()) > 1) {
+			return goToBallPFN;
+		}
+
+		if (ourRobot.isNearWall(pitch) && !ball.isNearWall(pitch)) {
+			return goToBallPFN;
+		}
+
+		return goToBallBezier;
+
+	}
 }
