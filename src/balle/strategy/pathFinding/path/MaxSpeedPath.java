@@ -6,22 +6,22 @@ import balle.world.Coord;
 
 public class MaxSpeedPath extends AbstractPath {
 
-	private final double MIN_SAFE_RADIUS = 0; // the smallest turning radius
+	private final double MIN_SAFE_RADIUS = 0.75; // the smallest turning radius
 												// where moving at maximum speed
 												// is ok (0.05)
-	private final double SAFER_SPEED_RATIO = 0.5; // ratio of (max
+	private final double SAFER_SPEED_RATIO = 0.9; // ratio of (max
 													// speed)/((minimum)safe
 													// speed). when making sharp
 													// turns the speed will be
 													// slowed toward max/this
-	private final double MAX_VELOCITY = Globals.powerToVelocity(450); // the
+	private final double MAX_VELOCITY = Globals.powerToVelocity(900); // the
 																		// maximum
 																		// wheel
 																		// velocity
 																		// to
 																		// use
 	private final double DAMPENING_POWERCHANGE = 0;
-	private final double DAMPENING_POWERRATIO = 0.5; // increase towards 1 to
+	private final double DAMPENING_POWERRATIO = 0; // increase towards 1 to
 														// make
 													// the robot move more
 													// strait
