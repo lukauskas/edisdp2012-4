@@ -158,10 +158,10 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 		snapshot = sp.getSnapshotAfterTime(System.currentTimeMillis()
 				- snapshot.getTimestamp());
 
-		if (isMoveStraitFinished(snapshot.getBalle())) {
-			controller.forward(Globals.MAXIMUM_MOTOR_SPEED);
-			return;
-		}
+		// if (isMoveStraitFinished(snapshot.getBalle())) {
+		// controller.forward(Globals.MAXIMUM_MOTOR_SPEED);
+		// return;
+		// }
 
 		// Get orientation.
 		Orientation angle = this.orient;
