@@ -4,14 +4,11 @@ import java.util.ArrayList;
 
 import balle.controller.Controller;
 import balle.main.drawable.Drawable;
-import balle.memory.FolderReader;
 import balle.strategy.Strategy;
 import balle.world.Snapshot;
 
 public abstract class AbstractPlanner implements Strategy {
     private final ArrayList<Drawable> drawables = new ArrayList<Drawable>();
-
-	protected FolderReader fr;
 
     /**
      * Notify the executor of a change in the current state
@@ -62,9 +59,5 @@ public abstract class AbstractPlanner implements Strategy {
 	}
 
 	protected abstract void onStep(Controller controller, Snapshot snapshot);
-
-	public void setFolderReader(FolderReader fr) {
-		this.fr = fr;
-	}
 
 }

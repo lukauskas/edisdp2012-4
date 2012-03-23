@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import balle.controller.Controller;
+import balle.memory.FolderReader;
 import balle.misc.Globals;
 import balle.strategy.planner.AbstractPlanner;
 import balle.world.Orientation;
@@ -32,7 +33,7 @@ public class Calibrate extends AbstractPlanner {
 	
 	private boolean done = false;
 
-	public Calibrate() {
+	public Calibrate(FolderReader fr) {
 		try {
 			bWriter = fr.getWriter("test.txt");
 		} catch (FileNotFoundException e) {
@@ -41,8 +42,8 @@ public class Calibrate extends AbstractPlanner {
 	}
 
 	@FactoryMethod(designator = "Calibrate")
-	public static Calibrate calibrateFactory() {
-		return new Calibrate();
+	public static Calibrate calibrateFactory(FolderReader fr) {
+		return new Calibrate(fr);
 	}
 
     /**

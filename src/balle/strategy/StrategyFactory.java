@@ -14,7 +14,6 @@ import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 
-import balle.memory.FolderReader;
 import balle.strategy.planner.AbstractPlanner;
 
 public class StrategyFactory {
@@ -23,10 +22,10 @@ public class StrategyFactory {
 
     private static HashMap<String, Method> runnableStrategies = null;
 
-	private FolderReader fr;
+	private Object[] arguments;
 
-	public StrategyFactory(FolderReader fr) {
-		this.fr = fr;
+	public StrategyFactory(Object[] arguments) {
+		this.arguments = arguments;
 	}
 
     private HashMap<String, Method> getRunnableStrategies() {
@@ -81,7 +80,11 @@ public class StrategyFactory {
 
         AbstractPlanner strategy;
         try {
-            strategy = (AbstractPlanner) m.invoke(null, new Object[] {});
+			if (m.getParameterTypes().length == 0)
+				strategy = (AbstractPlanner) m.invoke(null, new Object[0]);
+			else
+				strategy = (AbstractPlanner) m.invoke(null, arguments);
+
         } catch (IllegalArgumentException e) {
             LOG.error("IllegalArgumentException while trying to invoke " + designator);
             e.printStackTrace();
@@ -96,7 +99,6 @@ public class StrategyFactory {
             return null;
         }
         
-		strategy.setFolderReader(fr);
         return strategy;
     }
 }
