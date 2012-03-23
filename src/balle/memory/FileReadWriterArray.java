@@ -11,7 +11,7 @@ class SavesArray<S extends Saves> implements Saves {
 	public String save() {
 		String output = "";
 		for (S s : array)
-			output += s.save();
+			output += s.save() + "\n";
 		return output;
 	}
 }
@@ -54,12 +54,7 @@ public abstract class FileReadWriterArray<E extends Saves> extends
 
 	@Override
 	public final String writeBody(SavesArray<E> eArray) {
-		ArrayList<String> output = new ArrayList<String>();
-
-		for (E e : eArray.array)
-			output.add(e.save());
-
-		return output.toArray().toString();
+		return eArray.save();
 	}
 
 	public final void writeArray(List<E> e) throws IOException {
