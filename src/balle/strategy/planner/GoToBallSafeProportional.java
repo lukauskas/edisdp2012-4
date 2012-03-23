@@ -99,7 +99,7 @@ public class GoToBallSafeProportional extends GoToBall {
         return new Point(targetLine.getB());
     }
 
-    @FactoryMethod(designator = "GoToBallSafeProportional")
+    @FactoryMethod(designator = "GoToBallSafeProportional", parameterNames = {})
     public static GoToBallSafeProportional factoryMethod() {
         return new GoToBallSafeProportional();
     }

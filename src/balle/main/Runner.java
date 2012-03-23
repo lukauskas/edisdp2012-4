@@ -155,7 +155,7 @@ public class Runner {
 		StrategyRunner strategyRunner = new StrategyRunner(controllerA,
 				controllerB, worldA, worldB, gui, folderreader);
 
-		StrategyFactory sf = new StrategyFactory(new Object[] { folderreader });
+        StrategyFactory sf = new StrategyFactory();
 		StratTab strategyTab = new StratTab(controllerA, controllerB, worldA,
 				worldB, strategyRunner, simulator, sf);
 

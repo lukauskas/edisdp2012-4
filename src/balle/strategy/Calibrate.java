@@ -42,10 +42,10 @@ public class Calibrate extends AbstractPlanner {
 		}
 	}
 
-	@FactoryMethod(designator = "Calibrate")
+	    @FactoryMethod(designator = "Calibrate", parameterNames = {})
 	public static Calibrate calibrateFactory(FolderReader fr) {
 		return new Calibrate(fr);
-	}
+    }
 
 	private Coord startPos;
 	private long startT;

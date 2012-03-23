@@ -12,7 +12,7 @@ public class JustKick extends AbstractPlanner {
     }
 
 
-    @FactoryMethod(designator = "Just kick")
+    @FactoryMethod(designator = "Just kick", parameterNames = {})
     public static final JustKick factory() {
         return new JustKick();
     }

@@ -96,14 +96,14 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 																	// end
 	private boolean endInfront;
 
-	@FactoryMethod(designator = "BezierNav")
+    @FactoryMethod(designator = "BezierNav", parameterNames = {})
 	public static SimpleGoToBallFaceGoal bezierNavFactory() {
 		return new SimpleGoToBallFaceGoal(new BezierNav(
 new SimplePathFinder(
 				new CustomCHI()), true));
 	}
 
-	@FactoryMethod(designator = "BezierNav (Forwards and backwards)")
+    @FactoryMethod(designator = "BezierNav (Forwards and backwards)", parameterNames = {})
 	public static SimpleGoToBallFaceGoal bezierNavFactoryFAB() {
 		return new SimpleGoToBallFaceGoal(new BezierNav(
 				new ForwardAndReversePathFinder(
