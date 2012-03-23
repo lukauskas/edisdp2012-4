@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.jbox2d.common.Vec2;
 
+import balle.memory.FolderReader;
 import balle.world.AngularVelocity;
 import balle.world.Orientation;
 import balle.world.Velocity;
@@ -12,18 +13,14 @@ import balle.world.objects.Robot;
 
 public class Globals {
 
+	// ----------
+	// Constants.
+
     public static final float BALL_RADIUS = 0.02135f;
     public static final float ROBOT_WIDTH = 0.15f;
     public static final float ROBOT_LENGTH = 0.2f;
     public static final float ROBOT_TRACK_WIDTH = 0.155f; // Meters
     public static final float ROBOT_WHEEL_DIAMETER = 0.0816f; // Meters
-	public static ArrayList<Powers> powervelo;
-	static {
-		Powers[] data = VtoPData.getData();
-		powervelo = new ArrayList<Powers>();
-		for (Powers p : data)
-			powervelo.add(p);
-	}
 	
 	public static final Vec2 ROBOT_LEFT_WHEEL_POS = new Vec2(0,
 			-ROBOT_TRACK_WIDTH / 2);
@@ -85,6 +82,12 @@ public class Globals {
 	public static final float MAX_MOTOR_POWER_ACCEL = 500f; // p/s^2
     public static final float ARBITRARY_BALL_VEL_SCALING = 100;
     public static final double VELOCITY_NOISE_THRESHOLD = 1e-8;
+
+	public static final FolderReader resFolder = new FolderReader("res");
+
+
+	// --------
+	// Methods
 
 	public static float powerToVelocity(float p) {
 		Powers powerAbove = null;
@@ -152,6 +155,25 @@ public class Globals {
     public static Pitch getPitch() {
         return new Pitch(0, PITCH_WIDTH, 0, PITCH_HEIGHT);
     }
+
+
+	// ----------------
+	// Variable Fields.
+
+
+	public static ArrayList<Powers> powervelo;
+	static {
+		Powers[] data = VtoPData.getData();
+		powervelo = new ArrayList<Powers>();
+		for (Powers p : data)
+			powervelo.add(p);
+	}
+
+    
+    
+    
+    // -------------------------------------
+	// Methods dealing with variable fields.
 
 	public static double[] getWheelVels(Robot r) {
 		return getWheelVels(r.getVelocity(), r.getAngularVelocity(),

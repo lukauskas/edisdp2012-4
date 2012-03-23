@@ -7,7 +7,6 @@ import org.apache.log4j.Logger;
 import balle.controller.Controller;
 import balle.main.SimpleWorldGUI;
 import balle.main.drawable.Drawable;
-import balle.memory.FolderReader;
 import balle.world.AbstractWorld;
 import balle.world.MutableSnapshot;
 import balle.world.Snapshot;
@@ -22,7 +21,6 @@ public class StrategyRunner extends AbstractWorldProcessor {
 	private Strategy currentStrategyA;
 	private Strategy currentStrategyB;
 	private final SimpleWorldGUI gui;
-	private final FolderReader folderReader;
 
 	/**
 	 * Initialises strategy runner
@@ -39,15 +37,13 @@ public class StrategyRunner extends AbstractWorldProcessor {
 	 *            GUI that Drawables will be drawn on.
 	 */
 	public StrategyRunner(Controller controllerA, Controller controllerB,
-			AbstractWorld worldA, AbstractWorld worldB, SimpleWorldGUI gui,
-			FolderReader fr) {
+			AbstractWorld worldA, AbstractWorld worldB, SimpleWorldGUI gui) {
 		super(worldA);
 		this.controllerA = controllerA;
 		this.controllerB = controllerB;
 		this.currentStrategyA = null;
 		this.currentStrategyB = null;
 		this.gui = gui;
-		this.folderReader = fr;
 	}
 
 	@Override
