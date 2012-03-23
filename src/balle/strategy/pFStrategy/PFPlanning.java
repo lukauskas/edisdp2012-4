@@ -13,7 +13,7 @@ public class PFPlanning {
     PointObject                 ball;
     double                      default_power = 5;
     RobotConf                   config;
-    List<Object>                objects;
+    List<PFObject>                objects;
     /** power for opponent. */
     double                      opponentPower;
     /** influence distance for opponent */
@@ -40,7 +40,7 @@ public class PFPlanning {
     public PFPlanning(RobotConf conf, double opponentPower, double opponentInf,
             double targetPower, double alpha) {
         this.config = conf;
-        objects = new ArrayList<Object>();
+        objects = new ArrayList<PFObject>();
         this.opponentPower = opponentPower;
         this.opponentInf = opponentInf;
         this.ballPower = targetPower;
@@ -99,7 +99,7 @@ public class PFPlanning {
 
         init(robot, opponent, ball);
 
-        List<Object> complList = new ArrayList<Object>(objects);
+        List<PFObject> complList = new ArrayList<PFObject>(objects);
         if (this.opponent != null)
             complList.add(this.opponent);
 
@@ -110,7 +110,7 @@ public class PFPlanning {
     }
 
     /** Adds static object in the arena to list of static obstacles. */
-    public void addObject(Object r) {
+    public void addObject(PFObject r) {
         objects.add(r);
     }
 
@@ -118,7 +118,7 @@ public class PFPlanning {
      * Actual function which computes the the next velocity vector to be applied
      * to the robot.
      */
-    public Vector GoTo(List<Object> obstacles, PointObject dest_obj,
+    public Vector GoTo(List<PFObject> obstacles, PointObject dest_obj,
             Point start_point) {
 
         Vector rep = new Vector(0, 0);
@@ -146,7 +146,7 @@ public class PFPlanning {
      *            the start_point
      * @return the vector
      */
-    public Vector GoTo(List<Object> obstacles, PointObject dest_obj,
+    public Vector GoTo(List<PFObject> obstacles, PointObject dest_obj,
             Pos start_point) {
 
         Vector rep = new Vector(0, 0);

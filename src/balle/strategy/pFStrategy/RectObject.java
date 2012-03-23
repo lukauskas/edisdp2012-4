@@ -2,7 +2,7 @@ package balle.strategy.pFStrategy;
 
 //A rectangle based object which calculates repulsive vector given that a surface is 
 //considered.
-public class RectObject implements Object {
+public class RectObject implements PFObject {
 
 	private final double power;
 	private final double infl_distance;
