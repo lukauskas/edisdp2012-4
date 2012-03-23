@@ -15,6 +15,16 @@ class SavesArray<S extends Saves> implements Saves {
 	}
 }
 
+/**
+ * For writing files that contain a list of elements. As an example see
+ * PowersConfigFile that can store an array of powers objects.
+ * 
+ * 
+ * @author s0952880
+ * 
+ * @param <E>
+ *            Elements you want written to a file.
+ */
 public abstract class FileReadWriterArray<E extends Saves> extends
 		FileReadWriter<SavesArray<E>> {
 
