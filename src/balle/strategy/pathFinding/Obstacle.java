@@ -1,4 +1,4 @@
-package balle.strategy.pathfinding;
+package balle.strategy.pathFinding;
 
 import balle.misc.Globals;
 import balle.strategy.curve.Curve;

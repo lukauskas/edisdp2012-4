@@ -19,10 +19,10 @@ import balle.strategy.curve.Curve;
 import balle.strategy.curve.CustomCHI;
 import balle.strategy.executor.movement.MovementExecutor;
 import balle.strategy.executor.movement.OrientedMovementExecutor;
-import balle.strategy.pathfinding.AbstractPath;
-import balle.strategy.pathfinding.ForwardAndReversePathFinder;
-import balle.strategy.pathfinding.PathFinder;
-import balle.strategy.pathfinding.SimplePathFinder;
+import balle.strategy.pathFinding.ForwardAndReversePathFinder;
+import balle.strategy.pathFinding.PathFinder;
+import balle.strategy.pathFinding.SimplePathFinder;
+import balle.strategy.pathFinding.path.Path;
 import balle.strategy.planner.SimpleGoToBallFaceGoal;
 import balle.world.BasicWorld;
 import balle.world.Coord;
@@ -204,7 +204,7 @@ new SimplePathFinder(
 		// }
 
 		// decide on a path to take
-		AbstractPath pathToTake = getBestPath(snapshot, angle);
+		Path pathToTake = getBestPath(snapshot, angle);
 		c = pathToTake.getCurve();
 
 		// calculate wheel speeds/powers
@@ -224,11 +224,11 @@ new SimplePathFinder(
 				(int) right, System.currentTimeMillis()));
 	}
 	
-	private AbstractPath getBestPath(Snapshot s, Orientation finalOrient) {
+	private Path getBestPath(Snapshot s, Orientation finalOrient) {
 		// get candidate paths
-		AbstractPath[] paths = pathfinder.getPaths(s, pf, finalOrient);
+		Path[] paths = pathfinder.getPaths(s, pf, finalOrient);
 		boolean hasLastPathUsed = lastPathIndexUsed != -1;
-		AbstractPath best = paths[hasLastPathUsed ? lastPathIndexUsed : 0];
+		Path best = paths[hasLastPathUsed ? lastPathIndexUsed : 0];
 		// look for the quickest time path
 		Robot bot = s.getBalle();
 		double bestTime = best.getTimeToDrive(bot)
@@ -239,7 +239,7 @@ new SimplePathFinder(
 															// choice more
 															// consistent
 		for(int i = 1; i < paths.length; i++) {
-			AbstractPath curr = paths[i];
+			Path curr = paths[i];
 			if (curr != null) {
 				double currTime = curr.getTimeToDrive(bot);
 				if (bestTime > currTime) {
@@ -251,7 +251,7 @@ new SimplePathFinder(
 		}
 		// save the unused paths for drawing
 		altCurves.clear();
-		for (AbstractPath p : paths) {
+		for (Path p : paths) {
 			if (p != best) {
 				altCurves.add(p.getCurve());
 			}

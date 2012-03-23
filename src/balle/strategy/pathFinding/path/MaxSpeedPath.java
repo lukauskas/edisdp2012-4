@@ -1,4 +1,4 @@
-package balle.strategy.pathfinding;
+package balle.strategy.pathFinding.path;
 
 import balle.misc.Globals;
 import balle.strategy.curve.Curve;
@@ -14,7 +14,7 @@ public class MaxSpeedPath extends AbstractPath {
 													// speed). when making sharp
 													// turns the speed will be
 													// slowed toward max/this
-	private final double MAX_VELOCITY = Globals.powerToVelocity(900); // the
+	private final double MAX_VELOCITY = Globals.powerToVelocity(450); // the
 																		// maximum
 																		// wheel
 																		// velocity

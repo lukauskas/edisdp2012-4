@@ -1,4 +1,4 @@
-package balle.strategy.pathfinding;
+package balle.strategy.pathFinding.path;
 
 import balle.misc.Globals;
 import balle.strategy.curve.Curve;
@@ -20,7 +20,7 @@ import balle.world.objects.Robot;
  * @author s0906575
  * 
  */
-public abstract class AbstractPath {
+public abstract class AbstractPath implements Path {
 
 	private Curve curve;
 

@@ -1,4 +1,4 @@
-package balle.strategy.pathfinding;
+package balle.strategy.pathFinding.path;
 
 import balle.strategy.curve.Curve;
 
@@ -11,9 +11,9 @@ import balle.strategy.curve.Curve;
  */
 public class ReversePath extends AbstractPath {
 
-	private AbstractPath reversePath;
+	private Path reversePath;
 
-	public ReversePath(AbstractPath reversePath) {
+	public ReversePath(Path reversePath) {
 		super(reversePath.getCurve());
 		this.reversePath = reversePath;
 	}

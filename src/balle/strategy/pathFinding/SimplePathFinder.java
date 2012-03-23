@@ -1,4 +1,4 @@
-package balle.strategy.pathfinding;
+package balle.strategy.pathFinding;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -9,6 +9,8 @@ import balle.main.drawable.Dot;
 import balle.main.drawable.Drawable;
 import balle.strategy.curve.Curve;
 import balle.strategy.curve.Interpolator;
+import balle.strategy.pathFinding.path.MaxSpeedPath;
+import balle.strategy.pathFinding.path.Path;
 import balle.world.Coord;
 import balle.world.Orientation;
 import balle.world.Snapshot;
@@ -28,7 +30,7 @@ public class SimplePathFinder implements PathFinder {
 	}
 
 	@Override
-	public AbstractPath[] getPaths(Snapshot s, Coord end,
+	public Path[] getPaths(Snapshot s, Coord end,
 			Orientation endAngle) {
 		
 		Robot robot = s.getBalle();
@@ -38,7 +40,7 @@ public class SimplePathFinder implements PathFinder {
 		return getPaths(s, start, startAngle, end, endAngle);
 	}
 
-	protected AbstractPath[] getPaths(Snapshot s, Coord start,
+	protected Path[] getPaths(Snapshot s, Coord start,
 			Orientation startAngle, Coord end, Orientation endAngle) {
 		
 		drawables = new ArrayList<Drawable>();
@@ -61,7 +63,7 @@ public class SimplePathFinder implements PathFinder {
 		}
 
 		// Convert to a path.
-		return new AbstractPath[] { new MaxSpeedPath(getCurve(list)) };
+		return new Path[] { new MaxSpeedPath(getCurve(list)) };
 	}
 
 	/**
