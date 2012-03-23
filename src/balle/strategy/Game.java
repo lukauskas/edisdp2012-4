@@ -41,6 +41,8 @@ public class Game extends AbstractPlanner {
 	protected final RotateToOrientationExecutor turningExecutor;
     protected final Dribble_M4 kickingStrategy;
     protected final InitialStrategy initialStrategy;
+	protected final Strategy goToBallPFN;
+	protected final Strategy goToBallBezier;
 
     protected boolean initial;
 
@@ -95,6 +97,10 @@ public class Game extends AbstractPlanner {
         turningExecutor = new IncFaceAngle();
         kickingStrategy = new Dribble_M4();
         initialStrategy = new InitialStrategy();
+		goToBallPFN = new GoToBall(new GoToObjectPFN(0));
+		((GoToBall) goToBallPFN).setApproachTargetFromCorrectSide(true);
+		goToBallBezier = new SimpleGoToBallFaceGoal(new BezierNav(
+				new SimplePathFinder(new CustomCHI())));
         initial = false;
     }
 
@@ -151,6 +157,7 @@ public class Game extends AbstractPlanner {
         Robot opponent = snapshot.getOpponent();
         Ball ball = snapshot.getBall();
         Goal ownGoal = snapshot.getOwnGoal();
+		Goal opponentsGoal = snapshot.getOpponentsGoal();
         Pitch pitch = snapshot.getPitch();
 
         if ((ourRobot.getPosition() == null) || (ball.getPosition() == null))
@@ -181,22 +188,21 @@ public class Game extends AbstractPlanner {
             } else {
                 LOG.warn("We need to go around the ball");
             }
-        } else if ((opponent.possessesBall(ball))
-                && (opponent.isFacingGoal(ownGoal))) {
-            LOG.info("Defending");
-            setCurrentStrategy(defensiveStrategy.getClass().getName());
-            // Let defensiveStrategy deal with it!
-			defensiveStrategy.step(controller, snapshot);
-            addDrawables(defensiveStrategy.getDrawables());
-        } else if (ball.isNearWall(pitch)) {
-            setCurrentStrategy(pickBallFromWallStrategy.getClass().getName());
-			pickBallFromWallStrategy.step(controller, snapshot);
-            addDrawables(pickBallFromWallStrategy.getDrawables());
+		} else if (!ourRobot.isApproachingTargetFromCorrectSide(ball,
+				opponentsGoal)) {
+			// let pfn get us on the right side of the pitch
+			setCurrentStrategy(goToBallPFN.getClass().getName());
+			goToBallPFN.step(controller, snapshot);
+			addDrawables(goToBallPFN.getDrawables());
+			// } else if (ball.isNearWall(pitch)) {
+			// setCurrentStrategy(pickBallFromWallStrategy.getClass().getName());
+			// pickBallFromWallStrategy.step(controller, snapshot);
+			// addDrawables(pickBallFromWallStrategy.getDrawables());
         } else {
             // Approach ball
-            setCurrentStrategy(goToBallStrategy.getClass().getName());
-			goToBallStrategy.step(controller, snapshot);
-            addDrawables(goToBallStrategy.getDrawables());
+			setCurrentStrategy(goToBallBezier.getClass().getName());
+			goToBallBezier.step(controller, snapshot);
+			addDrawables(goToBallBezier.getDrawables());
 
         }
 
