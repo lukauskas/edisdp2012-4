@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import balle.controller.Controller;
 import balle.misc.Globals;
 import balle.strategy.planner.AbstractPlanner;
+import balle.world.Coord;
 import balle.world.Orientation;
 import balle.world.Snapshot;
 
@@ -22,7 +23,7 @@ public class Calibrate extends AbstractPlanner {
 	private long lastPowerChangeTime = System.currentTimeMillis();
 	private long sampleStartTime;
 	private long sampleEndTime;
-	private int power = 0;
+	private int power = 900;
 	private ArrayList<Orientation> samples = new ArrayList<Orientation>();
 	
 	private boolean done = false;
@@ -32,12 +33,28 @@ public class Calibrate extends AbstractPlanner {
 		return new Calibrate();
 	}
 
+	private Coord startPos;
+	private long startT;
+	
     /**
      * Tell the strategy to do a step (e.g. move forward).
      * @param snapshot TODO
      */
 	public void onStep(Controller controller, Snapshot snapshot) {
 		// if (true) {
+		// controller.setWheelSpeeds(900, 900);
+		// return;
+		// }
+
+		// if (true) {
+		// Coord pos = snapshot.getBalle().getPosition();
+		// if (startPos == null) {
+		// startPos = pos;
+		// startT = snapshot.getTimestamp();
+		// }
+		// System.out
+		// .println(((startPos.dist(pos)) / (snapshot.getTimestamp() -
+		// startT)));
 		// controller.setWheelSpeeds(900, 900);
 		// return;
 		// }
@@ -66,8 +83,8 @@ public class Calibrate extends AbstractPlanner {
 				record();
 				// move to the next power (or stop if done)
 				samples.clear();
-				power += POWER_STEP;
-				if(power <= Globals.MAXIMUM_MOTOR_SPEED) {
+				power -= POWER_STEP;
+				if (power > 0) {
 					controller.setWheelSpeeds(power, -power);
 					lastPowerChangeTime = System.currentTimeMillis();
 				} else {
