@@ -155,6 +155,11 @@ public class Globals {
     public static Pitch getPitch() {
         return new Pitch(0, PITCH_WIDTH, 0, PITCH_HEIGHT);
     }
+    
+	@SuppressWarnings("unchecked")
+	public static <E> E[] cast(Object[] array) {
+		return (E[]) array;
+    }
 
 
 	// ----------------

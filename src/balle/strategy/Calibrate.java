@@ -105,10 +105,12 @@ public class Calibrate extends AbstractPlanner {
 	
 	@Override
 	public void stop(Controller controller) {
+		super.stop(controller);
+
 		try {
 			PowersConfigFile pcf = new PowersConfigFile(Globals.resFolder,
 					"powersConfig.txt");
-			pcf.writeArray((Powers[]) record.toArray());
+			pcf.writeArray(record);
 			record = new ArrayList<Powers>();
 
 		} catch (IOException e) {

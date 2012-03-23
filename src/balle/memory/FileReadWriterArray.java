@@ -2,9 +2,10 @@ package balle.memory;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 class SavesArray<S extends Saves> implements Saves {
-	public S[] array;
+	public List<S> array;
 
 	@Override
 	public String save() {
@@ -34,7 +35,6 @@ public abstract class FileReadWriterArray<E extends Saves> extends
 
 	public abstract E readLine(String line);
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public final SavesArray<E> readBody(String[] lines) {
 		ArrayList<E> list = new ArrayList<E>();
@@ -43,8 +43,13 @@ public abstract class FileReadWriterArray<E extends Saves> extends
 			list.add(readLine(line));
 
 		SavesArray<E> output = new SavesArray<E>();
-		output.array = (E[]) list.toArray();
+		output.array = list;
 		return output;
+	}
+
+	public final List<E> readArray() throws IOException {
+		SavesArray<E> sa = read();
+		return sa.array;
 	}
 
 	@Override
@@ -57,7 +62,7 @@ public abstract class FileReadWriterArray<E extends Saves> extends
 		return output.toArray().toString();
 	}
 
-	public final void writeArray(E[] e) throws IOException {
+	public final void writeArray(List<E> e) throws IOException {
 		SavesArray<E> eArray = new SavesArray<E>();
 		eArray.array = e;
 		super.write(eArray);
