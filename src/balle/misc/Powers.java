@@ -17,4 +17,11 @@ public class Powers {
 		this.velocity = velocity;
 	}
 
+	/**
+	 * Used in PwrVeloFile.java if you change it, update it their too. Will
+	 * damage all saved files.
+	 */
+	public String toString() {
+		return power + ";" + velocity;
+	}
 }
