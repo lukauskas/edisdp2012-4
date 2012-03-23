@@ -18,6 +18,7 @@ import balle.controller.Controller;
 import balle.controller.DummyController;
 import balle.io.reader.SocketVisionReader;
 import balle.logging.StrategyLogAppender;
+import balle.memory.FolderReader;
 import balle.misc.Globals;
 import balle.simulator.Simulator;
 import balle.simulator.SoftBot;
@@ -149,10 +150,12 @@ public class Runner {
 		SimpleWorldGUI gui = new SimpleWorldGUI(worldA);
 		GUITab mainWindow = new GUITab();
 
-		StrategyRunner strategyRunner = new StrategyRunner(controllerA,
-				controllerB, worldA, worldB, gui);
+		FolderReader folderreader = new FolderReader("res");
 
-        StrategyFactory sf = new StrategyFactory();
+		StrategyRunner strategyRunner = new StrategyRunner(controllerA,
+				controllerB, worldA, worldB, gui, folderreader);
+
+        StrategyFactory sf = new StrategyFactory(folderreader);
 		StratTab strategyTab = new StratTab(controllerA, controllerB, worldA,
 				worldB, strategyRunner, simulator, sf);
 

@@ -23,7 +23,7 @@ public class FolderReader {
 	}
 
 	public FolderReader(FolderReader parent, String foldername) {
-		this.foldername = parent.foldername + foldername;
+		this.foldername = parent.foldername + "\\" + foldername;
 	}
 
 	// Interface

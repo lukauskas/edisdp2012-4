@@ -14,6 +14,7 @@ import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 
+import balle.memory.FolderReader;
 import balle.strategy.planner.AbstractPlanner;
 
 public class StrategyFactory {
@@ -21,6 +22,12 @@ public class StrategyFactory {
     private static final Logger LOG = Logger.getLogger(StrategyFactory.class);
 
     private static HashMap<String, Method> runnableStrategies = null;
+
+	private FolderReader fr;
+
+	public StrategyFactory(FolderReader fr) {
+		this.fr = fr;
+	}
 
     private HashMap<String, Method> getRunnableStrategies() {
         if (runnableStrategies != null)
@@ -89,6 +96,7 @@ public class StrategyFactory {
             return null;
         }
         
+		strategy.setFolderReader(fr);
         return strategy;
     }
 }
