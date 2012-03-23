@@ -1,8 +1,10 @@
 package balle.misc;
 
-public class Powers {
-	private final int power;
-	private final float velocity;
+import balle.memory.Saves;
+
+public class Powers implements Saves {
+	private int power;
+	private float velocity;
 
 	public int getPower() {
 		return power;
@@ -17,11 +19,15 @@ public class Powers {
 		this.velocity = velocity;
 	}
 
-	/**
-	 * Used in PwrVeloFile.java if you change it, update it their too. Will
-	 * damage all saved files.
-	 */
-	public String toString() {
+	@Override
+	public String save() {
 		return power + ";" + velocity;
+	}
+
+	public static Saves load(String line) {
+		String[] tokens = line.split(";");
+		int power = Integer.parseInt(tokens[0]);
+		float velocity = Float.parseFloat(tokens[1]);
+		return new Powers(power, velocity);
 	}
 }

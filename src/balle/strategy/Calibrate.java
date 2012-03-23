@@ -1,12 +1,13 @@
 package balle.strategy;
 
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
 import balle.controller.Controller;
+import balle.memory.FileReadWriter;
+import balle.memory.PowerConfigFile;
 import balle.misc.Globals;
+import balle.misc.Powers;
 import balle.strategy.planner.AbstractPlanner;
 import balle.world.Coord;
 import balle.world.Orientation;
@@ -14,7 +15,7 @@ import balle.world.Snapshot;
 
 public class Calibrate extends AbstractPlanner {
 
-	protected BufferedWriter bWriter;
+	protected ArrayList<Powers> record = new ArrayList<Powers>();
 
 	private final long ACCEL_TIME = 1000; // time needed to accelerate to the
 											// terminal speed
@@ -33,15 +34,7 @@ public class Calibrate extends AbstractPlanner {
 	
 	private boolean done = false;
 
-	public Calibrate() {
-		try {
-			bWriter = Globals.resFolder.getWriter("test.txt");
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
-
-	    @FactoryMethod(designator = "Calibrate", parameterNames = {})
+	@FactoryMethod(designator = "Calibrate", parameterNames = {})
 	public static Calibrate calibrateFactory() {
 		return new Calibrate();
     }
@@ -54,6 +47,7 @@ public class Calibrate extends AbstractPlanner {
      * @param snapshot TODO
      */
 	public void onStep(Controller controller, Snapshot snapshot) {
+
 		// if (true) {
 		// controller.setWheelSpeeds(900, 900);
 		// return;
@@ -113,10 +107,15 @@ public class Calibrate extends AbstractPlanner {
 	@Override
 	public void stop(Controller controller) {
 		try {
-			bWriter.close();
+			FileReadWriter<Powers> pvf = new PowerConfigFile(
+					Globals.resFolder, "p2vConfig.txt");
+			pvf.write((Powers[]) record.toArray());
+			record = new ArrayList<Powers>();
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
 	}
 
 	/**
@@ -131,16 +130,10 @@ public class Calibrate extends AbstractPlanner {
 		double angVel = Math.abs(deltaA / (sampleEndTime - sampleStartTime));
 		double wheelVelocity = angularVelToWheelSpeed(angVel);
 		
-		// record (just print out for now)
-		String output = power + ";" + wheelVelocity;
-		System.out.println(output);
-
-		// print to file
-		try {
-			bWriter.append(output + "\n");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		// print to file and console
+		Powers powers = new Powers(power, (float) wheelVelocity);
+		record.add(powers);
+		System.out.println(powers.save());
 	}
 
 	/**
