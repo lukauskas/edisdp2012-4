@@ -4,8 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import balle.controller.Controller;
-import balle.memory.FileReadWriter;
-import balle.memory.PowerConfigFile;
+import balle.memory.PowersConfigFile;
 import balle.misc.Globals;
 import balle.misc.Powers;
 import balle.strategy.planner.AbstractPlanner;
@@ -107,9 +106,9 @@ public class Calibrate extends AbstractPlanner {
 	@Override
 	public void stop(Controller controller) {
 		try {
-			FileReadWriter<Powers> pvf = new PowerConfigFile(
-					Globals.resFolder, "p2vConfig.txt");
-			pvf.write((Powers[]) record.toArray());
+			PowersConfigFile pcf = new PowersConfigFile(Globals.resFolder,
+					"powersConfig.txt");
+			pcf.writeArray((Powers[]) record.toArray());
 			record = new ArrayList<Powers>();
 
 		} catch (IOException e) {

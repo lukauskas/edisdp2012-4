@@ -5,8 +5,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import balle.misc.Powers;
-
 public abstract class FileReadWriter<E extends Saves> {
 	
 	// Instance
@@ -23,38 +21,39 @@ public abstract class FileReadWriter<E extends Saves> {
 	}
 	
 	// Interface
-	
-	public abstract E read(String line);
 
-	protected abstract boolean isHeader(String header);
-
-	protected abstract String writeHeader();
-
-	public Powers[] read() throws IOException {
+	public final E read() throws IOException {
 		BufferedReader br = fr.getReader(filename);
 		
-		ArrayList<E> output = new ArrayList<E>();
-		
 		String nextLine;
+		ArrayList<String> lines = new ArrayList<String>();
 		if (!isHeader(br.readLine()))
 			throw new IOException();
 
 		while ((nextLine = br.readLine()) != null)
-			output.add(read(nextLine));
-		
+			lines.add(nextLine);
 		br.close();
-		return (Powers[]) output.toArray();
+		
+		E output = readBody((String[]) lines.toArray());
+		return (E) output;
 	}
 
-	public void write(E[] data) throws IOException {
+	public final void write(E powers) throws IOException {
 		BufferedWriter bw = fr.getWriter(filename);
 
 		bw.write(writeHeader() + "\n");
-		
-		for (E e : data)
-			bw.append(e.save() + "\n");
+		bw.append(writeBody(powers));
 		
 		bw.close();
 	}
 
+	// Internal
+
+	public abstract E readBody(String[] lines);
+
+	public abstract String writeBody(E e);
+
+	protected abstract boolean isHeader(String header);
+
+	protected abstract String writeHeader();
 }

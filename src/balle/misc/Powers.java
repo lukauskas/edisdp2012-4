@@ -2,6 +2,7 @@ package balle.misc;
 
 import balle.memory.Saves;
 
+
 public class Powers implements Saves {
 	private int power;
 	private float velocity;
@@ -19,12 +20,11 @@ public class Powers implements Saves {
 		this.velocity = velocity;
 	}
 
-	@Override
 	public String save() {
 		return power + ";" + velocity;
 	}
 
-	public static Saves load(String line) {
+	public static Powers load(String line) {
 		String[] tokens = line.split(";");
 		int power = Integer.parseInt(tokens[0]);
 		float velocity = Float.parseFloat(tokens[1]);
