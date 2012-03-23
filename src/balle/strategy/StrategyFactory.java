@@ -22,6 +22,12 @@ public class StrategyFactory {
 
     private static HashMap<String, Method> runnableStrategies = null;
 
+	private Object[] arguments;
+
+	public StrategyFactory(Object[] arguments) {
+		this.arguments = arguments;
+	}
+
     private HashMap<String, Method> getRunnableStrategies() {
         if (runnableStrategies != null)
             return runnableStrategies;
@@ -74,7 +80,11 @@ public class StrategyFactory {
 
         AbstractPlanner strategy;
         try {
-            strategy = (AbstractPlanner) m.invoke(null, new Object[] {});
+			if (m.getParameterTypes().length == 0)
+				strategy = (AbstractPlanner) m.invoke(null, new Object[0]);
+			else
+				strategy = (AbstractPlanner) m.invoke(null, arguments);
+
         } catch (IllegalArgumentException e) {
             LOG.error("IllegalArgumentException while trying to invoke " + designator);
             e.printStackTrace();
@@ -85,7 +95,7 @@ public class StrategyFactory {
             return null;
         } catch (InvocationTargetException e) {
             LOG.error("InvocationTargetException while trying to invoke " + designator);
-            e.printStackTrace();
+			e.getCause().printStackTrace();
             return null;
         }
         

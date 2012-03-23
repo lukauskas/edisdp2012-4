@@ -1,8 +1,12 @@
 package balle.strategy;
 
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import balle.controller.Controller;
+import balle.memory.FolderReader;
 import balle.misc.Globals;
 import balle.strategy.planner.AbstractPlanner;
 import balle.world.Coord;
@@ -11,9 +15,11 @@ import balle.world.Snapshot;
 
 public class Calibrate extends AbstractPlanner {
 
+	protected BufferedWriter bWriter;
+
 	private final long ACCEL_TIME = 1000; // time needed to accelerate to the
 											// terminal speed
-	private final int POWER_STEP = 25;
+	private final int POWER_STEP = 1; // 25;
 	private final long SAMPLE_TIME = 4000; // how many angular velocity samples
 											// to
 										// take (Must be greater then 1)
@@ -28,9 +34,17 @@ public class Calibrate extends AbstractPlanner {
 	
 	private boolean done = false;
 
+	public Calibrate(FolderReader fr) {
+		try {
+			bWriter = fr.getWriter("test.txt");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+
 	@FactoryMethod(designator = "Calibrate")
-	public static Calibrate calibrateFactory() {
-		return new Calibrate();
+	public static Calibrate calibrateFactory(FolderReader fr) {
+		return new Calibrate(fr);
 	}
 
 	private Coord startPos;
@@ -90,12 +104,22 @@ public class Calibrate extends AbstractPlanner {
 				} else {
 					done = true;
 				}
+
 			}
 		} else {
 			controller.stop();
 		}
 	}
 	
+	@Override
+	public void stop(Controller controller) {
+		try {
+			bWriter.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	/**
 	 * uses the current samples and power to record a (power, velocity) pair 
 	 */
@@ -109,7 +133,15 @@ public class Calibrate extends AbstractPlanner {
 		double wheelVelocity = angularVelToWheelSpeed(angVel);
 		
 		// record (just print out for now)
-		System.out.println(power + ";" + wheelVelocity);
+		String output = power + ";" + wheelVelocity;
+		System.out.println(output);
+
+		// print to file
+		try {
+			bWriter.append(output + "\n");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**

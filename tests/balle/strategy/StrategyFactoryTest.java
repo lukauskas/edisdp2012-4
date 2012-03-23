@@ -15,7 +15,7 @@ public class StrategyFactoryTest {
      */
     @Test
     public void testAvailableDesignators() throws UnknownDesignatorException {
-        StrategyFactory sf = new StrategyFactory();
+		StrategyFactory sf = new StrategyFactory(null);
 
         ArrayList<String> availableDesignators = sf.availableDesignators();
         for (String designator : availableDesignators) {
