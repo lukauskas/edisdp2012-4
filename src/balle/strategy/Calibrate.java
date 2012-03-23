@@ -1,5 +1,8 @@
 package balle.strategy;
 
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import balle.controller.Controller;
@@ -9,6 +12,8 @@ import balle.world.Orientation;
 import balle.world.Snapshot;
 
 public class Calibrate extends AbstractPlanner {
+
+	protected BufferedWriter bWriter;
 
 	private final long ACCEL_TIME = 1000; // time needed to accelerate to the
 											// terminal speed
@@ -26,6 +31,14 @@ public class Calibrate extends AbstractPlanner {
 	private ArrayList<Orientation> samples = new ArrayList<Orientation>();
 	
 	private boolean done = false;
+
+	public Calibrate() {
+		try {
+			bWriter = fr.getWriter("test.txt");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
 
 	@FactoryMethod(designator = "Calibrate")
 	public static Calibrate calibrateFactory() {
@@ -92,7 +105,15 @@ public class Calibrate extends AbstractPlanner {
 		double wheelVelocity = angularVelToWheelSpeed(angVel);
 		
 		// record (just print out for now)
-		System.out.println(power + ";" + wheelVelocity);
+		String output = power + ";" + wheelVelocity;
+		System.out.println(output);
+
+		// print to file
+		try {
+			bWriter.append("\n" + output);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
