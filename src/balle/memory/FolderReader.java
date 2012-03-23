@@ -23,29 +23,29 @@ public class FolderReader {
 	}
 
 	public FolderReader(FolderReader parent, String foldername) {
-		this.foldername = parent.foldername + "\\" + foldername;
+		this.foldername = parent.foldername + "/" + foldername;
 	}
 
 	// Interface
 
 	public File getFile(String filename) {
-		return new File(filename);
+		return new File(foldername + "/" + filename);
 	}
 
 
 	public BufferedWriter getWriter(String filename)
 			throws FileNotFoundException {
 		return new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
-				new File(filename))));
+				new File(foldername + "/" + filename))));
 	}
 	public BufferedReader getReader(String filename)
 			throws FileNotFoundException {
 		return new BufferedReader(new InputStreamReader(new FileInputStream(
-				new File(filename))));
+				new File(foldername + "/" + filename))));
 	}
 
 	public String readFile(String filename) throws IOException {
-		BufferedReader br = getReader(filename);
+		BufferedReader br = getReader(foldername + "/" + filename);
 		String nextline = null, out = "";
 
 		// Concatenate all lines together in one string.
@@ -56,7 +56,7 @@ public class FolderReader {
 	}
 
 	public void writeFile(String filename, String body) throws IOException {
-		BufferedWriter bw = getWriter(filename);
+		BufferedWriter bw = getWriter(foldername + "/" + filename);
 		String[] lines = body.split("\n");
 
 		for (String line : lines)

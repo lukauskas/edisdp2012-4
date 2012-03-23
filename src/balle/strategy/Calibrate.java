@@ -18,7 +18,7 @@ public class Calibrate extends AbstractPlanner {
 
 	private final long ACCEL_TIME = 1000; // time needed to accelerate to the
 											// terminal speed
-	private final int POWER_STEP = 25;
+	private final int POWER_STEP = 1; // 25;
 	private final long SAMPLE_TIME = 4000; // how many angular velocity samples
 											// to
 										// take (Must be greater then 1)
@@ -87,12 +87,22 @@ public class Calibrate extends AbstractPlanner {
 				} else {
 					done = true;
 				}
+
 			}
 		} else {
 			controller.stop();
 		}
 	}
 	
+	@Override
+	public void stop(Controller controller) {
+		try {
+			bWriter.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	/**
 	 * uses the current samples and power to record a (power, velocity) pair 
 	 */
@@ -111,7 +121,7 @@ public class Calibrate extends AbstractPlanner {
 
 		// print to file
 		try {
-			bWriter.append("\n" + output);
+			bWriter.append(output + "\n");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
