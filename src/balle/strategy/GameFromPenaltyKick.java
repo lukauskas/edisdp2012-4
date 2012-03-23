@@ -19,7 +19,7 @@ public class GameFromPenaltyKick extends Game {
         super(goToBallStrategy);
 	}
 
-    @FactoryMethod(designator = "Game (Penalty Kick)")
+    @FactoryMethod(designator = "Game (Penalty Kick)", parameterNames = {})
     public static GameFromPenaltyKick gameFromPenaltyKickFactory() {
         return new GameFromPenaltyKick(new GoToBall(new GoToObjectPFN(0)));
     }

@@ -19,4 +19,6 @@ public @interface FactoryMethod {
      * @return
      */
     String designator();
+
+    String[] parameterNames();
 }

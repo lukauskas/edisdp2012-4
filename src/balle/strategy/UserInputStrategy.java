@@ -22,7 +22,7 @@ public class UserInputStrategy extends AbstractPlanner {
     private float  leftWheelPower = 0, rightWheelPower = 0;
 	private Controller controller;
 
-	@FactoryMethod(designator = "UserInput")
+    @FactoryMethod(designator = "UserInput", parameterNames = {})
 	public static UserInputStrategy gameFactory() {
 		return new UserInputStrategy();
 	}

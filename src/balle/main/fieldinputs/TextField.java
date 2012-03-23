@@ -12,7 +12,7 @@ public class TextField extends FieldInput {
     public TextField(String name) {
         super(name);
         this.setLayout(new BorderLayout());
-        input = new JTextField(30);
+        input = new JTextField(20);
         this.add(new JLabel(name), BorderLayout.WEST);
         this.add(input, BorderLayout.EAST);
     }

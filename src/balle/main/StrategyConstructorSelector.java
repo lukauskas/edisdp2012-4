@@ -1,8 +1,11 @@
 package balle.main;
 
+import java.awt.Dimension;
+
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
 import org.apache.log4j.Logger;
 
@@ -15,13 +18,18 @@ public class StrategyConstructorSelector extends JPanel {
             .getLogger(StrategyConstructorSelector.class);
 
     private final Class<?>[] args;
+    private final String[] argNames;
     private FieldInput[] fields;
 
-    public StrategyConstructorSelector(String strategyName, Class<?>[] args) {
+    public StrategyConstructorSelector(String strategyName, String[] argNames,
+            Class<?>[] args) {
         super();
+        this.argNames = argNames;
         this.args = args;
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        this.add(new JLabel(strategyName + " arguments:"));
+        JLabel name = new JLabel(strategyName + " arguments:", SwingConstants.CENTER);
+        name.setPreferredSize(new Dimension(300, 20));
+        this.add(name);
         generateArgFields();
         this.validate();
     }
@@ -32,11 +40,12 @@ public class StrategyConstructorSelector extends JPanel {
         for (int i = 0; i < args.length; i++)
         {
             Class<?> arg = args[i];
+            String argName = argNames[i];
             if (double.class.isAssignableFrom(arg)) {
-                fs[i] = new DoubleField(Integer.toString(i));
+                fs[i] = new DoubleField(argName);
                 this.add(fs[i]);
             } else if (boolean.class.isAssignableFrom(arg)) {
-                fs[i] = new BooleanField(Integer.toString(i));
+                fs[i] = new BooleanField(argName);
                 this.add(fs[i]);
             }
             else

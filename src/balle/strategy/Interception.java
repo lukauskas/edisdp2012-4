@@ -133,49 +133,49 @@ public class Interception extends AbstractPlanner {
         }
     }
 
-    @FactoryMethod(designator = "InterceptsM4-CP-PFN")
+    @FactoryMethod(designator = "InterceptsM4-CP-PFN", parameterNames = {})
     public static final Interception factoryCPPFN() {
         return new Interception(true, new GoToObjectPFN(
                 Globals.ROBOT_LENGTH / 3), null, true, true);
     }
 
-    @FactoryMethod(designator = "InterceptsM4-NCP-PFN")
+    @FactoryMethod(designator = "InterceptsM4-NCP-PFN", parameterNames = {})
     public static final Interception factoryNCPPFN() {
         return new Interception(false, new GoToObjectPFN(
                 Globals.ROBOT_LENGTH / 3), null, true, true);
     }
 
-    @FactoryMethod(designator = "InterceptsM4-CP-PFNF")
+    @FactoryMethod(designator = "InterceptsM4-CP-PFNF", parameterNames = {})
     public static final Interception factoryCPPFNF() {
         return new Interception(true, new GoToObjectPFN(
                 Globals.ROBOT_LENGTH / 3, false), null, true, true);
     }
 
-    @FactoryMethod(designator = "InterceptsM4-CP-PFNF-NG")
+    @FactoryMethod(designator = "InterceptsM4-CP-PFNF-NG", parameterNames = {})
     public static final Interception factoryCPPFNFNG() {
         return new Interception(true, new GoToObjectPFN(
                 Globals.ROBOT_LENGTH / 3, false), null, true, false);
     }
 
-    @FactoryMethod(designator = "InterceptsM4-NCP-PFNF")
+    @FactoryMethod(designator = "InterceptsM4-NCP-PFNF", parameterNames = {})
     public static final Interception factoryNCPPFNF() {
         return new Interception(false, new GoToObjectPFN(
                 Globals.ROBOT_LENGTH / 3, false), null, true, true);
     }
 
-    @FactoryMethod(designator = "InterceptsM4-CP-BZR")
+    @FactoryMethod(designator = "InterceptsM4-CP-BZR", parameterNames = {})
     public static final Interception factoryCPBZR() {
         return new Interception(true, null, new BezierNav(new SimplePathFinder(
                 new CustomCHI())), true, true);
     }
 
-    @FactoryMethod(designator = "InterceptsM4-CP-BZR-NG")
+    @FactoryMethod(designator = "InterceptsM4-CP-BZR-NG", parameterNames = {})
     public static final Interception factoryCPBZRNG() {
         return new Interception(true, null, new BezierNav(new SimplePathFinder(
                 new CustomCHI())), true, false);
 }
 
-    @FactoryMethod(designator = "InterceptsM4-NCP-BZR")
+    @FactoryMethod(designator = "InterceptsM4-NCP-BZR", parameterNames = {})
     public static final Interception factoryNCPBZR() {
         return new Interception(false, null, new BezierNav(
                 new SimplePathFinder(new CustomCHI())), true, true);

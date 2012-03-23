@@ -28,7 +28,7 @@ public class Calibrate extends AbstractPlanner {
 	
 	private boolean done = false;
 
-	@FactoryMethod(designator = "Calibrate")
+    @FactoryMethod(designator = "Calibrate", parameterNames = {})
 	public static Calibrate calibrateFactory() {
 		return new Calibrate();
 	}

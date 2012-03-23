@@ -178,6 +178,8 @@ public class StratTab extends JPanel implements ActionListener {
             }
         });
         this.add(controlPanel);
+        
+        generateStrategyConstructorSelector();
 
 	}
 
@@ -190,6 +192,7 @@ public class StratTab extends JPanel implements ActionListener {
         String designator = greenStrategy.getSelectedItem().toString();
         try {
             parametersPanelGreen = new StrategyConstructorSelector(designator,
+                    strategyFactory.getArgumentNames(designator),
                     strategyFactory.getArguments(designator));
         } catch (UnknownDesignatorException e) {
             // TODO Auto-generated catch block
@@ -205,6 +208,7 @@ public class StratTab extends JPanel implements ActionListener {
         String designatorRed = redStrategy.getSelectedItem().toString();
         try {
             parametersPanelRed = new StrategyConstructorSelector(designatorRed,
+                    strategyFactory.getArgumentNames(designatorRed),
                     strategyFactory.getArguments(designatorRed));
         } catch (UnknownDesignatorException e) {
             // TODO Auto-generated catch block

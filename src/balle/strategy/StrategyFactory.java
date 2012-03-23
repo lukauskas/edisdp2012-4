@@ -21,12 +21,25 @@ public class StrategyFactory {
     private static final Logger LOG = Logger.getLogger(StrategyFactory.class);
 
     private static HashMap<String, Method> runnableStrategies = null;
+    private static HashMap<String, String[]> runnableStrategyParameterNames = null;
+
+    public static String[] getParameterNames(String designator)
+            throws UnknownDesignatorException {
+        String[] ans = runnableStrategyParameterNames.get(designator);
+        if (ans == null)
+            throw new UnknownDesignatorException("Don't know strategy \""
+                    + designator + "\"");
+
+        return ans;
+    }
+
 
     private HashMap<String, Method> getRunnableStrategies() {
         if (runnableStrategies != null)
             return runnableStrategies;
 
         runnableStrategies = new HashMap<String, Method>();
+        runnableStrategyParameterNames = new HashMap<String, String[]>();
         // Reflections reflections = new Reflections("balle.strategy");
         Reflections reflections = new Reflections(new ConfigurationBuilder().setUrls(
                 ClasspathHelper.forPackage("balle.strategy")).setScanners(
@@ -34,7 +47,9 @@ public class StrategyFactory {
         Set<Method> annotatedMethods = reflections.getMethodsAnnotatedWith(FactoryMethod.class);
         for (Method m : annotatedMethods)
         {
-            String designator = m.getAnnotation(FactoryMethod.class).designator();
+            FactoryMethod annotation = m.getAnnotation(FactoryMethod.class);
+            String designator = annotation.designator();
+            String[] parameterNames = annotation.parameterNames();
             if (!AbstractPlanner.class.isAssignableFrom(m.getReturnType()))
             {
                 LOG.warn("Skipping designator " + designator
@@ -43,9 +58,16 @@ public class StrategyFactory {
             } else if (!Modifier.isStatic(m.getModifiers())) {
                 LOG.warn("Skipping designator " + designator + " as it is not static");
                 continue;
+            } else if (m.getParameterTypes().length != annotation
+                    .parameterNames().length) {
+                LOG.warn("Skipping designator " + designator
+                        + " as it's parameter names count "
+                        + "match the parameter count");
+                continue;
             }
 
             runnableStrategies.put(designator, m);
+            runnableStrategyParameterNames.put(designator, parameterNames);
         }
         LOG.debug("Found " + runnableStrategies.size() + " runnable strategies");
         return runnableStrategies;
@@ -64,6 +86,9 @@ public class StrategyFactory {
         return m.getParameterTypes();
     }
 
+    public String[] getArgumentNames(String designator) {
+        return runnableStrategyParameterNames.get(designator);
+    }
     public ArrayList<String> availableDesignators() {
         runnableStrategies = getRunnableStrategies();
 
