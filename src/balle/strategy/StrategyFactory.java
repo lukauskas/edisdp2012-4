@@ -92,7 +92,7 @@ public class StrategyFactory {
             return null;
         } catch (InvocationTargetException e) {
             LOG.error("InvocationTargetException while trying to invoke " + designator);
-            e.printStackTrace();
+			e.getCause().printStackTrace();
             return null;
         }
         
