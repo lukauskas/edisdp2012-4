@@ -23,7 +23,7 @@ public class GameFromPenaltyDefence extends Game {
         super(goToBallStrategy);
 	}
 	
-    @FactoryMethod(designator = "Game (Penalty Defence)")
+    @FactoryMethod(designator = "Game (Penalty Defence)", parameterNames = {})
 	public static GameFromPenaltyDefence gameFromPenaltyDefenceFactory()
 	{
         return new GameFromPenaltyDefence(new GoToBall(new GoToObjectPFN(0)));

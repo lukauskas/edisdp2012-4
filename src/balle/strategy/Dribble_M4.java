@@ -20,7 +20,7 @@ public class Dribble_M4 extends AbstractPlanner {
 		super();
 	}
 	
-	@FactoryMethod(designator = "Game (Dribble)")
+    @FactoryMethod(designator = "Game (Dribble)", parameterNames = {})
 	public static Dribble_M4 Dribble_M4()
 	{
 		return new Dribble_M4();

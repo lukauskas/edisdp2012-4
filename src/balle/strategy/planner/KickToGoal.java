@@ -4,7 +4,6 @@ import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
 import balle.misc.Globals;
-import balle.strategy.FactoryMethod;
 import balle.world.Snapshot;
 import balle.world.objects.Ball;
 import balle.world.objects.Goal;
@@ -22,10 +21,6 @@ public class KickToGoal extends AbstractPlanner {
 		// TODO Auto-generated constructor stub
 	}
 
-	@FactoryMethod(designator = "KickToGoal")
-	public static KickToGoal kickToGoalFactory() {
-		return new KickToGoal();
-	}
 
     @Override
     protected void onStep(Controller controller, Snapshot snapshot) {
