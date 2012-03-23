@@ -21,7 +21,8 @@ public class MaxSpeedPath extends AbstractPath {
 																		// to
 																		// use
 	private final double DAMPENING_POWERCHANGE = 0;
-	private final double DAMPENING_POWERRATIO = 0; // increase towards 1 to make
+	private final double DAMPENING_POWERRATIO = 0.5; // increase towards 1 to
+														// make
 													// the robot move more
 													// strait
 

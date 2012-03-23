@@ -90,6 +90,7 @@ public class VtoPData {
 			}
 
 		});
+
 		return powers;
 	}
 
