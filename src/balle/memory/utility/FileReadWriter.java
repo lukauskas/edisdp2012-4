@@ -1,9 +1,11 @@
-package balle.memory;
+package balle.memory.utility;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+
+import balle.memory.FolderReader;
 
 public abstract class FileReadWriter<E extends Saves> {
 	

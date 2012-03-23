@@ -1,6 +1,6 @@
 package balle.misc;
 
-import balle.memory.Saves;
+import balle.memory.utility.Saves;
 
 
 public class Powers implements Saves {

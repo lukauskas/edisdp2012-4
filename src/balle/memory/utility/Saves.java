@@ -1,4 +1,4 @@
-package balle.memory;
+package balle.memory.utility;
 
 public interface Saves {
 

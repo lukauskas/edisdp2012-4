@@ -1,8 +1,10 @@
-package balle.memory;
+package balle.memory.utility;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import balle.memory.FolderReader;
 
 class SavesArray<S extends Saves> implements Saves {
 	public List<S> array;

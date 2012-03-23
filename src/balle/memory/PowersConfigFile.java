@@ -1,5 +1,6 @@
 package balle.memory;
 
+import balle.memory.utility.FileReadWriterArray;
 import balle.misc.Powers;
 
 public class PowersConfigFile extends FileReadWriterArray<Powers> {
@@ -23,5 +24,6 @@ public class PowersConfigFile extends FileReadWriterArray<Powers> {
 	protected String writeHeader() {
 		return IDENTIFIER;
 	}
+
 
 }
