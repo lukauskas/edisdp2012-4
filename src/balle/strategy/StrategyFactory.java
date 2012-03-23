@@ -52,6 +52,18 @@ public class StrategyFactory {
 
     }
 
+    public Class[] getArguments(String designator)
+            throws UnknownDesignatorException {
+        runnableStrategies = getRunnableStrategies();
+        Method m = runnableStrategies.get(designator);
+
+        if (m == null)
+            throw new UnknownDesignatorException("Don't know strategy \""
+                    + designator + "\"");
+
+        return m.getParameterTypes();
+    }
+
     public ArrayList<String> availableDesignators() {
         runnableStrategies = getRunnableStrategies();
 
@@ -63,7 +75,7 @@ public class StrategyFactory {
         return titles;
 	}
 
-    public AbstractPlanner createClass(String designator)
+    public AbstractPlanner createClass(String designator, Object[] arglist)
             throws UnknownDesignatorException {
 
         runnableStrategies = getRunnableStrategies();
@@ -74,7 +86,7 @@ public class StrategyFactory {
 
         AbstractPlanner strategy;
         try {
-            strategy = (AbstractPlanner) m.invoke(null, new Object[] {});
+            strategy = (AbstractPlanner) m.invoke(null, arglist);
         } catch (IllegalArgumentException e) {
             LOG.error("IllegalArgumentException while trying to invoke " + designator);
             e.printStackTrace();
