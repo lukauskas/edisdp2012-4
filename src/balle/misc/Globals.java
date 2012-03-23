@@ -58,8 +58,8 @@ public class Globals {
     public static final int MAXIMUM_MOTOR_SPEED = 900;
 
     // Camera Info
-    public static final float P1_CAMERA_HEIGHT = 2.386f; // Meters
-    public static final float P0_CAMERA_HEIGHT = 2.421f; // Meters
+	public static final float P1_CAMERA_HEIGHT = 2.285f; // 2.386f; // Meters
+	public static final float P0_CAMERA_HEIGHT = 2.37f; // 2.421f; // Meters
 
     public static final float ROBOT_HEIGHT = 0.19f; // Meters
 
