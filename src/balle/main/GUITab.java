@@ -16,7 +16,7 @@ public class GUITab extends JPanel {
     private JPanel sidebar;
     private JPanel mainPanel;
 
-    public GUITab() {
+	public GUITab() {
         super();
 
         frame = new JFrame();

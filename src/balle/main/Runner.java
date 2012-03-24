@@ -18,6 +18,7 @@ import balle.controller.Controller;
 import balle.controller.DummyController;
 import balle.io.reader.SocketVisionReader;
 import balle.logging.StrategyLogAppender;
+import balle.memory.ConfigFile;
 import balle.misc.Globals;
 import balle.simulator.Simulator;
 import balle.simulator.SoftBot;
@@ -146,6 +147,15 @@ public class Runner {
 	public static void initialiseGUI(Controller controllerA,
 			Controller controllerB, AbstractWorld worldA, AbstractWorld worldB,
 			StrategyLogPane strategyLog, Simulator simulator) {
+		Config config;
+		try {
+			config = (new ConfigFile(Globals.resFolder, Globals.configFolder))
+					.read();
+		} catch (IOException e) {
+			config = new Config();
+			System.err.println("No config file found");
+		}
+
 		SimpleWorldGUI gui = new SimpleWorldGUI(worldA);
 		GUITab mainWindow = new GUITab();
 
@@ -153,8 +163,8 @@ public class Runner {
 				controllerB, worldA, worldB, gui);
 
         StrategyFactory sf = new StrategyFactory();
-		StratTab strategyTab = new StratTab(controllerA, controllerB, worldA,
-				worldB, strategyRunner, simulator, sf);
+		StratTab strategyTab = new StratTab(config, controllerA, controllerB,
+				worldA, worldB, strategyRunner, simulator, sf);
 
 		// Jon: I struggled to get this to work with new layout
 		// and both drop down menus. I'll look into it more
@@ -225,7 +235,7 @@ public class Runner {
 			StrategyLogPane strategyLog) {
 		Simulator simulator = Simulator.createSimulator();
 
-        SimulatedWorld worldA = new SimulatedWorld(balleIsBlue, goalIsLeft,
+		SimulatedWorld worldA = new SimulatedWorld(balleIsBlue, goalIsLeft,
 				Globals.getPitch());
 		((BasicWorld) worldA).updatePitchSize(Globals.PITCH_WIDTH,
 				Globals.PITCH_HEIGHT);

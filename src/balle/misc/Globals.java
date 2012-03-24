@@ -1,10 +1,14 @@
 package balle.misc;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.jbox2d.common.Vec2;
 
 import balle.memory.FolderReader;
+import balle.memory.PowersConfigFile;
 import balle.world.AngularVelocity;
 import balle.world.Orientation;
 import balle.world.Velocity;
@@ -84,6 +88,7 @@ public class Globals {
     public static final double VELOCITY_NOISE_THRESHOLD = 1e-8;
 
 	public static final FolderReader resFolder = new FolderReader("res");
+	public static final String configFolder = "initConfig.txt";
 
 
 	// --------
@@ -166,7 +171,7 @@ public class Globals {
 	// Variable Fields.
 
 
-	public static ArrayList<Powers> powervelo;
+	public static List<Powers> powervelo;
 	static {
 		Powers[] data = VtoPData.getData();
 		powervelo = new ArrayList<Powers>();
@@ -179,6 +184,21 @@ public class Globals {
     
     // -------------------------------------
 	// Methods dealing with variable fields.
+
+	public void setPowerVelo(String filename) {
+		if (filename == null || filename.equals("[DEFAULT]"))
+			return;
+
+		try {
+			PowersConfigFile pcf = new PowersConfigFile(resFolder, filename);
+			powervelo = pcf.readArray();
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 	public static double[] getWheelVels(Robot r) {
 		return getWheelVels(r.getVelocity(), r.getAngularVelocity(),

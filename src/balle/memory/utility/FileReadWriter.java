@@ -40,7 +40,7 @@ public abstract class FileReadWriter<E extends Saves> {
 			lines.add(nextLine);
 		br.close();
 		
-		E output = readBody((String[]) lines.toArray());
+		E output = readBody(lines);
 		return (E) output;
 	}
 
@@ -59,7 +59,7 @@ public abstract class FileReadWriter<E extends Saves> {
 
 	// Internal
 
-	protected abstract E readBody(String[] lines);
+	protected abstract E readBody(ArrayList<String> lines);
 
 	protected abstract boolean isHeader(String header);
 

@@ -40,7 +40,7 @@ public abstract class FileReadWriterArray<E extends Saves> extends
 	public abstract E readLine(String line);
 
 	@Override
-	public final SavesArray<E> readBody(String[] lines) {
+	public final SavesArray<E> readBody(ArrayList<String> lines) {
 		ArrayList<E> list = new ArrayList<E>();
 
 		for (String line : lines)
@@ -82,7 +82,7 @@ public abstract class FileReadWriterArray<E extends Saves> extends
 			lines.add(nextLine);
 		br.close();
 
-		SavesArray<E> output = readBody((String[]) lines.toArray());
+		SavesArray<E> output = readBody(lines);
 		return (SavesArray<E>) output;
 	}
 

@@ -5,6 +5,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.BoxLayout;
@@ -16,6 +17,8 @@ import javax.swing.JPanel;
 import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
+import balle.memory.ConfigFile;
+import balle.misc.Globals;
 import balle.simulator.Simulator;
 import balle.strategy.StrategyFactory;
 import balle.strategy.StrategyRunner;
@@ -26,6 +29,9 @@ import balle.world.AbstractWorld;
 public class StratTab extends JPanel implements ActionListener {
 
 	private static final Logger LOG = Logger.getLogger(StratTab.class);
+
+	private final Config config;
+
 	// GUI declarations
 
 	private JPanel controlPanel;
@@ -39,6 +45,7 @@ public class StratTab extends JPanel implements ActionListener {
 	private JButton noiseButton;
 	private JButton randomButton;
 	private JButton resetButton;
+	private JButton saveButton;
 	private boolean isBlue;
 	private ArrayList<String> stratTabs;
 	private String[] strings = new String[0];
@@ -55,12 +62,15 @@ public class StratTab extends JPanel implements ActionListener {
 	private final static String GREEN_LABEL_TEXT = "Select Green strategy";
 	private final static String RED_LABEL_TEXT = "Select Red strategy";
 
-	public StratTab(Controller controllerA, Controller controllerB,
+	public StratTab(Config config, Controller controllerA,
+			Controller controllerB,
 			AbstractWorld worldA, AbstractWorld worldB,
-			StrategyRunner strategyRunner, Simulator simulator, StrategyFactory strategyFactory) {
+			StrategyRunner strategyRunner, Simulator simulator,
+			StrategyFactory strategyFactory) {
 
 		super();
 
+		this.config = config;
 		this.worldA = worldA;
 		this.simulator = simulator;
 		// Initialise strategy runner
@@ -161,6 +171,13 @@ public class StratTab extends JPanel implements ActionListener {
 		c.gridy = 5;
 		controlPanel.add(resetButton, c);
 
+		saveButton = new JButton("Save");
+		saveButton.addActionListener(this);
+		saveButton.setActionCommand("save");
+		c.gridx = 2;
+		c.gridy = 2;
+		controlPanel.add(saveButton, c);
+
         greenStrategy.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -180,6 +197,12 @@ public class StratTab extends JPanel implements ActionListener {
         this.add(controlPanel);
         
         generateStrategyConstructorSelector();
+
+		// Interprett Config object
+
+		greenStrategy.setSelectedItem(config.get(Config.GREEN_STRATEGY));
+		if (simulator != null)
+			redStrategy.setSelectedItem(config.get(Config.RED_STRATEGY));
 
 	}
 
@@ -237,6 +260,10 @@ public class StratTab extends JPanel implements ActionListener {
 					// selectedStrategyB = (String)
 					// redStrategy.getSelectedItem();
 				}
+
+				config.set(Config.GREEN_STRATEGY, selectedStrategyA);
+				if (simulator != null)
+					config.set(Config.RED_STRATEGY, selectedStrategyB);
 
 				try {
                     strategyRunner.startStrategy(
@@ -319,6 +346,16 @@ public class StratTab extends JPanel implements ActionListener {
 							simulator.getYellowSoft());
 				}
 			}
+		} else if (event.getActionCommand().equals("save")) {
+			this.saveButton.setText("Saving");
+			try {
+				ConfigFile cf = new ConfigFile(Globals.resFolder,
+						Globals.configFolder);
+				cf.write(config);
+			} catch (IOException e) {
+				System.err.println("Couldn't save configurations.");
+			}
+
 		}
 	}
 

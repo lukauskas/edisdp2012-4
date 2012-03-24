@@ -1,5 +1,7 @@
 package balle.memory;
 
+import java.util.ArrayList;
+
 import balle.main.Config;
 import balle.memory.utility.FileReadWriter;
 
@@ -11,7 +13,7 @@ public class ConfigFile extends FileReadWriter<Config> {
 	}
 
 	@Override
-	protected Config readBody(String[] lines) {
+	protected Config readBody(ArrayList<String> lines) {
 		return Config.load(lines);
 	}
 
