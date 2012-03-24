@@ -1,5 +1,7 @@
 package balle.memory.utility;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,6 +64,36 @@ public abstract class FileReadWriterArray<E extends Saves> extends
 	public final void writeArray(List<E> e) throws IOException {
 		SavesArray<E> eArray = new SavesArray<E>();
 		eArray.array = e;
-		super.write(eArray);
+		write(eArray);
 	}
+
+	// Override superclass.
+
+	@Override
+	public final SavesArray<E> read() throws IOException {
+		BufferedReader br = fr.getReader(filename);
+
+		String nextLine;
+		ArrayList<String> lines = new ArrayList<String>();
+		if (!isHeader(br.readLine()))
+			throw new IOException();
+
+		while ((nextLine = br.readLine()) != null)
+			lines.add(nextLine);
+		br.close();
+
+		SavesArray<E> output = readBody((String[]) lines.toArray());
+		return (SavesArray<E>) output;
+	}
+
+	@Override
+	public final void write(SavesArray<E> powers) throws IOException {
+		BufferedWriter bw = fr.getWriter(filename);
+
+		bw.write(writeHeader() + "\n");
+		bw.append(writeBody(powers));
+
+		bw.close();
+	}
+
 }

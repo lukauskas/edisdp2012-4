@@ -2,6 +2,7 @@ package balle.memory.utility;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -11,6 +12,8 @@ public abstract class FileReadWriter<E extends Saves> {
 	
 	// Instance
 	
+	protected final File file;
+
 	protected final String filename;
 
 	protected final FolderReader fr;
@@ -20,11 +23,12 @@ public abstract class FileReadWriter<E extends Saves> {
 	public FileReadWriter(FolderReader fr, String filename) {
 		this.fr = fr;
 		this.filename = filename;
+		this.file = new File(filename);
 	}
 	
 	// Interface
 
-	public final E read() throws IOException {
+	public E read() throws IOException {
 		BufferedReader br = fr.getReader(filename);
 		
 		String nextLine;
@@ -40,7 +44,7 @@ public abstract class FileReadWriter<E extends Saves> {
 		return (E) output;
 	}
 
-	public final void write(E powers) throws IOException {
+	public void write(E powers) throws IOException {
 		BufferedWriter bw = fr.getWriter(filename);
 
 		bw.write(writeHeader() + "\n");
