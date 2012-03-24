@@ -55,9 +55,9 @@ public abstract class FileReadWriter<E extends Saves> {
 
 	// Internal
 
-	public abstract E readBody(String[] lines);
+	protected abstract E readBody(String[] lines);
 
-	public abstract String writeBody(E e);
+	protected abstract String writeBody(E e);
 
 	protected abstract boolean isHeader(String header);
 

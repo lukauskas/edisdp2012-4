@@ -1,5 +1,6 @@
 package balle.memory.utility;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -11,38 +12,89 @@ import org.xml.sax.SAXException;
 
 import balle.memory.FolderReader;
 
-public class XmlFileReadWriter<E extends XmlSaves> extends FileReadWriter<E> {
+class XmlLeaf {
+
+	private XmlSaves e;
+
+	public XmlLeaf(XmlSaves e) {
+		this.e = e;
+	}
+
+	public XmlSaves get() {
+		return e;
+	}
+
+}
+
+class XmlElement implements XmlSaves {
+
+	public XmlLeaf[] children;
+
+	@Override
+	public String save() {
+		return null;
+	}
+
+	@Override
+	public void save(Document d) {
+		
+	}
+
+}
+
+public abstract class XmlFileReadWriter<E extends XmlSaves> extends
+		FileReadWriter<E> {
+	protected static String MAKE_COMMENT(String line) {
+		return "<!--" + line + "-->";
+	}
 	
-	protected DocumentBuilderFactory docBuilderFactory;
-	protected DocumentBuilder docBuilder;
-	protected Document doc;
+	// Instance
+
+	protected final DocumentBuilderFactory docBuilderFactory;
+	protected final DocumentBuilder docBuilder;
+
+	// Constructor
 
 	public XmlFileReadWriter(FolderReader fr, String filename)
 			throws SAXException, IOException, ParserConfigurationException {
 		super(fr, filename);
 		docBuilderFactory = DocumentBuilderFactory.newInstance();
-		doc = docBuilder.parse(file);
 		docBuilder = docBuilderFactory.newDocumentBuilder();
 	}
 
 	@Override
-	public E readBody(String[] lines) {
+	public E read() throws IOException {
+		Document doc;
+
+		try {
+			doc = docBuilder.parse(file);
+
+		} catch (SAXException e) {
+			throw new IOException();
+		}
+
+
 		return null;
 	}
 
 	@Override
-	public String writeBody(E e) {
+	public void write(E powers) throws IOException {
+		BufferedWriter bw = fr.getWriter(filename);
+
+		bw.write(writeHeader() + "\n");
+		bw.append(writeBody(powers));
+
+		bw.close();
+	}
+
+	// Interface.
+	// Don't do these things
+
+	protected E readBody(String[] lines) {
 		return null;
 	}
 
-	@Override
-	protected boolean isHeader(String header) {
-		return false;
-	}
-
-	@Override
-	protected String writeHeader() {
+	protected String writeBody(E e) {
 		return null;
 	}
-
 }
