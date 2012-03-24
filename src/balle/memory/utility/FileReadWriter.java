@@ -53,11 +53,13 @@ public abstract class FileReadWriter<E extends Saves> {
 		bw.close();
 	}
 
+	protected String writeBody(E e) {
+		return e.save();
+	}
+
 	// Internal
 
 	protected abstract E readBody(String[] lines);
-
-	protected abstract String writeBody(E e);
 
 	protected abstract boolean isHeader(String header);
 
