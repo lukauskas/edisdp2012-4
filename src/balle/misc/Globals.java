@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.jbox2d.common.Vec2;
 
+import balle.main.Config;
 import balle.memory.FolderReader;
 import balle.memory.PowersConfigFile;
 import balle.world.AngularVelocity;
@@ -166,6 +167,30 @@ public class Globals {
 		return (E[]) array;
     }
 
+	public static double[] getWheelVels(Robot r) {
+		return getWheelVels(r.getVelocity(), r.getAngularVelocity(),
+				r.getOrientation());
+	}
+
+	public static double[] getWheelVels(Velocity lv, AngularVelocity av,
+			Orientation forward) {
+		// this uses the angular and linear velocity of the robot to
+		// find the estimated powers to the wheels
+		// basicV is the velocity of each wheel assuming the robot is just
+		// spinning
+		double curentLeftV;
+		double curentRightV;
+		if (lv != null && av != null) {
+			double basicV = av.radians() * Globals.ROBOT_TRACK_WIDTH / 2;
+			int flipper = lv.dot(forward.getUnitCoord()) <= 0 ? -1 : 1;
+			curentLeftV = (flipper * lv.abs()) - basicV;
+			curentRightV = (flipper * lv.abs()) + basicV;
+
+		} else {
+			curentLeftV = curentRightV = 0;
+		}
+		return new double[] { curentLeftV, curentRightV };
+	}
 
 	// ----------------
 	// Variable Fields.
@@ -185,7 +210,11 @@ public class Globals {
     // -------------------------------------
 	// Methods dealing with variable fields.
 
-	public void setPowerVelo(String filename) {
+	public static void initGlobals(Config config) {
+		setPowerVelo(config.get(Config.POWER_VELO_DATA));
+	}
+
+	public static void setPowerVelo(String filename) {
 		if (filename == null || filename.equals("[DEFAULT]"))
 			return;
 
@@ -200,31 +229,6 @@ public class Globals {
 		}
 	}
 
-	public static double[] getWheelVels(Robot r) {
-		return getWheelVels(r.getVelocity(), r.getAngularVelocity(),
-				r.getOrientation());
-	}
-
-	public static double[] getWheelVels(Velocity lv, AngularVelocity av,
-			Orientation forward) {
-		// this uses the angular and linear velocity of the robot to
-		// find the estimated powers to the wheels
-		// basicV is the velocity of each wheel assuming the robot is just
-		// spinning
-		double curentLeftV;
-		double curentRightV;
-		if (lv != null && av != null) {
-			double basicV = av.radians() * Globals.ROBOT_TRACK_WIDTH / 2;
-			int flipper = lv.dot(forward.getUnitCoord()) <= 0 ? -1
-					: 1;
-			curentLeftV = (flipper * lv.abs()) - basicV;
-			curentRightV = (flipper * lv.abs()) + basicV;
-
-		} else {
-			curentLeftV = curentRightV = 0;
-		}
-		return new double[] { curentLeftV, curentRightV };
-	}
 
 
 }

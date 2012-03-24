@@ -156,6 +156,8 @@ public class Runner {
 			System.err.println("No config file found");
 		}
 
+		Globals.initGlobals(config);
+
 		SimpleWorldGUI gui = new SimpleWorldGUI(worldA);
 		GUITab mainWindow = new GUITab();
 

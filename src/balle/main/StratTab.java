@@ -347,7 +347,6 @@ public class StratTab extends JPanel implements ActionListener {
 				}
 			}
 		} else if (event.getActionCommand().equals("save")) {
-			this.saveButton.setText("Saving");
 			try {
 				ConfigFile cf = new ConfigFile(Globals.resFolder,
 						Globals.configFolder);

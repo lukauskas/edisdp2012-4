@@ -19,11 +19,16 @@ public class Config implements Saves {
 	}
 
 	public Config() {
-		args = new String[4];
+		this.args = defaults();
+	}
+
+	protected static String[] defaults() {
+		String[] args = new String[4];
 		args[0] = "Default";
 		args[1] = "NullStrategy";
 		args[2] = "NullStrategy";
 		args[3] = "[DEFAULT]";
+		return args;
 	}
 
 
@@ -38,9 +43,14 @@ public class Config implements Saves {
 	}
 
 	public static Config load(ArrayList<String> lines) {
-		String[] strings = new String[lines.size()];
-		for (int i = 0; i < lines.size(); i++)
-			strings[i] = lines.get(i);
+		String[] defaults = defaults();
+		String[] strings = new String[defaults.length];
+
+		for (int i = 0; i < defaults.length; i++)
+			if (i >= lines.size())
+				strings[i] = defaults[i];
+			else
+				strings[i] = lines.get(i);
 		return new Config(strings);
 	}
 
