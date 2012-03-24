@@ -1,5 +1,6 @@
 package balle.memory.utility;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
@@ -11,36 +12,6 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import balle.memory.FolderReader;
-
-class XmlLeaf {
-
-	private XmlSaves e;
-
-	public XmlLeaf(XmlSaves e) {
-		this.e = e;
-	}
-
-	public XmlSaves get() {
-		return e;
-	}
-
-}
-
-class XmlElement implements XmlSaves {
-
-	public XmlLeaf[] children;
-
-	@Override
-	public String save() {
-		return null;
-	}
-
-	@Override
-	public void save(Document d) {
-		
-	}
-
-}
 
 public abstract class XmlFileReadWriter<E extends XmlSaves> extends
 		FileReadWriter<E> {
@@ -64,6 +35,10 @@ public abstract class XmlFileReadWriter<E extends XmlSaves> extends
 
 	@Override
 	public E read() throws IOException {
+		BufferedReader br = fr.getReader(filename);
+		if (!isHeader(br.readLine()))
+			throw new IOException();
+
 		Document doc;
 
 		try {
@@ -73,19 +48,31 @@ public abstract class XmlFileReadWriter<E extends XmlSaves> extends
 			throw new IOException();
 		}
 
+		doc.getDocumentElement().normalize();
 
-		return null;
+		return read(doc);
 	}
+
+	public abstract E read(Document doc);
 
 	@Override
-	public void write(E powers) throws IOException {
+	public void write(E e) throws IOException {
 		BufferedWriter bw = fr.getWriter(filename);
+		bw.write(writeHeader());
 
-		bw.write(writeHeader() + "\n");
-		bw.append(writeBody(powers));
+		Document doc;
 
-		bw.close();
+		try {
+			doc = docBuilder.parse(file);
+
+		} catch (SAXException ex) {
+			throw new IOException();
+		}
+
+		write(doc, e);
 	}
+
+	public abstract void write(Document doc, E e);
 
 	// Interface.
 	// Don't do these things
