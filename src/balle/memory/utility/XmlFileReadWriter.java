@@ -69,10 +69,8 @@ public abstract class XmlFileReadWriter<E extends XmlSaves> extends
 			throw new IOException();
 		}
 
-		write(doc, e);
+		((XmlSaves) e).save(doc);
 	}
-
-	public abstract void write(Document doc, E e);
 
 	// Interface.
 	// Don't do these things
