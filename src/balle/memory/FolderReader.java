@@ -14,21 +14,16 @@ public class FolderReader {
 
 	// Instance
 
-	protected final File folder;
 	protected final String foldername;
 
 	// Constructor
 
 	public FolderReader(String foldername) {
 		this.foldername = foldername;
-		this.folder = new File(foldername);
-
-		if (!folder.exists())
-			folder.mkdir();
 	}
 
 	public FolderReader(FolderReader parent, String foldername) {
-		this(parent.foldername + "/" + foldername);
+		this.foldername = parent.foldername + "/" + foldername;
 	}
 
 	// Interface
