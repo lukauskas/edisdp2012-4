@@ -6,22 +6,28 @@ import balle.world.Coord;
 
 public class MaxSpeedPath extends AbstractPath {
 
-	private final double MIN_SAFE_RADIUS = 0; // the smallest turning radius
+	private final double MIN_SAFE_RADIUS = 0.75; // the smallest turning radius
 												// where moving at maximum speed
 												// is ok (0.05)
-	private final double SAFER_SPEED_RATIO = 0.5; // ratio of (max
+	private final double SAFER_SPEED_RATIO = 0.9; // ratio of (max
 													// speed)/((minimum)safe
 													// speed). when making sharp
 													// turns the speed will be
 													// slowed toward max/this
-	private final double MAX_VELOCITY = Globals.powerToVelocity(450); // the
+	private final double APPROACH_SPEEDRATIO = 0.3; // when near the target
+														// slow down to this
+														// ratio of max speed
+	private final double APPROACH_DISTANCE = 0.8; // Approaching if within this
+													// distance
+	private final double MAX_VELOCITY = Globals.powerToVelocity(900); // the
 																		// maximum
 																		// wheel
 																		// velocity
 																		// to
 																		// use
+
 	private final double DAMPENING_POWERCHANGE = 0;
-	private final double DAMPENING_POWERRATIO = 0.5; // increase towards 1 to
+	private final double DAMPENING_POWERRATIO = 0; // increase towards 1 to
 														// make
 													// the robot move more
 													// strait
@@ -40,9 +46,15 @@ public class MaxSpeedPath extends AbstractPath {
 		boolean isLeft = new Coord(0, 0).angleBetween(
 				c.vel(t).getOrientation().getUnitCoord(), a)
 				.atan2styleradians() > 0;
-		// throttle speed (slow when doing sharp turns)
+		// throttle speed (slow when doing sharp turns or approaching)
 		double max = MAX_VELOCITY;
-		// // maximum speed is ok
+		double distToTarget = c.pos(t).dist(c.pos(1));
+		System.out.println("dist to target: " + distToTarget);
+		if (distToTarget < APPROACH_DISTANCE) {
+			double closeness = 1 - (distToTarget / APPROACH_DISTANCE);
+			max = (closeness * (max * APPROACH_SPEEDRATIO))
+					+ ((1 - closeness) * max);
+		}
 		if (r < MIN_SAFE_RADIUS) {
 			double min = max * SAFER_SPEED_RATIO;
 			max = min + ((r / MIN_SAFE_RADIUS) * (max - min));

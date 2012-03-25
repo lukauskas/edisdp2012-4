@@ -136,7 +136,7 @@ public class Game extends AbstractPlanner {
 
     }
 
-    @FactoryMethod(designator = "Friendly1")
+    @FactoryMethod(designator = "Friendly1", parameterNames = {})
     public static Game factoryMethod() {
         return new Game();
     }

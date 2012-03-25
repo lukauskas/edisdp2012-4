@@ -23,6 +23,7 @@ import balle.strategy.pathFinding.ForwardAndReversePathFinder;
 import balle.strategy.pathFinding.PathFinder;
 import balle.strategy.pathFinding.SimplePathFinder;
 import balle.strategy.pathFinding.path.Path;
+import balle.strategy.pathFinding.path.WheelAccelerationAwarePath;
 import balle.strategy.planner.SimpleGoToBallFaceGoal;
 import balle.world.BasicWorld;
 import balle.world.Coord;
@@ -96,14 +97,14 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 																	// end
 	private boolean endInfront;
 
-	@FactoryMethod(designator = "BezierNav")
+    @FactoryMethod(designator = "BezierNav", parameterNames = {})
 	public static SimpleGoToBallFaceGoal bezierNavFactory() {
 		return new SimpleGoToBallFaceGoal(new BezierNav(
-new SimplePathFinder(
+				new SimplePathFinder(
 				new CustomCHI()), true));
 	}
 
-	@FactoryMethod(designator = "BezierNav (Forwards and backwards)")
+    @FactoryMethod(designator = "BezierNav (Forwards and backwards)", parameterNames = {})
 	public static SimpleGoToBallFaceGoal bezierNavFactoryFAB() {
 		return new SimpleGoToBallFaceGoal(new BezierNav(
 				new ForwardAndReversePathFinder(
@@ -157,11 +158,7 @@ new SimplePathFinder(
 				- snapshot.getTimestamp());
 
 		// if (isMoveStraitFinished(snapshot.getBalle())) {
-		// if (isFinished(snapshot)) {
-		// controller.stop();
-		// } else {
 		// controller.forward(Globals.MAXIMUM_MOTOR_SPEED);
-		// }
 		// return;
 		// }
 
@@ -227,6 +224,9 @@ new SimplePathFinder(
 	private Path getBestPath(Snapshot s, Orientation finalOrient) {
 		// get candidate paths
 		Path[] paths = pathfinder.getPaths(s, pf, finalOrient);
+		for (int i = 0; i < paths.length; i++) {
+			paths[i] = new WheelAccelerationAwarePath(paths[i]);
+		}
 		boolean hasLastPathUsed = lastPathIndexUsed != -1;
 		Path best = paths[hasLastPathUsed ? lastPathIndexUsed : 0];
 		// look for the quickest time path

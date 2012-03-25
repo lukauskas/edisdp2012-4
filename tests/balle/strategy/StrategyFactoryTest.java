@@ -15,12 +15,12 @@ public class StrategyFactoryTest {
      */
     @Test
     public void testAvailableDesignators() throws UnknownDesignatorException {
-		StrategyFactory sf = new StrategyFactory(null);
+        StrategyFactory sf = new StrategyFactory();
 
         ArrayList<String> availableDesignators = sf.availableDesignators();
         for (String designator : availableDesignators) {
             // An actual test
-            sf.createClass(designator);
+            sf.createClass(designator, new Object[] {});
         }
     }
 

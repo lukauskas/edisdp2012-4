@@ -6,7 +6,7 @@ import balle.world.Snapshot;
 
 public class NullStrategy extends AbstractPlanner {
 	
-	@FactoryMethod(designator = "NullStrategy")
+    @FactoryMethod(designator = "NullStrategy", parameterNames = {})
 	public static NullStrategy gameFactory() {
 		return new NullStrategy();
 	}

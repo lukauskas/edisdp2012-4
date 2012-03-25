@@ -69,26 +69,32 @@ public class Game extends AbstractPlanner {
         this.currentStrategy = currentStrategy;
     }
 
-    @FactoryMethod(designator = "Game (Bezier)")
+    @FactoryMethod(designator = "Game (Bezier)", parameterNames = {})
     public static Game gameFactory() {
         return new Game(new SimpleGoToBallFaceGoal(new BezierNav(
                 new SimplePathFinder(new CustomCHI()))), true);
     }
 
-    @FactoryMethod(designator = "Game (Bezier,NoInit)")
+    @FactoryMethod(designator = "Game (Bezier,NoInit)", parameterNames = {})
     public static Game gameFactoryTesting() {
         return new Game(new SimpleGoToBallFaceGoal(new BezierNav(
                 new SimplePathFinder(new CustomCHI()))), false);
     }
 
-    @FactoryMethod(designator = "Game (PFN)")
+    @FactoryMethod(designator = "Game (PFN)", parameterNames = {})
     public static Game gameFactory2() {
         return new Game(new GoToBall(new GoToObjectPFN(0)), true);
     }
 
-    @FactoryMethod(designator = "Game (PFN,NoInit)")
+    @FactoryMethod(designator = "Game (PFN,NoInit)", parameterNames = {})
     public static Game gameFactoryTesting2() {
         return new Game(new GoToBall(new GoToObjectPFN(0)), false);
+    }
+
+    @FactoryMethod(designator = "TEST", parameterNames = { "startWithInitial",
+            "test" })
+    public static Game gameFactoryTesting2(boolean startWithInitial, double test) {
+        return new Game(new GoToBall(new GoToObjectPFN(0)), startWithInitial);
     }
 
     public Game(Strategy goToBallStrategy) {

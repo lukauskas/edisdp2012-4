@@ -1,9 +1,15 @@
 package balle.misc;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.jbox2d.common.Vec2;
 
+import balle.main.Config;
+import balle.memory.FolderReader;
+import balle.memory.PowersConfigFile;
 import balle.world.AngularVelocity;
 import balle.world.Orientation;
 import balle.world.Velocity;
@@ -12,18 +18,14 @@ import balle.world.objects.Robot;
 
 public class Globals {
 
+	// ----------
+	// Constants.
+
     public static final float BALL_RADIUS = 0.02135f;
     public static final float ROBOT_WIDTH = 0.15f;
     public static final float ROBOT_LENGTH = 0.2f;
     public static final float ROBOT_TRACK_WIDTH = 0.155f; // Meters
     public static final float ROBOT_WHEEL_DIAMETER = 0.0816f; // Meters
-	public static ArrayList<Powers> powervelo;
-	static {
-		Powers[] data = VtoPData.getData();
-		powervelo = new ArrayList<Powers>();
-		for (Powers p : data)
-			powervelo.add(p);
-	}
 	
 	public static final Vec2 ROBOT_LEFT_WHEEL_POS = new Vec2(0,
 			-ROBOT_TRACK_WIDTH / 2);
@@ -85,6 +87,13 @@ public class Globals {
 	public static final float MAX_MOTOR_POWER_ACCEL = 500f; // p/s^2
     public static final float ARBITRARY_BALL_VEL_SCALING = 100;
     public static final double VELOCITY_NOISE_THRESHOLD = 1e-8;
+
+	public static final FolderReader resFolder = new FolderReader("res");
+	public static final String configFolder = "initConfig.txt";
+
+
+	// --------
+	// Methods
 
 	public static float powerToVelocity(float p) {
 		Powers powerAbove = null;
@@ -152,6 +161,11 @@ public class Globals {
     public static Pitch getPitch() {
         return new Pitch(0, PITCH_WIDTH, 0, PITCH_HEIGHT);
     }
+    
+	@SuppressWarnings("unchecked")
+	public static <E> E[] cast(Object[] array) {
+		return (E[]) array;
+    }
 
 	public static double[] getWheelVels(Robot r) {
 		return getWheelVels(r.getVelocity(), r.getAngularVelocity(),
@@ -168,8 +182,7 @@ public class Globals {
 		double curentRightV;
 		if (lv != null && av != null) {
 			double basicV = av.radians() * Globals.ROBOT_TRACK_WIDTH / 2;
-			int flipper = lv.dot(forward.getUnitCoord()) <= 0 ? -1
-					: 1;
+			int flipper = lv.dot(forward.getUnitCoord()) <= 0 ? -1 : 1;
 			curentLeftV = (flipper * lv.abs()) - basicV;
 			curentRightV = (flipper * lv.abs()) + basicV;
 
@@ -178,6 +191,44 @@ public class Globals {
 		}
 		return new double[] { curentLeftV, curentRightV };
 	}
+
+	// ----------------
+	// Variable Fields.
+
+
+	public static List<Powers> powervelo;
+	static {
+		Powers[] data = VtoPData.getData();
+		powervelo = new ArrayList<Powers>();
+		for (Powers p : data)
+			powervelo.add(p);
+	}
+
+    
+    
+    
+    // -------------------------------------
+	// Methods dealing with variable fields.
+
+	public static void initGlobals(Config config) {
+		setPowerVelo(config.get(Config.POWER_VELO_DATA));
+	}
+
+	public static void setPowerVelo(String filename) {
+		if (filename == null || filename.equals("[DEFAULT]"))
+			return;
+
+		try {
+			PowersConfigFile pcf = new PowersConfigFile(resFolder, filename);
+			powervelo = pcf.readArray();
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 
 
 }
