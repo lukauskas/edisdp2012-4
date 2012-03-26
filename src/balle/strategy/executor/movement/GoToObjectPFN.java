@@ -31,11 +31,11 @@ public class GoToObjectPFN implements MovementExecutor {
     private double OPPONENT_POWER;
     private static final double DEFAULT_OPPONENT_POWER = 0;
     private double OPPONENT_INFLUENCE_DISTANCE;
-    private static final double DEFAULT_OPPONENT_INFLUENCE_DISTANCE = 1;
+    private static final double DEFAULT_OPPONENT_INFLUENCE_DISTANCE = 0;
     private double TARGET_POWER;
-    private static final double DEFAULT_TARGET_POWER = 20;
+    private static final double DEFAULT_TARGET_POWER = 10;
     private double ALPHA;
-    private static final double DEFAULT_ALPHA = 15;
+    private static final double DEFAULT_ALPHA = 0;
 
     private double stopDistance; // meters
     private boolean slowDownCloseToTarget;
