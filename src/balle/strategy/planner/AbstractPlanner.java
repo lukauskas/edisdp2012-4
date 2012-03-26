@@ -28,11 +28,11 @@ public abstract class AbstractPlanner implements Strategy {
     }
 
     @Override
-    public ArrayList<Drawable> getDrawables() {
+    public synchronized ArrayList<Drawable> getDrawables() {
         return drawables;
     }
 
-    protected void clearDrawables() {
+    protected synchronized void clearDrawables() {
         drawables.clear();
     }
 
@@ -41,7 +41,7 @@ public abstract class AbstractPlanner implements Strategy {
      * 
      * @param drawable
      */
-    protected void addDrawable(Drawable drawable) {
+    protected synchronized void addDrawable(Drawable drawable) {
         drawables.add(drawable);
     }
 
@@ -50,7 +50,7 @@ public abstract class AbstractPlanner implements Strategy {
      * 
      * @param drawables
      */
-    protected void addDrawables(ArrayList<Drawable> drawables) {
+    protected synchronized void addDrawables(ArrayList<Drawable> drawables) {
         this.drawables.addAll(drawables);
     }
 
