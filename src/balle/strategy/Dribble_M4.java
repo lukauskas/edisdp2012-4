@@ -17,7 +17,7 @@ public class Dribble_M4 extends AbstractPlanner {
 	private int currentSpeed = INITIAL_CURRENT_SPEED;
 	private int turnSpeed = INITIAL_TURN_SPEED;
     private long lastDribbled = 0;
-    private double MAX_DRIBBLE_PAUSE = 200; // ms
+	private double MAX_DRIBBLE_PAUSE = 700; // ms
 
 	public Dribble_M4() {
 		super();

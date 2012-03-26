@@ -164,24 +164,10 @@ public class Game extends AbstractPlanner {
         addDrawable(new Circle(ourRobot.getFrontSide().midpoint(), 0.1,
                 Color.RED));
 
-        if ((ourRobot.getFrontSide().midpoint().dist(ball.getPosition()) < 0.1)
-                && (ourRobot.isFacingGoalHalf(ownGoal)))
-        {
-            LOG.warn("Approaching from wrong side.. backing off");
-            backingOffStrategy.startBackingOff(snapshot);
-            backingOffStrategy.step(controller, snapshot);
-            return;
-        } else if ((ourRobot.getFrontSide().midpoint().dist(ball.getPosition()) < 0.05)
-                && (!ourRobot.isFacingGoalHalf(ownGoal))) {
-                setCurrentStrategy(kickingStrategy.getClass().getName());
-                kickingStrategy.step(controller, snapshot);
-                addDrawables(kickingStrategy.getDrawables());
-        } else {
-			Strategy strategy = getStrategy(snapshot);
-			setCurrentStrategy(strategy.getClass().getName());
-			strategy.step(controller, snapshot);
-			addDrawables(strategy.getDrawables());
-        }
+		Strategy strategy = getStrategy(snapshot);
+		setCurrentStrategy(strategy.getClass().getName());
+		strategy.step(controller, snapshot);
+		addDrawables(strategy.getDrawables());
     }
 
 	private Strategy getStrategy(Snapshot snapshot) {
@@ -191,6 +177,11 @@ public class Game extends AbstractPlanner {
 		Goal ownGoal = snapshot.getOwnGoal();
 		Goal opponentsGoal = snapshot.getOpponentsGoal();
 		Pitch pitch = snapshot.getPitch();
+
+		if (ourRobot.getFrontSide().midpoint().dist(ball.getPosition()) < 0.1
+				&& !ourRobot.isFacingGoalHalf(ownGoal)) {
+			return kickingStrategy;
+		}
 
 		// Could the opponent be in the way? use pfn if so
 		RectangularObject corridor = new Line(ourRobot.getPosition(),
@@ -208,7 +199,10 @@ public class Game extends AbstractPlanner {
 			return goToBallPFN;
 		}
 
-		if (ourRobot.isNearWall(pitch) && !ball.isNearWall(pitch)) {
+		// Bezier can have trouble next to walls
+		if (ourRobot.isNearWall(pitch)
+				&& (!ball.isNearWall(pitch) || ourRobot.getPosition().dist(
+						ball.getPosition()) > 0.5)) {
 			return goToBallPFN;
 		}
 
