@@ -79,7 +79,7 @@ public class BasicWorld extends AbstractWorld {
 		Robot them = null;
 		Ball ball = null;
 
-		Snapshot prev = getSnapshotRaw();
+		Snapshot prev = getSnapshot();
 
 		// Check if the new positions make sense. For instance, discard
 		// the ones that are unreasonably far away from the previous one
@@ -156,13 +156,13 @@ public class BasicWorld extends AbstractWorld {
 		// pack into a snapshot, and update prev/prevRaw
 		Snapshot nextSnapshot = new Snapshot(them, ours, ball,
 				getOpponentsGoal(), getOwnGoal(), getPitch(), timestamp);
+		prevRaw = nextSnapshot;
 		nextSnapshot = filter(nextSnapshot);
-		this.prevRaw = nextSnapshot;
         updateSnapshot(nextSnapshot);
     }
 
     protected synchronized void updateSnapshot(Snapshot nextSnapshot) {
-        this.prev = nextSnapshot;
+		prev = nextSnapshot;
 	}
 
 	@Override
