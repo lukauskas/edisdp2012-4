@@ -25,11 +25,6 @@ public class Dribble_M4 extends AbstractPlanner {
 	{
 		return new Dribble_M4();
 	}
-
-	public boolean isDribbling(Snapshot snapshot) {
-		
-        return true;
-	}
 	
 	@Override
 	public void onStep(Controller controller, Snapshot snapshot) {
