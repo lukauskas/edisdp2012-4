@@ -47,7 +47,7 @@ public class RectangularObject extends MovingPoint implements FieldObject {
 
     @Override
     public boolean containsCoord(Coord point) {
-        if (getPosition() == null)
+        if ((getPosition() == null) || (point == null))
             return false;
 
         Coord dPoint = new Coord(point.getX() - getPosition().getX(),
