@@ -12,11 +12,9 @@ import balle.main.drawable.DrawableLine;
 import balle.main.drawable.DrawableVector;
 import balle.main.drawable.Label;
 import balle.misc.Globals;
-import balle.strategy.executor.movement.GoToObjectPFN;
 import balle.strategy.executor.movement.MovementExecutor;
 import balle.strategy.executor.movement.OrientedMovementExecutor;
 import balle.strategy.planner.AbstractPlanner;
-import balle.strategy.planner.GoToBall;
 import balle.world.Coord;
 import balle.world.Line;
 import balle.world.Orientation;
@@ -62,7 +60,7 @@ public class Interception extends AbstractPlanner {
         this.movementExecutor = movementExecutor;
         this.orientedMovementExecutor = orientedMovementExecutor;
         shouldPlayGame = false;
-        this.gameStrategy = new Game(new GoToBall(new GoToObjectPFN(0)), false);
+        this.gameStrategy = new Game(false);
         this.startGameAfterwards = startGameAfterwards;
 
         // new Game(new SimpleGoToBallFaceGoal(new BezierNav(

@@ -19,7 +19,6 @@ import balle.strategy.pathFinding.SimplePathFinder;
 import balle.strategy.planner.AbstractPlanner;
 import balle.strategy.planner.BackingOffStrategy;
 import balle.strategy.planner.DefensiveStrategy;
-import balle.strategy.planner.GoToBall;
 import balle.strategy.planner.GoToBallSafeProportional;
 import balle.strategy.planner.InitialStrategy;
 import balle.strategy.planner.KickFromWall;
@@ -38,7 +37,6 @@ public class Game extends AbstractPlanner {
     private static final Logger LOG = Logger.getLogger(Game.class);
 	// Strategies that we will need make sure to call stop() for each of them
 	protected final Strategy defensiveStrategy;
-	protected final Strategy goToBallStrategy;
 	protected final Strategy pickBallFromWallStrategy;
 	protected final AbstractPlanner backingOffStrategy;
 	protected final RotateToOrientationExecutor turningExecutor;
@@ -69,38 +67,13 @@ public class Game extends AbstractPlanner {
         this.currentStrategy = currentStrategy;
     }
 
-    @FactoryMethod(designator = "Game (Bezier)", parameterNames = {})
-    public static Game gameFactory() {
-        return new Game(new SimpleGoToBallFaceGoal(new BezierNav(
-                new SimplePathFinder(new CustomCHI()))), true);
+    @FactoryMethod(designator = "Game", parameterNames = { "init" })
+    public static Game gameFactoryTesting2(boolean init) {
+        return new Game(init);
     }
 
-    @FactoryMethod(designator = "Game (Bezier,NoInit)", parameterNames = {})
-    public static Game gameFactoryTesting() {
-        return new Game(new SimpleGoToBallFaceGoal(new BezierNav(
-                new SimplePathFinder(new CustomCHI()))), false);
-    }
-
-    @FactoryMethod(designator = "Game (PFN)", parameterNames = {})
-    public static Game gameFactory2() {
-        return new Game(new GoToBall(new GoToObjectPFN(0)), true);
-    }
-
-    @FactoryMethod(designator = "Game (PFN,NoInit)", parameterNames = {})
-    public static Game gameFactoryTesting2() {
-        return new Game(new GoToBall(new GoToObjectPFN(0)), false);
-    }
-
-    @FactoryMethod(designator = "TEST", parameterNames = { "startWithInitial",
-            "test" })
-    public static Game gameFactoryTesting2(boolean startWithInitial, double test) {
-        return new Game(new GoToBall(new GoToObjectPFN(0)), startWithInitial);
-    }
-
-    public Game(Strategy goToBallStrategy) {
+    public Game() {
         defensiveStrategy = new DefensiveStrategy(new GoToObjectPFN(0.1f));
-		// goToBallStrategy = new GoToBallSafeProportional();
-        this.goToBallStrategy = goToBallStrategy;
         pickBallFromWallStrategy = new KickFromWall(new GoToObjectPFN(0));
 		backingOffStrategy = new BackingOffStrategy();
         turningExecutor = new IncFaceAngle();
@@ -145,8 +118,8 @@ public class Game extends AbstractPlanner {
         this.initial = initial;
     }
 
-    public Game(Strategy goToBallStrategy, boolean startWithInitial) {
-        this(goToBallStrategy);
+    public Game(boolean startWithInitial) {
+        this();
         initial = startWithInitial;
         LOG.info("Starting game strategy with initial strategy turned on");
     }
@@ -154,7 +127,6 @@ public class Game extends AbstractPlanner {
     @Override
     public void stop(Controller controller) {
         defensiveStrategy.stop(controller);
-        goToBallStrategy.stop(controller);
         pickBallFromWallStrategy.stop(controller);
         backingOffStrategy.stop(controller);
     }

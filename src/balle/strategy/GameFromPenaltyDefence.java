@@ -3,8 +3,6 @@ package balle.strategy;
 import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
-import balle.strategy.executor.movement.GoToObjectPFN;
-import balle.strategy.planner.GoToBall;
 import balle.world.Coord;
 import balle.world.Orientation;
 import balle.world.Snapshot;
@@ -19,14 +17,14 @@ public class GameFromPenaltyDefence extends Game {
 
 	private boolean finished = false;
 
-    public GameFromPenaltyDefence(Strategy goToBallStrategy) {
-        super(goToBallStrategy);
+    public GameFromPenaltyDefence() {
+        super();
 	}
 	
     @FactoryMethod(designator = "Game (Penalty Defence)", parameterNames = {})
 	public static GameFromPenaltyDefence gameFromPenaltyDefenceFactory()
 	{
-        return new GameFromPenaltyDefence(new GoToBall(new GoToObjectPFN(0)));
+        return new GameFromPenaltyDefence();
 	}
 
 	public boolean isStillInPenaltyDefence(Snapshot snapshot) {
