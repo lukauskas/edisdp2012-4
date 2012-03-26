@@ -14,10 +14,10 @@ public class MaxSpeedPath extends AbstractPath {
 													// speed). when making sharp
 													// turns the speed will be
 													// slowed toward max/this
-	private final double APPROACH_SPEEDRATIO = 0.3; // when near the target
+	private final double APPROACH_SPEEDRATIO = 0.2; // when near the target
 														// slow down to this
 														// ratio of max speed
-	private final double APPROACH_DISTANCE = 0.8; // Approaching if within this
+	private final double APPROACH_DISTANCE = 2; // Approaching if within this
 													// distance
 	private final double MAX_VELOCITY = Globals.powerToVelocity(900); // the
 																		// maximum
