@@ -159,16 +159,13 @@ public class Game extends AbstractPlanner {
         SnapshotPredictor sp = snapshot.getSnapshotPredictor();
         Snapshot nextSnap = sp.getSnapshotAfterTime(50);
 
-        if ((ourRobot.possessesBall(ball) || (nextSnap.getBalle()
-                .possessesBall(nextSnap.getBall())))) {
-            // Kick if we are facing opponents goal
-            if (!ourRobot.isFacingGoalHalf(ownGoal)) {
-                setCurrentStrategy(kickingStrategy.getClass().getName());
-                kickingStrategy.step(controller, snapshot);
-                addDrawables(kickingStrategy.getDrawables());
-            } else {
-                LOG.warn("We need to go around the ball");
-            }
+        if (ourRobot.getFrontSide().dist(ball.getPosition()) < 0.15
+                && !ourRobot.isFacingGoalHalf(ownGoal)) {
+
+            setCurrentStrategy(kickingStrategy.getClass().getName());
+            kickingStrategy.step(controller, snapshot);
+            addDrawables(kickingStrategy.getDrawables());
+
 			// } else if (!ourRobot.isApproachingTargetFromCorrectSide(ball,
 			// opponentsGoal)) {
 			// // let pfn get us on the right side of the pitch
