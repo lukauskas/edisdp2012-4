@@ -73,23 +73,13 @@ public class RectangularObject extends MovingPoint implements FieldObject {
          * it is considered to be away from any walls.
          */
 
-        double minX, maxX, minY, maxY;
-        minX = p.getMinX() + Globals.DISTANCE_TO_WALL;
-        maxX = p.getMaxX() - Globals.DISTANCE_TO_WALL;
-        minY = p.getMinY() + Globals.DISTANCE_TO_WALL;
-        maxY = p.getMaxY() - Globals.DISTANCE_TO_WALL;
-
-        if (getPosition().getX() < minX)
-            return true;
-        if (getPosition().getX() > maxX)
-            return true;
-        if (getPosition().getY() < minY)
-            return true;
-        if (getPosition().getY() > maxY)
-            return true;
+        for (Line wall : p.getWalls()) {
+            if (wall.dist(getPosition()) < Globals.DISTANCE_TO_WALL) {
+                return true;
+            }
+        }
 
         return false;
-
     }
 
     @Override

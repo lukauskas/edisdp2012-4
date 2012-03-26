@@ -39,7 +39,7 @@ public class Globals {
     // THIS
 
     // For defining near corner, and near wall areas.
-    public final static double DISTANCE_TO_WALL = 0.1;
+    public final static double DISTANCE_TO_WALL = 0.15;
     public final static double DISTANCE_TO_CORNER = 0.2;
 
     public static final float PITCH_WIDTH = 2.4384f; // Metres
