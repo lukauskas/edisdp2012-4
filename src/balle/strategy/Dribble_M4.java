@@ -4,17 +4,20 @@ import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
 import balle.strategy.planner.AbstractPlanner;
-import balle.world.Coord;
 import balle.world.Snapshot;
 
 public class Dribble_M4 extends AbstractPlanner {
 
+    private static final int INITIAL_TURN_SPEED = 100;
+
+    private static final int INITIAL_CURRENT_SPEED = 150;
+
     private static Logger LOG = Logger.getLogger(Dribble_M4.class);
 
-	private int current_speed = 150;
-	private int turn_speed = 100;
-	private Coord startingCoordinate = null;
-	private Coord currentCoordinate = null;
+	private int currentSpeed = INITIAL_CURRENT_SPEED;
+	private int turnSpeed = INITIAL_TURN_SPEED;
+    private long lastDribbled = 0;
+    private double MAX_DRIBBLE_PAUSE = 200; // ms
 
 	public Dribble_M4() {
 		super();
@@ -29,21 +32,25 @@ public class Dribble_M4 extends AbstractPlanner {
 	@Override
 	public void onStep(Controller controller, Snapshot snapshot) {
 
-		if (startingCoordinate == null) {
-			startingCoordinate = snapshot.getBalle().getPosition();
-		}
+        // Make sure to reset the speeds if we haven't been dribbling for a
+        // while
+        long currentTime = System.currentTimeMillis();
+        if ((currentTime - lastDribbled) > MAX_DRIBBLE_PAUSE) {
+            currentSpeed = INITIAL_CURRENT_SPEED;
+            turnSpeed = INITIAL_TURN_SPEED;
+        }
 
-		currentCoordinate = snapshot.getBalle().getPosition();
+        lastDribbled = currentTime;
 
-		boolean facingGoal = snapshot.getBalle().getFacingLine()
+        boolean facingGoal = snapshot.getBalle().getFacingLine()
 				.intersects(snapshot.getOpponentsGoal().getGoalLine());
 
-		if (current_speed <= 560) {
-			current_speed += 20;
+		if (currentSpeed <= 560) {
+			currentSpeed += 20;
 		}
 
-		if (turn_speed <= 150) {
-			turn_speed += 5;
+		if (turnSpeed <= 150) {
+			turnSpeed += 5;
 		}
 
 		boolean isLeftGoal = snapshot.getOpponentsGoal().isLeftGoal();
@@ -54,33 +61,33 @@ public class Dribble_M4 extends AbstractPlanner {
 
 		if (isLeftGoal) {
 			if (facingGoal) {
-				controller.setWheelSpeeds(current_speed, current_speed);
+				controller.setWheelSpeeds(currentSpeed, currentSpeed);
                 controller.kick();
 			} else if ((!facingGoal) && (angle < Math.PI - threshold)) {
-				controller.setWheelSpeeds(current_speed, current_speed
-						+ turn_speed);
+				controller.setWheelSpeeds(currentSpeed, currentSpeed
+						+ turnSpeed);
 			} else if ((!facingGoal) && (angle > Math.PI + threshold)) {
-				controller.setWheelSpeeds(current_speed + turn_speed,
-						current_speed);
+				controller.setWheelSpeeds(currentSpeed + turnSpeed,
+						currentSpeed);
 			} else {
-				controller.setWheelSpeeds(current_speed, current_speed);
+                controller.setWheelSpeeds(currentSpeed, currentSpeed);
 			}
 		}
 
 		if (!isLeftGoal) {
 			if (facingGoal) {
-				controller.setWheelSpeeds(current_speed, current_speed);
+				controller.setWheelSpeeds(currentSpeed, currentSpeed);
                 controller.kick();
 			} else if ((!facingGoal) && (angle > threshold)
 					&& (angle < Math.PI)) {
-				controller.setWheelSpeeds(current_speed + turn_speed,
-						current_speed);
+				controller.setWheelSpeeds(currentSpeed + turnSpeed,
+						currentSpeed);
 			} else if ((!facingGoal) && (angle < (2 * Math.PI) - threshold)
 					&& (angle > Math.PI)) {
-				controller.setWheelSpeeds(current_speed, current_speed
-						+ turn_speed);
+				controller.setWheelSpeeds(currentSpeed, currentSpeed
+						+ turnSpeed);
 			} else {
-				controller.setWheelSpeeds(current_speed, current_speed);
+                controller.setWheelSpeeds(currentSpeed, currentSpeed);
 			}
 		}
 
