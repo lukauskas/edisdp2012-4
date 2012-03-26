@@ -325,6 +325,7 @@ public class GoToBall extends AbstractPlanner {
         // If it says it is not finished, tell it to do something for a step.
         if (!executorStrategy.isFinished(snapshot)) {
 			executorStrategy.step(controller, snapshot);
+            addDrawables(executorStrategy.getDrawables());
         } else {
             // Tell the strategy to stop doing whatever it was doing
             executorStrategy.stop(controller);

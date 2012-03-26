@@ -26,7 +26,7 @@ public class GoToObjectPFN implements MovementExecutor {
 
     // cm
     private static final double ROBOT_TRACK_WIDTH = Globals.ROBOT_TRACK_WIDTH * 100;
-    private static final double WHEEL_RADIUS      = Globals.ROBOT_WHEEL_DIAMETER * 100 / 2.0;
+    private static final double WHEEL_RADIUS = Globals.ROBOT_WHEEL_DIAMETER * 100 / 2.0;
 
     private double OPPONENT_POWER;
     private static final double DEFAULT_OPPONENT_POWER = 0;
