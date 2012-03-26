@@ -59,6 +59,11 @@ public class BackingOffStrategy extends GoToBall {
 		setShouldAvoidOpponent(false);
 	}
 
+    public void startBackingOff(Snapshot snapshot) {
+        long timeNow = new Date().getTime();
+        timeStartedBackingOff = timeNow;
+        setTarget(snapshot);
+    }
 	@Override
 	public boolean shouldStealStep(Snapshot snapshot) {
 		Robot us = snapshot.getBalle();
@@ -80,7 +85,7 @@ public class BackingOffStrategy extends GoToBall {
 			}
 
 			if (timeNow - timeWhenMaybeStuck > TIME_THRESH) {
-				timeStartedBackingOff = timeNow;
+                startBackingOff(snapshot);
 				setTarget(snapshot);
 
 				LOG.info("We're stuck! Back off");
@@ -101,8 +106,8 @@ public class BackingOffStrategy extends GoToBall {
                 }
 
                 if (timeNow - timeWhenMaybeStuck > TIME_THRESH) {
-                    timeStartedBackingOff = timeNow;
-                    setTarget(snapshot);
+                    startBackingOff(snapshot);
+
 
                     LOG.info("We're stuck to wall! Back off");
                     return true;

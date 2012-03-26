@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
+import balle.main.drawable.Circle;
 import balle.main.drawable.Drawable;
 import balle.main.drawable.Label;
 import balle.misc.Globals;
@@ -38,7 +39,7 @@ public class Game extends AbstractPlanner {
 	// Strategies that we will need make sure to call stop() for each of them
 	protected final Strategy defensiveStrategy;
 	protected final Strategy pickBallFromWallStrategy;
-	protected final AbstractPlanner backingOffStrategy;
+    protected final BackingOffStrategy backingOffStrategy;
 	protected final RotateToOrientationExecutor turningExecutor;
     protected final Dribble_M4 kickingStrategy;
     protected final InitialStrategy initialStrategy;
@@ -158,14 +159,23 @@ public class Game extends AbstractPlanner {
 
         SnapshotPredictor sp = snapshot.getSnapshotPredictor();
         Snapshot nextSnap = sp.getSnapshotAfterTime(50);
+        addDrawable(new Circle(ourRobot.getFrontSide().midpoint(), 0.07,
+                Color.GREEN));
+        addDrawable(new Circle(ourRobot.getFrontSide().midpoint(), 0.1,
+                Color.RED));
 
-        if (ourRobot.getFrontSide().dist(ball.getPosition()) < 0.07
-                && !ourRobot.isFacingGoalHalf(ownGoal)) {
-
-            setCurrentStrategy(kickingStrategy.getClass().getName());
-            kickingStrategy.step(controller, snapshot);
-            addDrawables(kickingStrategy.getDrawables());
-
+        if ((ourRobot.getFrontSide().midpoint().dist(ball.getPosition()) < 0.1)
+                && (ourRobot.isFacingGoalHalf(ownGoal)))
+        {
+            LOG.warn("Approaching from wrong side.. backing off");
+            backingOffStrategy.startBackingOff(snapshot);
+            backingOffStrategy.step(controller, snapshot);
+            return;
+        } else if ((ourRobot.getFrontSide().midpoint().dist(ball.getPosition()) < 0.05)
+                && (!ourRobot.isFacingGoalHalf(ownGoal))) {
+                setCurrentStrategy(kickingStrategy.getClass().getName());
+                kickingStrategy.step(controller, snapshot);
+                addDrawables(kickingStrategy.getDrawables());
         } else {
 			Strategy strategy = getStrategy(snapshot);
 			setCurrentStrategy(strategy.getClass().getName());
