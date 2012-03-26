@@ -166,22 +166,6 @@ public class Game extends AbstractPlanner {
             kickingStrategy.step(controller, snapshot);
             addDrawables(kickingStrategy.getDrawables());
 
-			// } else if (!ourRobot.isApproachingTargetFromCorrectSide(ball,
-			// opponentsGoal)) {
-			// // let pfn get us on the right side of the pitch
-			// setCurrentStrategy(goToBallPFN.getClass().getName());
-			// goToBallPFN.step(controller, snapshot);
-			// addDrawables(goToBallPFN.getDrawables());
-			// // } else if (ball.isNearWall(pitch)) {
-			// //
-			// setCurrentStrategy(pickBallFromWallStrategy.getClass().getName());
-			// // pickBallFromWallStrategy.step(controller, snapshot);
-			// // addDrawables(pickBallFromWallStrategy.getDrawables());
-			// } else {
-			// // Approach ball
-			// setCurrentStrategy(goToBallBezier.getClass().getName());
-			// goToBallBezier.step(controller, snapshot);
-			// addDrawables(goToBallBezier.getDrawables());
         } else {
 			Strategy strategy = getStrategy(snapshot);
 			setCurrentStrategy(strategy.getClass().getName());

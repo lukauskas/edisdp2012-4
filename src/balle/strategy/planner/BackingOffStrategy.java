@@ -10,6 +10,7 @@ import balle.strategy.executor.movement.GoToObjectPFN;
 import balle.world.Coord;
 import balle.world.Line;
 import balle.world.Snapshot;
+import balle.world.objects.Ball;
 import balle.world.objects.FieldObject;
 import balle.world.objects.Point;
 import balle.world.objects.Robot;
@@ -63,11 +64,11 @@ public class BackingOffStrategy extends GoToBall {
 		Robot us = snapshot.getBalle();
 		Line ourFront = us.getFrontSide();
 		Robot opponent = snapshot.getOpponent();
+        Ball ball = snapshot.getBall();
 		
 		if (timeStartedBackingOff > 0) {
 			return true;
 		}
-		
 		if (ourFront.dist(opponent.getPosition()) < DISTANCE_THRESH
 				&& us.getVelocity().abs() < VELOCITY_THRESH) {
 
@@ -108,8 +109,19 @@ public class BackingOffStrategy extends GoToBall {
 	@Override
 	protected void onStep(Controller controller, Snapshot snapshot) {
 
-		LOG.trace("Backing off!");
 
+
+        Robot us = snapshot.getBalle();
+        Robot opponent = snapshot.getOpponent();
+        Ball ball = snapshot.getBall();
+
+        if (us.possessesBall(ball) && opponent.possessesBall(ball)) {
+            controller.stop();
+            LOG.warn("Stopping");
+            return;
+        }
+
+        LOG.warn("Backing off!");
 		long timeNow = new Date().getTime();
 
 		if (timeNow - timeStartedBackingOff > BACK_OFF_TIME) {
