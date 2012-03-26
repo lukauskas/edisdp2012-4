@@ -9,7 +9,7 @@ import balle.world.Snapshot;
 
 public class Dribble_M4 extends AbstractPlanner {
 
-	private static Logger LOG = Logger.getLogger(GameFromPenaltyDefence.class);
+    private static Logger LOG = Logger.getLogger(Dribble_M4.class);
 
 	private int current_speed = 150;
 	private int turn_speed = 100;
@@ -20,13 +20,13 @@ public class Dribble_M4 extends AbstractPlanner {
 		super();
 	}
 	
-    @FactoryMethod(designator = "Game (Dribble)", parameterNames = {})
-	public static Dribble_M4 Dribble_M4()
+    @FactoryMethod(designator = "Dribble", parameterNames = {})
+	public static Dribble_M4 factoryMethod()
 	{
 		return new Dribble_M4();
 	}
 
-	public boolean Dribbling(Snapshot snapshot) {
+	public boolean isDribbling(Snapshot snapshot) {
 		
         return true;
 	}
