@@ -1,5 +1,7 @@
 package balle.world;
 
+import java.util.ArrayList;
+
 import org.apache.log4j.Logger;
 
 import balle.world.objects.Ball;
@@ -8,8 +10,11 @@ import balle.world.objects.Robot;
 
 public class BasicWorld extends AbstractWorld {
 
+	private static final int FRAMES_FOR_VELOCITY = 5;
+
     private static final Logger LOG = Logger.getLogger(BasicWorld.class);
 
+	protected ArrayList<Snapshot> pastRaw = new ArrayList<Snapshot>();
 	protected Snapshot prev, prevRaw;
 
 	public BasicWorld(boolean balleIsBlue, boolean goalIsLeft, Pitch pitch) {
@@ -79,7 +84,8 @@ public class BasicWorld extends AbstractWorld {
 		Robot them = null;
 		Ball ball = null;
 
-		Snapshot prev = getSnapshot();
+		Snapshot prev = getSnapshotRaw();
+		Snapshot prevVel = pastRaw.size() > 0 ? pastRaw.get(0) : prev;
 
 		// Check if the new positions make sense. For instance, discard
 		// the ones that are unreasonably far away from the previous one
@@ -96,6 +102,7 @@ public class BasicWorld extends AbstractWorld {
 														// with EmptySnapshot
 														// and
 														// currentTimeMilis()
+		long deltaTVel = timestamp - prevVel.getTimestamp();
 
 		// Special case when we get two inputs with the same timestamp:
 		if (deltaT == 0) {
@@ -113,40 +120,40 @@ public class BasicWorld extends AbstractWorld {
 
 		// Calculate how much each position has changed between frames
 		Coord oursDPos, themDPos, ballDPos;
-		oursDPos = subtractOrNull(ourPosition, prev.getBalle().getPosition());
-		themDPos = subtractOrNull(theirsPosition, prev.getOpponent()
+		oursDPos = subtractOrNull(ourPosition, prevVel.getBalle().getPosition());
+		themDPos = subtractOrNull(theirsPosition, prevVel.getOpponent()
 				.getPosition());
-		ballDPos = subtractOrNull(ballPosition, prev.getBall().getPosition());
+		ballDPos = subtractOrNull(ballPosition, prevVel.getBall().getPosition());
 
 		// Recalculate the velocities from deltapositions above.
 		Velocity oursVel, themVel, ballVel;
-		oursVel = oursDPos != null ? new Velocity(oursDPos, deltaT)
+		oursVel = oursDPos != null ? new Velocity(oursDPos, deltaTVel)
 				: new Velocity(0, 0, 1, 1);
-		themVel = themDPos != null ? new Velocity(themDPos, deltaT)
+		themVel = themDPos != null ? new Velocity(themDPos, deltaTVel)
 				: new Velocity(0, 0, 1, 1);
-		ballVel = ballDPos != null ? new Velocity(ballDPos, deltaT)
+		ballVel = ballDPos != null ? new Velocity(ballDPos, deltaTVel)
 				: new Velocity(0, 0, 1, 1);
 
 		AngularVelocity oursAngVel = null, themAngVel = null;
 		if (ourOrientation == null) {
-			ourOrientation = prev.getBalle().getOrientation();
-		} else if (prev.getBalle().getOrientation() != null) {
+			ourOrientation = prevVel.getBalle().getOrientation();
+		} else if (prevVel.getBalle().getOrientation() != null) {
 			oursAngVel = new AngularVelocity(
-					ourOrientation.angleToatan2Radians(prev.getBalle()
-							.getOrientation()), deltaT);
+					ourOrientation.angleToatan2Radians(prevVel.getBalle()
+							.getOrientation()), deltaTVel);
 		}
 
 		if (theirsOrientation == null) {
-			theirsOrientation = prev.getOpponent().getOrientation();
-		} else if (prev.getOpponent().getOrientation() != null) {
+			theirsOrientation = prevVel.getOpponent().getOrientation();
+		} else if (prevVel.getOpponent().getOrientation() != null) {
 			themAngVel = new AngularVelocity(
-					theirsOrientation.angleToatan2Radians(prev.getOpponent()
-							.getOrientation()), deltaT);
+					theirsOrientation.angleToatan2Radians(prevVel.getOpponent()
+							.getOrientation()), deltaTVel);
 		}
 
 		themAngVel = (them != null) ? new AngularVelocity(
-				theirsOrientation.angleToatan2Radians(prev.getOpponent()
-						.getOrientation()), deltaT) : null;
+				theirsOrientation.angleToatan2Radians(prevVel.getOpponent()
+						.getOrientation()), deltaTVel) : null;
 
 		// put it all together (almost)
 		them = new Robot(theirsPosition, themVel, themAngVel, theirsOrientation);
@@ -156,6 +163,10 @@ public class BasicWorld extends AbstractWorld {
 		// pack into a snapshot, and update prev/prevRaw
 		Snapshot nextSnapshot = new Snapshot(them, ours, ball,
 				getOpponentsGoal(), getOwnGoal(), getPitch(), timestamp);
+		pastRaw.add(nextSnapshot);
+		while (pastRaw.size() > FRAMES_FOR_VELOCITY) {
+			pastRaw.remove(0);
+		}
 		prevRaw = nextSnapshot;
 		nextSnapshot = filter(nextSnapshot);
         updateSnapshot(nextSnapshot);

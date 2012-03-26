@@ -17,6 +17,8 @@ public class WheelAccelerationAwarePath extends AbstractPath {
 	@Override
 	public double[] getVelocities(double t, Curve c, double leftWheelVel,
 			double rightWheelVel) {
+
+
 		// get the ignorant velocities
 		double[] vels = accelIgnorantPath.getVelocities(t, c, leftWheelVel,
 				rightWheelVel);
