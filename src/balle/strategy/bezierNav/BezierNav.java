@@ -58,7 +58,7 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 														// points befor it try
 														// to get to the next
 														// point
-	private static final double CHANGEPATH_IMPROVEMENT_THRESHHOLD = 1.2; // only
+	private static final double CHANGEPATH_IMPROVEMENT_THRESHHOLD = 1.05; // only
 																			// change
 																			// paths
 																			// if
@@ -73,7 +73,7 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 	// these 2 must moth be satisfied before this movement is finished
 	private double stopDistance = 0.03; // distance to target (centre of robot
 										// to adjusted p3)
-	private double stopAngle = Math.PI / 13; // angle of robot vs desired final
+	private double stopAngle = Math.PI / 6; // angle of robot vs desired final
 												// angle (orient)
 
 
@@ -104,7 +104,7 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 				new CustomCHI()), true));
 	}
 
-    @FactoryMethod(designator = "BezierNav (Forwards and backwards)", parameterNames = {})
+	@FactoryMethod(designator = "BezierNav (Forwards and backwards)", parameterNames = {})
 	public static SimpleGoToBallFaceGoal bezierNavFactoryFAB() {
 		return new SimpleGoToBallFaceGoal(new BezierNav(
 				new ForwardAndReversePathFinder(
@@ -125,8 +125,19 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 		controllerHistory = new ArrayList<ControllerHistoryElement>();
 	}
 
+	private boolean isBackwards(Robot bot) {
+		double da = Math.abs(bot.getVelocity().getUnitCoord()
+				.angleBetween(bot.getOrientation().getUnitCoord())
+				.atan2styleradians());
+		return da > Math.PI / 2;
+	}
+
 	private boolean isMoveStraitFinished(Robot bot) {
-		Coord n = bot.getOrientation().getUnitCoord()
+		Orientation o = bot.getOrientation();
+		if(isBackwards(bot)) {
+			o = o.getOpposite();
+		}
+		Coord n = o.getUnitCoord()
 				.rotate(new Orientation(Math.PI / 2));
 		double da = Math.abs(bot.getOrientation().angleToatan2Radians(orient));
 		double dd = Math
@@ -157,10 +168,20 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 		snapshot = sp.getSnapshotAfterTime(System.currentTimeMillis()
 				- snapshot.getTimestamp());
 
-		// if (isMoveStraitFinished(snapshot.getBalle())) {
-		// controller.forward(Globals.MAXIMUM_MOTOR_SPEED);
-		// return;
-		// }
+		Robot r = snapshot.getBalle();
+		if (isMoveStraitFinished(r)) {
+			if (r.getPosition().dist(snapshot.getOpponentsGoal().getPosition()) > 0.3) {
+				if (isBackwards(r)) {
+					controller.backward(Globals.MAXIMUM_MOTOR_SPEED);
+				} else {
+					controller.forward(Globals.MAXIMUM_MOTOR_SPEED);
+				}
+			}
+ else {
+				controller.stop();
+			}
+			return;
+		}
 
 		// Get orientation.
 		Orientation angle = this.orient;
