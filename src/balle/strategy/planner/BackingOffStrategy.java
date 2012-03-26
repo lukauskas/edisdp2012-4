@@ -69,6 +69,7 @@ public class BackingOffStrategy extends GoToBall {
 		if (timeStartedBackingOff > 0) {
 			return true;
 		}
+
 		if (ourFront.dist(opponent.getPosition()) < DISTANCE_THRESH
 				&& us.getVelocity().abs() < VELOCITY_THRESH) {
 
@@ -88,6 +89,28 @@ public class BackingOffStrategy extends GoToBall {
 				return false;
 			}
 		}
+
+        for (Line wall : snapshot.getPitch().getWalls()) {
+            if (wall.dist(ourFront.midpoint()) < 0.05
+                    && us.getVelocity().abs() < VELOCITY_THRESH) {
+
+                long timeNow = new Date().getTime();
+                if (timeWhenMaybeStuck == -1) {
+                    timeWhenMaybeStuck = timeNow;
+                    return false;
+                }
+
+                if (timeNow - timeWhenMaybeStuck > TIME_THRESH) {
+                    timeStartedBackingOff = timeNow;
+                    setTarget(snapshot);
+
+                    LOG.info("We're stuck to wall! Back off");
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        }
 
 		timeWhenMaybeStuck = -1;
 		return false;

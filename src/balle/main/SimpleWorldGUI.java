@@ -186,8 +186,8 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 		private void drawFieldObjects(Graphics g) {
 			Snapshot s = getSnapshot();
 			if (s != null) {
-				drawRobot(g, Color.GREEN, s.getBalle());
-				drawRobot(g, Color.RED, s.getOpponent());
+                drawRobot(g, Color.GREEN, s.getBalle(), s.getOpponentsGoal());
+                drawRobot(g, Color.RED, s.getOpponent(), s.getOwnGoal());
 				drawBall(g, Color.RED, s);
 				drawGoals(g);
 			}
@@ -276,7 +276,7 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
             // }
 		}
 
-		private void drawRobot(Graphics g, Color c, Robot robot) {
+        private void drawRobot(Graphics g, Color c, Robot robot, Goal targetGoal) {
 
 			Snapshot s = getSnapshot();
 
@@ -348,7 +348,14 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 
 			g.fillPolygon(xs, ys, n);
 
-			DrawableLine orientationLine = new DrawableLine(
+            // Dim the line if we're not approaching from correct side
+            if ((s.getBall().getPosition() != null)
+                    && (!robot.isApproachingTargetFromCorrectSide(s.getBall(),
+                            targetGoal))) {
+                c = new Color(c.getRed(), c.getGreen(), c.getBlue(),
+                        c.getAlpha() / 2);
+            }
+            DrawableLine orientationLine = new DrawableLine(
 					robot.getFacingLine(), c);
 			orientationLine.draw(g, scaler);
 

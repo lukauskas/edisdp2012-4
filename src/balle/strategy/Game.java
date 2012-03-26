@@ -81,7 +81,7 @@ public class Game extends AbstractPlanner {
         initialStrategy = new InitialStrategy();
 		goToBallPFN = new GoToBallSafeProportional();
 		goToBallBezier = new SimpleGoToBallFaceGoal(new BezierNav(
-				new SimplePathFinder(new CustomCHI())));
+                new SimplePathFinder(new CustomCHI())));
         initial = false;
     }
 
@@ -159,7 +159,7 @@ public class Game extends AbstractPlanner {
         SnapshotPredictor sp = snapshot.getSnapshotPredictor();
         Snapshot nextSnap = sp.getSnapshotAfterTime(50);
 
-        if (ourRobot.getFrontSide().dist(ball.getPosition()) < 0.15
+        if (ourRobot.getFrontSide().dist(ball.getPosition()) < 0.07
                 && !ourRobot.isFacingGoalHalf(ownGoal)) {
 
             setCurrentStrategy(kickingStrategy.getClass().getName());
@@ -201,6 +201,7 @@ public class Game extends AbstractPlanner {
 		if (ourRobot.isNearWall(pitch) && !ball.isNearWall(pitch)) {
 			return goToBallPFN;
 		}
+
 
 		return goToBallBezier;
 

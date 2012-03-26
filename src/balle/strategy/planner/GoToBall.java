@@ -32,7 +32,7 @@ public class GoToBall extends AbstractPlanner {
     private final double AVOIDANCE_GAP; // Meters
     private final double OVERSHOOT_GAP; // Meters
     private static final double DEFAULT_AVOIDANCE_GAP = 0.5;
-    private static final double DEFAULT_OVERSHOOT_GAP = 0.7;
+    private static final double DEFAULT_OVERSHOOT_GAP = 0.8;
 	private static final double DIST_DIFF_THRESHOLD = 0.2; // Meters
 
 	private boolean approachTargetFromCorrectSide;
