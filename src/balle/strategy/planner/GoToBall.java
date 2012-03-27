@@ -107,7 +107,7 @@ public class GoToBall extends AbstractPlanner {
     }
 
     protected FieldObject getTarget(Snapshot snapshot) {
-		return snapshot.getBall();
+		return new Point(snapshot.getBallEstimator().estimatePosition(10));
     }
 
     protected Color getTargetColor() {
