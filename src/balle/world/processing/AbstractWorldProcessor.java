@@ -16,7 +16,7 @@ public abstract class AbstractWorldProcessor extends Thread {
 
     private Snapshot            snapshot;
     private Snapshot            prevSnapshot;
-    private final AbstractWorld world;
+	protected final AbstractWorld world;
     private boolean             shouldStop           = false;
 
     private long                lastSnapshotReceived = 0;
