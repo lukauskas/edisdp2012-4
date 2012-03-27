@@ -25,15 +25,18 @@ public class Snapshot {
 	private final Robot bot;
 	private final Ball ball;
 
+	private final BallEstimator ballEstimator;
+
 	private final Goal opponentsGoal;
 	private final Goal ownGoal;
 
 	private final Pitch pitch;
 	private final long timestamp;
 
-    public Snapshot(Robot opponent, Robot balle,
-			Ball ball, Goal opponentsGoal, Goal ownGoal, Pitch pitch,
- long timestamp, ArrayList<ControllerHistoryElement> controllerHistory) {
+	public Snapshot(Robot opponent, Robot balle, Ball ball, Goal opponentsGoal,
+			Goal ownGoal, Pitch pitch, BallEstimator ballEstimator,
+			long timestamp,
+			ArrayList<ControllerHistoryElement> controllerHistory) {
 
 		super();
 		this.opponent = opponent;
@@ -44,22 +47,29 @@ public class Snapshot {
 		this.ownGoal = ownGoal;
 		this.pitch = pitch;
         this.controllerHistory = controllerHistory;
+		this.ballEstimator = ballEstimator;
 	}
 
-    public Snapshot(Robot opponent, Robot balle, Ball ball, Goal opponentsGoal, Goal ownGoal,
-            Pitch pitch, long timestamp) {
+	public Snapshot(Robot opponent, Robot balle, Ball ball, Goal opponentsGoal,
+			Goal ownGoal, Pitch pitch, BallEstimator ballEstimator,
+			long timestamp) {
 
         // Create a new snapshot predictor based on the information provided
-        this(opponent, balle, ball, opponentsGoal, ownGoal, pitch, timestamp,
-                new ArrayList<ControllerHistoryElement>());
+		this(opponent, balle, ball, opponentsGoal, ownGoal, pitch,
+				ballEstimator, timestamp,
+				new ArrayList<ControllerHistoryElement>());
                 
     }
+
+	public BallEstimator getBallEstimator() {
+		return ballEstimator;
+	}
 	
-    public SnapshotPredictor getSnapshotPredictor() {
+	public SnapshotPredictor getSnapshotPredictor() {
         // Always create new in order not to break the immutability
-        return new SnapshotPredictor(getOpponent(), getBalle(), getBall(), getOpponentsGoal(),
-                getOwnGoal(), getPitch(), getTimestamp(),
- getControllerHistory());
+		return new SnapshotPredictor(getOpponent(), getBalle(), getBall(),
+				getOpponentsGoal(), getOwnGoal(), getPitch(), ballEstimator,
+				getTimestamp(), getControllerHistory());
 
     }
 
@@ -92,13 +102,15 @@ public class Snapshot {
 	}
 
 	public Snapshot duplicate() {
-        return new Snapshot(getOpponent(), getBalle(), getBall(), getOpponentsGoal(), getOwnGoal(),
-                getPitch(), getTimestamp(), getControllerHistory());
+		return new Snapshot(getOpponent(), getBalle(), getBall(),
+				getOpponentsGoal(), getOwnGoal(), getPitch(), ballEstimator,
+				getTimestamp(), getControllerHistory());
 	}
 
 	public MutableSnapshot unpack() {
-        return new MutableSnapshot(getOpponent(), getBalle(), getBall(), getOpponentsGoal(),
-                getOwnGoal(), getPitch(), getTimestamp(), getControllerHistory());
+		return new MutableSnapshot(getOpponent(), getBalle(), getBall(),
+				getOpponentsGoal(), getOwnGoal(), getPitch(), ballEstimator,
+				getTimestamp(), getControllerHistory());
 	}
 
 	@Override

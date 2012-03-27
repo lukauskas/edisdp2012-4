@@ -158,7 +158,6 @@ public class Game extends AbstractPlanner {
         }
 
         SnapshotPredictor sp = snapshot.getSnapshotPredictor();
-        Snapshot nextSnap = sp.getSnapshotAfterTime(50);
         addDrawable(new Circle(ourRobot.getFrontSide().midpoint(), 0.07,
                 Color.GREEN));
         addDrawable(new Circle(ourRobot.getFrontSide().midpoint(), 0.1,
