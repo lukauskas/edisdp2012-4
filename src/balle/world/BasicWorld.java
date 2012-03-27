@@ -93,8 +93,6 @@ public class BasicWorld extends AbstractWorld {
 				ourPosition) ? ourPosition : null;
 		theirsPosition = positionIsCloseToExpected(prev.getOpponent()
 				.getPosition(), theirsPosition) ? theirsPosition : null;
-		ballPosition = positionIsCloseToExpected(prev.getBall().getPosition(),
-				ballPosition) ? ballPosition : null;
 
 		// change in time
 		long deltaT = timestamp - prev.getTimestamp(); // Hopefully that does
