@@ -116,7 +116,7 @@ public class GoToObjectPFN implements MovementExecutor {
      *            distance to stop from (in meters)
      */
     public GoToObjectPFN(double stopDistance) {
-        this(stopDistance, true, 0, 0.1, 20, 15);
+		this(stopDistance, true);
     }
 
     @Override
