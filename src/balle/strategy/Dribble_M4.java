@@ -3,6 +3,7 @@ package balle.strategy;
 import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
+import balle.misc.Globals;
 import balle.strategy.planner.AbstractPlanner;
 import balle.world.Snapshot;
 
@@ -28,6 +29,10 @@ public class Dribble_M4 extends AbstractPlanner {
 	{
 		return new Dribble_M4();
 	}
+
+    public boolean isDribbling() {
+        return (System.currentTimeMillis() - lastDribbled) < MAX_DRIBBLE_PAUSE;
+    }
 	
 	@Override
 	public void onStep(Controller controller, Snapshot snapshot) {
@@ -35,7 +40,7 @@ public class Dribble_M4 extends AbstractPlanner {
         // Make sure to reset the speeds if we haven't been dribbling for a
         // while
         long currentTime = System.currentTimeMillis();
-        if ((currentTime - lastDribbled) > MAX_DRIBBLE_PAUSE) {
+        if (!isDribbling()) {
             currentSpeed = INITIAL_CURRENT_SPEED;
             turnSpeed = INITIAL_TURN_SPEED;
         }
@@ -61,7 +66,8 @@ public class Dribble_M4 extends AbstractPlanner {
 
 		if (isLeftGoal) {
 			if (facingGoal) {
-				controller.setWheelSpeeds(currentSpeed, currentSpeed);
+                controller.setWheelSpeeds(Globals.MAXIMUM_MOTOR_SPEED,
+                        Globals.MAXIMUM_MOTOR_SPEED);
                 controller.kick();
 			} else if ((!facingGoal) && (angle < Math.PI - threshold)) {
 				controller.setWheelSpeeds(currentSpeed, currentSpeed
@@ -72,11 +78,10 @@ public class Dribble_M4 extends AbstractPlanner {
 			} else {
                 controller.setWheelSpeeds(currentSpeed, currentSpeed);
 			}
-		}
-
-		if (!isLeftGoal) {
+        } else {
 			if (facingGoal) {
-				controller.setWheelSpeeds(currentSpeed, currentSpeed);
+                controller.setWheelSpeeds(Globals.MAXIMUM_MOTOR_SPEED,
+                        Globals.MAXIMUM_MOTOR_SPEED);
                 controller.kick();
 			} else if ((!facingGoal) && (angle > threshold)
 					&& (angle < Math.PI)) {

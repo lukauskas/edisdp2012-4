@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import balle.controller.Controller;
 import balle.main.drawable.Circle;
 import balle.main.drawable.Drawable;
+import balle.main.drawable.DrawableRectangularObject;
 import balle.main.drawable.Label;
 import balle.misc.Globals;
 import balle.simulator.SnapshotPredictor;
@@ -20,6 +21,7 @@ import balle.strategy.pathFinding.SimplePathFinder;
 import balle.strategy.planner.AbstractPlanner;
 import balle.strategy.planner.BackingOffStrategy;
 import balle.strategy.planner.DefensiveStrategy;
+import balle.strategy.planner.GoToBall;
 import balle.strategy.planner.GoToBallSafeProportional;
 import balle.strategy.planner.InitialStrategy;
 import balle.strategy.planner.KickFromWall;
@@ -45,6 +47,7 @@ public class Game extends AbstractPlanner {
     protected final InitialStrategy initialStrategy;
 	protected final Strategy goToBallPFN;
 	protected final Strategy goToBallBezier;
+    protected final Strategy goToBallPrecision;
 
     protected boolean initial;
 
@@ -83,6 +86,7 @@ public class Game extends AbstractPlanner {
 		goToBallPFN = new GoToBallSafeProportional();
 		goToBallBezier = new SimpleGoToBallFaceGoal(new BezierNav(
                 new SimplePathFinder(new CustomCHI())));
+        goToBallPrecision = new GoToBall(new GoToObjectPFN(0), false);
         initial = false;
     }
 
@@ -158,13 +162,22 @@ public class Game extends AbstractPlanner {
         }
 
         SnapshotPredictor sp = snapshot.getSnapshotPredictor();
-        addDrawable(new Circle(ourRobot.getFrontSide().midpoint(), 0.07,
-                Color.GREEN));
-        addDrawable(new Circle(ourRobot.getFrontSide().midpoint(), 0.1,
-                Color.RED));
+        // addDrawable(new Circle(ourRobot.getFrontSide().midpoint(), 0.07,
+        // Color.GREEN));
+        // addDrawable(new Circle(ourRobot.getFrontSide().midpoint(), 0.1,
+        // Color.RED));
 
+        String oldStrategy = getCurrentStrategy();
 		Strategy strategy = getStrategy(snapshot);
+        LOG.debug("Selected strategy: " + strategy.getClass().getName());
 		setCurrentStrategy(strategy.getClass().getName());
+        if ("balle.strategy.Dribble_M4".equals(oldStrategy)
+                && !oldStrategy.equals(getCurrentStrategy())) {
+            LOG.info("Stopped using Dribble for " + getCurrentStrategy());
+            LOG.info(ourRobot.getOrientation().degrees());
+            LOG.info(ourRobot.getFrontSide().midpoint()
+                    .dist(ball.getPosition()));
+        }
 		strategy.step(controller, snapshot);
 		addDrawables(strategy.getDrawables());
     }
@@ -177,15 +190,23 @@ public class Game extends AbstractPlanner {
 		Goal opponentsGoal = snapshot.getOpponentsGoal();
 		Pitch pitch = snapshot.getPitch();
 
-		if (ourRobot.getFrontSide().midpoint().dist(ball.getPosition()) < 0.1
-				&& !ourRobot.isFacingGoalHalf(ownGoal)) {
+        addDrawable(new Circle(ourRobot.getFrontSide().midpoint(), 0.2,
+                Color.BLUE));
+
+
+        RectangularObject dribbleBox = ourRobot.getFrontSide()
+                .extendBothDirections(0.01).widen(0.20);
+        addDrawable(new DrawableRectangularObject(dribbleBox, Color.CYAN));
+        if ((kickingStrategy.isDribbling() && ball.getPosition().isEstimated())
+                || (dribbleBox.containsCoord(ball.getPosition()) && !ourRobot
+                        .isFacingGoalHalf(ownGoal))) {
 			return kickingStrategy;
 		}
 
 		// Could the opponent be in the way? use pfn if so
 		RectangularObject corridor = new Line(ourRobot.getPosition(),
 				ball.getPosition()).widen(0.5);
-
+        addDrawable(new DrawableRectangularObject(corridor, Color.BLACK));
 		if (corridor.containsCoord(opponent.getPosition())) {
 			return goToBallBezier;
 		}
@@ -206,6 +227,12 @@ public class Game extends AbstractPlanner {
 			return goToBallPFN;
 		}
 
+
+        if ((!ourRobot.isNearWall(snapshot.getPitch()))
+                && (!ball.isNearWall(snapshot.getPitch()))
+                && (ourRobot.getFrontSide().midpoint().dist(ball.getPosition()) < 0.2)) {
+            return goToBallPrecision;
+        }
 
 		return goToBallBezier;
 

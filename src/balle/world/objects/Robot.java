@@ -136,8 +136,8 @@ public class Robot extends RectangularObject {
         if (getOrientation() == null)
             return false;
 
-        return (getOrientation().degrees() > 90)
-                && (getOrientation().degrees() < 270);
+        return (getOrientation().degrees() >= 90)
+                && (getOrientation().degrees() <= 270);
     }
 
     /**
@@ -149,8 +149,8 @@ public class Robot extends RectangularObject {
         if (getOrientation() == null)
             return false;
 
-        return (getOrientation().degrees() < 90)
-                || (getOrientation().degrees() > 270);
+        return (getOrientation().degrees() <= 90)
+                || (getOrientation().degrees() >= 270);
     }
 
     /**

@@ -237,9 +237,8 @@ public class Line {
 	 * @return the rectangle
 	 */
 	public RectangularObject widen(double width) {
-		return new RectangularObject(midpoint(),
-				new Velocity(0, 0, 0), new AngularVelocity(0, 0), angle(),
-				length(), width);
+        return new RectangularObject(midpoint(), new Velocity(0, 0, 0),
+                new AngularVelocity(0, 0), angle(), width, length());
 	}
 
 	/**
