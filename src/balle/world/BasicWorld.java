@@ -170,8 +170,7 @@ public class BasicWorld extends AbstractWorld {
 				timestamp);
 		prevRaw = nextSnapshot;
 
-		LOG.debug(nextSnapshot);
-		// nextSnapshot = filter(nextSnapshot);
+		nextSnapshot = filter(nextSnapshot);
         updateSnapshot(nextSnapshot);
     }
 
