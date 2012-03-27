@@ -66,6 +66,10 @@ public class GameFromPenaltyDefence extends Game {
 			return;
 		}
 
+		if (snapshot.getBalle().getPosition() == null) {
+			return;
+		}
+
 		if ((firstSnapshot == null)
 				&& (snapshot.getBall().getPosition() != null)) {
 			firstSnapshot = snapshot;
