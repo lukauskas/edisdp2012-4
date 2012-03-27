@@ -120,11 +120,10 @@ public class BasicWorld extends AbstractWorld {
 		ballPosition = ballEstimator.getPosition();
 
 		// Calculate how much each position has changed between frames
-		Coord oursDPos, themDPos, ballDPos;
+		Coord oursDPos, themDPos;
 		oursDPos = subtractOrNull(ourPosition, prev.getBalle().getPosition());
 		themDPos = subtractOrNull(theirsPosition, prev.getOpponent()
 				.getPosition());
-		ballDPos = subtractOrNull(ballPosition, prev.getBall().getPosition());
 
 		// Recalculate the velocities from deltapositions above.
 		Velocity oursVel, themVel, ballVel;
@@ -132,8 +131,7 @@ public class BasicWorld extends AbstractWorld {
 				: new Velocity(0, 0, 1, 1);
 		themVel = themDPos != null ? new Velocity(themDPos, deltaT)
 				: new Velocity(0, 0, 1, 1);
-		// ballVel = ballDPos != null ? new Velocity(ballDPos, deltaT)
-		// : new Velocity(0, 0, 1, 1);
+
 		ballVel = ballEstimator.getVelocity();
 
 		AngularVelocity oursAngVel = null, themAngVel = null;

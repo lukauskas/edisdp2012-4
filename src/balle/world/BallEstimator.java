@@ -7,10 +7,12 @@ public class BallEstimator {
 
 	private static final Logger LOG = Logger.getLogger(BallEstimator.class);
 
-	private DESP velocityPredictor;
-	private DESP positionPredictor;
+	private final DESP velocityPredictor;
+	private final DESP positionPredictor;
 	
 	private Velocity velocity;
+
+	private int estimatedFrames = 0;
 
 	public BallEstimator() {
 		velocityPredictor = new DESP(0.7);
@@ -36,7 +38,8 @@ public class BallEstimator {
 	 * @return The estimated position
 	 */
 	public Coord estimatePosition(int frames) {
-		return positionPredictor.predict(frames);
+		return new Coord(positionPredictor.predict(frames), estimatedFrames
+				+ frames);
 	}
 
 	/**
@@ -50,8 +53,12 @@ public class BallEstimator {
 
 	public void update(Coord pos, double dt) {
 
-		if (pos == null) {
+		boolean estimated = pos == null;
+		if (estimated) {
 			pos = getPosition();
+			estimatedFrames++;
+		} else {
+			estimatedFrames = 0;
 		}
 
 		velocityPredictor.update(pos);
