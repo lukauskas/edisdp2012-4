@@ -33,6 +33,8 @@ public class BrickController implements Controller {
 
     public static final int MAXIMUM_MOTOR_SPEED = Globals.MAXIMUM_MOTOR_SPEED;
 
+    public static final int GEAR_ERROR_RATIO = 2; // Gears cut our turns in half
+
     public BrickController() {
 
         pilot = new TachoPilot(WHEEL_DIAMETER, TRACK_WIDTH, LEFT_WHEEL,
@@ -151,7 +153,7 @@ public class BrickController implements Controller {
     @Override
     public void rotate(int deg, int speed) {
         pilot.setTurnSpeed(speed);
-        pilot.rotate(deg);
+        pilot.rotate(deg / GEAR_ERROR_RATIO);
     }
 
     @Override
