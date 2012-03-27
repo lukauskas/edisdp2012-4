@@ -19,14 +19,31 @@ public class BallEstimator {
 		velocity = new Velocity(0, 0, 1000);
 	}
 	
+	/**
+	 * Get the estimated current position
+	 * 
+	 * @return The ball's current position
+	 */
 	public Coord getPosition() {
 		return estimatePosition(0);
 	}
 
+	/**
+	 * Get the ball's estimated future position
+	 * 
+	 * @param frames
+	 *            How many frames to predict
+	 * @return The estimated position
+	 */
 	public Coord estimatePosition(int frames) {
 		return positionPredictor.predict(frames);
 	}
 
+	/**
+	 * Get the ball's estimated current velocity
+	 * 
+	 * @return The current velocity of the ball
+	 */
 	public Velocity getVelocity() {
 		return velocity;
 	}
@@ -40,8 +57,6 @@ public class BallEstimator {
 
 		velocityPredictor.update(pos);
 		positionPredictor.update(pos);
-
-		LOG.debug(positionPredictor.predict(0));
 
 		velocity = new Velocity(velocityPredictor.predict((int) (dt * 1000))
 				.sub(pos),
