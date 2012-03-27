@@ -11,7 +11,7 @@ public class BooleanField extends FieldInput {
     public BooleanField(String name) {
         super(name);
         this.setLayout(new BorderLayout());
-        input = new JComboBox(new String[] { "true", "false" });
+		input = new JComboBox(new String[] { "false", "true" });
         this.add(new JLabel(name), BorderLayout.WEST);
         this.add(input, BorderLayout.EAST);
     }

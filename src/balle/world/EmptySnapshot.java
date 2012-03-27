@@ -11,15 +11,18 @@ import balle.world.objects.Robot;
  */
 public class EmptySnapshot extends Snapshot {
 
-	public EmptySnapshot(Goal opponentsGoal, Goal ownGoal, Pitch pitch) {
-        super(new Robot(null, null, null, null), new Robot(null, null, null, null), new Ball(null,
-                null), opponentsGoal, ownGoal, pitch, System.currentTimeMillis(), null);
+	public EmptySnapshot(Goal opponentsGoal, Goal ownGoal, Pitch pitch,
+			BallEstimator ballEstimator) {
+		super(new Robot(null, null, null, null), new Robot(null, null, null,
+				null), new Ball(null, null), opponentsGoal, ownGoal, pitch,
+				ballEstimator, System.currentTimeMillis(), null);
 	}
 
 	public EmptySnapshot(Goal opponentsGoal, Goal ownGoal, Pitch pitch,
-			long timeStamp) {
-        super(new Robot(null, null, null, null), new Robot(null, null, null, null), new Ball(null,
-                null), opponentsGoal, ownGoal, pitch, timeStamp, null);
+			BallEstimator ballEstimator, long timeStamp) {
+		super(new Robot(null, null, null, null), new Robot(null, null, null,
+				null), new Ball(null, null), opponentsGoal, ownGoal, pitch,
+				ballEstimator, timeStamp, null);
 	}
 
 }

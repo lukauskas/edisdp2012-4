@@ -12,6 +12,7 @@ import balle.main.drawable.Dot;
 import balle.strategy.executor.movement.OrientedMovementExecutor;
 import balle.world.Snapshot;
 import balle.world.objects.FieldObject;
+import balle.world.objects.Point;
 
 /**
  * @author s0909773
@@ -38,7 +39,7 @@ public class SimpleGoToBallFaceGoal extends AbstractPlanner {
 	}
 
     protected FieldObject getTarget(Snapshot snapshot) {
-		return snapshot.getBall();
+		return new Point(snapshot.getBallEstimator().estimatePosition(10));
 	}
 
 	protected Color getTargetColor() {

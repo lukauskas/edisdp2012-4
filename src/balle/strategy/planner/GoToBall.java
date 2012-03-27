@@ -9,6 +9,8 @@ import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
 import balle.main.drawable.Dot;
+import balle.strategy.FactoryMethod;
+import balle.strategy.executor.movement.GoToObjectPFN;
 import balle.strategy.executor.movement.MovementExecutor;
 import balle.world.Coord;
 import balle.world.Snapshot;
@@ -27,27 +29,18 @@ public class GoToBall extends AbstractPlanner {
 
     MovementExecutor executorStrategy;
 
-    private static final double AVOIDANCE_GAP = 0.5; // Meters
-    private static final double OVERSHOOT_GAP = 0.7; // Meters
+    private final double AVOIDANCE_GAP; // Meters
+    private final double OVERSHOOT_GAP; // Meters
+    private static final double DEFAULT_AVOIDANCE_GAP = 0.5;
+    private static final double DEFAULT_OVERSHOOT_GAP = 0.8;
 	private static final double DIST_DIFF_THRESHOLD = 0.2; // Meters
 
 	private boolean approachTargetFromCorrectSide;
 	private boolean shouldAvoidOpponent = true;
 
     public GoToBall(MovementExecutor movementExecutor) {
-        executorStrategy = movementExecutor;
-        approachTargetFromCorrectSide = false;
-    }
-
-    public void setStopDistance(double distance) {
-        executorStrategy.setStopDistance(distance);
-    }
-    public MovementExecutor getExecutorStrategy() {
-        return executorStrategy;
-    }
-
-    public void setExecutorStrategy(MovementExecutor executorStrategy) {
-        this.executorStrategy = executorStrategy;
+        this(movementExecutor, DEFAULT_AVOIDANCE_GAP, DEFAULT_OVERSHOOT_GAP,
+                false);
     }
 
     /**
@@ -60,9 +53,41 @@ public class GoToBall extends AbstractPlanner {
      */
     public GoToBall(MovementExecutor movementExecutor,
             boolean approachTargetFromCorrectSide) {
-        executorStrategy = movementExecutor;
-        this.approachTargetFromCorrectSide = approachTargetFromCorrectSide;
+        this(movementExecutor, DEFAULT_AVOIDANCE_GAP, DEFAULT_OVERSHOOT_GAP,
+                true);
     }
+
+    public GoToBall(MovementExecutor movementExecutor, double avoidanceGap,
+            double overshootGap, boolean approachfromCorrectSide) {
+        executorStrategy = movementExecutor;
+        this.approachTargetFromCorrectSide = approachfromCorrectSide;
+        AVOIDANCE_GAP = avoidanceGap;
+        OVERSHOOT_GAP = overshootGap;
+    }
+
+    @FactoryMethod(designator = "GoToBall PFN Test", parameterNames = {
+            "ApproachFromCorrectSide", "opponentPower",
+            "opponentInfluenceDistance", "targetPower", "alpha" })
+    public static GoToBall pfnTestFactory(boolean approachFromCorrectSide,
+            double opponentPower, double opponentInfluenceDistance,
+            double targetPower, double alpha) {
+        return new GoToBall(new GoToObjectPFN(0, true, opponentPower,
+                opponentInfluenceDistance, targetPower, alpha),
+                DEFAULT_AVOIDANCE_GAP,
+                DEFAULT_OVERSHOOT_GAP, approachFromCorrectSide);
+    }
+    public void setStopDistance(double distance) {
+        executorStrategy.setStopDistance(distance);
+    }
+    public MovementExecutor getExecutorStrategy() {
+        return executorStrategy;
+    }
+
+    public void setExecutorStrategy(MovementExecutor executorStrategy) {
+        this.executorStrategy = executorStrategy;
+    }
+
+
 
     public boolean shouldApproachTargetFromCorrectSide() {
         return approachTargetFromCorrectSide;
@@ -82,7 +107,7 @@ public class GoToBall extends AbstractPlanner {
     }
 
     protected FieldObject getTarget(Snapshot snapshot) {
-		return snapshot.getBall();
+		return new Point(snapshot.getBallEstimator().estimatePosition(10));
     }
 
     protected Color getTargetColor() {
@@ -300,6 +325,7 @@ public class GoToBall extends AbstractPlanner {
         // If it says it is not finished, tell it to do something for a step.
         if (!executorStrategy.isFinished(snapshot)) {
 			executorStrategy.step(controller, snapshot);
+            addDrawables(executorStrategy.getDrawables());
         } else {
             // Tell the strategy to stop doing whatever it was doing
             executorStrategy.stop(controller);
