@@ -50,7 +50,6 @@ public class BallEstimator {
 
 	public void update(Coord pos, double dt) {
 
-		// dt = dt / 1000;
 		if (pos == null) {
 			pos = getPosition();
 		}
@@ -58,8 +57,7 @@ public class BallEstimator {
 		velocityPredictor.update(pos);
 		positionPredictor.update(pos);
 
-		velocity = new Velocity(velocityPredictor.predict((int) (dt * 1000))
-				.sub(pos),
-				1000);
+		velocity = new Velocity(velocityPredictor.predict((int) (1000 / dt))
+				.sub(pos), 1000);
 	}
 }

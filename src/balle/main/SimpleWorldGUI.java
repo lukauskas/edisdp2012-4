@@ -16,12 +16,14 @@ import org.apache.log4j.Logger;
 
 import balle.main.drawable.Drawable;
 import balle.main.drawable.DrawableLine;
+import balle.main.drawable.DrawableVector;
 import balle.main.drawable.Label;
 import balle.misc.Globals;
 import balle.world.AbstractWorld;
 import balle.world.Coord;
 import balle.world.Scaler;
 import balle.world.Snapshot;
+import balle.world.Velocity;
 import balle.world.objects.Ball;
 import balle.world.objects.Goal;
 import balle.world.objects.Robot;
@@ -231,15 +233,14 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 			// BallEstimator predictor = snapshot.getBallEstimator();
 			// Coord estimatedPos = predictor.estimatePosition(5); // 5 Frames =
 			// // ~250ms
-			// Velocity vel = ball.getVelocity();
-			// LOG.debug(estimatedPos);
-			// DrawableVector vec = new DrawableVector(ball.getPosition(), vel,
-			// Color.CYAN);
-			// vec.draw(g, scaler);
 			// new Circle(estimatedPos.x, estimatedPos.y, 0.05,
 			// Color.BLUE).draw(
-			// g,
-			// scaler);
+			// g, scaler);
+
+			Velocity vel = ball.getVelocity().mult(1000);
+			DrawableVector vec = new DrawableVector(ball.getPosition(), vel,
+					Color.CYAN);
+			vec.draw(g, scaler);
 
             // Velocity vel = ball.getVelocity();
             // DrawableVector velocityVec = new
