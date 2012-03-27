@@ -191,7 +191,7 @@ public class Game extends AbstractPlanner {
 		}
 
 		if (!ourRobot.isApproachingTargetFromCorrectSide(ball, opponentsGoal,
-				30)) {
+				25)) {
 			return goToBallPFN;
 		}
 
