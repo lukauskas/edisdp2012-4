@@ -50,10 +50,11 @@ public abstract class AbstractWorldProcessor extends Thread {
             Snapshot newSnapshot = world.getSnapshot();
             // James, Daniel:
             // Timestamps of the 2 snapshots is frequently the same.
-            if ((newSnapshot != null) && (!newSnapshot.equals(prevSnapshot))) {
-                actionOnChange();
+			while ((newSnapshot != null) && (!newSnapshot.equals(prevSnapshot))) {
                 prevSnapshot = snapshot;
                 snapshot = newSnapshot;
+
+				actionOnChange();
 
                 if (prevSnapshot != null && snapshot.getTimestamp() != prevSnapshot.getTimestamp()) {
                     registerSnapshotReceived();
