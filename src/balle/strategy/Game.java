@@ -190,7 +190,8 @@ public class Game extends AbstractPlanner {
 			return goToBallBezier;
 		}
 
-		if (!ourRobot.isApproachingTargetFromCorrectSide(ball, opponentsGoal)) {
+		if (!ourRobot.isApproachingTargetFromCorrectSide(ball, opponentsGoal,
+				30)) {
 			return goToBallPFN;
 		}
 
