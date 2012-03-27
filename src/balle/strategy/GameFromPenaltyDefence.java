@@ -1,31 +1,57 @@
 package balle.strategy;
 
+import java.awt.Color;
+
 import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
+import balle.main.drawable.Dot;
+import balle.misc.Globals;
 import balle.world.Coord;
 import balle.world.Orientation;
 import balle.world.Snapshot;
+import balle.world.objects.Ball;
+import balle.world.objects.Goal;
+import balle.world.objects.Robot;
 
 public class GameFromPenaltyDefence extends Game {
 
-	private static Logger LOG = Logger.getLogger(GameFromPenaltyDefence.class);
+    private int SPEED;
+
+    private static Logger LOG = Logger.getLogger(GameFromPenaltyDefence.class);
 
 	private Snapshot firstSnapshot = null;
 	String robotState = "Center";
 	int rotateSpeed = 0;
 
+    private enum MovementDirection {
+        FORWARD, BACKWARD, NONE
+    };
+
 	private boolean finished = false;
 
-    public GameFromPenaltyDefence() {
+    public GameFromPenaltyDefence(int speed) {
         super();
+        SPEED = speed;
 	}
+
+    public GameFromPenaltyDefence() {
+        this(200);
+    }
+
 	
     @FactoryMethod(designator = "Game (Penalty Defence)", parameterNames = {})
 	public static GameFromPenaltyDefence gameFromPenaltyDefenceFactory()
 	{
         return new GameFromPenaltyDefence();
 	}
+
+    // @FactoryMethod(designator = "Game (Penalty Defence SP)", parameterNames =
+    // { "speed" })
+    // public static GameFromPenaltyDefence gameFromPenaltyDefenceFactory(
+    // double speed) {
+    // return new GameFromPenaltyDefence((int) speed);
+    // }
 
 	public boolean isStillInPenaltyDefence(Snapshot snapshot) {
 
@@ -58,6 +84,61 @@ public class GameFromPenaltyDefence extends Game {
 		return false;
 	}
 
+    public MovementDirection getMovementDirection(Snapshot snapshot) {
+        Robot opponent = snapshot.getOpponent();
+        Robot ourRobot = snapshot.getBalle();
+        Goal ourGoal = snapshot.getOwnGoal();
+        Ball ball = snapshot.getBall();
+
+        if ((opponent.getPosition() == null)
+                || (ourRobot.getPosition() == null))
+            return MovementDirection.NONE;
+        
+
+        Coord intersectionPoint = null;
+        if ((ball.getPosition() != null) && (!ball.getPosition().isEstimated()))
+            intersectionPoint = opponent.getBallKickLine(ball).getIntersect(
+                    ourRobot.getFacingLineBothWays());
+
+        if (intersectionPoint == null)
+            intersectionPoint = opponent.getFacingLine().getIntersect(
+                    ourRobot.getFacingLineBothWays());
+
+
+        if (intersectionPoint == null)
+            return MovementDirection.NONE;
+
+        double yCoord = intersectionPoint.getY();
+        yCoord = Math.max(yCoord, ourGoal.getMinY() + Globals.ROBOT_LENGTH / 3);
+        yCoord = Math.min(yCoord, ourGoal.getMaxY() - Globals.ROBOT_LENGTH / 3);
+
+        Coord targetPoint = new Coord(ourRobot.getPosition().getX(), yCoord);
+        addDrawable(new Dot(targetPoint, Color.WHITE));
+        
+        boolean isUpward;
+        Orientation ourOrientation = ourRobot.getOrientation();
+        if ((ourOrientation.radians() >= 0)
+                && (ourOrientation.radians() < Math.PI))
+                isUpward = true;
+        else
+            isUpward = false;
+
+        // If we are already blocking the point stop
+        if (ourRobot.containsCoord(targetPoint))
+            return MovementDirection.NONE;
+
+        double diff = (targetPoint.getY() - ourRobot.getPosition().getY());
+        if (diff > 0)
+            if (isUpward)
+                return MovementDirection.FORWARD;
+            else
+                return MovementDirection.BACKWARD;
+        else if (isUpward)
+            return MovementDirection.BACKWARD;
+        else
+            return MovementDirection.FORWARD;
+            
+    }
 	@Override
 	public void onStep(Controller controller, Snapshot snapshot) {
 
@@ -75,68 +156,12 @@ public class GameFromPenaltyDefence extends Game {
 			firstSnapshot = snapshot;
 		}
 
-		Orientation opponentAngle = snapshot.getOpponent().getOrientation();
-
-		double threshold = Math.toRadians(30);
-		
-		Boolean isLeftGoal = snapshot.getOwnGoal().isLeftGoal();
-
-		if (snapshot.getOwnGoal().getMaxY() < snapshot.getBalle()
-.getPosition()
-				.getY() + 0.3) {
-			robotState = "Up";
-		} else if (snapshot.getOwnGoal().getMinY() > snapshot.getBalle()
-				.getPosition().getY() - 0.3) {
-			robotState = "Down";
-		} else {
-			robotState = "Center";
-		}
-
-		LOG.debug("robotState: " + robotState);
-
-		if (isLeftGoal == true) {
-			if (opponentAngle.atan2styleradians() > Math.PI - threshold) {
-				moveTo("Up", controller);
-			} else if (opponentAngle.atan2styleradians() < -Math.PI + threshold) {
-				moveTo("Down", controller);
-			} else {
-				moveTo("Center", controller);
-			}
-
-		} else {
-			if (opponentAngle.atan2styleradians() > threshold) {
-				moveTo("Up", controller);
-			} else if (opponentAngle.atan2styleradians() < -threshold) {
-				moveTo("Down", controller);
-			} else {
-				moveTo("Center", controller);
-			}
-		}
-	}
-
-	private void moveTo(String moveTo, Controller controller) {
-
-		rotateSpeed = 0;
-		LOG.debug("moveTo: " + moveTo);
-
-		if (robotState.equals("Center") && moveTo.equals("Up"))
-			rotateSpeed = 400;
-		if (robotState.equals("Center") && moveTo.equals("Down"))
-			rotateSpeed = -400;
-		if (robotState.equals("Up") && moveTo.equals("Center"))
-			rotateSpeed = -400;
-		if (robotState.equals("Up") && moveTo.equals("Down"))
-			rotateSpeed = -400;
-		if (robotState.equals("Down") && moveTo.equals("Center"))
-			rotateSpeed = 400;
-		if (robotState.equals("Down") && moveTo.equals("Up"))
-			rotateSpeed = 400;
-
-		if (rotateSpeed == 0)
-			controller.stop();
+        MovementDirection movementDirection = getMovementDirection(snapshot);
+        if (movementDirection == MovementDirection.FORWARD)
+            controller.setWheelSpeeds(SPEED, SPEED);
+        else if (movementDirection == MovementDirection.BACKWARD)
+            controller.setWheelSpeeds(-SPEED, -SPEED);
 		else
-			controller.setWheelSpeeds(rotateSpeed, rotateSpeed);
-
-		LOG.debug("Speed: " + rotateSpeed);
+            controller.stop();
 	}
 }
