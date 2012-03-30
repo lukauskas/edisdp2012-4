@@ -34,6 +34,8 @@ public class BrickController implements Controller {
 
     public static final int GEAR_ERROR_RATIO = 2; // Gears cut our turns in half
 
+    private volatile boolean isKicking = false;
+
     public BrickController() {
 
         pilot = new TachoPilot(WHEEL_DIAMETER, TRACK_WIDTH, LEFT_WHEEL,
@@ -47,6 +49,7 @@ public class BrickController implements Controller {
         RIGHT_WHEEL.smoothAcceleration(true);
         KICKER.smoothAcceleration(false);
         KICKER.regulateSpeed(false);
+
     }
 
     /*
@@ -77,14 +80,29 @@ public class BrickController implements Controller {
      */
     @Override
     public void kick() {
+
+        if (isKicking) {
+            return;
+        }
+
+        isKicking = true;
+
         KICKER.setSpeed(900);
         KICKER.resetTachoCount();
         KICKER.forward();
-        try {
-            Thread.sleep(80);
-        } catch (InterruptedException e) {
-        }
-        KICKER.rotateTo(0);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(80);
+                } catch (InterruptedException e) {
+                    //
+                }
+                KICKER.rotateTo(0);
+                isKicking = false;
+            }
+        }).start();
     }
 
     public void gentleKick(int speed, int angle) {
