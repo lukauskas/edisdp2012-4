@@ -50,6 +50,15 @@ public class Dribble extends AbstractPlanner {
         boolean facingGoal = snapshot.getBalle().getFacingLine()
 				.intersects(snapshot.getOpponentsGoal().getGoalLine());
 
+        if (snapshot.getBall().getPosition() != null)
+            facingGoal = facingGoal
+                    || snapshot
+                            .getBalle()
+                            .getBallKickLine(snapshot.getBall())
+                            .intersects(
+                                    snapshot.getOpponentsGoal().getGoalLine());
+
+
 		if (currentSpeed <= 560) {
 			currentSpeed += 20;
 		}
@@ -69,7 +78,7 @@ public class Dribble extends AbstractPlanner {
                 controller.setWheelSpeeds(Globals.MAXIMUM_MOTOR_SPEED,
                         Globals.MAXIMUM_MOTOR_SPEED);
                 controller.kick();
-			} else if ((!facingGoal) && (angle < Math.PI - threshold)) {
+            } else if ((!facingGoal) && (angle < Math.PI - threshold)) {
 				controller.setWheelSpeeds(currentSpeed, currentSpeed
 						+ turnSpeed);
 			} else if ((!facingGoal) && (angle > Math.PI + threshold)) {
@@ -83,6 +92,7 @@ public class Dribble extends AbstractPlanner {
                 controller.setWheelSpeeds(Globals.MAXIMUM_MOTOR_SPEED,
                         Globals.MAXIMUM_MOTOR_SPEED);
                 controller.kick();
+
 			} else if ((!facingGoal) && (angle > threshold)
 					&& (angle < Math.PI)) {
 				controller.setWheelSpeeds(currentSpeed + turnSpeed,

@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import balle.controller.Controller;
 import balle.main.drawable.Circle;
 import balle.main.drawable.Drawable;
+import balle.main.drawable.DrawableLine;
 import balle.main.drawable.DrawableRectangularObject;
 import balle.main.drawable.Label;
 import balle.misc.Globals;
@@ -190,17 +191,26 @@ public class Game extends AbstractPlanner {
 		Goal opponentsGoal = snapshot.getOpponentsGoal();
 		Pitch pitch = snapshot.getPitch();
 
-        addDrawable(new Circle(ourRobot.getFrontSide().midpoint(), 0.2,
+        addDrawable(new Circle(ourRobot.getFrontSide().midpoint(), 0.4,
                 Color.BLUE));
 
 
+        SnapshotPredictor sp = snapshot.getSnapshotPredictor();
+        Snapshot newsnap = sp.getSnapshotAfterTime(50);
         RectangularObject dribbleBox = ourRobot.getFrontSide()
-                .extendBothDirections(0.01).widen(0.20);
+                .extendBothDirections(0.01).widen(0.25);
         addDrawable(new DrawableRectangularObject(dribbleBox, Color.CYAN));
+        
+
+        addDrawable(new DrawableLine(newsnap.getBalle().getFrontSide(),
+                Color.red));
+
         if ((kickingStrategy.isDribbling() && ball.getPosition().isEstimated())
                 || (dribbleBox.containsCoord(ball.getPosition()) && !ourRobot
                         .isFacingGoalHalf(ownGoal))) {
-			return kickingStrategy;
+            addDrawable(new Label("DRIBBLING", ball.getPosition().sub(
+                    new Coord(0.1, 0.1)), Color.CYAN));
+            return kickingStrategy;
 		}
 
 		// Could the opponent be in the way? use pfn if so
