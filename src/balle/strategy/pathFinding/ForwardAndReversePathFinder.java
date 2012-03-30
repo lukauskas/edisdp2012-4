@@ -1,7 +1,7 @@
 package balle.strategy.pathFinding;
 
 import balle.strategy.curve.Interpolator;
-import balle.strategy.pathFinding.path.AbstractPath;
+import balle.strategy.pathFinding.path.AbstractInstantAccelPath;
 import balle.strategy.pathFinding.path.Path;
 import balle.strategy.pathFinding.path.ReversePath;
 import balle.world.Coord;
@@ -17,7 +17,7 @@ public class ForwardAndReversePathFinder extends SimplePathFinder {
 
 	@Override
 	public Path[] getPaths(Snapshot s, Coord end, Orientation endAngle) {
-		Path[] paths = new AbstractPath[2];
+		Path[] paths = new AbstractInstantAccelPath[2];
 		Robot robot = s.getBalle();
 		// full forwards
 		paths[0] = super.getPaths(s, robot.getPosition(),

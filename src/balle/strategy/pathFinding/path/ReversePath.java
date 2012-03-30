@@ -9,7 +9,7 @@ import balle.strategy.curve.Curve;
  * @author s0906575
  *
  */
-public class ReversePath extends AbstractPath {
+public class ReversePath extends AbstractInstantAccelPath {
 
 	private Path reversePath;
 

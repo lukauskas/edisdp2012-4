@@ -4,7 +4,7 @@ import balle.misc.Globals;
 import balle.strategy.curve.Curve;
 import balle.world.Coord;
 
-public class MaxSpeedPath extends AbstractPath {
+public class MaxSpeedPath extends AbstractAccelAwarePath {
 
 	private final double MIN_SAFE_RADIUS = 0.75; // the smallest turning radius
 												// where moving at maximum speed
@@ -17,7 +17,7 @@ public class MaxSpeedPath extends AbstractPath {
 	private final double APPROACH_SPEEDRATIO = 0.2; // when near the target
 														// slow down to this
 														// ratio of max speed
-	private final double APPROACH_DISTANCE = 2; // Approaching if within this
+	private final double APPROACH_DISTANCE = 0; // Approaching if within this
 													// distance
 	private final double MAX_VELOCITY = Globals.powerToVelocity(900); // the
 																		// maximum

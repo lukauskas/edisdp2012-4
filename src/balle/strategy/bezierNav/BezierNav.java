@@ -22,8 +22,8 @@ import balle.strategy.executor.movement.OrientedMovementExecutor;
 import balle.strategy.pathFinding.ForwardAndReversePathFinder;
 import balle.strategy.pathFinding.PathFinder;
 import balle.strategy.pathFinding.SimplePathFinder;
+import balle.strategy.pathFinding.path.AbstractAccelAwarePath;
 import balle.strategy.pathFinding.path.Path;
-import balle.strategy.pathFinding.path.WheelAccelerationAwarePath;
 import balle.strategy.planner.SimpleGoToBallFaceGoal;
 import balle.world.BasicWorld;
 import balle.world.Coord;
@@ -86,7 +86,7 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 	private Curve c;
 	private ArrayList<Curve> altCurves = new ArrayList<Curve>();
 
-    private FieldObject         target;
+	private FieldObject target;
 
 	private Orientation orient;
 	private Coord pi, pf;
@@ -97,8 +97,10 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 																	// end
 	private boolean endInfront;
 
-    @FactoryMethod(designator = "BezierNav", parameterNames = {})
-	public static SimpleGoToBallFaceGoal bezierNavFactory() {
+    @FactoryMethod(designator = "BezierNav", parameterNames = {"a", "s"})
+	public static SimpleGoToBallFaceGoal bezierNavFactory(double a, double s) {
+		AbstractAccelAwarePath.A = a;
+		AbstractAccelAwarePath.SCALE_TERM_VELS = s;
 		return new SimpleGoToBallFaceGoal(new BezierNav(
 				new SimplePathFinder(
 				new CustomCHI()), true));
@@ -245,9 +247,6 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 	private Path getBestPath(Snapshot s, Orientation finalOrient) {
 		// get candidate paths
 		Path[] paths = pathfinder.getPaths(s, pf, finalOrient);
-		for (int i = 0; i < paths.length; i++) {
-			paths[i] = new WheelAccelerationAwarePath(paths[i]);
-		}
 		boolean hasLastPathUsed = lastPathIndexUsed != -1;
 		Path best = paths[hasLastPathUsed ? lastPathIndexUsed : 0];
 		// look for the quickest time path
