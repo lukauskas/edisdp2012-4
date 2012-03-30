@@ -20,7 +20,7 @@ public class MutableSnapshot {
 
 	private Pitch pitch;
 
-	private final BallEstimator ballEstimator;
+	private final Estimator ballEstimator;
 
     private ArrayList<ControllerHistoryElement> controllerHistory;
 
@@ -36,7 +36,7 @@ public class MutableSnapshot {
 
 	public MutableSnapshot(Robot opponent, Robot balle, Ball ball,
 			Goal opponentsGoal, Goal ownGoal, Pitch pitch,
-			BallEstimator ballEstimator, long timestamp,
+			Estimator ballEstimator, long timestamp,
             ArrayList<ControllerHistoryElement> controllerHistory) {
 
 		super();

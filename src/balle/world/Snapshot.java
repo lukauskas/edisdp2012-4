@@ -25,7 +25,7 @@ public class Snapshot {
 	private final Robot bot;
 	private final Ball ball;
 
-	private final BallEstimator ballEstimator;
+	private final Estimator ballEstimator;
 
 	private final Goal opponentsGoal;
 	private final Goal ownGoal;
@@ -34,7 +34,7 @@ public class Snapshot {
 	private final long timestamp;
 
 	public Snapshot(Robot opponent, Robot balle, Ball ball, Goal opponentsGoal,
-			Goal ownGoal, Pitch pitch, BallEstimator ballEstimator,
+			Goal ownGoal, Pitch pitch, Estimator ballEstimator,
 			long timestamp,
 			ArrayList<ControllerHistoryElement> controllerHistory) {
 
@@ -51,7 +51,7 @@ public class Snapshot {
 	}
 
 	public Snapshot(Robot opponent, Robot balle, Ball ball, Goal opponentsGoal,
-			Goal ownGoal, Pitch pitch, BallEstimator ballEstimator,
+			Goal ownGoal, Pitch pitch, Estimator ballEstimator,
 			long timestamp) {
 
         // Create a new snapshot predictor based on the information provided
@@ -61,7 +61,7 @@ public class Snapshot {
                 
     }
 
-	public BallEstimator getBallEstimator() {
+	public Estimator getBallEstimator() {
 		return ballEstimator;
 	}
 	

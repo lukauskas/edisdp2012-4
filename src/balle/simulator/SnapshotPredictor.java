@@ -9,7 +9,7 @@ import org.jbox2d.dynamics.World;
 
 import balle.strategy.bezierNav.ControllerHistoryElement;
 import balle.world.AngularVelocity;
-import balle.world.BallEstimator;
+import balle.world.Estimator;
 import balle.world.Coord;
 import balle.world.Orientation;
 import balle.world.Snapshot;
@@ -30,7 +30,7 @@ public class SnapshotPredictor extends WorldSimulator {
     private final balle.world.objects.Robot initOpponent;
     private final balle.world.objects.Ball initBall;
     
-	private final BallEstimator ballEstimator;
+	private final Estimator ballEstimator;
 
     private final Pitch                               pitch;
 
@@ -60,7 +60,7 @@ public class SnapshotPredictor extends WorldSimulator {
 	public SnapshotPredictor(balle.world.objects.Robot opponent,
 			balle.world.objects.Robot balle,
  Ball ball, Goal opponentsGoal,
-			Goal ownGoal, Pitch pitch, BallEstimator ballEstimator,
+			Goal ownGoal, Pitch pitch, Estimator ballEstimator,
 			long timestamp,
             ArrayList<ControllerHistoryElement> controllerHistory) {
         super(false);
