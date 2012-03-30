@@ -31,6 +31,13 @@ public class GoToBallSafeProportional extends GoToBall {
 		turnHack = new TurnHack();
     }
 
+    public GoToBallSafeProportional(double avoidanceGap, double overshootGap,
+            boolean approachfromCorrectSide) {
+        super(new GoToObjectPFN(0), avoidanceGap, overshootGap,
+                approachfromCorrectSide);
+        turnHack = new TurnHack();
+    }
+
     protected FieldObject getOriginalTarget(Snapshot snapshot) {
 		return super.getTarget(snapshot);
     }

@@ -21,7 +21,6 @@ import balle.strategy.executor.turning.RotateToOrientationExecutor;
 import balle.strategy.pathFinding.SimplePathFinder;
 import balle.strategy.planner.AbstractPlanner;
 import balle.strategy.planner.BackingOffStrategy;
-import balle.strategy.planner.DefensiveStrategy;
 import balle.strategy.planner.GoToBall;
 import balle.strategy.planner.GoToBallSafeProportional;
 import balle.strategy.planner.InitialStrategy;
@@ -78,7 +77,7 @@ public class Game extends AbstractPlanner {
     }
 
     public Game() {
-        defensiveStrategy = new DefensiveStrategy(new GoToObjectPFN(0.1f));
+        defensiveStrategy = new GoToBallSafeProportional(0.5, 0.4, true);
         pickBallFromWallStrategy = new KickFromWall(new GoToObjectPFN(0));
 		backingOffStrategy = new BackingOffStrategy();
         turningExecutor = new IncFaceAngle();
@@ -220,6 +219,16 @@ public class Game extends AbstractPlanner {
 		if (corridor.containsCoord(opponent.getPosition())) {
 			return goToBallBezier;
 		}
+		
+        Line ballMovementLine = new Line(ball.getPosition(), snapshot
+                .getBallEstimator().estimatePosition(40));
+		
+        addDrawable(new DrawableLine(ballMovementLine, Color.MAGENTA));
+        if (ballMovementLine.intersects(snapshot.getOwnGoal().getGoalLine()
+                .extendBothDirections(0.5))) {
+            return defensiveStrategy;
+        }
+		    
 
 		if (!ourRobot.isApproachingTargetFromCorrectSide(ball, opponentsGoal,
 				25)) {
