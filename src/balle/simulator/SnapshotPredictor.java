@@ -1,6 +1,6 @@
 package balle.simulator;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jbox2d.common.Vec2;
@@ -9,7 +9,6 @@ import org.jbox2d.dynamics.World;
 
 import balle.strategy.bezierNav.ControllerHistoryElement;
 import balle.world.AngularVelocity;
-import balle.world.Estimator;
 import balle.world.Coord;
 import balle.world.Orientation;
 import balle.world.Snapshot;
@@ -21,18 +20,10 @@ import balle.world.objects.Pitch;
 public class SnapshotPredictor extends WorldSimulator {
 
     // Recreate object if you want to update the history
-    private final ArrayList<ControllerHistoryElement> controllerHistory;
+	private final List<ControllerHistoryElement> controllerHistory;
     private long                                      simulatorTimestamp;
-
-    private final Goal                                opponentsGoal;
-    private final Goal                                ownGoal;
-    private final balle.world.objects.Robot initOurRobot;
-    private final balle.world.objects.Robot initOpponent;
-    private final balle.world.objects.Ball initBall;
     
-	private final Estimator ballEstimator;
-
-    private final Pitch                               pitch;
+	private final Snapshot initSnapshot;
 
     private final Logger LOG = Logger.getLogger(SnapshotPredictor.class);
 
@@ -43,40 +34,16 @@ public class SnapshotPredictor extends WorldSimulator {
      */
 
 	public SnapshotPredictor(Snapshot initialSnapshot,
-            ArrayList<ControllerHistoryElement> controllerHistory) {
-		this(initialSnapshot.getOpponent(), initialSnapshot.getBalle(),
-				initialSnapshot.getBall(), initialSnapshot.getOpponentsGoal(),
-				initialSnapshot.getOwnGoal(), initialSnapshot.getPitch(),
-				initialSnapshot.getBallEstimator(), initialSnapshot
-						.getTimestamp(), controllerHistory);
-    }
-
-    /**
-     * Create new snapshot predictor
-     * 
-     * @param controllerHistory
-     */
-
-	public SnapshotPredictor(balle.world.objects.Robot opponent,
-			balle.world.objects.Robot balle,
- Ball ball, Goal opponentsGoal,
-			Goal ownGoal, Pitch pitch, Estimator ballEstimator,
-			long timestamp,
-            ArrayList<ControllerHistoryElement> controllerHistory) {
+			List<ControllerHistoryElement> controllerHistory) {
         super(false);
         setWorld(new World(new Vec2(), true));
         initWorld();
         setVisionDelay(0);
-        this.simulatorTimestamp = timestamp;
+		this.initSnapshot = initialSnapshot;
+		this.simulatorTimestamp = initialSnapshot.getTimestamp();
         this.controllerHistory = controllerHistory;
-        this.opponentsGoal = opponentsGoal;
-        this.ownGoal = ownGoal;
-        this.pitch = pitch;
-        this.initOpponent = opponent;
-        this.initBall = ball;
-        this.initOurRobot = balle;
-		this.ballEstimator = ballEstimator;
-        updatePositions(opponent, balle, ball);
+		updatePositions(initialSnapshot.getOpponent(),
+				initialSnapshot.getBalle(), initialSnapshot.getBall());
     }
 
     /**
@@ -229,11 +196,12 @@ public class SnapshotPredictor extends WorldSimulator {
         
         // Assume we are blue and opponent is yellow again
         balle.world.objects.Robot ourRobot = getRobotFromBody(blue,
-                getBlueSoft(), initOurRobot);
+				getBlueSoft(), initSnapshot.getBalle());
         balle.world.objects.Robot opponent = getRobotFromBody(yellow,
-                getYellowSoft(), initOpponent);
+				getYellowSoft(), initSnapshot.getOpponent());
       
-        balle.world.objects.Ball ball;
+		Ball initBall = initSnapshot.getBall();
+		Ball ball;
         if ((ballBody == null) || (initBall.getPosition() == null)) {
             ball = new Ball(null, null);
         } else {
@@ -242,12 +210,11 @@ public class SnapshotPredictor extends WorldSimulator {
                     Velocity.fromVec2(ballBody.getLinearVelocity(), SCALE));
         }
         
-		return new Snapshot(opponent, ourRobot, ball, getOpponentsGoal(),
-				getOwnGoal(), getPitch(), ballEstimator,
+		return new Snapshot(initSnapshot.getWorld(), opponent, ourRobot, ball,
 				getSimulatorTimestamp(), getControllerHistory());
     }
 
-    protected ArrayList<ControllerHistoryElement> getControllerHistory() {
+	protected List<ControllerHistoryElement> getControllerHistory() {
         return controllerHistory;
     }
 
@@ -260,15 +227,15 @@ public class SnapshotPredictor extends WorldSimulator {
     }
 
     protected Goal getOpponentsGoal() {
-        return opponentsGoal;
+		return initSnapshot.getOpponentsGoal();
     }
 
     protected Goal getOwnGoal() {
-        return ownGoal;
+		return initSnapshot.getOwnGoal();
     }
 
     protected Pitch getPitch() {
-        return pitch;
+		return initSnapshot.getPitch();
     }
 
 }

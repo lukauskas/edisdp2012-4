@@ -23,10 +23,8 @@ public class BasicWorld extends AbstractWorld {
 		ourRobotEstimator = Estimator.getRobotEstimator();
 		theirRobotEstimator = Estimator.getRobotEstimator();
 
-		prev = new EmptySnapshot(getOpponentsGoal(), getOwnGoal(), getPitch(),
-				ballEstimator);
-		prevRaw = new EmptySnapshot(getOpponentsGoal(), getOwnGoal(),
-				getPitch(), ballEstimator);
+		prev = new EmptySnapshot(this);
+		prevRaw = new EmptySnapshot(this);
 	}
 
 	@Override
@@ -36,6 +34,10 @@ public class BasicWorld extends AbstractWorld {
 
 	public synchronized Snapshot getSnapshotRaw() {
 		return prevRaw;
+	}
+
+	public Estimator getBallEstimator() {
+		return ballEstimator;
 	}
 
 	/**
@@ -146,9 +148,7 @@ public class BasicWorld extends AbstractWorld {
 		ball = new Ball(ballPosition, ballVel);
 
 		// pack into a snapshot, and update prev/prevRaw
-		Snapshot nextSnapshot = new Snapshot(them, ours, ball,
-				getOpponentsGoal(), getOwnGoal(), getPitch(), ballEstimator,
-				timestamp);
+		Snapshot nextSnapshot = new Snapshot(this, them, ours, ball, timestamp);
 		prevRaw = nextSnapshot;
 
 		nextSnapshot = filter(nextSnapshot);
@@ -167,10 +167,8 @@ public class BasicWorld extends AbstractWorld {
 			ourRobotEstimator.reset();
 			theirRobotEstimator.reset();
 
-			prev = new EmptySnapshot(getOpponentsGoal(), getOwnGoal(),
-					getPitch(), ballEstimator);
-			prevRaw = new EmptySnapshot(getOpponentsGoal(), getOwnGoal(),
-					getPitch(), ballEstimator);
+			prev = new EmptySnapshot(this);
+			prevRaw = new EmptySnapshot(this);
 		}
 	}
 
