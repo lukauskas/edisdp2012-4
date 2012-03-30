@@ -7,27 +7,27 @@ import balle.misc.Globals;
 import balle.strategy.planner.AbstractPlanner;
 import balle.world.Snapshot;
 
-public class Dribble_M4 extends AbstractPlanner {
+public class Dribble extends AbstractPlanner {
 
     private static final int INITIAL_TURN_SPEED = 100;
 
     private static final int INITIAL_CURRENT_SPEED = 150;
 
-    private static Logger LOG = Logger.getLogger(Dribble_M4.class);
+    private static Logger LOG = Logger.getLogger(Dribble.class);
 
 	private int currentSpeed = INITIAL_CURRENT_SPEED;
 	private int turnSpeed = INITIAL_TURN_SPEED;
     private long lastDribbled = 0;
 	private double MAX_DRIBBLE_PAUSE = 700; // ms
 
-	public Dribble_M4() {
+	public Dribble() {
 		super();
 	}
 	
     @FactoryMethod(designator = "Dribble", parameterNames = {})
-	public static Dribble_M4 factoryMethod()
+	public static Dribble factoryMethod()
 	{
-		return new Dribble_M4();
+		return new Dribble();
 	}
 
     public boolean isDribbling() {

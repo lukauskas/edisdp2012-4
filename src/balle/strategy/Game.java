@@ -43,7 +43,7 @@ public class Game extends AbstractPlanner {
 	protected final Strategy pickBallFromWallStrategy;
     protected final BackingOffStrategy backingOffStrategy;
 	protected final RotateToOrientationExecutor turningExecutor;
-    protected final Dribble_M4 kickingStrategy;
+    protected final Dribble kickingStrategy;
     protected final InitialStrategy initialStrategy;
 	protected final Strategy goToBallPFN;
 	protected final Strategy goToBallBezier;
@@ -81,7 +81,7 @@ public class Game extends AbstractPlanner {
         pickBallFromWallStrategy = new KickFromWall(new GoToObjectPFN(0));
 		backingOffStrategy = new BackingOffStrategy();
         turningExecutor = new IncFaceAngle();
-        kickingStrategy = new Dribble_M4();
+        kickingStrategy = new Dribble();
         initialStrategy = new InitialStrategy();
 		goToBallPFN = new GoToBallSafeProportional();
 		goToBallBezier = new SimpleGoToBallFaceGoal(new BezierNav(
