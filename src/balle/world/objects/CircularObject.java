@@ -25,6 +25,11 @@ public class CircularObject extends MovingPoint implements FieldObject {
 
     @Override
     public boolean isNearWall(Pitch p) {
+        return isNearWall(p, Globals.DISTANCE_TO_WALL);
+
+    }
+
+    public boolean isNearWall(Pitch p, double distance) {
         /*
          * Defines imaginary rectangle inside the pitch with size dependent on
          * the DISTANCE_TO_WALL constant. If the robot is within this rectangle
@@ -32,10 +37,10 @@ public class CircularObject extends MovingPoint implements FieldObject {
          */
 
         double minX, maxX, minY, maxY;
-        minX = p.getMinX() + Globals.DISTANCE_TO_WALL;
-        maxX = p.getMaxX() - Globals.DISTANCE_TO_WALL;
-        minY = p.getMinY() + Globals.DISTANCE_TO_WALL;
-        maxY = p.getMaxY() - Globals.DISTANCE_TO_WALL;
+        minX = p.getMinX() + distance;
+        maxX = p.getMaxX() - distance;
+        minY = p.getMinY() + distance;
+        maxY = p.getMaxY() - distance;
 
         if (getPosition().getX() < minX)
             return true;

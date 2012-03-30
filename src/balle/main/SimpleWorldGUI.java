@@ -224,11 +224,19 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 			g.fillOval((int) (scaler.m2PX(pos.getX()) - (w / 2)),
 					(int) (scaler.m2PY(pos.getY()) - (w / 2)), (int) w, (int) w);
 			
+
             Label ballSpeedLabel = new Label(String.format("%.5fE-3", ball
                     .getVelocity().abs() * 1000), new Coord(ball.getPosition()
                     .getX(), ball
                     .getPosition().getY() - ball.getRadius() * 3), Color.RED);
             ballSpeedLabel.draw(g, scaler);
+
+            if (ball.isNearWall(snapshot.getPitch())) {
+                Label nearWallLabel = new Label("NW", new Coord(ball
+                        .getPosition().getX(), ball.getPosition().getY()
+                        + ball.getRadius() * 3), Color.MAGENTA);
+                nearWallLabel.draw(g, scaler);
+            }
 
 			// BallEstimator predictor = snapshot.getBallEstimator();
 			// Coord estimatedPos = predictor.estimatePosition(5); // 5 Frames =

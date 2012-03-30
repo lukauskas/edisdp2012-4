@@ -71,9 +71,16 @@ public class Game extends AbstractPlanner {
         this.currentStrategy = currentStrategy;
     }
 
-    @FactoryMethod(designator = "Game", parameterNames = { "init" })
-    public static Game gameFactoryTesting2(boolean init) {
-        return new Game(init);
+    @FactoryMethod(designator = "Game", parameterNames = { "init",
+            "no bounce shots" })
+    public static Game gameFactoryTesting2(boolean init, boolean notTriggerHappy) {
+        Game g = new Game(init);
+        g.setTriggerHappy(!notTriggerHappy);
+        return g;
+    }
+
+    public void setTriggerHappy(boolean triggerHappy) {
+        kickingStrategy.setTriggerHappy(triggerHappy);
     }
 
     public Game() {
@@ -204,7 +211,8 @@ public class Game extends AbstractPlanner {
         addDrawable(new DrawableLine(newsnap.getBalle().getFrontSide(),
                 Color.red));
 
-        if ((kickingStrategy.isDribbling() && ball.getPosition().isEstimated())
+        if ((kickingStrategy.isDribbling() && ball.getPosition().isEstimated() && ball
+                .getPosition().dist(ourRobot.getPosition()) < Globals.ROBOT_LENGTH * 2)
                 || (dribbleBox.containsCoord(ball.getPosition()) && !ourRobot
                         .isFacingGoalHalf(ownGoal))) {
             addDrawable(new Label("DRIBBLING", ball.getPosition().sub(
