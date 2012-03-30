@@ -27,6 +27,7 @@ import balle.strategy.StrategyRunner;
 import balle.world.AbstractWorld;
 import balle.world.BasicWorld;
 import balle.world.SimulatedWorld;
+import balle.world.filter.BallNearWallFilter;
 import balle.world.filter.HeightFilter;
 import balle.world.filter.TimeFilter;
 
@@ -206,6 +207,8 @@ public class Runner {
 			world.addFilter(new HeightFilter(world.getPitch().getPosition(),
 					Globals.P1_CAMERA_HEIGHT));
 		}
+
+        world.addFilter(new BallNearWallFilter());
 		// world.addFilter(new SmoothingFilter());
 
 		// Moving this forward so we do not start a GUI until controller is
@@ -242,7 +245,10 @@ public class Runner {
 				Globals.PITCH_HEIGHT);
 		simulator.addListener(worldA);
 
+
 		// worldA.addFilter(new SmoothingFilter());
+
+        worldA.addFilter(new BallNearWallFilter());
 
 		SoftBot botA, botB;
 		if (!balleIsBlue) {

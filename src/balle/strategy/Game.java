@@ -204,7 +204,8 @@ public class Game extends AbstractPlanner {
         addDrawable(new DrawableLine(newsnap.getBalle().getFrontSide(),
                 Color.red));
 
-        if ((kickingStrategy.isDribbling() && ball.getPosition().isEstimated())
+        if ((kickingStrategy.isDribbling() && ball.getPosition().isEstimated() && ball
+                .getPosition().dist(ourRobot.getPosition()) < Globals.ROBOT_LENGTH * 2)
                 || (dribbleBox.containsCoord(ball.getPosition()) && !ourRobot
                         .isFacingGoalHalf(ownGoal))) {
             addDrawable(new Label("DRIBBLING", ball.getPosition().sub(
