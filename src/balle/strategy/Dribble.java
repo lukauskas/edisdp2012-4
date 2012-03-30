@@ -22,10 +22,25 @@ public class Dribble extends AbstractPlanner {
 	private double MAX_DRIBBLE_PAUSE = 700; // ms
     private double MAX_DRIBBLE_LENGTH = 500; // ms
 
-	public Dribble() {
-		super();
+    private boolean triggerHappy;
+
+    public boolean isTriggerHappy() {
+        return triggerHappy;
+    }
+
+    public void setTriggerHappy(boolean triggerHappy) {
+        this.triggerHappy = triggerHappy;
+    }
+
+    public Dribble() {
+        this(false);
 	}
 	
+    public Dribble(boolean triggerHappy) {
+        super();
+        setTriggerHappy(triggerHappy);
+    }
+
     @FactoryMethod(designator = "Dribble", parameterNames = {})
 	public static Dribble factoryMethod()
 	{
@@ -118,7 +133,7 @@ public class Dribble extends AbstractPlanner {
 			}
 		}
 
-        if (facingGoal || (nearWall && !facingOwnGoalSide)) {
+        if (facingGoal || (isTriggerHappy() && nearWall && !facingOwnGoalSide)) {
             controller.kick();
         }
 

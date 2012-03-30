@@ -71,9 +71,16 @@ public class Game extends AbstractPlanner {
         this.currentStrategy = currentStrategy;
     }
 
-    @FactoryMethod(designator = "Game", parameterNames = { "init" })
-    public static Game gameFactoryTesting2(boolean init) {
-        return new Game(init);
+    @FactoryMethod(designator = "Game", parameterNames = { "init",
+            "no bounce shots" })
+    public static Game gameFactoryTesting2(boolean init, boolean notTriggerHappy) {
+        Game g = new Game(init);
+        g.setTriggerHappy(!notTriggerHappy);
+        return g;
+    }
+
+    public void setTriggerHappy(boolean triggerHappy) {
+        kickingStrategy.setTriggerHappy(triggerHappy);
     }
 
     public Game() {
