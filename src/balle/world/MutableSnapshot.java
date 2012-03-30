@@ -20,6 +20,8 @@ public class MutableSnapshot {
 
 	private Pitch pitch;
 
+	private final BallEstimator ballEstimator;
+
     private ArrayList<ControllerHistoryElement> controllerHistory;
 
     private long                                timestamp;
@@ -32,9 +34,9 @@ public class MutableSnapshot {
         return (ArrayList<ControllerHistoryElement>) controllerHistory.clone();
     }
 
-    public MutableSnapshot(Robot opponent, Robot balle,
-			Ball ball, Goal opponentsGoal, Goal ownGoal, Pitch pitch,
- long timestamp,
+	public MutableSnapshot(Robot opponent, Robot balle, Ball ball,
+			Goal opponentsGoal, Goal ownGoal, Pitch pitch,
+			BallEstimator ballEstimator, long timestamp,
             ArrayList<ControllerHistoryElement> controllerHistory) {
 
 		super();
@@ -46,6 +48,7 @@ public class MutableSnapshot {
 		this.opponentsGoal = opponentsGoal;
 		this.ownGoal = ownGoal;
 		this.pitch = pitch;
+		this.ballEstimator = ballEstimator;
 	}
 
 
@@ -106,13 +109,15 @@ public class MutableSnapshot {
 	}
 
 	public MutableSnapshot duplicate() {
-        return new MutableSnapshot(getOpponent(), getBalle(), getBall(), getOpponentsGoal(),
-                getOwnGoal(), getPitch(), getTimestamp(), getControllerHistory());
+		return new MutableSnapshot(getOpponent(), getBalle(), getBall(),
+				getOpponentsGoal(), getOwnGoal(), getPitch(), ballEstimator,
+				getTimestamp(), getControllerHistory());
 	}
 
 	public Snapshot pack() {
-        return new Snapshot(getOpponent(), getBalle(), getBall(), getOpponentsGoal(), getOwnGoal(),
-                getPitch(), getTimestamp(), getControllerHistory());
+		return new Snapshot(getOpponent(), getBalle(), getBall(),
+				getOpponentsGoal(), getOwnGoal(), getPitch(), ballEstimator,
+				getTimestamp(), getControllerHistory());
 	}
 
 	@Override

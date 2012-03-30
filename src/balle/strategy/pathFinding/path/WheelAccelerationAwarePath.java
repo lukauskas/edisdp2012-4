@@ -5,7 +5,7 @@ import balle.strategy.curve.Curve;
 public class WheelAccelerationAwarePath extends AbstractPath {
 
 	private static final double EXAGGERATION = 4;
-	private static final double MOISTURIZER = 0;
+    private static final double MOISTURIZER = 0.3;
 
 	private Path accelIgnorantPath;
 

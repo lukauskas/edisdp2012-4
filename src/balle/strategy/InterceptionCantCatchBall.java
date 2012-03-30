@@ -11,10 +11,8 @@ import balle.main.drawable.Dot;
 import balle.misc.Globals;
 import balle.strategy.bezierNav.BezierNav;
 import balle.strategy.curve.CustomCHI;
-import balle.strategy.executor.movement.GoToObjectPFN;
 import balle.strategy.executor.movement.MovementExecutor;
 import balle.strategy.executor.movement.OrientedMovementExecutor;
-import balle.strategy.friendly1.GoToBall;
 import balle.strategy.pathFinding.SimplePathFinder;
 import balle.strategy.planner.AbstractPlanner;
 import balle.world.Coord;
@@ -59,7 +57,7 @@ public class InterceptionCantCatchBall extends AbstractPlanner {
         this.movementExecutor = movementExecutor;
         this.orientedMovementExecutor = orientedMovementExecutor;
         shouldPlayGame = false;
-        this.gameStrategy = new Game(new GoToBall(new GoToObjectPFN(0)), false);
+        this.gameStrategy = new Game(false);
     }
 
 

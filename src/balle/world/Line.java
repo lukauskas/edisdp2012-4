@@ -2,6 +2,8 @@ package balle.world;
 
 import java.awt.geom.Line2D;
 
+import balle.world.objects.RectangularObject;
+
 public class Line {
 
 	private final Coord a, b;
@@ -226,6 +228,18 @@ public class Line {
 
         return new Line(new Coord(newAX, newAY), new Coord(newX, newY));
     }
+
+	/**
+	 * Returns a rectangular object with this line running down the centre
+	 * 
+	 * @param width
+	 *            the width of the rectangle
+	 * @return the rectangle
+	 */
+	public RectangularObject widen(double width) {
+        return new RectangularObject(midpoint(), new Velocity(0, 0, 0),
+                new AngularVelocity(0, 0), angle(), width, length());
+	}
 
 	/**
 	 * Get a new line with direction opposite to this one

@@ -60,29 +60,6 @@ public class PFPlanning {
         this.ball = ballObj;
 
     }
-
-    // public VelocityVec update(Pos robot, Pos opponent, Point goal, Point
-    // ball,
-    // boolean orig) {
-    // init(robot, opponent, ball, orig);
-    // Vector vgoal = new Vector(goal);
-    // Vector vball = new Vector(ball);
-    // Vector vres = vgoal.subtract(vball);
-    // Vector threshold = new Vector(20, 20);
-    // Vector finalres = vres.subtract(threshold);
-    // PointObject obj = new PointObject(finalres, 10000, this.opponentInf);
-    // List<Object> complList = new ArrayList<Object>(objects);
-    // complList.add(this.opponent);
-    // complList.add(obj);
-    // Vector res = GoTo(complList, this.ball, robot.getLocation());
-    //
-    // if (orig)
-    // return new VelocityVec(res.getX(), res.getY());
-    // else
-    // return getVelocity(res, robot);
-    //
-    // }
-
     /**
      * Given Pos of different objects, this function will create PointObjects to
      * be used later.

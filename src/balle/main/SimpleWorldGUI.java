@@ -16,12 +16,14 @@ import org.apache.log4j.Logger;
 
 import balle.main.drawable.Drawable;
 import balle.main.drawable.DrawableLine;
+import balle.main.drawable.DrawableVector;
 import balle.main.drawable.Label;
 import balle.misc.Globals;
 import balle.world.AbstractWorld;
 import balle.world.Coord;
 import balle.world.Scaler;
 import balle.world.Snapshot;
+import balle.world.Velocity;
 import balle.world.objects.Ball;
 import balle.world.objects.Goal;
 import balle.world.objects.Robot;
@@ -186,8 +188,8 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 		private void drawFieldObjects(Graphics g) {
 			Snapshot s = getSnapshot();
 			if (s != null) {
-				drawRobot(g, Color.GREEN, s.getBalle());
-				drawRobot(g, Color.RED, s.getOpponent());
+                drawRobot(g, Color.GREEN, s.getBalle(), s.getOpponentsGoal());
+                drawRobot(g, Color.RED, s.getOpponent(), s.getOwnGoal());
 				drawBall(g, Color.RED, s);
 				drawGoals(g);
 			}
@@ -228,7 +230,17 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
                     .getPosition().getY() - ball.getRadius() * 3), Color.RED);
             ballSpeedLabel.draw(g, scaler);
 
+			// BallEstimator predictor = snapshot.getBallEstimator();
+			// Coord estimatedPos = predictor.estimatePosition(5); // 5 Frames =
+			// // ~250ms
+			// new Circle(estimatedPos.x, estimatedPos.y, 0.05,
+			// Color.BLUE).draw(
+			// g, scaler);
 
+			Velocity vel = ball.getVelocity().mult(1000);
+			DrawableVector vec = new DrawableVector(ball.getPosition(), vel,
+					Color.CYAN);
+			vec.draw(g, scaler);
 
             // Velocity vel = ball.getVelocity();
             // DrawableVector velocityVec = new
@@ -276,7 +288,7 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
             // }
 		}
 
-		private void drawRobot(Graphics g, Color c, Robot robot) {
+        private void drawRobot(Graphics g, Color c, Robot robot, Goal targetGoal) {
 
 			Snapshot s = getSnapshot();
 
@@ -348,7 +360,14 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 
 			g.fillPolygon(xs, ys, n);
 
-			DrawableLine orientationLine = new DrawableLine(
+            // Dim the line if we're not approaching from correct side
+            if ((s.getBall().getPosition() != null)
+                    && (!robot.isApproachingTargetFromCorrectSide(s.getBall(),
+                            targetGoal))) {
+                c = new Color(c.getRed(), c.getGreen(), c.getBlue(),
+                        c.getAlpha() / 2);
+            }
+            DrawableLine orientationLine = new DrawableLine(
 					robot.getFacingLine(), c);
 			orientationLine.draw(g, scaler);
 

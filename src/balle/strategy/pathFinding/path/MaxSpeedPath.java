@@ -49,7 +49,7 @@ public class MaxSpeedPath extends AbstractPath {
 		// throttle speed (slow when doing sharp turns or approaching)
 		double max = MAX_VELOCITY;
 		double distToTarget = c.pos(t).dist(c.pos(1));
-		System.out.println("dist to target: " + distToTarget);
+        // System.out.println("dist to target: " + distToTarget);
 		if (distToTarget < APPROACH_DISTANCE) {
 			double closeness = 1 - (distToTarget / APPROACH_DISTANCE);
 			max = (closeness * (max * APPROACH_SPEEDRATIO))

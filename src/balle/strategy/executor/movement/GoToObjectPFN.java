@@ -26,7 +26,16 @@ public class GoToObjectPFN implements MovementExecutor {
 
     // cm
     private static final double ROBOT_TRACK_WIDTH = Globals.ROBOT_TRACK_WIDTH * 100;
-    private static final double WHEEL_RADIUS      = Globals.ROBOT_WHEEL_DIAMETER * 100 / 2.0;
+    private static final double WHEEL_RADIUS = Globals.ROBOT_WHEEL_DIAMETER * 100 / 2.0;
+
+    private double OPPONENT_POWER;
+    private static final double DEFAULT_OPPONENT_POWER = 0;
+    private double OPPONENT_INFLUENCE_DISTANCE;
+    private static final double DEFAULT_OPPONENT_INFLUENCE_DISTANCE = 0;
+    private double TARGET_POWER;
+    private static final double DEFAULT_TARGET_POWER = 10;
+    private double ALPHA;
+    private static final double DEFAULT_ALPHA = 0;
 
     private double stopDistance; // meters
     private boolean slowDownCloseToTarget;
@@ -55,24 +64,28 @@ public class GoToObjectPFN implements MovementExecutor {
     PFPlanning                plann;
 
     public GoToObjectPFN(double stopDistance, boolean slowDownCloseToTarget) {
-        this(stopDistance);
+        this(stopDistance, slowDownCloseToTarget, DEFAULT_OPPONENT_POWER,
+                DEFAULT_OPPONENT_INFLUENCE_DISTANCE, DEFAULT_TARGET_POWER,
+                DEFAULT_ALPHA);
+    }
+
+    public GoToObjectPFN(double stopDistance, boolean slowDownCloseToTarget,
+            double opponentPower, double opponentInfluenceDistance,
+            double targetPower, double alpha) {
+        this.stopDistance = 0;
         setSlowDownCloseToTarget(slowDownCloseToTarget);
 
-    }
-    /**
-     * Instantiates a new go to object executor that uses Potential Fields
-     * Navigation
-     * 
-     * @param stopDistance
-     *            distance to stop from (in meters)
-     */
-    public GoToObjectPFN(double stopDistance) {
-        this.stopDistance = stopDistance;
-        setSlowDownCloseToTarget(true);
+        OPPONENT_POWER = opponentPower;
+        OPPONENT_INFLUENCE_DISTANCE = opponentInfluenceDistance;
+        TARGET_POWER = targetPower;
+        ALPHA = alpha;
+
+        setSlowDownCloseToTarget(slowDownCloseToTarget);
         RobotConf conf = new RobotConf(ROBOT_TRACK_WIDTH, WHEEL_RADIUS);
         // plann = new PFPlanning(conf, 0, 1, 12, 0.5); // No opponent avoidance
         // Avoids opponent:
-        plann = new PFPlanning(conf, 0, 0.6, 20, 15);
+        plann = new PFPlanning(conf, OPPONENT_POWER,
+                OPPONENT_INFLUENCE_DISTANCE, TARGET_POWER, ALPHA);
 
         // Add walls
         double wallPower = 0.05;
@@ -93,6 +106,17 @@ public class GoToObjectPFN implements MovementExecutor {
         plann.addObject(rightWall);
         plann.addObject(topWall);
         plann.addObject(bottomWall);
+    }
+
+    /**
+     * Instantiates a new go to object executor that uses Potential Fields
+     * Navigation
+     * 
+     * @param stopDistance
+     *            distance to stop from (in meters)
+     */
+    public GoToObjectPFN(double stopDistance) {
+		this(stopDistance, true);
     }
 
     @Override
