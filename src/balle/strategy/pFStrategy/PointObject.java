@@ -102,10 +102,9 @@ public class PointObject extends Vector implements PFObject {
 
             Vector out_point = new Vector(point.getLocation());
             Vector res = out_point.subtract(this);
-            LOG.trace(res);
+
             Vector final_res = res.mult(power * -1);
-            LOG.trace(power + " " + final_res);
-            LOG.trace("Attraction power " + final_res.norm());
+
 
             return final_res;
         }
