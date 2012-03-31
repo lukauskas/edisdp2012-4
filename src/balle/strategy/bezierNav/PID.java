@@ -1,5 +1,7 @@
 package balle.strategy.bezierNav;
 
+import java.util.LinkedList;
+
 
 /**
  * P. I. D. controller, smoothes controls to reduce severity of overshoots.
@@ -17,17 +19,12 @@ public class PID {
 	/**
 	 * P - Proportional, I - Integral, D - Derivative,
 	 */
-	protected double p, i, d;
+	protected double kp, ki, kd;
 
 	/**
 	 * History of the PID, for modifying values.
 	 */
-	protected double[] history;
-	{
-		history = new double[HISTORY];
-		for (int i = 0; i < history.length; i++)
-			history[i] = Double.NaN;
-	}
+	protected LinkedList<Tuple> history;
 
 	/**
 	 * Current number of examples.
@@ -44,40 +41,78 @@ public class PID {
 	 * @param d
 	 *            Derivative weighting,
 	 */
-	public PID(int history, double p, double i, double d) {
+	public PID(int history, double kp, double ki, double kd) {
 		this.HISTORY = history;
-		this.p = p;
-		this.i = i;
-		this.d = d;
+		this.kp = kp;
+		this.ki = ki;
+		this.kd = kd;
+
+		this.history = new LinkedList<Tuple>();
+		for (int i = 0; i < HISTORY; i++) {
+			this.history.add(new Tuple(Double.NaN, Double.NaN));
+		}
 	}
 
-	/**
-	 * Append x, and return value replaced.
-	 * 
-	 * @param x
-	 * @return
-	 */
-	protected double append(double x) {
-		double out = history[(int) (historyLength % HISTORY)];
-		history[(int) (historyLength++ % HISTORY)] = x;
-		return out;
+	class Tuple {
+		private double a, b;
+
+		Tuple(double a, double y) {
+			this.a = a;
+			this.b = y;
+		}
+
+		public double a() {
+			return a;
+		}
+
+		public double b() {
+			return b;
+		}
+
+		public boolean isNaN() {
+			return Double.isNaN(a) || Double.isNaN(b);
+		}
 	}
 
-	protected double sum() {
-		double sum = 0;
-		for (int i = HISTORY; i < 0; i++)
-			sum += history[(int) ((1 + i + historyLength) % HISTORY)]
-					/ (HISTORY + i);
-		return sum;
+	public double convert(double SP, double PV) {
+		double p, i, d;
+
+		// Calculate Potential
+		p = SP - PV;
+		
+		// Calculate Integral
+		i = 0;
+		for (Tuple each : history) {
+			double x = each.a() - each.b();
+			if (!Double.isNaN(x))
+				i += x;
+		}
+		
+		// Calculate Differential
+		d = SP - history.getLast().b();
+		System.out.println(d);
+
+
+		double output = PV;
+		if (kp != 0)
+			output += kp * p;
+		if (ki != 0)
+			output += ki * i;
+		if (kd != 0 && !Double.isNaN(kd))
+			output += kd * d;
+
+		history.add(new Tuple(SP, PV));
+		history.pollFirst();
+
+		// String x = "";
+		// for (Tuple t : history)
+		// if (t.isNaN()) {
+		// x += "X";
+		// } else {
+		// x += "?";
+		// }
+
+		return output;
 	}
 
-	public double convert(double desX, double currX) {
-		double kp, ki = sum(), kd;
-		double x = currX - desX, xd = append(x);
-
-		kp = desX - currX;
-		kd = ((double) (x-xd))/HISTORY;
-
-		return currX + (kp * p) + (ki * i) + (kd * d);
-	}
 }

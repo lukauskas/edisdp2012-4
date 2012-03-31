@@ -1,6 +1,7 @@
 package balle.strategy.pathFinding.path;
 
 import balle.misc.Globals;
+import balle.strategy.bezierNav.PID;
 import balle.strategy.curve.Curve;
 import balle.world.objects.Robot;
 
@@ -40,6 +41,14 @@ public abstract class AbstractAccelAwarePath implements Path {
 		return curve;
 	}
 
+	public static int history = 10;
+	public static double p = 1, i = 1, d = 0;
+	private static PID lPid = new PID(history, p, i, d), rPid = new PID(
+			history, p, i,
+			d);
+
+	public static boolean usePid = false;
+
 	/**
 	 * Get the left and right powers to be sent to the motors
 	 * 
@@ -73,17 +82,30 @@ public abstract class AbstractAccelAwarePath implements Path {
 		// currentLeftV, currentRightV);
 		// !!!!!!!!!!!
 
-		// use acceleration not velocities
-		double[] accels = new double[] { (velsF[0] - currentLeftV) / dT,
+		double[] accels = new double[2];
+		if (usePid) {
+			accels[0] = lPid.convert(velsF[0], currentLeftV);
+			accels[1] = rPid.convert(velsF[1], currentRightV);
+		} else {
+
+			// use acceleration not velocities
+			accels = new double[] { (velsF[0] - currentLeftV) / dT,
 				(velsF[1] - currentRightV) / dT };
 
+		}
 		int[] newPs = accelsToPowers(accels[0], accels[1], currentLeftV,
 				currentRightV);
+
+		System.out.println(accels[0] + " " + velsF[0] + " " + currentLeftV);
+		System.out.println(accels[1] + " " + velsF[1] + " " + currentRightV);
 
 		System.out.println("-----left------_");
 		System.out.println(Globals.velocityToPower((float) velsF[0]));
 		System.out.println(newPs[0]);
 		System.out.println("---------------_");
+
+		newPs[0] = (int) Globals.velocityToPower((float) accels[0]);
+		newPs[1] = (int) Globals.velocityToPower((float) accels[1]);
 
 		return newPs;
 	}

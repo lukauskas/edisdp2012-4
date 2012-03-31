@@ -98,14 +98,30 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 	private boolean endInfront;
 
 	@FactoryMethod(designator = "BezierNav", parameterNames = { "s", "hl" })
-	public static SimpleGoToBallFaceGoal bezierNavFactory(double s,
-			double hl) {
+	public static SimpleGoToBallFaceGoal bezierNavFactory(double s, double hl) {
 		AbstractAccelAwarePath.SCALE_TERM_VELS = s;
 		AbstractAccelAwarePath.HALF_LIFE = hl;
+		AbstractAccelAwarePath.usePid = false;
+		return new SimpleGoToBallFaceGoal(new BezierNav(new SimplePathFinder(
+				new CustomCHI()), true));
+	}
+
+	@FactoryMethod(designator = "BezierNavPid", parameterNames = { "history",
+			"p", "i", "d" })
+	public static SimpleGoToBallFaceGoal bezierNavFactory(double hist,
+			double p, double i, double d) {
+		AbstractAccelAwarePath.HALF_LIFE = -1;
+		
+		AbstractAccelAwarePath.usePid = true;
+		AbstractAccelAwarePath.history = (int) hist;
+		AbstractAccelAwarePath.p = p;
+		AbstractAccelAwarePath.i = i;
+		AbstractAccelAwarePath.d = d;
 		return new SimpleGoToBallFaceGoal(new BezierNav(
 				new SimplePathFinder(
 				new CustomCHI()), true));
 	}
+
 
 	@FactoryMethod(designator = "BezierNav (Forwards and backwards)", parameterNames = {})
 	public static SimpleGoToBallFaceGoal bezierNavFactoryFAB() {

@@ -2,7 +2,9 @@ package balle.world;
 
 import org.jbox2d.common.Vec2;
 
-public class Velocity extends Coord {
+import balle.memory.utility.Saves;
+
+public class Velocity extends Coord implements Saves {
 
     protected final double timeDelta;
 
@@ -91,5 +93,18 @@ public class Velocity extends Coord {
 
         return new Velocity(x, y, getTimeDelta(), getEstimatedFrames());
     }
+
+	// Save/Load
+
+	public static Velocity load(String line) {
+		String[] tokens = line.split(" ");
+		return new Velocity(Double.parseDouble(tokens[0]),
+				Double.parseDouble(tokens[1]), Double.parseDouble(tokens[3]));
+	}
+
+	@Override
+	public String save() {
+		return x + " " + y + " " + timeDelta;
+	}
 
 }
