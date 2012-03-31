@@ -84,16 +84,7 @@ public class BasicWorld extends AbstractWorld {
 		Robot them = null;
 		Ball ball = null;
 
-		Snapshot prev = getSnapshotRaw();
-		Snapshot prevVel = prev;
-
-		// Check if the new positions make sense. For instance, discard
-		// the ones that are unreasonably far away from the previous one
-		// ourPosition =
-		// positionIsCloseToExpected(prev.getBalle().getPosition(),
-		// ourPosition) ? ourPosition : null;
-		// theirsPosition = positionIsCloseToExpected(prev.getOpponent()
-		// .getPosition(), theirsPosition) ? theirsPosition : null;
+		Snapshot prev = getSnapshot();
 
 		// change in time
 		long deltaT = timestamp - prev.getTimestamp(); // Hopefully that does
@@ -101,7 +92,6 @@ public class BasicWorld extends AbstractWorld {
 														// with EmptySnapshot
 														// and
 														// currentTimeMilis()
-		long deltaTVel = timestamp - prevVel.getTimestamp();
 
 		// Special case when we get two inputs with the same timestamp:
 		if (deltaT == 0) {
@@ -125,24 +115,24 @@ public class BasicWorld extends AbstractWorld {
 
 		AngularVelocity oursAngVel = null, themAngVel = null;
 		if (ourOrientation == null) {
-			ourOrientation = prevVel.getBalle().getOrientation();
-		} else if (prevVel.getBalle().getOrientation() != null) {
+			ourOrientation = prev.getBalle().getOrientation();
+		} else if (prev.getBalle().getOrientation() != null) {
 			oursAngVel = new AngularVelocity(
-					ourOrientation.angleToatan2Radians(prevVel.getBalle()
-							.getOrientation()), deltaTVel);
+					ourOrientation.angleToatan2Radians(prev.getBalle()
+							.getOrientation()), deltaT);
 		}
 
 		if (theirsOrientation == null) {
-			theirsOrientation = prevVel.getOpponent().getOrientation();
-		} else if (prevVel.getOpponent().getOrientation() != null) {
+			theirsOrientation = prev.getOpponent().getOrientation();
+		} else if (prev.getOpponent().getOrientation() != null) {
 			themAngVel = new AngularVelocity(
-					theirsOrientation.angleToatan2Radians(prevVel.getOpponent()
-							.getOrientation()), deltaTVel);
+					theirsOrientation.angleToatan2Radians(prev.getOpponent()
+							.getOrientation()), deltaT);
 		}
 
 		themAngVel = (them != null) ? new AngularVelocity(
-				theirsOrientation.angleToatan2Radians(prevVel.getOpponent()
-						.getOrientation()), deltaTVel) : null;
+				theirsOrientation.angleToatan2Radians(prev.getOpponent()
+						.getOrientation()), deltaT) : null;
 
 		// put it all together (almost)
 		them = new Robot(theirsPosition, themVel, themAngVel, theirsOrientation);
@@ -150,6 +140,7 @@ public class BasicWorld extends AbstractWorld {
 		ball = new Ball(ballPosition, ballVel);
 
 
+		// Pack into a snapshot
 		Snapshot nextSnapshot = new Snapshot(this, them, ours, ball, timestamp);
 		prevRaw = nextSnapshot;
 
