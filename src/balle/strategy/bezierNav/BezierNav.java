@@ -97,10 +97,11 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 																	// end
 	private boolean endInfront;
 
-    @FactoryMethod(designator = "BezierNav", parameterNames = {"a", "s"})
-	public static SimpleGoToBallFaceGoal bezierNavFactory(double a, double s) {
-		AbstractAccelAwarePath.A = a;
+	@FactoryMethod(designator = "BezierNav", parameterNames = { "s", "hl" })
+	public static SimpleGoToBallFaceGoal bezierNavFactory(double s,
+			double hl) {
 		AbstractAccelAwarePath.SCALE_TERM_VELS = s;
+		AbstractAccelAwarePath.HALF_LIFE = hl;
 		return new SimpleGoToBallFaceGoal(new BezierNav(
 				new SimplePathFinder(
 				new CustomCHI()), true));

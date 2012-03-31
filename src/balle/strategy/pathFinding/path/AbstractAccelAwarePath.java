@@ -28,6 +28,7 @@ public abstract class AbstractAccelAwarePath implements Path {
 										// accelerate
 									// faster
 	public static double SCALE_TERM_VELS = 1.2;
+	public static double HALF_LIFE = 50;
 
 	private Curve curve;
 
@@ -133,13 +134,11 @@ public abstract class AbstractAccelAwarePath implements Path {
 		}
 
 		// use simplified version.... use a half life to terminal vel
-		double halfLife = 50;
-
 		int bestP = 0;
 		double bestAC = Double.MAX_VALUE;
 		for (int p = -900; p <= 900; p++) {
 			double vf = (powToTermVel(p) + vi);
-			double currAC = Math.abs(((vf - vi) / halfLife) - a);
+			double currAC = Math.abs(((vf - vi) / HALF_LIFE) - a);
 			if (currAC < bestAC) {
 				bestP = p;
 				bestAC = currAC;
