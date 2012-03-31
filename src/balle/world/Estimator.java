@@ -3,9 +3,9 @@ package balle.world;
 import org.apache.log4j.Logger;
 
 
-public class BallEstimator {
+public class Estimator {
 
-	private static final Logger LOG = Logger.getLogger(BallEstimator.class);
+	private static final Logger LOG = Logger.getLogger(Estimator.class);
 
 	private final DESP velocityPredictor;
 	private final DESP positionPredictor;
@@ -14,11 +14,19 @@ public class BallEstimator {
 
 	private int estimatedFrames = 0;
 
-	public BallEstimator() {
-		velocityPredictor = new DESP(0.7);
-		positionPredictor = new DESP(0.4);
-		
+	public Estimator(double posAlpha, double velAlpha) {
+		velocityPredictor = new DESP(velAlpha);
+		positionPredictor = new DESP(posAlpha);
+
 		velocity = new Velocity(0, 0, 1000);
+	}
+
+	public static Estimator getBallEstimator() {
+		return new Estimator(0.7, 0.4);
+	}
+
+	public static Estimator getRobotEstimator() {
+		return new Estimator(0.4, 0.5);
 	}
 	
 	/**
@@ -66,5 +74,10 @@ public class BallEstimator {
 
 		velocity = new Velocity(velocityPredictor.predict((int) (1000 / dt))
 				.sub(pos), 1000);
+	}
+
+	public void reset() {
+		velocityPredictor.reset();
+		positionPredictor.reset();
 	}
 }
