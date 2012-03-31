@@ -34,4 +34,9 @@ public class DESP {
 		double b = 1 + alpha * time / (1 - alpha);
 		return s1.mult(a).sub(s2.mult(b));
 	}
+
+	public void reset() {
+		s1 = new Coord(0, 0);
+		s2 = new Coord(0, 0);
+	}
 }

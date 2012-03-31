@@ -1,5 +1,7 @@
 package balle.world.objects;
 
+import java.awt.geom.Rectangle2D;
+
 import org.apache.log4j.Logger;
 
 import balle.misc.Globals;
@@ -50,19 +52,10 @@ public class RectangularObject extends MovingPoint implements FieldObject {
         if ((getPosition() == null) || (point == null))
             return false;
 
-        Coord dPoint = new Coord(point.getX() - getPosition().getX(),
-                point.getY() - getPosition().getY());
+        Rectangle2D rect = new Rectangle2D.Double(getPosition().getX() - width
+                / 2, getPosition().getY() - height / 2, width, height);
 
-        dPoint = dPoint.rotate(getOrientation());
-        if (dPoint.getX() < (-width / 2.0f))
-            return false;
-        if (dPoint.getX() > (width / 2.0f))
-            return false;
-        if (dPoint.getY() < (-height / 2.0f))
-            return false;
-        if (dPoint.getY() > (height / 2.0f))
-            return false;
-        return true;
+        return rect.contains(point.getX(), point.getY());
     }
 
     @Override

@@ -18,12 +18,29 @@ public class Dribble extends AbstractPlanner {
 	private int currentSpeed = INITIAL_CURRENT_SPEED;
 	private int turnSpeed = INITIAL_TURN_SPEED;
     private long lastDribbled = 0;
+    private long firstDribbled = 0;
 	private double MAX_DRIBBLE_PAUSE = 700; // ms
+    private double MAX_DRIBBLE_LENGTH = 500; // ms
 
-	public Dribble() {
-		super();
+    private boolean triggerHappy;
+
+    public boolean isTriggerHappy() {
+        return triggerHappy;
+    }
+
+    public void setTriggerHappy(boolean triggerHappy) {
+        this.triggerHappy = triggerHappy;
+    }
+
+    public Dribble() {
+        this(false);
 	}
 	
+    public Dribble(boolean triggerHappy) {
+        super();
+        setTriggerHappy(triggerHappy);
+    }
+
     @FactoryMethod(designator = "Dribble", parameterNames = {})
 	public static Dribble factoryMethod()
 	{
@@ -31,7 +48,10 @@ public class Dribble extends AbstractPlanner {
 	}
 
     public boolean isDribbling() {
-        return (System.currentTimeMillis() - lastDribbled) < MAX_DRIBBLE_PAUSE;
+        double deltaPause = (System.currentTimeMillis() - lastDribbled);
+        double deltaStart = (System.currentTimeMillis() - firstDribbled);
+        return deltaPause < MAX_DRIBBLE_PAUSE
+                && deltaStart < MAX_DRIBBLE_LENGTH;
     }
 	
 	@Override
@@ -43,12 +63,22 @@ public class Dribble extends AbstractPlanner {
         if (!isDribbling()) {
             currentSpeed = INITIAL_CURRENT_SPEED;
             turnSpeed = INITIAL_TURN_SPEED;
+            firstDribbled = currentTime;
         }
 
         lastDribbled = currentTime;
 
         boolean facingGoal = snapshot.getBalle().getFacingLine()
 				.intersects(snapshot.getOpponentsGoal().getGoalLine());
+
+        if (snapshot.getBall().getPosition() != null)
+            facingGoal = facingGoal
+                    || snapshot
+                            .getBalle()
+                            .getBallKickLine(snapshot.getBall())
+                            .intersects(
+                                    snapshot.getOpponentsGoal().getGoalLine());
+
 
 		if (currentSpeed <= 560) {
 			currentSpeed += 20;
@@ -58,22 +88,30 @@ public class Dribble extends AbstractPlanner {
 			turnSpeed += 5;
 		}
 
+        int turnSpeedToUse = turnSpeed;
+
 		boolean isLeftGoal = snapshot.getOpponentsGoal().isLeftGoal();
 
 		double angle = snapshot.getBalle().getOrientation().radians();
 
 		double threshold = Math.toRadians(5);
+		
+		boolean facingOwnGoalSide = snapshot.getBalle().isFacingGoalHalf(snapshot.getOwnGoal());
+        boolean nearWall = snapshot.getBall().isNearWall(snapshot.getPitch());
+
+        // Turn twice as fast near walls
+        if (nearWall)
+            turnSpeedToUse *= 2;
 
 		if (isLeftGoal) {
 			if (facingGoal) {
                 controller.setWheelSpeeds(Globals.MAXIMUM_MOTOR_SPEED,
                         Globals.MAXIMUM_MOTOR_SPEED);
-                controller.kick();
-			} else if ((!facingGoal) && (angle < Math.PI - threshold)) {
+            } else if ((!facingGoal) && (angle < Math.PI - threshold)) {
 				controller.setWheelSpeeds(currentSpeed, currentSpeed
-						+ turnSpeed);
+                        + turnSpeedToUse);
 			} else if ((!facingGoal) && (angle > Math.PI + threshold)) {
-				controller.setWheelSpeeds(currentSpeed + turnSpeed,
+                controller.setWheelSpeeds(currentSpeed + turnSpeedToUse,
 						currentSpeed);
 			} else {
                 controller.setWheelSpeeds(currentSpeed, currentSpeed);
@@ -82,19 +120,22 @@ public class Dribble extends AbstractPlanner {
 			if (facingGoal) {
                 controller.setWheelSpeeds(Globals.MAXIMUM_MOTOR_SPEED,
                         Globals.MAXIMUM_MOTOR_SPEED);
-                controller.kick();
-			} else if ((!facingGoal) && (angle > threshold)
+            } else if ((!facingGoal) && (angle > threshold)
 					&& (angle < Math.PI)) {
-				controller.setWheelSpeeds(currentSpeed + turnSpeed,
+                controller.setWheelSpeeds(currentSpeed + turnSpeedToUse,
 						currentSpeed);
 			} else if ((!facingGoal) && (angle < (2 * Math.PI) - threshold)
 					&& (angle > Math.PI)) {
 				controller.setWheelSpeeds(currentSpeed, currentSpeed
-						+ turnSpeed);
+                        + turnSpeedToUse);
 			} else {
                 controller.setWheelSpeeds(currentSpeed, currentSpeed);
 			}
 		}
+
+        if (facingGoal || (isTriggerHappy() && nearWall && !facingOwnGoalSide)) {
+            controller.kick();
+        }
 
 	}
 

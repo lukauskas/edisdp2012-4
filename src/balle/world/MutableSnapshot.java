@@ -1,6 +1,7 @@
 package balle.world;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import balle.strategy.bezierNav.ControllerHistoryElement;
 import balle.world.objects.Ball;
@@ -10,70 +11,52 @@ import balle.world.objects.Robot;
 
 public class MutableSnapshot {
 
-
+	private BasicWorld world;
+	
     private Robot             opponent;
 	private Robot bot;
 	private Ball ball;
 
-	private Goal opponentsGoal;
-	private Goal ownGoal;
-
-	private Pitch pitch;
-
-	private final BallEstimator ballEstimator;
-
-    private ArrayList<ControllerHistoryElement> controllerHistory;
+	private List<ControllerHistoryElement> controllerHistory;
 
     private long                                timestamp;
 
-    public void setControllerHistory(ArrayList<ControllerHistoryElement> controllerHistory) {
+	public void setControllerHistory(
+			List<ControllerHistoryElement> controllerHistory) {
         this.controllerHistory = controllerHistory;
     }
 
-    public ArrayList<ControllerHistoryElement> getControllerHistory() {
-        return (ArrayList<ControllerHistoryElement>) controllerHistory.clone();
+	public List<ControllerHistoryElement> getControllerHistory() {
+		return new ArrayList<ControllerHistoryElement>(controllerHistory);
     }
 
-	public MutableSnapshot(Robot opponent, Robot balle, Ball ball,
-			Goal opponentsGoal, Goal ownGoal, Pitch pitch,
-			BallEstimator ballEstimator, long timestamp,
-            ArrayList<ControllerHistoryElement> controllerHistory) {
-
-		super();
+	public MutableSnapshot(BasicWorld world, Robot opponent, Robot balle,
+			Ball ball, long timestamp,
+			List<ControllerHistoryElement> controllerHistory) {
+		
+		this.world = world;
         this.controllerHistory = controllerHistory;
 		this.opponent = opponent;
 		this.bot = balle;
 		this.ball = ball;
 		this.timestamp = timestamp;
-		this.opponentsGoal = opponentsGoal;
-		this.ownGoal = ownGoal;
-		this.pitch = pitch;
-		this.ballEstimator = ballEstimator;
 	}
 
 
 	public Pitch getPitch() {
-		return pitch;
+		return world.getPitch();
 	}
 
-	public void setPitch(Pitch p) {
-		pitch = p;
+	public void setWorld(BasicWorld w) {
+		world = w;
 	}
 
 	public Goal getOpponentsGoal() {
-		return opponentsGoal;
-	}
-
-	public void setOpponentsGoal(Goal g) {
-		opponentsGoal = g;
+		return world.getOpponentsGoal();
 	}
 
 	public Goal getOwnGoal() {
-		return ownGoal;
-	}
-
-	public void setOwnGoal(Goal g) {
-		ownGoal = g;
+		return world.getOwnGoal();
 	}
 
 	public Robot getOpponent() {
@@ -109,14 +92,12 @@ public class MutableSnapshot {
 	}
 
 	public MutableSnapshot duplicate() {
-		return new MutableSnapshot(getOpponent(), getBalle(), getBall(),
-				getOpponentsGoal(), getOwnGoal(), getPitch(), ballEstimator,
+		return new MutableSnapshot(world, getOpponent(), getBalle(), getBall(),
 				getTimestamp(), getControllerHistory());
 	}
 
 	public Snapshot pack() {
-		return new Snapshot(getOpponent(), getBalle(), getBall(),
-				getOpponentsGoal(), getOwnGoal(), getPitch(), ballEstimator,
+		return new Snapshot(world, getOpponent(), getBalle(), getBall(),
 				getTimestamp(), getControllerHistory());
 	}
 
