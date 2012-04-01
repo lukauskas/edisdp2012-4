@@ -1,49 +1,72 @@
 package balle.strategy;
 
 import java.awt.Color;
+import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
+import balle.main.drawable.Circle;
 import balle.main.drawable.Dot;
 import balle.main.drawable.DrawableLine;
+import balle.main.drawable.DrawableVector;
+import balle.main.drawable.Label;
 import balle.misc.Globals;
-import balle.strategy.executor.movement.GoToObjectPFN;
 import balle.strategy.executor.movement.MovementExecutor;
+import balle.strategy.executor.movement.OrientedMovementExecutor;
 import balle.strategy.planner.AbstractPlanner;
 import balle.world.Coord;
 import balle.world.Line;
-import balle.world.Predictor;
+import balle.world.Orientation;
 import balle.world.Snapshot;
+import balle.world.Velocity;
 import balle.world.objects.Ball;
 import balle.world.objects.CircularBuffer;
 import balle.world.objects.Goal;
-import balle.world.objects.Pitch;
 import balle.world.objects.Point;
 import balle.world.objects.Robot;
 
 public class Interception extends AbstractPlanner {
-
-    private int     ballCount          = 0;
-    private int     countNeeded        = 6;              // require 6 readings
-                                                          // of ball position
-    private boolean predictionCoordSet = false;
+    private boolean ballHasMoved = false;
     private Coord   intercept          = new Coord(0, 0);
-    private double  lineLength         = 200;
-    protected CircularBuffer ballBuffer         = new CircularBuffer(6);
+    private boolean shouldPlayGame;
+    private static final double STRATEGY_STOP_DISTANCE = 0.3;
+    private static final double GO_DIRECTLY_TO_BALL_DISTANCE = STRATEGY_STOP_DISTANCE * 1.75;
+
+    protected final boolean useCpOnly;
+	protected final boolean mirror;
+    protected CircularBuffer<Coord> ballCoordBuffer;
 
     private static Logger LOG                = Logger.getLogger(Interception.class);
 
-    private MovementExecutor movementExecutor   = new GoToObjectPFN(Globals.ROBOT_LENGTH / 2);
+    private MovementExecutor movementExecutor;
+    private OrientedMovementExecutor orientedMovementExecutor;
+    private AbstractPlanner gameStrategy;
+
+    private boolean startGameAfterwards;
 
     protected void setIAmDoing(String message) {
         LOG.info(message);
     }
 
-    public Interception() {
+    public Interception(boolean useCpOnly, MovementExecutor movementExecutor,
+            OrientedMovementExecutor orientedMovementExecutor, boolean mirror,
+            boolean startGameAfterwards) {
         super();
-        // TODO Auto-generated constructor stub
+        ballCoordBuffer = new CircularBuffer<Coord>(6);
+        this.useCpOnly = useCpOnly;
+		this.mirror = mirror;
+        
+        this.movementExecutor = movementExecutor;
+        this.orientedMovementExecutor = orientedMovementExecutor;
+        shouldPlayGame = false;
+        this.gameStrategy = new Game(false);
+        this.startGameAfterwards = startGameAfterwards;
+
+        // new Game(new SimpleGoToBallFaceGoal(new BezierNav(
+        // new SimplePathFinder(new CustomCHI()))), false);
     }
+
 
     @Override
     public void onStep(Controller controller, Snapshot snapshot) {
@@ -54,126 +77,232 @@ public class Interception extends AbstractPlanner {
         if (ball.getPosition() == null)
             return;
 
-        Robot opponent = snapshot.getOpponent();
-        Robot robot = snapshot.getBalle();
-        ballBuffer.addCoord(ball.getPosition());
-
-
-
-        // run kicker to get ball moving - comment out when testing on pitch
-        // executor.kick();
+        ballCoordBuffer.add(ball.getPosition());
 
         if (ballIsMoving(ball) /* && !predictionCoordSet */) {
-            // read a certain number of values
-            ballCount += 1;
-            if (ballCount > countNeeded) {
-                lineLength = 4 * distanceOfMovingBall(ball);
-                intercept = getPredictionCoord(snapshot.getPitch(), ball, lineLength, ballBuffer);
-                predictionCoordSet = true;
-            }
-            // setIAmDoing("Getting ball positions");
-            /*
-             * } else if (robot.isInCoord(intercept)){ //reset to find new
-             * prediction point predictionCoordSet = false; ballCount = 0;
-             * executor.stop(); setIAmDoing("Predict point reached - stopping");
-             */
+			intercept = getPredictionCoordVelocityvector(snapshot, useCpOnly,
+					mirror);
+            ballHasMoved = true;
         }
-        if (predictionCoordSet) {
-            movementExecutor.updateTarget(new Point(intercept));
+
+        if (!shouldPlayGame) {
+            addDrawable(new Circle(snapshot.getBalle().getPosition(),
+                    STRATEGY_STOP_DISTANCE, Color.red));
+            addDrawable(new Circle(snapshot.getBalle().getPosition(),
+                    STRATEGY_STOP_DISTANCE * 1.75, Color.red));
+        }
+        if (snapshot.getBalle().getPosition()
+                .dist(snapshot.getBall().getPosition()) < STRATEGY_STOP_DISTANCE) {
+            if (startGameAfterwards)
+                shouldPlayGame = true;
+        }
+
+        if (shouldPlayGame) {
+            setIAmDoing("GAME!");
+            gameStrategy.step(controller, snapshot);
+            addDrawables(gameStrategy.getDrawables());
+        } else if (ballHasMoved) {
             setIAmDoing("Going to point - predict");
-            movementExecutor.step(controller, snapshot);
-            addDrawable(new Dot(intercept, Color.PINK));
+
+            Coord goToCoord = intercept;
+            if (snapshot.getBalle().getPosition()
+                    .dist(snapshot.getBall().getPosition()) < GO_DIRECTLY_TO_BALL_DISTANCE) {
+                goToCoord = snapshot.getBall().getPosition();
+            }
+            addDrawable(new Dot(goToCoord, Color.BLACK));
+            addDrawable(new Dot(intercept, new Color(0, 0, 0, 100)));
+            if (movementExecutor != null) {
+                movementExecutor.updateTarget(new Point(goToCoord));
+                addDrawables(movementExecutor.getDrawables());
+                movementExecutor.step(controller, snapshot);
+            } else if (orientedMovementExecutor != null) {
+                orientedMovementExecutor.updateTarget(new Point(goToCoord),
+                        snapshot.getOpponentsGoal().getGoalLine().midpoint()
+                                .sub(intercept).orientation());
+                addDrawables(orientedMovementExecutor.getDrawables());
+                orientedMovementExecutor.step(controller, snapshot);
+            }
+        } else {
+            setIAmDoing("Waiting");
+            controller.stop();
         }
-
-
     }
 
-    @FactoryMethod(designator = "InterceptsM4")
-    public static final Interception factory() {
-        return new Interception();
-    }
+    // @FactoryMethod(designator = "InterceptsM4-CP-PFN", parameterNames = {})
+    // public static final Interception factoryCPPFN() {
+    // return new Interception(true, new GoToObjectPFN(
+    // Globals.ROBOT_LENGTH / 3), null, true, true);
+    // }
+    //
+    // @FactoryMethod(designator = "InterceptsM4-NCP-PFN", parameterNames = {})
+    // public static final Interception factoryNCPPFN() {
+    // return new Interception(false, new GoToObjectPFN(
+    // Globals.ROBOT_LENGTH / 3), null, true, true);
+    // }
+    //
+    // @FactoryMethod(designator = "InterceptsM4-CP-PFNF", parameterNames = {})
+    // public static final Interception factoryCPPFNF() {
+    // return new Interception(true, new GoToObjectPFN(
+    // Globals.ROBOT_LENGTH / 3, false), null, true, true);
+    // }
+    //
+    // @FactoryMethod(designator = "InterceptsM4-CP-PFNF-NG", parameterNames =
+    // {})
+    // public static final Interception factoryCPPFNFNG() {
+    // return new Interception(true, new GoToObjectPFN(
+    // Globals.ROBOT_LENGTH / 3, false), null, true, false);
+    // }
+    //
+    // @FactoryMethod(designator = "InterceptsM4-NCP-PFNF", parameterNames = {})
+    // public static final Interception factoryNCPPFNF() {
+    // return new Interception(false, new GoToObjectPFN(
+    // Globals.ROBOT_LENGTH / 3, false), null, true, true);
+    // }
+    //
+    // @FactoryMethod(designator = "InterceptsM4-CP-BZR", parameterNames = {})
+    // public static final Interception factoryCPBZR() {
+    // return new Interception(true, null, new BezierNav(new SimplePathFinder(
+    // new CustomCHI())), true, true);
+    // }
+    //
+    // @FactoryMethod(designator = "InterceptsM4-CP-BZR-NG", parameterNames =
+    // {})
+    // public static final Interception factoryCPBZRNG() {
+    // return new Interception(true, null, new BezierNav(new SimplePathFinder(
+    // new CustomCHI())), true, false);
+    // }
+    //
+    // @FactoryMethod(designator = "InterceptsM4-NCP-BZR", parameterNames = {})
+    // public static final Interception factoryNCPBZR() {
+    // return new Interception(false, null, new BezierNav(
+    // new SimplePathFinder(new CustomCHI())), true, true);
+    // }
+
     /**
      * Checks when ball has moved since last reading
      * 
      * @return
      */
     private boolean ballIsMoving(Ball ball) {
-        Coord oldBall = new Coord(ballBuffer.getXPosAt(ballBuffer.getLastPosition()),
-                ballBuffer.getYPosAt(ballBuffer.getLastPosition()));
-        if (oldBall.dist(ball.getPosition()) > 0.1) {
-            return true;
-        } else
+        Iterator<Coord> it = ballCoordBuffer.iterator();
+        Coord lastKnownLoc = null;
+        while (it.hasNext())
+            lastKnownLoc = it.next();
+        
+        if (lastKnownLoc == null)
             return false;
+        
+        if (lastKnownLoc.dist(ball.getPosition()) > 0.05) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    private double distanceOfMovingBall(Ball ball) {
-        Coord oldBall = new Coord(ballBuffer.getXPosAt(ballBuffer.getLastPosition()),
-                ballBuffer.getYPosAt(ballBuffer.getLastPosition()));
 
-        return oldBall.dist(ball.getPosition());
-    }
+	protected Coord getPredictionCoordVelocityvector(Snapshot s,
+			boolean useCPOnly, boolean mirror) {
+        Ball ball = s.getBall();
+        Robot ourRobot = s.getBalle();
 
-    /**
-     * Gets a point that is LENGTH away from the ball based on it's previous
-     * positions
-     * 
-     * @param ball
-     * @param length
-     * @return
-     */
-    protected Coord getPredictionCoord(Pitch pitch, Ball ball, double length, CircularBuffer ballBuffer) {
+		Coord ballPos, currPos;
+		ballPos = ball.getPosition();
+		currPos = ourRobot.getPosition();
 
-        Predictor predictor = new Predictor();
+		double dist = (new Line(currPos, s.getOwnGoal().getPosition()))
+				.length();
+		if (mirror && dist > (Globals.PITCH_WIDTH / 2)) {
 
-        for (int i = 0; i < ballBuffer.getBufferLength(); i++) {
-            addDrawable(new Dot(ballBuffer.getCoordAt(i), new Color(255, 255, 255, 20)));
-        }
+			// // Mirror X position.
+			// double dX = currPos.getX() - s.getPitch().getPosition().getX();
+			// currPos = new Coord(s.getPitch().getPosition().getX() - dX,
+			// currPos.getY());
 
-        double[] parameters = new double[4];
-        predictor.fitLine(parameters, ballBuffer.getXBuffer(), ballBuffer.getYBuffer(), null, null,
-                ballBuffer.getBufferLength());
+			addDrawable(new Label("length = " + dist, new Coord(0, 0),
+					Color.ORANGE));
 
-        // get the x offset value such that distance of will always equal 100
-        double lineLength = length;
-        double xOffset = (lineLength / Math.sqrt(1 + parameters[1] * parameters[1]));
+			return s.getOwnGoal().getPosition();
 
-        // changed the offset if the ball is travelling right
-        if (Math.abs(ballBuffer.getXPosAt(ballBuffer.getCurrentPosition()))
-                - Math.abs(ballBuffer.getXPosAt(ballBuffer.getLastPosition())) > 0) {
-            xOffset = xOffset * -1;
-        }
+		}
 
-        // define coordinates of the line to draw
-        double x1 =  ball.getPosition().getX();
-        double y1 = (parameters[1] * ball.getPosition().getX() + parameters[0]);
-        double x2 = ball.getPosition().getX() + xOffset;
-        double y2 = (parameters[1] * (ball.getPosition().getX() + xOffset) + parameters[0]);
 
-        // draw the line between (x1,y1) and (x2,y2)
-        addDrawable(new DrawableLine(new Line(x1, y1, x2, y2), Color.CYAN));
+        Velocity vel = ball.getVelocity();
+        Coord vec = new Coord(vel.getX(), vel.getY());
+        vec = vec.mult(0.5 / vec.abs());
+        
+		Line ballRobotLine = new Line(ballPos, currPos);
+        // .extendBothDirections(Globals.PITCH_WIDTH);
+        //addDrawable(new DrawableLine(ballRobotLine, Color.WHITE));
 
-        Coord predictCoord = new Coord(x2, y2);
+		Line ballDirectionLine = new Line(ballPos, currPos.add(vec));
+        ballDirectionLine = ballDirectionLine.extend(Globals.PITCH_WIDTH);
+        //addDrawable(new DrawableLine(ballDirectionLine, Color.WHITE));
 
-        // check if the line is going out of the pitch
-        while (!pitch.containsCoord(predictCoord)) {
-            double x = predictCoord.getX();
-            double y = predictCoord.getY();
 
-            addDrawable(new Dot(new Coord(x, y), Color.GRAY));
+        Line rotatedRobotBallLine = ballRobotLine.rotateAroundPoint(
+                ballRobotLine.midpoint(), Orientation.rightAngle)
+                .extendBothDirections(Globals.PITCH_WIDTH);
+        //addDrawable(new DrawableLine(rotatedRobotBallLine, Color.PINK));
 
-            // use symmetry to get point in pitch
-            if (x > pitch.getMaxX()) {
-                predictCoord = new Coord((pitch.getMaxX() - Math.abs(x - pitch.getMaxX())), y);
-            } else if (x < pitch.getMinX()) {
-                predictCoord = new Coord(pitch.getMinX() + Math.abs(x - pitch.getMinX()), y);
-            }
-            if (y > pitch.getMaxY()) {
-                predictCoord = new Coord(x, (pitch.getMaxY() - Math.abs(y - pitch.getMaxY())));
-            } else if (y < pitch.getMinY()) {
-                predictCoord = new Coord(x, (pitch.getMinY() + Math.abs(y - pitch.getMinY())));
-            }
-        }
+        Coord pivot = rotatedRobotBallLine.getIntersect(ballDirectionLine);
+       
+		Coord CP = ballDirectionLine.closestPoint(currPos);
+        addDrawable(new DrawableLine(ballDirectionLine, Color.WHITE));
+        addDrawable(new Dot(CP, Color.WHITE));
+		addDrawable(new DrawableLine(new Line(CP, currPos),
+                Color.CYAN));
+        // addDrawable(new DrawableLine(new Line(CP, ball.getPosition()),
+        // Color.ORANGE));
 
+        
+		if (useCPOnly) {
+			// Coord earlier = CP.add(ball.getPosition().sub(CP).getUnitCoord()
+			// .mult(0.4));
+//			return earlier;
+			return CP;
+		}
+        
+        if (pivot == null)
+            return CP;
+        
+        //addDrawable(new Dot(pivot, Color.RED));
+
+        Coord scaler = CP.sub(pivot);
+		Orientation theta = ballPos.angleBetween(currPos, CP);
+		Orientation theta2 = ballPos.angleBetween(CP, currPos);
+        
+         double minTheta = Math.min(theta.radians(), theta2.radians());
+        
+         // addDrawable(new Label(String.format("Theta: %.2f", minTheta),
+         // new Coord(0, -0.15), Color.CYAN));
+        
+
+        scaler = scaler.mult(Math.abs(minTheta) / (Math.PI / 2));
+        
+		Coord predictCoord = pivot.sub(scaler);
+		Line robotPredictLine = new Line(currPos, predictCoord);
+        // robotPredictLine = robotPredictLine.extend(0.5);
+        addDrawable(new DrawableLine(robotPredictLine, Color.PINK));
+        predictCoord = robotPredictLine.getB();
+
+         // addDrawable(new DrawableLine(rotatedRobotBallLine, Color.PINK));
+        
+         // Coord predictCoord = rotatedRobotBallLine
+         // .getIntersect(ballDirectionLine);
+        
+         // if (predictCoord == null) {
+         // // if the lines do not intersect jsut get a point thats 1m away
+        // from
+         // // the ball
+         //
+         // predictCoord = ball.getPosition().add(vec);
+         // }
+         //
+         // //addDrawable(new DrawableVector(ball.getPosition(), vec,
+         // Color.WHITE));
+        addDrawable(new DrawableVector(pivot, scaler, Color.BLACK));
         return predictCoord;
     }
+
+
 }

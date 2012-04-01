@@ -151,7 +151,7 @@ public class Simulator extends TestbedTest implements AbstractVisionReader {
 	}
 
 	public void resetBallPosition() {
-		worldWrapper.resetBallPosition();
+		worldWrapper.resetBallPosition(0, 0);
 	}
 
 	public void resetRobotPositions() {

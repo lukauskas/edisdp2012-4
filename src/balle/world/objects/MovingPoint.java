@@ -9,7 +9,7 @@ import balle.world.Velocity;
 public class MovingPoint {
 
     private final Coord    position;
-    private final Velocity velocity;
+	private Velocity velocity;
 
     public MovingPoint(Coord position, Velocity velocity) {
         super();
@@ -25,5 +25,9 @@ public class MovingPoint {
     public Velocity getVelocity() {
         return velocity;
     }
+
+	public void setVelocity(Velocity velocity) {
+		this.velocity = velocity;
+	}
 
 }

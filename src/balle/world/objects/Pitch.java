@@ -64,4 +64,15 @@ public class Pitch extends StaticFieldObject {
 		return containsCoord(line.getA()) != containsCoord(line.getB());
 	}
 
+	/**
+	 * Get half of the pitch this point is on.
+	 * 
+	 * @param position
+	 *            Point in the pitch.
+	 * @return True if on left, false otherwise.
+	 */
+	public Object getHalf(Coord position) {
+		return position.getX() < getPosition().getX();
+	}
+
 }

@@ -17,7 +17,7 @@ public class Velocity extends Coord {
     }
 
     public Velocity(Coord coord, double timeDelta) {
-        this(coord.getX() / timeDelta, coord.getY() / timeDelta, timeDelta,
+		this(coord.getX(), coord.getY(), timeDelta,
 				coord.getEstimatedFrames());
     }
 

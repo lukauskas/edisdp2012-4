@@ -1,5 +1,7 @@
 package balle.world.objects;
 
+import java.awt.geom.Rectangle2D;
+
 import org.apache.log4j.Logger;
 
 import balle.misc.Globals;
@@ -47,22 +49,13 @@ public class RectangularObject extends MovingPoint implements FieldObject {
 
     @Override
     public boolean containsCoord(Coord point) {
-        if (getPosition() == null)
+        if ((getPosition() == null) || (point == null))
             return false;
 
-        Coord dPoint = new Coord(point.getX() - getPosition().getX(),
-                point.getY() - getPosition().getY());
+        Rectangle2D rect = new Rectangle2D.Double(getPosition().getX() - width
+                / 2, getPosition().getY() - height / 2, width, height);
 
-        dPoint = dPoint.rotate(getOrientation());
-        if (dPoint.getX() < (-width / 2.0f))
-            return false;
-        if (dPoint.getX() > (width / 2.0f))
-            return false;
-        if (dPoint.getY() < (-height / 2.0f))
-            return false;
-        if (dPoint.getY() > (height / 2.0f))
-            return false;
-        return true;
+        return rect.contains(point.getX(), point.getY());
     }
 
     @Override
@@ -73,23 +66,13 @@ public class RectangularObject extends MovingPoint implements FieldObject {
          * it is considered to be away from any walls.
          */
 
-        double minX, maxX, minY, maxY;
-        minX = p.getMinX() + Globals.DISTANCE_TO_WALL;
-        maxX = p.getMaxX() - Globals.DISTANCE_TO_WALL;
-        minY = p.getMinY() + Globals.DISTANCE_TO_WALL;
-        maxY = p.getMaxY() - Globals.DISTANCE_TO_WALL;
-
-        if (getPosition().getX() < minX)
-            return true;
-        if (getPosition().getX() > maxX)
-            return true;
-        if (getPosition().getY() < minY)
-            return true;
-        if (getPosition().getY() > maxY)
-            return true;
+        for (Line wall : p.getWalls()) {
+            if (wall.dist(getPosition()) < Globals.DISTANCE_TO_WALL) {
+                return true;
+            }
+        }
 
         return false;
-
     }
 
     @Override

@@ -6,8 +6,8 @@ import balle.world.objects.Point;
 
 public class Coord {
 
-	private final double x;
-	private final double y;
+	public final double x;
+	public final double y;
 
 	private final int estimatedFrames;
 
@@ -190,7 +190,8 @@ public class Coord {
 		Coord a = from.sub(this);
 		Coord b = to.sub(this);
 
-		return b.getOrientation().sub(a.getOrientation());
+        return new Orientation(b.getOrientation().radians()
+                - a.getOrientation().radians());
 
 		/*
 		 * Orientation out;

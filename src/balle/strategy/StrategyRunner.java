@@ -8,8 +8,9 @@ import balle.controller.Controller;
 import balle.main.SimpleWorldGUI;
 import balle.main.drawable.Drawable;
 import balle.world.AbstractWorld;
-import balle.world.MutableSnapshot;
 import balle.world.Snapshot;
+import balle.world.objects.Goal;
+import balle.world.objects.Robot;
 import balle.world.processing.AbstractWorldProcessor;
 
 public class StrategyRunner extends AbstractWorldProcessor {
@@ -56,32 +57,25 @@ public class StrategyRunner extends AbstractWorldProcessor {
         long start = System.currentTimeMillis();
 		if (currentStrategyA != null && currentStrategyB != null) {
 			Snapshot snapshot = getSnapshot();
-			MutableSnapshot mSnapshot = snapshot.unpack();
-			mSnapshot.setOpponent(snapshot.getBalle());
-			mSnapshot.setBalle(snapshot.getOpponent());
-            mSnapshot.setOpponentsGoal(snapshot.getOwnGoal());
-            mSnapshot.setOwnGoal(snapshot.getOpponentsGoal());
 
-			// Snapshot centered on opponent robot (Balle from snapshot
-			// becomes opponent in snapshot2 etc
-			Snapshot snapshot2 = mSnapshot.pack();
+			Snapshot snapshot2 = new OpponentSnapshot(snapshot);
 
-			try {
+            try {
 				currentStrategyA.step(controllerA, snapshot);
 				if (controllerB != null) {
 					currentStrategyB.step(controllerB, snapshot2);
 				}
-			} catch (Exception e) {
-				LOG.error("Strategy raised exception" + e.toString());
+            } catch (Exception e) {
+                LOG.error("Strategy raised exception" + e.toString());
 
-				for (StackTraceElement se : e.getStackTrace())
-					LOG.debug(se.toString());
+                for (StackTraceElement se : e.getStackTrace())
+                    LOG.debug(se.toString());
 
-				controllerA.stop();
-				if (controllerB != null) {
-					controllerB.stop();
-				}
-			}
+                controllerA.stop();
+                if (controllerB != null) {
+                    controllerB.stop();
+                }
+            }
             ArrayList<Drawable> drawables = currentStrategyA.getDrawables();
             ArrayList<Drawable> opponentDrawables = currentStrategyB
                     .getDrawables();
@@ -159,5 +153,40 @@ public class StrategyRunner extends AbstractWorldProcessor {
 	public void start() {
 		super.start();
 		LOG.info("StrategyRunner initialised");
+	}
+
+	/**
+	 * Snapshot that flips own/opponent TODO: can still get the normal world
+	 * through this
+	 * 
+	 * @author s0913664
+	 * 
+	 */
+	private static class OpponentSnapshot extends Snapshot {
+
+		public OpponentSnapshot(Snapshot snapshot) {
+			super(snapshot);
+		}
+
+		@Override
+		public Goal getOpponentsGoal() {
+			return super.getOwnGoal();
+		}
+
+		@Override
+		public Goal getOwnGoal() {
+			return super.getOpponentsGoal();
+		}
+
+		@Override
+		public Robot getOpponent() {
+			return super.getBalle();
+		}
+
+		@Override
+		public Robot getBalle() {
+			return super.getOpponent();
+		}
+
 	}
 }

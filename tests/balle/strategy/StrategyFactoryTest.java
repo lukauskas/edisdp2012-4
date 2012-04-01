@@ -20,7 +20,7 @@ public class StrategyFactoryTest {
         ArrayList<String> availableDesignators = sf.availableDesignators();
         for (String designator : availableDesignators) {
             // An actual test
-            sf.createClass(designator);
+            sf.createClass(designator, new Object[] {});
         }
     }
 

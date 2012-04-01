@@ -1,6 +1,6 @@
 package balle.simulator;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jbox2d.common.Vec2;
@@ -20,16 +20,10 @@ import balle.world.objects.Pitch;
 public class SnapshotPredictor extends WorldSimulator {
 
     // Recreate object if you want to update the history
-    private final ArrayList<ControllerHistoryElement> controllerHistory;
+	private final List<ControllerHistoryElement> controllerHistory;
     private long                                      simulatorTimestamp;
-
-    private final Goal                                opponentsGoal;
-    private final Goal                                ownGoal;
-    private final balle.world.objects.Robot initOurRobot;
-    private final balle.world.objects.Robot initOpponent;
-    private final balle.world.objects.Ball initBall;
-
-    private final Pitch                               pitch;
+    
+	private final Snapshot initSnapshot;
 
     private final Logger LOG = Logger.getLogger(SnapshotPredictor.class);
 
@@ -39,35 +33,17 @@ public class SnapshotPredictor extends WorldSimulator {
      * @param controllerHistory
      */
 
-    public SnapshotPredictor(Snapshot initialSnapshot,
-            ArrayList<ControllerHistoryElement> controllerHistory) {
-        this(initialSnapshot.getOpponent(), initialSnapshot.getBalle(), initialSnapshot.getBall(),
-                initialSnapshot.getOpponentsGoal(), initialSnapshot.getOwnGoal(), initialSnapshot
-                        .getPitch(), initialSnapshot.getTimestamp(), controllerHistory);
-    }
-
-    /**
-     * Create new snapshot predictor
-     * 
-     * @param controllerHistory
-     */
-
-    public SnapshotPredictor(balle.world.objects.Robot opponent, balle.world.objects.Robot balle,
-            Ball ball, Goal opponentsGoal, Goal ownGoal, Pitch pitch, long timestamp,
-            ArrayList<ControllerHistoryElement> controllerHistory) {
+	public SnapshotPredictor(Snapshot initialSnapshot,
+			List<ControllerHistoryElement> controllerHistory) {
         super(false);
         setWorld(new World(new Vec2(), true));
         initWorld();
         setVisionDelay(0);
-        this.simulatorTimestamp = timestamp;
+		this.initSnapshot = initialSnapshot;
+		this.simulatorTimestamp = initialSnapshot.getTimestamp();
         this.controllerHistory = controllerHistory;
-        this.opponentsGoal = opponentsGoal;
-        this.ownGoal = ownGoal;
-        this.pitch = pitch;
-        this.initOpponent = opponent;
-        this.initBall = ball;
-        this.initOurRobot = balle;
-        updatePositions(opponent, balle, ball);
+		updatePositions(initialSnapshot.getOpponent(),
+				initialSnapshot.getBalle(), initialSnapshot.getBall());
     }
 
     /**
@@ -83,17 +59,22 @@ public class SnapshotPredictor extends WorldSimulator {
         // TODO: add the wheelspeeds again
         // clean up the history (ensure there is at least one element left in
         // history)
-        while (controllerHistory.size() > 1 && controllerHistory.get(0).getTimestamp() < startTime) {
-            controllerHistory.remove(0);
+		if (controllerHistory.size() <= 1) {
+			controllerHistory.add(new ControllerHistoryElement(0, 0, 0));
+		}
+		while (controllerHistory.size() > 2
+				&& controllerHistory.get(0).getTimestamp() <= startTime) {
+			if (controllerHistory.get(1).getTimestamp() > startTime)
+				break;
+			else
+				controllerHistory.remove(0);
         }
         //
         // // setup a simulator using the current snapshot (assume we are blue)
-        float lastLPower = 0, lastRPower = 0;
-        if (controllerHistory.size() > 0) {
-            ControllerHistoryElement lastState = controllerHistory.get(0);
-            lastLPower = lastState.getPowerLeft();
-            lastRPower = lastState.getPowerRight();
-        }
+		float lastLPower, lastRPower;
+        ControllerHistoryElement lastState = controllerHistory.get(0);
+        lastLPower = lastState.getPowerLeft();
+        lastRPower = lastState.getPowerRight();
 
         // Assume we are always blue
         SoftBot virtual = getBlueSoft();
@@ -215,11 +196,12 @@ public class SnapshotPredictor extends WorldSimulator {
         
         // Assume we are blue and opponent is yellow again
         balle.world.objects.Robot ourRobot = getRobotFromBody(blue,
-                getBlueSoft(), initOurRobot);
+				getBlueSoft(), initSnapshot.getBalle());
         balle.world.objects.Robot opponent = getRobotFromBody(yellow,
-                getYellowSoft(), initOpponent);
+				getYellowSoft(), initSnapshot.getOpponent());
       
-        balle.world.objects.Ball ball;
+		Ball initBall = initSnapshot.getBall();
+		Ball ball;
         if ((ballBody == null) || (initBall.getPosition() == null)) {
             ball = new Ball(null, null);
         } else {
@@ -228,11 +210,11 @@ public class SnapshotPredictor extends WorldSimulator {
                     Velocity.fromVec2(ballBody.getLinearVelocity(), SCALE));
         }
         
-        return new Snapshot(opponent, ourRobot, ball, getOpponentsGoal(), getOwnGoal(), getPitch(),
-                getSimulatorTimestamp(), getControllerHistory());
+		return new Snapshot(initSnapshot.getWorld(), opponent, ourRobot, ball,
+				getSimulatorTimestamp(), getControllerHistory());
     }
 
-    protected ArrayList<ControllerHistoryElement> getControllerHistory() {
+	protected List<ControllerHistoryElement> getControllerHistory() {
         return controllerHistory;
     }
 
@@ -245,15 +227,15 @@ public class SnapshotPredictor extends WorldSimulator {
     }
 
     protected Goal getOpponentsGoal() {
-        return opponentsGoal;
+		return initSnapshot.getOpponentsGoal();
     }
 
     protected Goal getOwnGoal() {
-        return ownGoal;
+		return initSnapshot.getOwnGoal();
     }
 
     protected Pitch getPitch() {
-        return pitch;
+		return initSnapshot.getPitch();
     }
 
 }

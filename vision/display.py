@@ -148,7 +148,7 @@ class Gui:
     def updateLayer(self, name, layer):
         """
         Update the layer specified by 'name'
-        If the layer name is not in the know list of layers, 
+        If the layer name is not in the known list of layers, 
         then it will be drawn regardless of the current view setting
         """
         
@@ -280,6 +280,9 @@ class ThresholdGui:
         
         self.currentEntity = name
         self.setTrackbarValues(self.threshold._values[name])
+
+        # Make sure trackbars update immediately
+        cv.WaitKey(2)
 
         if self._showOnGui:
             self._gui.switchLayerset(name)

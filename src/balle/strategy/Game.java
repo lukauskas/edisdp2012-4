@@ -6,29 +6,33 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
+import balle.main.drawable.Circle;
 import balle.main.drawable.Drawable;
+import balle.main.drawable.DrawableLine;
+import balle.main.drawable.DrawableRectangularObject;
 import balle.main.drawable.Label;
 import balle.misc.Globals;
+import balle.simulator.SnapshotPredictor;
 import balle.strategy.bezierNav.BezierNav;
 import balle.strategy.curve.CustomCHI;
 import balle.strategy.executor.movement.GoToObjectPFN;
 import balle.strategy.executor.turning.IncFaceAngle;
 import balle.strategy.executor.turning.RotateToOrientationExecutor;
-import balle.strategy.pathfinding.SimplePathFinder;
+import balle.strategy.pathFinding.SimplePathFinder;
 import balle.strategy.planner.AbstractPlanner;
 import balle.strategy.planner.BackingOffStrategy;
-import balle.strategy.planner.DefensiveStrategy;
 import balle.strategy.planner.GoToBall;
+import balle.strategy.planner.GoToBallSafeProportional;
 import balle.strategy.planner.InitialStrategy;
 import balle.strategy.planner.KickFromWall;
-import balle.strategy.planner.KickToGoal;
 import balle.strategy.planner.SimpleGoToBallFaceGoal;
 import balle.world.Coord;
-import balle.world.Orientation;
+import balle.world.Line;
 import balle.world.Snapshot;
 import balle.world.objects.Ball;
 import balle.world.objects.Goal;
 import balle.world.objects.Pitch;
+import balle.world.objects.RectangularObject;
 import balle.world.objects.Robot;
 
 public class Game extends AbstractPlanner {
@@ -36,12 +40,14 @@ public class Game extends AbstractPlanner {
     private static final Logger LOG = Logger.getLogger(Game.class);
 	// Strategies that we will need make sure to call stop() for each of them
 	protected final Strategy defensiveStrategy;
-	protected final Strategy goToBallStrategy;
 	protected final Strategy pickBallFromWallStrategy;
-	protected final AbstractPlanner backingOffStrategy;
+    protected final BackingOffStrategy backingOffStrategy;
 	protected final RotateToOrientationExecutor turningExecutor;
-	protected final KickToGoal kickingStrategy;
+    protected final Dribble kickingStrategy;
     protected final InitialStrategy initialStrategy;
+	protected final Strategy goToBallPFN;
+	protected final Strategy goToBallBezier;
+    protected final Strategy goToBallPrecision;
 
     protected boolean initial;
 
@@ -65,37 +71,29 @@ public class Game extends AbstractPlanner {
         this.currentStrategy = currentStrategy;
     }
 
-    @FactoryMethod(designator = "Game (Bezier)")
-    public static Game gameFactory() {
-        return new Game(new SimpleGoToBallFaceGoal(new BezierNav(
-                new SimplePathFinder(new CustomCHI()))), true);
+    @FactoryMethod(designator = "Game", parameterNames = { "init",
+            "no bounce shots" })
+    public static Game gameFactoryTesting2(boolean init, boolean notTriggerHappy) {
+        Game g = new Game(init);
+        g.setTriggerHappy(!notTriggerHappy);
+        return g;
     }
 
-    @FactoryMethod(designator = "Game (Bezier,NoInit)")
-    public static Game gameFactoryTesting() {
-        return new Game(new SimpleGoToBallFaceGoal(new BezierNav(
-                new SimplePathFinder(new CustomCHI()))), false);
+    public void setTriggerHappy(boolean triggerHappy) {
+        kickingStrategy.setTriggerHappy(triggerHappy);
     }
 
-    @FactoryMethod(designator = "Game (PFN)")
-    public static Game gameFactory2() {
-        return new Game(new GoToBall(new GoToObjectPFN(0)), true);
-    }
-
-    @FactoryMethod(designator = "Game (PFN,NoInit)")
-    public static Game gameFactoryTesting2() {
-        return new Game(new GoToBall(new GoToObjectPFN(0)), false);
-    }
-
-    public Game(Strategy goToBallStrategy) {
-        defensiveStrategy = new DefensiveStrategy(new GoToObjectPFN(0.1f));
-		// goToBallStrategy = new GoToBallSafeProportional();
-        this.goToBallStrategy = goToBallStrategy;
+    public Game() {
+        defensiveStrategy = new GoToBallSafeProportional(0.5, 0.4, true);
         pickBallFromWallStrategy = new KickFromWall(new GoToObjectPFN(0));
 		backingOffStrategy = new BackingOffStrategy();
         turningExecutor = new IncFaceAngle();
-        kickingStrategy = new KickToGoal();
+        kickingStrategy = new Dribble();
         initialStrategy = new InitialStrategy();
+		goToBallPFN = new GoToBallSafeProportional();
+		goToBallBezier = new SimpleGoToBallFaceGoal(new BezierNav(
+                new SimplePathFinder(new CustomCHI())));
+        goToBallPrecision = new GoToBall(new GoToObjectPFN(0), false);
         initial = false;
     }
 
@@ -132,15 +130,15 @@ public class Game extends AbstractPlanner {
         this.initial = initial;
     }
 
-    public Game(Strategy goToBallStrategy, boolean startWithInitial) {
-        this(goToBallStrategy);
+    public Game(boolean startWithInitial) {
+        this();
         initial = startWithInitial;
         LOG.info("Starting game strategy with initial strategy turned on");
     }
+
     @Override
     public void stop(Controller controller) {
         defensiveStrategy.stop(controller);
-        goToBallStrategy.stop(controller);
         pickBallFromWallStrategy.stop(controller);
         backingOffStrategy.stop(controller);
     }
@@ -152,6 +150,7 @@ public class Game extends AbstractPlanner {
         Robot opponent = snapshot.getOpponent();
         Ball ball = snapshot.getBall();
         Goal ownGoal = snapshot.getOwnGoal();
+		Goal opponentsGoal = snapshot.getOpponentsGoal();
         Pitch pitch = snapshot.getPitch();
 
         if ((ourRobot.getPosition() == null) || (ball.getPosition() == null))
@@ -169,78 +168,100 @@ public class Game extends AbstractPlanner {
             return;
         }
 
-        if (ourRobot.possessesBall(ball)) {
-            // Kick if we are facing opponents goal
-            if (!ourRobot.isFacingGoalHalf(ownGoal)) {
-                setCurrentStrategy(kickingStrategy.getClass().getName());
-                kickingStrategy.step(controller, snapshot);
-                addDrawables(kickingStrategy.getDrawables());
-            } else {
-                LOG.warn("We need to go around the ball");
-             // TODO: turn the robot slightly so we face away from our
-                // own goal.
-                // Implement a turning executor that would use
-                // setWheelSpeeds to some arbitrary low
-                // number (say -300,300 and 300,-300) to turn to correct
-                // direction and use it here.
-                // it has to be similar to FaceAngle executor but should not
-                // use the controller.rotate()
-                // command that is blocking.
+        SnapshotPredictor sp = snapshot.getSnapshotPredictor();
+        // addDrawable(new Circle(ourRobot.getFrontSide().midpoint(), 0.07,
+        // Color.GREEN));
+        // addDrawable(new Circle(ourRobot.getFrontSide().midpoint(), 0.1,
+        // Color.RED));
 
-                Coord r, b, g;
-                r = ourRobot.getPosition();
-                b = ball.getPosition();
-                g = ownGoal.getPosition();
+        String oldStrategy = getCurrentStrategy();
+		Strategy strategy = getStrategy(snapshot);
+        LOG.debug("Selected strategy: " + strategy.getClass().getName());
+		setCurrentStrategy(strategy.getClass().getName());
+        if ("balle.strategy.Dribble_M4".equals(oldStrategy)
+                && !oldStrategy.equals(getCurrentStrategy())) {
+            LOG.info("Stopped using Dribble for " + getCurrentStrategy());
+            LOG.info(ourRobot.getOrientation().degrees());
+            LOG.info(ourRobot.getFrontSide().midpoint()
+                    .dist(ball.getPosition()));
+        }
+		strategy.step(controller, snapshot);
+		addDrawables(strategy.getDrawables());
+    }
 
-                if (r.angleBetween(g, b).atan2styleradians() < 0) {
-                    // Clockwise.
-                    Orientation orien = ourRobot
-                            .findMaxRotationMaintaintingPossession(ball, true);
-                    System.out.println(orien);
-                    turningExecutor.setTargetOrientation(orien);
-					turningExecutor.step(controller, snapshot);
-                } else {
-                    // Anti-Clockwise
-                    Orientation orien = ourRobot
-                            .findMaxRotationMaintaintingPossession(ball, false);
-                    System.out.println(orien);
-                    turningExecutor.setTargetOrientation(orien);
-					turningExecutor.step(controller, snapshot);
-                }
+	private Strategy getStrategy(Snapshot snapshot) {
+		Robot ourRobot = snapshot.getBalle();
+		Robot opponent = snapshot.getOpponent();
+		Ball ball = snapshot.getBall();
+		Goal ownGoal = snapshot.getOwnGoal();
+		Goal opponentsGoal = snapshot.getOpponentsGoal();
+		Pitch pitch = snapshot.getPitch();
 
-            }
-        } else if ((opponent.possessesBall(ball))
-                && (opponent.isFacingGoal(ownGoal))) {
-            LOG.info("Defending");
-            setCurrentStrategy(defensiveStrategy.getClass().getName());
-            // Let defensiveStrategy deal with it!
-			defensiveStrategy.step(controller, snapshot);
-            addDrawables(defensiveStrategy.getDrawables());
-        } else if (ball.isNearWall(pitch)) {
-            setCurrentStrategy(pickBallFromWallStrategy.getClass().getName());
-			pickBallFromWallStrategy.step(controller, snapshot);
-            addDrawables(pickBallFromWallStrategy.getDrawables());
-            // } else if (ball.isNear(ourRobot)
-            // && (ourRobot.isApproachingTargetFromCorrectSide(ball,
-            // snapshot.getOpponentsGoal()))) {
-            // if (Math.abs(ourRobot.getAngleToTurn(targetOrientation)) >
-            // (Math.PI / 4)) {
-            // LOG.info("Ball is near our robot, turning to it");
-            // setCurrentStrategy(turningExecutor.getClass().getName());
-            // turningExecutor.setTargetOrientation(targetOrientation);
-            // turningExecutor.step(controller, snapshot);
-            // } else {
-            // setCurrentStrategy(null);
-            // // Go forward!
-            // controller.setWheelSpeeds(400, 400);
-            // }
-        } else {
-            // Approach ball
-            setCurrentStrategy(goToBallStrategy.getClass().getName());
-			goToBallStrategy.step(controller, snapshot);
-            addDrawables(goToBallStrategy.getDrawables());
+        addDrawable(new Circle(ourRobot.getFrontSide().midpoint(), 0.4,
+                Color.BLUE));
 
+
+        SnapshotPredictor sp = snapshot.getSnapshotPredictor();
+        Snapshot newsnap = sp.getSnapshotAfterTime(50);
+        RectangularObject dribbleBox = ourRobot.getFrontSide()
+                .extendBothDirections(0.01).widen(0.25);
+        addDrawable(new DrawableRectangularObject(dribbleBox, Color.CYAN));
+        
+
+        addDrawable(new DrawableLine(newsnap.getBalle().getFrontSide(),
+                Color.red));
+
+        if ((kickingStrategy.isDribbling() && ball.getPosition().isEstimated() && ball
+                .getPosition().dist(ourRobot.getPosition()) < Globals.ROBOT_LENGTH * 2)
+                || (dribbleBox.containsCoord(ball.getPosition()) && !ourRobot
+                        .isFacingGoalHalf(ownGoal))) {
+            addDrawable(new Label("DRIBBLING", ball.getPosition().sub(
+                    new Coord(0.1, 0.1)), Color.CYAN));
+            return kickingStrategy;
+		}
+
+		// Could the opponent be in the way? use pfn if so
+		RectangularObject corridor = new Line(ourRobot.getPosition(),
+				ball.getPosition()).widen(0.5);
+        addDrawable(new DrawableRectangularObject(corridor, Color.BLACK));
+		if (corridor.containsCoord(opponent.getPosition())) {
+			return goToBallBezier;
+		}
+		
+        Line ballMovementLine = new Line(ball.getPosition(), snapshot
+                .getBallEstimator().estimatePosition(40));
+		
+        addDrawable(new DrawableLine(ballMovementLine, Color.MAGENTA));
+        if (ballMovementLine.intersects(snapshot.getOwnGoal().getGoalLine()
+                .extendBothDirections(0.5))) {
+            return defensiveStrategy;
+        }
+		    
+
+		if (!ourRobot.isApproachingTargetFromCorrectSide(ball, opponentsGoal,
+				25)) {
+			return goToBallPFN;
+		}
+
+		if (ourRobot.getPosition().dist(ball.getPosition()) > 1) {
+			return goToBallPFN;
+		}
+
+		// Bezier can have trouble next to walls
+		if (ourRobot.isNearWall(pitch)
+				&& (!ball.isNearWall(pitch) || ourRobot.getPosition().dist(
+						ball.getPosition()) > 0.5)) {
+			return goToBallPFN;
+		}
+
+
+        if ((!ourRobot.isNearWall(snapshot.getPitch()))
+                && (!ball.isNearWall(snapshot.getPitch()))
+                && (ourRobot.getFrontSide().midpoint().dist(ball.getPosition()) < 0.2)) {
+            return goToBallPrecision;
         }
 
-    }
+		return goToBallBezier;
+
+	}
 }

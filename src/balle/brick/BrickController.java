@@ -4,7 +4,6 @@ import lejos.nxt.Motor;
 import lejos.robotics.navigation.TachoPilot;
 import balle.controller.Controller;
 import balle.controller.ControllerListener;
-import balle.misc.Globals;
 
 /**
  * The Control class. Handles the actual driving and movement of the bot, once
@@ -28,10 +27,14 @@ public class BrickController implements Controller {
 
     public final boolean INVERSE_WHEELS = true;
 
-    public final float WHEEL_DIAMETER = Globals.ROBOT_WHEEL_DIAMETER; // metres
-    public final float TRACK_WIDTH = Globals.ROBOT_TRACK_WIDTH; // metres
+    public final float WHEEL_DIAMETER = 0.0816f; // metres
+    public final float TRACK_WIDTH = 0.155f; // metres
 
-    public static final int MAXIMUM_MOTOR_SPEED = Globals.MAXIMUM_MOTOR_SPEED;
+    public static final int MAXIMUM_MOTOR_SPEED = 900;
+
+    public static final int GEAR_ERROR_RATIO = 2; // Gears cut our turns in half
+
+    private volatile boolean isKicking = false;
 
     public BrickController() {
 
@@ -46,6 +49,7 @@ public class BrickController implements Controller {
         RIGHT_WHEEL.smoothAcceleration(true);
         KICKER.smoothAcceleration(false);
         KICKER.regulateSpeed(false);
+
     }
 
     /*
@@ -76,14 +80,29 @@ public class BrickController implements Controller {
      */
     @Override
     public void kick() {
+
+        if (isKicking) {
+            return;
+        }
+
+        isKicking = true;
+
         KICKER.setSpeed(900);
         KICKER.resetTachoCount();
         KICKER.forward();
-        try {
-            Thread.sleep(80);
-        } catch (InterruptedException e) {
-        }
-        KICKER.rotateTo(0);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(80);
+                } catch (InterruptedException e) {
+                    //
+                }
+                KICKER.rotateTo(0);
+                isKicking = false;
+            }
+        }).start();
     }
 
     public void gentleKick(int speed, int angle) {
@@ -151,7 +170,7 @@ public class BrickController implements Controller {
     @Override
     public void rotate(int deg, int speed) {
         pilot.setTurnSpeed(speed);
-        pilot.rotate(deg);
+        pilot.rotate(deg / GEAR_ERROR_RATIO);
     }
 
     @Override

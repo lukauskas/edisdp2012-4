@@ -133,9 +133,7 @@ public class WorldSimulator {
 		addEdge(0f * SCALE, 0.91f * SCALE, -0.1f * SCALE, 0.91f * SCALE);
 		addEdge(2.54f * SCALE, 0.31f * SCALE, 2.54f * SCALE, 0.91f * SCALE);
 
-		// Create ball
-		resetBallPosition();
-
+		resetBallPosition(0, 0);
 		// create robots at either end of pitch
 		resetRobotPositions();
 	}
@@ -228,7 +226,7 @@ public class WorldSimulator {
                 new Orientation(Math.random() * 360, false));
     }
 
-	protected void resetBallPosition() {
+	protected void resetBallPosition(float x, float y) {
 
 		if (ball != null) {
 			world.destroyBody(ball);
@@ -241,7 +239,11 @@ public class WorldSimulator {
 		f.density = (1f / 0.36f) / SCALE;
 		BodyDef bd = new BodyDef();
 		bd.type = BodyType.DYNAMIC;
-		bd.position.set(1.22f * SCALE, 0.61f * SCALE);
+		if (x != 0 && y != 0) {
+			bd.position.set(x * SCALE, y * SCALE);
+		} else {
+			bd.position.set(1.22f * SCALE, 0.61f * SCALE);
+		}
 		bd.bullet = true;
 		ball = world.createBody(bd);
 		ball.createFixture(f);
@@ -360,6 +362,10 @@ public class WorldSimulator {
 			ballPosX = ballPos.x;
 			ballPosY = ballPos.y;
 
+			if (ballPos.x < 0f || ballPos.x > 2.44f) {
+				resetBallPosition(ballPosX, ballPosY);
+			}
+
 			long timestamp = getTimeStamp();
 
 			if (noisy) {
@@ -368,7 +374,7 @@ public class WorldSimulator {
 				float angSd = Globals.VISION_ANGLE_NOISE_SD;
 
 				// add noise to positions
-				if (rand.nextDouble() < 0.02) {
+                if (rand.nextDouble() < 0.02) {
 					yPosX = -1;
 					yPosY = -1;
 				} else {
@@ -388,8 +394,8 @@ public class WorldSimulator {
 					ballPosX = -1;
 					ballPosY = -1;
 				} else {
-					ballPosX = genRand(posSd, ballPosX);
-					ballPosY = genRand(posSd, ballPosY);
+                    ballPosX = genRandRounded(posSd, ballPosX);
+                    ballPosY = genRandRounded(posSd, ballPosY);
 				}
 
 				// add noise to angles
@@ -405,6 +411,12 @@ public class WorldSimulator {
 		private float genRand(float sd, float mean) {
 			return ((float) rand.nextGaussian() * sd) + mean;
 		}
+
+        private float genRandRounded(float sd, float mean) {
+            // Round the gaussian noise to centimeters
+            return (Math.round((float) rand.nextGaussian() * sd) * 100) / 100
+                    + mean;
+        }
 
 		private float genRandDeg(float sd, float mean) {
 			return genRand(sd, mean) % 360;
@@ -443,7 +455,7 @@ public class WorldSimulator {
 				* WorldSimulator.SCALE / 2;
 		private Vec2 kickPos = new Vec2((robotLength + kickerLength), 0);
 		private final PolygonShape kickerShape;
-		private static final float kickForce = 20f;
+		private static final float kickForce = 9f;
 
 		private float lastRPower;
 		private float lastLPower;

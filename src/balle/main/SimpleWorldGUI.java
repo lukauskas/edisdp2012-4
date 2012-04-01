@@ -14,16 +14,13 @@ import javax.swing.UIManager;
 
 import org.apache.log4j.Logger;
 
-import balle.main.drawable.Dot;
 import balle.main.drawable.Drawable;
 import balle.main.drawable.DrawableLine;
 import balle.main.drawable.DrawableVector;
 import balle.main.drawable.Label;
 import balle.misc.Globals;
-import balle.simulator.SnapshotPredictor;
 import balle.world.AbstractWorld;
 import balle.world.Coord;
-import balle.world.Line;
 import balle.world.Scaler;
 import balle.world.Snapshot;
 import balle.world.Velocity;
@@ -191,9 +188,9 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 		private void drawFieldObjects(Graphics g) {
 			Snapshot s = getSnapshot();
 			if (s != null) {
-				drawRobot(g, Color.GREEN, s.getBalle());
-				drawRobot(g, Color.RED, s.getOpponent());
-                drawBall(g, Color.RED, s);
+                drawRobot(g, Color.GREEN, s.getBalle(), s.getOpponentsGoal());
+                drawRobot(g, Color.RED, s.getOpponent(), s.getOwnGoal());
+				drawBall(g, Color.RED, s);
 				drawGoals(g);
 			}
 		}
@@ -227,58 +224,79 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 			g.fillOval((int) (scaler.m2PX(pos.getX()) - (w / 2)),
 					(int) (scaler.m2PY(pos.getY()) - (w / 2)), (int) w, (int) w);
 			
+
             Label ballSpeedLabel = new Label(String.format("%.5fE-3", ball
                     .getVelocity().abs() * 1000), new Coord(ball.getPosition()
                     .getX(), ball
                     .getPosition().getY() - ball.getRadius() * 3), Color.RED);
             ballSpeedLabel.draw(g, scaler);
 
-
-
-            Velocity vel = ball.getVelocity();
-            DrawableVector velocityVec = new DrawableVector(ball.getPosition(),
-                    vel.mult(4000), Color.CYAN);
-            velocityVec.draw(g, scaler);
-
-            SnapshotPredictor sp = snapshot.getSnapshotPredictor();
-            Coord lastPos = pos;
-            Color lineColor = Color.WHITE;
-            Color ballColor = changeAlpha(c, 0.8);
-
-
-            for (int lastEstimateAfter = 0; lastEstimateAfter < Globals.BALL_POSITION_ESTIMATE_MAX_STEP; lastEstimateAfter += Globals.BALL_POSITION_ESTIMATE_DRAW_STEP) {
-                Snapshot laterSnapshot = sp
-                        .getSnapshotAfterTime(Globals.BALL_POSITION_ESTIMATE_DRAW_STEP);
-                Coord newBallPos = laterSnapshot.getBall().getPosition();
-                if (newBallPos == null)
-                    break;
-
-                DrawableLine directionLine = new DrawableLine(new Line(lastPos,
-                        newBallPos), lineColor);
-                directionLine.draw(g, scaler);
-                lastPos = newBallPos;
-
-                Dot ballDot = new Dot(newBallPos, ballColor);
-                ballDot.draw(g, scaler);
-
-                // Fade the colours
-                lineColor = changeAlpha(lineColor, 0.7);
-                ballColor = changeAlpha(ballColor, 0.8);
-
-				if (lastEstimateAfter == 0) {
-					Label nextBallSpeedLabel = new Label(String.format(
-							"%.5fE-3", laterSnapshot.getBall().getVelocity()
-									.abs() * 1000),
-							new Coord(ball.getPosition().getX(), ball
-									.getPosition().getY()
-									- ball.getRadius()
-									* 6), changeAlpha(Color.pink, 0.8));
-					nextBallSpeedLabel.draw(g, scaler);
-				}
+            if (ball.isNearWall(snapshot.getPitch())) {
+                Label nearWallLabel = new Label("NW", new Coord(ball
+                        .getPosition().getX(), ball.getPosition().getY()
+                        + ball.getRadius() * 3), Color.MAGENTA);
+                nearWallLabel.draw(g, scaler);
             }
+
+			// BallEstimator predictor = snapshot.getBallEstimator();
+			// Coord estimatedPos = predictor.estimatePosition(5); // 5 Frames =
+			// // ~250ms
+			// new Circle(estimatedPos.x, estimatedPos.y, 0.05,
+			// Color.BLUE).draw(
+			// g, scaler);
+
+			Velocity vel = ball.getVelocity().mult(1000);
+			DrawableVector vec = new DrawableVector(ball.getPosition(), vel,
+					Color.CYAN);
+			vec.draw(g, scaler);
+
+            // Velocity vel = ball.getVelocity();
+            // DrawableVector velocityVec = new
+            // DrawableVector(ball.getPosition(),
+            // vel.mult(4000), Color.CYAN);
+            // velocityVec.draw(g, scaler);
+            //
+            // SnapshotPredictor sp = snapshot.getSnapshotPredictor();
+            // Coord lastPos = pos;
+            // Color lineColor = Color.WHITE;
+            // Color ballColor = changeAlpha(c, 0.8);
+            //
+            //
+            // for (int lastEstimateAfter = 0; lastEstimateAfter <
+            // Globals.BALL_POSITION_ESTIMATE_MAX_STEP; lastEstimateAfter +=
+            // Globals.BALL_POSITION_ESTIMATE_DRAW_STEP) {
+            // Snapshot laterSnapshot = sp
+            // .getSnapshotAfterTime(Globals.BALL_POSITION_ESTIMATE_DRAW_STEP);
+            // Coord newBallPos = laterSnapshot.getBall().getPosition();
+            // if (newBallPos == null)
+            // break;
+            //
+            // DrawableLine directionLine = new DrawableLine(new Line(lastPos,
+            // newBallPos), lineColor);
+            // directionLine.draw(g, scaler);
+            // lastPos = newBallPos;
+            //
+            // Dot ballDot = new Dot(newBallPos, ballColor);
+            // ballDot.draw(g, scaler);
+            //
+            // // Fade the colours
+            // lineColor = changeAlpha(lineColor, 0.7);
+            // ballColor = changeAlpha(ballColor, 0.8);
+            //
+            // if (lastEstimateAfter == 0) {
+            // Label nextBallSpeedLabel = new Label(String.format(
+            // "%.5fE-3", laterSnapshot.getBall().getVelocity()
+            // .abs() * 1000),
+            // new Coord(ball.getPosition().getX(), ball
+            // .getPosition().getY()
+            // - ball.getRadius()
+            // * 6), changeAlpha(Color.pink, 0.8));
+            // nextBallSpeedLabel.draw(g, scaler);
+            // }
+            // }
 		}
 
-		private void drawRobot(Graphics g, Color c, Robot robot) {
+        private void drawRobot(Graphics g, Color c, Robot robot, Goal targetGoal) {
 
 			Snapshot s = getSnapshot();
 
@@ -350,7 +368,14 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 
 			g.fillPolygon(xs, ys, n);
 
-			DrawableLine orientationLine = new DrawableLine(
+            // Dim the line if we're not approaching from correct side
+            if ((s.getBall().getPosition() != null)
+                    && (!robot.isApproachingTargetFromCorrectSide(s.getBall(),
+                            targetGoal))) {
+                c = new Color(c.getRed(), c.getGreen(), c.getBlue(),
+                        c.getAlpha() / 2);
+            }
+            DrawableLine orientationLine = new DrawableLine(
 					robot.getFacingLine(), c);
 			orientationLine.draw(g, scaler);
 

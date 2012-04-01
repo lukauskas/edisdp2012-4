@@ -31,14 +31,21 @@ public class GoToBallSafeProportional extends GoToBall {
 		turnHack = new TurnHack();
     }
 
+    public GoToBallSafeProportional(double avoidanceGap, double overshootGap,
+            boolean approachfromCorrectSide) {
+        super(new GoToObjectPFN(0), avoidanceGap, overshootGap,
+                approachfromCorrectSide);
+        turnHack = new TurnHack();
+    }
+
     protected FieldObject getOriginalTarget(Snapshot snapshot) {
-        return snapshot.getBall();
+		return super.getTarget(snapshot);
     }
 
     protected boolean ballSafeGapCanBeIncreased(Snapshot snapshot, Line newTargetLine) {
         Pitch pitch = snapshot.getPitch();
         Robot ourRobot = snapshot.getBalle();
-        Ball ball = snapshot.getBall();
+		FieldObject ball = getOriginalTarget(snapshot);
 
         // We cannot extend the line, if we cannot reach the endpoint
         if (!pitch.containsCoord(newTargetLine.extend(
@@ -99,7 +106,7 @@ public class GoToBallSafeProportional extends GoToBall {
         return new Point(targetLine.getB());
     }
 
-    @FactoryMethod(designator = "GoToBallSafeProportional")
+    @FactoryMethod(designator = "GoToBallSafeProportional", parameterNames = {})
     public static GoToBallSafeProportional factoryMethod() {
         return new GoToBallSafeProportional();
     }

@@ -2,6 +2,8 @@ package balle.world;
 
 import java.awt.geom.Line2D;
 
+import balle.world.objects.RectangularObject;
+
 public class Line {
 
 	private final Coord a, b;
@@ -35,24 +37,49 @@ public class Line {
 		if (dist > 0.000001) {
 			return false;
 		}
-
-		return (((minX() - a.getX() < 0.00001) && (maxX() - a.getX()) > -0.00001) && ((minY()
-				- a.getY() < 0.00001) && (maxY() - a.getY() > -0.00001)));
+        return true;
+        // return (((minX() - a.getX() < 0.00001) && (maxX() - a.getX()) >
+        // -0.00001) && ((minY()
+        // - a.getY() < 0.00001) && (maxY() - a.getY() > -0.00001)));
 	}
 
-	/**
-	 * rotate the line around the origin
-	 * 
-	 * @param orientation
-	 * @return
-	 */
+    /**
+     * rotate the line around
+     * 
+     * @param orientation
+     * @return
+     */
 	public Line rotate(Orientation orientation) {
 		return new Line(a.rotate(orientation), b.rotate(orientation));
 	}
 
+    /**
+     * rotate the line around the origin
+     * 
+     * @param orientation
+     * @return
+     */
+    public Line rotateAroundOrigin(Orientation orientation) {
+        return rotateAroundPoint(getA(), orientation);
+    }
+
+    /**
+     * rotate the line around the origin
+     * 
+     * @param orientation
+     * @return
+     */
+    public Line rotateAroundPoint(Coord point, Orientation orientation) {
+        return this.sub(point).rotate(orientation).add(point);
+    }
+
 	public Line add(Coord position) {
 		return new Line(a.add(position), b.add(position));
 	}
+
+    public Line sub(Coord position) {
+        return new Line(a.sub(position), b.sub(position));
+    }
 
 	public Coord getIntersect(Line l) {
 		double x1, x2, y1, y2;
@@ -141,21 +168,25 @@ public class Line {
 		Coord AP = p.sub(getA());
 		Coord AB = getB().sub(getA());
 
-		double t = AB.sqrAbs() / AP.dot(AB);
+        double t = AP.dot(AB) / AB.abs();
 
-		Coord closest = new Coord(getA().getX() + AB.getX() * t, getA().getY()
-				+ AB.getY() * t);
-		// Check if the closest point is in the segment
-		if (this.contains(closest)) {
-			return closest;
-		} else {
-			if (getA().dist(p) < getB().dist(p))
-				return getA();
-			else
-				return getB();
-		}
+        Coord closest = getA().add(AB.getUnitCoord().mult(t));
+
+
+        // Check if the closest point is in the segment
+         if (this.contains(closest)) {
+         return closest;
+         } else {
+         if (getA().dist(p) < getB().dist(p))
+         return getA();
+         else
+         return getB();
+         }
 	}
 
+    public double length() {
+        return getA().dist(getB());
+    }
 	public Coord getCenter() {
 		return new Coord((getA().getX() + getB().getX()) / 2,
 				(getA().getY() + getB().getY()) / 2);
@@ -197,6 +228,18 @@ public class Line {
 
         return new Line(new Coord(newAX, newAY), new Coord(newX, newY));
     }
+
+	/**
+	 * Returns a rectangular object with this line running down the centre
+	 * 
+	 * @param width
+	 *            the width of the rectangle
+	 * @return the rectangle
+	 */
+	public RectangularObject widen(double width) {
+        return new RectangularObject(midpoint(), new Velocity(0, 0, 0),
+                new AngularVelocity(0, 0), angle(), width, length());
+	}
 
 	/**
 	 * Get a new line with direction opposite to this one

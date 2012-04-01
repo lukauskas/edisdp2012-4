@@ -3,7 +3,7 @@ package balle.strategy.pFStrategy;
 import org.apache.log4j.Logger;
 
 //basic Point class includes x,y
-public class PointObject extends Vector implements Object {
+public class PointObject extends Vector implements PFObject {
 
     private static final Logger LOG = Logger.getLogger(PointObject.class);
 
@@ -73,6 +73,7 @@ public class PointObject extends Vector implements Object {
                     + (this.getY() - point.getLocation().getY())
                     * (this.getY() - point.getLocation().getY()));
 
+
             if ((distance < infl_distance) && (power != 0)) {
                 LOG.trace("Influenced by obstacle");
                 try {
@@ -101,8 +102,9 @@ public class PointObject extends Vector implements Object {
 
             Vector out_point = new Vector(point.getLocation());
             Vector res = out_point.subtract(this);
+
             Vector final_res = res.mult(power * -1);
-            LOG.trace("Attraction power " + final_res.norm());
+
 
             return final_res;
         }

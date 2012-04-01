@@ -12,7 +12,7 @@ import balle.main.drawable.Dot;
 import balle.strategy.FactoryMethod;
 import balle.strategy.curve.CustomCHI;
 import balle.strategy.executor.movement.OrientedMovementExecutor;
-import balle.strategy.pathfinding.SimplePathFinder;
+import balle.strategy.pathFinding.SimplePathFinder;
 import balle.strategy.planner.AbstractPlanner;
 import balle.world.Orientation;
 import balle.world.Snapshot;
@@ -29,7 +29,7 @@ public class GameBezier extends AbstractPlanner {
 
 	OrientedMovementExecutor executorStrategy;
 
-	@FactoryMethod(designator = "GameBezier")
+    @FactoryMethod(designator = "GameBezier", parameterNames = {})
 	public static GameBezier gameBezierFactory() {
 		return new GameBezier(new BezierNav(new SimplePathFinder(
 				new CustomCHI())));

@@ -1,4 +1,4 @@
-package balle.strategy.pathfinding;
+package balle.strategy.pathFinding;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -9,9 +9,12 @@ import balle.main.drawable.Dot;
 import balle.main.drawable.Drawable;
 import balle.strategy.curve.Curve;
 import balle.strategy.curve.Interpolator;
+import balle.strategy.pathFinding.path.MaxSpeedPath;
+import balle.strategy.pathFinding.path.Path;
 import balle.world.Coord;
 import balle.world.Orientation;
 import balle.world.Snapshot;
+import balle.world.objects.Robot;
 
 public class SimplePathFinder implements PathFinder {
 
@@ -27,8 +30,19 @@ public class SimplePathFinder implements PathFinder {
 	}
 
 	@Override
-	public Curve getPath(Snapshot s, Coord start, Orientation startAngle,
-			Coord end, Orientation endAngle) {
+	public Path[] getPaths(Snapshot s, Coord end,
+			Orientation endAngle) {
+		
+		Robot robot = s.getBalle();
+		Coord start = robot.getPosition();
+		Orientation startAngle = robot.getOrientation();
+
+		return getPaths(s, start, startAngle, end, endAngle);
+	}
+
+	protected Path[] getPaths(Snapshot s, Coord start,
+			Orientation startAngle, Coord end, Orientation endAngle) {
+		
 		drawables = new ArrayList<Drawable>();
 		// Initialise temporary variables.
 		this.start = start;
@@ -48,8 +62,8 @@ public class SimplePathFinder implements PathFinder {
 			last = list.get(i);
 		}
 
-		// Convert to a curve.
-		return getCurve(list);
+		// Convert to a path.
+		return new Path[] { new MaxSpeedPath(getCurve(list)) };
 	}
 
 	/**
@@ -124,6 +138,10 @@ public class SimplePathFinder implements PathFinder {
 	}
 
 	protected Obstacle isClear(Curve c, Snapshot s) {
+        // TODO: Review
+        if (s.getOpponent().getPosition() == null)
+            return null;
+
 		Obstacle[] obstacles = new Obstacle[] {
 
 		new Obstacle(s.getOpponent(), Math.min(Obstacle.ROBOT_CLEARANCE, s

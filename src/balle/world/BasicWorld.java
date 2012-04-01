@@ -12,11 +12,19 @@ public class BasicWorld extends AbstractWorld {
 
 	protected Snapshot prev, prevRaw;
 
+	private final Estimator ballEstimator;
+	private final Estimator ourRobotEstimator;
+	private final Estimator theirRobotEstimator;
+
 	public BasicWorld(boolean balleIsBlue, boolean goalIsLeft, Pitch pitch) {
 		super(balleIsBlue, goalIsLeft, pitch);
-		prev = new EmptySnapshot(getOpponentsGoal(), getOwnGoal(), getPitch());
-		prevRaw = new EmptySnapshot(getOpponentsGoal(), getOwnGoal(),
-				getPitch());
+
+		ballEstimator = Estimator.getBallEstimator();
+		ourRobotEstimator = Estimator.getRobotEstimator();
+		theirRobotEstimator = Estimator.getRobotEstimator();
+
+		prev = new EmptySnapshot(this);
+		prevRaw = new EmptySnapshot(this);
 	}
 
 	@Override
@@ -28,11 +36,8 @@ public class BasicWorld extends AbstractWorld {
 		return prevRaw;
 	}
 
-	private Coord subtractOrNull(Coord a, Coord b) {
-		if ((a == null) || (b == null))
-			return null;
-		else
-			return a.sub(b);
+	public Estimator getBallEstimator() {
+		return ballEstimator;
 	}
 
 	/**
@@ -79,16 +84,7 @@ public class BasicWorld extends AbstractWorld {
 		Robot them = null;
 		Ball ball = null;
 
-		Snapshot prev = getSnapshotRaw();
-
-		// Check if the new positions make sense. For instance, discard
-		// the ones that are unreasonably far away from the previous one
-		ourPosition = positionIsCloseToExpected(prev.getBalle().getPosition(),
-				ourPosition) ? ourPosition : null;
-		theirsPosition = positionIsCloseToExpected(prev.getOpponent()
-				.getPosition(), theirsPosition) ? theirsPosition : null;
-		ballPosition = positionIsCloseToExpected(prev.getBall().getPosition(),
-				ballPosition) ? ballPosition : null;
+		Snapshot prev = getSnapshot();
 
 		// change in time
 		long deltaT = timestamp - prev.getTimestamp(); // Hopefully that does
@@ -104,29 +100,18 @@ public class BasicWorld extends AbstractWorld {
 			return;
 		}
 
-		if (ourPosition == null)
-			ourPosition = estimatedPosition(prev.getBalle(), deltaT);
-		if (theirsPosition == null)
-			theirsPosition = estimatedPosition(prev.getOpponent(), deltaT);
-		if (ballPosition == null)
-			ballPosition = estimatedPosition(prev.getBall(), deltaT, true);
+		ourRobotEstimator.update(ourPosition, deltaT);
+		ourPosition = ourRobotEstimator.getPosition();
 
-		// Calculate how much each position has changed between frames
-		Coord oursDPos, themDPos, ballDPos;
-		oursDPos = subtractOrNull(ourPosition, prev.getBalle().getPosition());
-		themDPos = subtractOrNull(theirsPosition, prev.getOpponent()
-				.getPosition());
-		ballDPos = subtractOrNull(ballPosition, prev.getBall().getPosition());
+		theirRobotEstimator.update(ourPosition, deltaT);
+		ourPosition = theirRobotEstimator.getPosition();
 
-		// Recalculate the velocities from deltapositions above.
-		Velocity oursVel, themVel, ballVel;
-		oursVel = oursDPos != null ? new Velocity(oursDPos, deltaT)
-				: new Velocity(0, 0, 1, 1);
-		themVel = themDPos != null ? new Velocity(themDPos, deltaT)
-				: new Velocity(0, 0, 1, 1);
-		ballVel = ballDPos != null ? new Velocity(ballDPos, deltaT)
-				: new Velocity(0, 0, 1, 1);
-		LOG.trace("Ball velocity (BW): " + ballVel);
+		ballEstimator.update(ballPosition, deltaT);
+		ballPosition = ballEstimator.getPosition();
+
+		Velocity oursVel = ourRobotEstimator.getVelocity();
+		Velocity themVel = theirRobotEstimator.getVelocity();
+		Velocity ballVel = ballEstimator.getVelocity();
 
 		AngularVelocity oursAngVel = null, themAngVel = null;
 		if (ourOrientation == null) {
@@ -154,26 +139,29 @@ public class BasicWorld extends AbstractWorld {
 		ours = new Robot(ourPosition, oursVel, oursAngVel, ourOrientation);
 		ball = new Ball(ballPosition, ballVel);
 
-		// pack into a snapshot, and update prev/prevRaw
-		Snapshot nextSnapshot = new Snapshot(them, ours, ball,
-				getOpponentsGoal(), getOwnGoal(), getPitch(), timestamp);
+
+		// Pack into a snapshot
+		Snapshot nextSnapshot = new Snapshot(this, them, ours, ball, timestamp);
+		prevRaw = nextSnapshot;
+
 		nextSnapshot = filter(nextSnapshot);
-		this.prevRaw = nextSnapshot;
         updateSnapshot(nextSnapshot);
     }
 
     protected synchronized void updateSnapshot(Snapshot nextSnapshot) {
-        this.prev = nextSnapshot;
+		prev = nextSnapshot;
 	}
 
 	@Override
 	public void updatePitchSize(double width, double height) {
 		super.updatePitchSize(width, height);
 		synchronized (this) {
-			this.prev = new EmptySnapshot(getOpponentsGoal(), getOwnGoal(),
-					getPitch());
-			this.prevRaw = new EmptySnapshot(getOpponentsGoal(), getOwnGoal(),
-					getPitch());
+			ballEstimator.reset();
+			ourRobotEstimator.reset();
+			theirRobotEstimator.reset();
+
+			prev = new EmptySnapshot(this);
+			prevRaw = new EmptySnapshot(this);
 		}
 	}
 

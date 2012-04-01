@@ -4,7 +4,7 @@ import static balle.misc.Globals.MAXIMUM_MOTOR_SPEED;
 import static balle.misc.Globals.velocityToPower;
 import balle.controller.Controller;
 import balle.misc.Globals;
-import balle.strategy.pathfinding.PathFinder;
+import balle.strategy.pathFinding.PathFinder;
 import balle.world.Coord;
 import balle.world.Orientation;
 import balle.world.Snapshot;
