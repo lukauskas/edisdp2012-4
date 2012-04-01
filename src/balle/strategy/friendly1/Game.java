@@ -52,6 +52,8 @@ public class Game extends AbstractPlanner {
     public void onStep(Controller controller, Snapshot snapshot) {
 
         Robot ourRobot = snapshot.getBalle();
+        if (ourRobot.getPosition() == null)
+            return;
         Robot opponent = snapshot.getOpponent();
         Ball ball = snapshot.getBall();
         Goal ownGoal = snapshot.getOwnGoal();
