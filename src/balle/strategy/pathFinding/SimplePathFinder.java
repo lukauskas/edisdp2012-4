@@ -92,6 +92,10 @@ public class SimplePathFinder implements PathFinder {
 		currentPathStack.push(pathEnd);
 		Curve currentCurve = getCurve(currentPathStack);
 
+		// If path has already collided with an obstacle
+		if (!validated(currentCurve, s))
+			return new Stack<Coord>();
+
 		// find next obstacle
 		// Check for intersections.
 		Obstacle obsticle = isClear(currentCurve, s);
@@ -136,6 +140,10 @@ public class SimplePathFinder implements PathFinder {
 			// return best possible path
 			return best(possiblePaths);
 		}
+	}
+
+	private boolean validated(Curve currentCurve, Snapshot s) {
+		return true;
 	}
 
 	protected Obstacle isClear(Curve c, Snapshot s) {
