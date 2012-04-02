@@ -85,7 +85,7 @@ public class Dribble extends AbstractPlanner {
     }
 
 	@Override
-	public void onStep(Controller controller, Snapshot snapshot) {
+	public void onStep(Controller controller, Snapshot snapshot) throws ConfusedException {
 
         if (snapshot.getBalle().getPosition() == null)
             return;

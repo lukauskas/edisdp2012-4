@@ -48,7 +48,7 @@ public class GoToFaceBall extends GoToBall {
 	}
 	
 	@Override
-    public void onStep(Controller controller, Snapshot snapshot) {
+    public void onStep(Controller controller, Snapshot snapshot) throws ConfusedException {
         FieldObject target = getTarget(snapshot);
 
 		if ((snapshot == null)
@@ -78,18 +78,11 @@ public class GoToFaceBall extends GoToBall {
 
         // If it says it is not finished, tell it to do something for a step.
         if (!executorStrategy.isFinished(snapshot)) {
-			try {
-				executorStrategy.step(controller, snapshot);
-			} catch (ConfusedException e) {
-				e.printStackTrace();
-			}
+            executorStrategy.step(controller, snapshot);
+
         } else if (!rotateStrategy.isFinished(snapshot)) {
         	executorStrategy.stop(controller);
-			try {
-				rotateStrategy.step(controller, snapshot);
-			} catch (ConfusedException e) {
-				e.printStackTrace();
-			}
+            rotateStrategy.step(controller, snapshot);
         } else {
             // Tell the strategy to stop doing whatever it was doing
             executorStrategy.stop(controller);

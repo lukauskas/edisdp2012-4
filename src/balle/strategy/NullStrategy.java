@@ -16,7 +16,7 @@ public class NullStrategy extends AbstractPlanner {
 	}
 
 	@Override
-	public void onStep(Controller controller, Snapshot snapshot) {
+	public void onStep(Controller controller, Snapshot snapshot) throws ConfusedException {
 		if (snapshot == null) {
 			System.out.println("No Snapshot");
 			return;

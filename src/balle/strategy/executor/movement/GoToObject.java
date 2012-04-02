@@ -60,7 +60,8 @@ public class GoToObject implements MovementExecutor {
 	}
 
 	@Override
-	public void step(Controller controller, Snapshot snapshot) {
+    public void step(Controller controller, Snapshot snapshot)
+            throws ConfusedException {
 		// Fail quickly if state not set
 		if (snapshot == null)
 			return;
@@ -83,11 +84,9 @@ public class GoToObject implements MovementExecutor {
 
 			if (turningExecutor.isTurning()) // If we are still turning here
 			{
-				try {
-					turningExecutor.step(controller, snapshot);
-				} catch (ConfusedException e) {
-					e.printStackTrace();
-				}
+
+                turningExecutor.step(controller, snapshot);
+
 				return; // Continue
 			} else {
 				Orientation orientationToTarget = targetCoord.sub(
@@ -108,11 +107,8 @@ public class GoToObject implements MovementExecutor {
 						isMoving = false;
 					}
 
-					try {
-						turningExecutor.step(controller, snapshot);
-					} catch (ConfusedException e) {
-						e.printStackTrace();
-					}
+                    turningExecutor.step(controller, snapshot);
+
 				} else {
                     controller.forward(movementSpeed);
                     isMoving = true;

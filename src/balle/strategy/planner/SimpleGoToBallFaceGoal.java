@@ -48,7 +48,7 @@ public class SimpleGoToBallFaceGoal extends AbstractPlanner {
 	}
 
 	@Override
-	public void onStep(Controller controller, Snapshot snapshot) {
+	public void onStep(Controller controller, Snapshot snapshot) throws ConfusedException {
         FieldObject target = getTarget(snapshot);
 
 		if ((snapshot == null) || (snapshot.getBalle().getPosition() == null)
@@ -66,11 +66,9 @@ public class SimpleGoToBallFaceGoal extends AbstractPlanner {
 
 		// If it says it is not finished, tell it to do something for a step.
 		if (!executorStrategy.isFinished(snapshot)) {
-			try {
-				executorStrategy.step(controller, snapshot);
-			} catch (ConfusedException e) {
-				e.printStackTrace();
-			}
+
+            executorStrategy.step(controller, snapshot);
+
 		} else {
 			// Tell the strategy to stop doing whatever it was doing
 			executorStrategy.stop(controller);

@@ -50,7 +50,7 @@ public class Game extends AbstractPlanner {
     }
 
     @Override
-    public void onStep(Controller controller, Snapshot snapshot) {
+    public void onStep(Controller controller, Snapshot snapshot) throws ConfusedException {
 
         Robot ourRobot = snapshot.getBalle();
         if (ourRobot.getPosition() == null)
@@ -94,11 +94,8 @@ public class Game extends AbstractPlanner {
                             .findMaxRotationMaintaintingPossession(ball, true);
                     System.out.println(orien);
                     turningExecutor.setTargetOrientation(orien);
-					try {
-						turningExecutor.step(controller, snapshot);
-					} catch (ConfusedException e) {
-						e.printStackTrace();
-					}
+                    turningExecutor.step(controller, snapshot);
+
                     if (ourRobot.findMaxRotationMaintaintingPossession(ball,
                             true).degrees() < 10)
                         controller.kick();
@@ -108,11 +105,9 @@ public class Game extends AbstractPlanner {
                             .findMaxRotationMaintaintingPossession(ball, false);
                     System.out.println(orien);
                     turningExecutor.setTargetOrientation(orien);
-					try {
-						turningExecutor.step(controller, snapshot);
-					} catch (ConfusedException e) {
-						e.printStackTrace();
-					}
+
+                    turningExecutor.step(controller, snapshot);
+
                     if (ourRobot.findMaxRotationMaintaintingPossession(ball,
                             false).degrees() > -10)
                         controller.kick();
@@ -122,18 +117,14 @@ public class Game extends AbstractPlanner {
                 && (opponent.isFacingGoal(ownGoal))) {
             LOG.info("Defending");
             // Let defensiveStrategy deal with it!
-			try {
-				defensiveStrategy.step(controller, snapshot);
-			} catch (ConfusedException e) {
-				e.printStackTrace();
-			}
+
+            defensiveStrategy.step(controller, snapshot);
+
             addDrawables(defensiveStrategy.getDrawables());
         } else if (ball.isNearWall(pitch)) {
-			try {
-				pickBallFromWallStrategy.step(controller, snapshot);
-			} catch (ConfusedException e) {
-				e.printStackTrace();
-			}
+
+            pickBallFromWallStrategy.step(controller, snapshot);
+
             addDrawables(pickBallFromWallStrategy.getDrawables());
         } else if (ball.isNear(ourRobot)
                 && (ourRobot.isApproachingTargetFromCorrectSide(ball,
@@ -141,22 +132,18 @@ public class Game extends AbstractPlanner {
             if (Math.abs(ourRobot.getAngleToTurn(targetOrientation)) > (Math.PI / 4)) {
                 LOG.info("Ball is near our robot, turning to it");
                 turningExecutor.setTargetOrientation(targetOrientation);
-				try {
+
 					turningExecutor.step(controller, snapshot);
-				} catch (ConfusedException e) {
-					e.printStackTrace();
-				}
+
             } else {
                 // Go forward!
                 controller.setWheelSpeeds(400, 400);
             }
         } else {
             // Approach ball
-			try {
-				goToBallStrategy.step(controller, snapshot);
-			} catch (ConfusedException e) {
-				e.printStackTrace();
-			}
+
+            goToBallStrategy.step(controller, snapshot);
+
             addDrawables(goToBallStrategy.getDrawables());
 
         }

@@ -2,6 +2,7 @@ package balle.strategy.purePF;
 
 import balle.controller.Controller;
 import balle.misc.Globals;
+import balle.strategy.ConfusedException;
 import balle.strategy.planner.AbstractPlanner;
 import balle.world.Coord;
 import balle.world.Orientation;
@@ -19,7 +20,7 @@ public class GoToBallPurePFOnly extends AbstractPlanner {
 	}
 
 	@Override
-	public void onStep(Controller controller, Snapshot snapshot) {
+	public void onStep(Controller controller, Snapshot snapshot) throws ConfusedException {
 
 		Ball b = snapshot.getBall();
 		ball.update(b.getPosition(), snapshot.getOpponentsGoal());

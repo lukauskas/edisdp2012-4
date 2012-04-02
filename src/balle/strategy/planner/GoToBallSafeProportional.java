@@ -113,7 +113,7 @@ public class GoToBallSafeProportional extends GoToBall {
     }
 
     @Override
-    protected void onStep(Controller controller, Snapshot snapshot) {
+    protected void onStep(Controller controller, Snapshot snapshot) throws ConfusedException {
         FieldObject ball = getOriginalTarget(snapshot);
         Robot ourRobot = snapshot.getBalle();
 
@@ -183,7 +183,7 @@ public class GoToBallSafeProportional extends GoToBall {
 		}
 
 		@Override
-		protected void onStep(Controller controller, Snapshot snapshot) {
+		protected void onStep(Controller controller, Snapshot snapshot) throws ConfusedException {
 
 			Robot ourRobot = snapshot.getBalle();
 			Ball ball = snapshot.getBall();
@@ -201,11 +201,7 @@ public class GoToBallSafeProportional extends GoToBall {
 				isTurning = false;
 			}
 
-			try {
-				turnExecutor.step(controller, snapshot);
-			} catch (ConfusedException e) {
-				e.printStackTrace();
-			}
+            turnExecutor.step(controller, snapshot);
 
 		}
 

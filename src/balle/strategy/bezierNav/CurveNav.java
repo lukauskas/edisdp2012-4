@@ -73,7 +73,8 @@ public class CurveNav implements OrientedMovementExecutor {
 	}
 
 	@Override
-	public void step(Controller controller, Snapshot snapshot) {
+    public void step(Controller controller, Snapshot snapshot)
+            throws ConfusedException {
 		if (isFinished(snapshot)) {
 			stop(controller);
 			return;
@@ -86,11 +87,8 @@ public class CurveNav implements OrientedMovementExecutor {
 
 		// Update Movement Executor.
 		movementExecutor.updateTarget(curve.pos(stepDist).getPoint());
-		try {
 			movementExecutor.step(controller, snapshot);
-		} catch (ConfusedException e) {
-			e.printStackTrace();
-		}
+
 	}
 
 	@Override

@@ -59,7 +59,7 @@ public class InitialBezierStrategy extends AbstractPlanner {
 
     }
     @Override
-    protected void onStep(Controller controller, Snapshot snapshot) {
+    protected void onStep(Controller controller, Snapshot snapshot) throws ConfusedException {
 
         if (snapshot.getBalle().getPosition() == null)
             return;
@@ -68,11 +68,8 @@ public class InitialBezierStrategy extends AbstractPlanner {
         FieldObject target = getTarget(snapshot);
         Orientation desiredOrientation = getDesiredOrientation(target, snapshot);
         ome.updateTarget(target, desiredOrientation);
-		try {
-			ome.step(controller, snapshot);
-		} catch (ConfusedException e) {
-			e.printStackTrace();
-		}
+        ome.step(controller, snapshot);
+
     }
 
 }

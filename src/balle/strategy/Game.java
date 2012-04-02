@@ -164,7 +164,8 @@ public class Game extends AbstractPlanner {
     }
 
     @Override
-    public void onStep(Controller controller, Snapshot snapshot) {
+    public void onStep(Controller controller, Snapshot snapshot)
+            throws ConfusedException {
 
         Robot ourRobot = snapshot.getBalle();
         Ball ball = snapshot.getBall();
@@ -179,11 +180,9 @@ public class Game extends AbstractPlanner {
 
         if (isInitial(snapshot)) {
             setCurrentStrategy(initialStrategy.getClass().getName());
-			try {
-				initialStrategy.step(controller, snapshot);
-			} catch (ConfusedException e) {
-				e.printStackTrace();
-			}
+
+            initialStrategy.step(controller, snapshot);
+
             addDrawables(initialStrategy.getDrawables());
             return;
         }
@@ -205,11 +204,8 @@ public class Game extends AbstractPlanner {
             LOG.info(ourRobot.getFrontSide().midpoint()
                     .dist(ball.getPosition()));
         }
-		try {
-			strategy.step(controller, snapshot);
-		} catch (ConfusedException e) {
-			e.printStackTrace();
-		}
+        strategy.step(controller, snapshot);
+
 		addDrawables(strategy.getDrawables());
     }
 

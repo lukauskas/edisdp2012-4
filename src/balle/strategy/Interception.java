@@ -69,7 +69,7 @@ public class Interception extends AbstractPlanner {
 
 
     @Override
-    public void onStep(Controller controller, Snapshot snapshot) {
+    public void onStep(Controller controller, Snapshot snapshot) throws ConfusedException {
 
         Coord optimum = new Coord(0, 0);
         Goal goal = snapshot.getOwnGoal();
@@ -114,21 +114,15 @@ public class Interception extends AbstractPlanner {
             if (movementExecutor != null) {
                 movementExecutor.updateTarget(new Point(goToCoord));
                 addDrawables(movementExecutor.getDrawables());
-				try {
-					movementExecutor.step(controller, snapshot);
-				} catch (ConfusedException e) {
-					e.printStackTrace();
-				}
+                movementExecutor.step(controller, snapshot);
+
             } else if (orientedMovementExecutor != null) {
                 orientedMovementExecutor.updateTarget(new Point(goToCoord),
                         snapshot.getOpponentsGoal().getGoalLine().midpoint()
                                 .sub(intercept).orientation());
                 addDrawables(orientedMovementExecutor.getDrawables());
-				try {
-					orientedMovementExecutor.step(controller, snapshot);
-				} catch (ConfusedException e) {
-					e.printStackTrace();
-				}
+                orientedMovementExecutor.step(controller, snapshot);
+
             }
         } else {
             setIAmDoing("Waiting");

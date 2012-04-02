@@ -15,7 +15,7 @@ public interface Strategy {
 	 *            TODO
 	 * @throws ConfusedException
 	 */
-	public void step(Controller controller, Snapshot snapshot)
+    public void step(Controller controller, Snapshot snapshot)
 			throws ConfusedException;
 
     /**
