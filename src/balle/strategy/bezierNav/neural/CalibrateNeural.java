@@ -1,6 +1,7 @@
 package balle.strategy.bezierNav.neural;
 
 import org.apache.log4j.Logger;
+import org.neuroph.core.learning.TrainingElement;
 import org.neuroph.core.learning.TrainingSet;
 import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.nnet.learning.BackPropagation;
@@ -18,6 +19,8 @@ public class CalibrateNeural extends AbstractPlanner {
 	protected NeuralNetExecutor nne;
 
 	protected TrainingSet ts;
+
+	protected int leftCmd = 0, rightCmd = 0;
 
 	@FactoryMethod(designator = "CalibrateNeural", parameterNames = {})
 	public static CalibrateNeural calibrateNeuralFactory() {
@@ -42,11 +45,12 @@ public class CalibrateNeural extends AbstractPlanner {
 
 	}
 
-	protected void record(double desLeft, double desRight, double actLeft,
-			double actRight, double fitness) {
-		LOG.trace(desLeft + " " + desRight);
+	protected void record(double left, double right, double fitness) {
+		LOG.trace(left + " " + right);
 
-		// TODO
+		TrainingElement te = new TrainingElement(left, right);
+		
+		ts.addElement(te);
 	}
 
 }
