@@ -382,6 +382,13 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 			g.setColor(c);
 			g.fillPolygon(new int[] { xs[2], xs[3], scaler.m2PX(x) },
 					new int[] { ys[2], ys[3], scaler.m2PY(y) }, 3);
+
+            if (robot.isNearWall(s.getPitch())) {
+                Label nearWallLabel = new Label("NW", new Coord(robot
+                        .getPosition().getX(), robot.getPosition().getY()
+                        + robot.getHeight() / 2 + 0.03), Color.MAGENTA);
+                nearWallLabel.draw(g, scaler);
+            }
 		}
 
 		// Convert meters into pixels and draws line
