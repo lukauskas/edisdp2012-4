@@ -15,6 +15,7 @@ public class NeuralNetExecutor implements WheelSpeedExecutor {
 
 	protected CalibrateNeural listener;
 
+	protected int gLeft = 0, gRight = 0;
 
 	public NeuralNetExecutor(NeuralNetwork neural) {
 		this.neural = neural;
@@ -52,13 +53,16 @@ public class NeuralNetExecutor implements WheelSpeedExecutor {
 		oRight = (int) neural.getOutput()[1];
 
 		controller.setWheelSpeeds(oLeft, oRight);
+		listener.record(gLeft, gRight, oLeft, oRight);
 	}
 
 	@Override
-	public void update(double desLeft, double desRight, double actLeft,
+	public void update(int desLeft, int desRight, double actLeft,
 			double actRight) {
 		neural.setInput(desLeft, actLeft, desRight, actRight);
 		neural.calculate();
+		gLeft = desLeft;
+		gRight = desRight;
 	}
 
 }
