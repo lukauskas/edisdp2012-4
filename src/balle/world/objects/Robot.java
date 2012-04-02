@@ -316,7 +316,7 @@ public class Robot extends RectangularObject {
 		Coord s, f, delta;
 		s = rel;
 		f = getVelocity().add(rel.rotate(dAng));
-		delta = f.sub(f);
+		delta = f.sub(s);
 
 		double cst = Math.PI - 2;
 		double var = dAng.radians() / Math.PI;

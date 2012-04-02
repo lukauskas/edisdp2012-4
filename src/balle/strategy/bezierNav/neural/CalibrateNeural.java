@@ -9,11 +9,11 @@ import org.neuroph.nnet.learning.BackPropagation;
 import balle.controller.Controller;
 import balle.misc.Globals;
 import balle.strategy.FactoryMethod;
-import balle.strategy.planner.AbstractPlanner;
+import balle.strategy.UserInputStrategy;
 import balle.world.Snapshot;
 import balle.world.objects.Robot;
 
-public class CalibrateNeural extends AbstractPlanner {
+public class CalibrateNeural extends UserInputStrategy {
 
 	public static final Logger LOG = Logger.getLogger(CalibrateNeural.class);
 	public static long lastCheck;
@@ -31,6 +31,7 @@ public class CalibrateNeural extends AbstractPlanner {
 		return new CalibrateNeural();
 	}
 
+
 	public CalibrateNeural() {
 		mlp = new MultiLayerPerceptron(4, 5, 5, 2);
 		mlp.setLearningRule(new BackPropagation());
@@ -41,34 +42,18 @@ public class CalibrateNeural extends AbstractPlanner {
 		nne.addlistener(this);
 	}
 
-	int leftWheelSpeed = -900;
-	int rightWheelSpeed = -900;
-	int i;
-	int space;
-
 	@Override
-	protected void onStep(Controller controller, Snapshot snapshot) {
-		snapshot.getTimestamp();
-		int leftWheelSpeed = 0;
-		int rightWheelSpeed = 0;
-		
-		long timeThisCheck = System.currentTimeMillis();
-		long timeOut = timeThisCheck - lastCheck;
-		
-		if ( timeOut > 100) {
-			controller.setWheelSpeeds(leftWheelSpeed, rightWheelSpeed);
-	
-			lastCheck = timeThisCheck;
-			if (leftWheelSpeed < Globals.MAXIMUM_MOTOR_SPEED -20) {
-				switch(space) {
-					case 1: leftWheelSpeed += 20; space = 2; break;
-					case 2: leftWheelSpeed += 20; space = 3; break;
-					case 3: leftWheelSpeed += 20; space = 4; break;
-					case 4: rightWheelSpeed += 20; space = 1; break;
-				}
-				
-			}
-		}
+	public void onStep(Controller controller, Snapshot snapshot) {
+		if (lastRobot == null)
+			lastRobot = snapshot.getBalle();
+
+		double velLeft, velRight;
+		velLeft = snapshot.getBalle().getLeftWheelSpeed();
+		velRight = snapshot.getBalle().getRightWheelSpeed();
+
+		nne.update((int) leftWheelPower, (int) rightWheelPower, velLeft,
+				velRight);
+		nne.step(controller, snapshot);
 
 	}
 
@@ -93,6 +78,10 @@ public class CalibrateNeural extends AbstractPlanner {
 		this.currRight = cRight;
 		this.desLeftCmd = gLeft;
 		this.desRightCmd = gRight;
+
+		LOG.trace("Commands\n" + left + "\n" + right + "\n" + cLeft
+				+ "\n" + cRight + "\n" + gLeft + "\n" + gRight);
+
 	}
 
 	protected float getFitness(int desLeftCmd, int desRightCmd,
@@ -103,4 +92,35 @@ public class CalibrateNeural extends AbstractPlanner {
 	private double angularVelToWheelSpeed(double angVel) {
 		return (angVel * Globals.ROBOT_TRACK_WIDTH) / (PIVOT ? 1 : 2);
 	}
+
+	// int leftWheelSpeed = -900;
+	// int rightWheelSpeed = -900;
+	// int i;
+	// int space;
+
+	// @Override
+	// public void onStep(Controller controller, Snapshot snapshot) {
+	// snapshot.getTimestamp();
+	// int leftWheelSpeed = 0;
+	// int rightWheelSpeed = 0;
+	//
+	// long timeThisCheck = System.currentTimeMillis();
+	// long timeOut = timeThisCheck - lastCheck;
+	//
+	// if ( timeOut > 100) {
+	// controller.setWheelSpeeds(leftWheelSpeed, rightWheelSpeed);
+	//
+	// lastCheck = timeThisCheck;
+	// if (leftWheelSpeed < Globals.MAXIMUM_MOTOR_SPEED -20) {
+	// switch(space) {
+	// case 1: leftWheelSpeed += 20; space = 2; break;
+	// case 2: leftWheelSpeed += 20; space = 3; break;
+	// case 3: leftWheelSpeed += 20; space = 4; break;
+	// case 4: rightWheelSpeed += 20; space = 1; break;
+	// }
+	//
+	// }
+	// }
+	//
+	// }
 }

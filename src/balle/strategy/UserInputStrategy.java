@@ -19,8 +19,13 @@ public class UserInputStrategy extends AbstractPlanner {
 
     private Screen screen;
     private int    mouseXPos = 10, mouseYPos = 4;
-    private float  leftWheelPower = 0, rightWheelPower = 0;
-	private Controller controller;
+
+	protected float leftWheelPower = 0, rightWheelPower = 0;
+
+	// Shouldn't keep references to the controller.
+	// private Controller controller;
+
+	protected boolean kick;
 
     @FactoryMethod(designator = "UserInput", parameterNames = {})
 	public static UserInputStrategy gameFactory() {
@@ -33,7 +38,7 @@ public class UserInputStrategy extends AbstractPlanner {
 
         JFrame frame = new JFrame("Controller");
         frame.setSize(500, 500);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		// V Annoying: frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
 
         screen = new Screen();
@@ -58,9 +63,12 @@ public class UserInputStrategy extends AbstractPlanner {
     @Override
     // TODO Change to rely on and react to JPanel thing
     public void onStep(Controller controller, Snapshot snapshot) {
-		this.controller = controller;
         controller.setWheelSpeeds(Math.round(leftWheelPower),
                 Math.round(rightWheelPower));
+
+		if (kick)
+			controller.kick();
+        kick = false;
 
     }
 
@@ -108,7 +116,7 @@ public class UserInputStrategy extends AbstractPlanner {
         @Override
         public void mousePressed(MouseEvent arg0) {
 			if (arg0.getButton() == MouseEvent.BUTTON3) {
-				controller.kick();
+				kick = true;
 			}
 
         }
