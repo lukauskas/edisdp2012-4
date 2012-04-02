@@ -92,8 +92,6 @@ public class SimplePathFinder implements PathFinder {
 	private Stack<Coord> getPath(Coord pathStart, Coord pathEnd, Snapshot s,
 			int currentDepth) {
 
-		LOG.trace("ARG");
-
 		// get the curve without avoiding obstacles
 		Stack<Coord> currentPathStack = new Stack<Coord>();
 		int currentPathLength = currentPathStack.size();
@@ -162,11 +160,13 @@ public class SimplePathFinder implements PathFinder {
 	}
 
 	protected ArrayList<Obstacle> isClear(Curve c, Snapshot s) {
-        // TODO: Review
-        if (s.getOpponent().getPosition() == null)
-            return null;
-
 		ArrayList<Obstacle> out = new ArrayList<Obstacle>();
+
+		// TODO: David says "Review"
+		// James says "Yeah, this changes
+		// behaviour with more obstacles"
+		if (s.getOpponent().getPosition() == null)
+			return out;
 
 		Coord pos = s.getBalle().getPosition();
 		for (Obstacle o : getObstacles(s)) {
