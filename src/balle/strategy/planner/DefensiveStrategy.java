@@ -5,6 +5,7 @@ import java.awt.Color;
 import org.apache.log4j.Logger;
 
 import balle.main.drawable.DrawableLine;
+import balle.misc.Globals;
 import balle.strategy.executor.movement.MovementExecutor;
 import balle.world.Coord;
 import balle.world.Line;
@@ -58,8 +59,10 @@ public class DefensiveStrategy extends GoToBall {
 		Line defenceLine = new Line(ball.getPosition(), intersectionPoint);
 		addDrawable(new DrawableLine(defenceLine, Color.WHITE));
 
-		// return defenceLine.closestPoint(our.getPosition());
-		return defenceLine.midpoint();
+        if (defenceLine.dist(our.getPosition()) < Globals.ROBOT_LENGTH * 1.2)
+            return defenceLine.closestPoint(our.getPosition());
+        else
+            return defenceLine.midpoint();
 	}
 
 	@Override
