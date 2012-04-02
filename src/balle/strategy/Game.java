@@ -237,7 +237,9 @@ public class Game extends AbstractPlanner {
 		RectangularObject corridor = new Line(ourRobot.getPosition(),
 				ball.getPosition()).widen(0.5);
         addDrawable(new DrawableRectangularObject(corridor, Color.BLACK));
-		if (corridor.containsCoord(opponent.getPosition())) {
+        if ((corridor.containsCoord(opponent.getPosition()))
+                && !(opponent.possessesBall(ball) && (opponent
+                        .isFacingGoalHalf(ownGoal)))) {
 			return goToBallBezier;
 		}
 		
