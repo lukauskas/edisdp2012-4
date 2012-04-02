@@ -114,7 +114,7 @@ public class Orientation {
 	}
 
 	public boolean isFacingRight(double epsilon) {
-		return (degrees() < 90 - epsilon) && (degrees() > 270 + epsilon);
+        return (degrees() < 90 - epsilon) || (degrees() > 270 + epsilon);
 	}
 
 	public Orientation getOpposite() {
