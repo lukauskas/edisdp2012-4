@@ -204,7 +204,14 @@ public class Game extends AbstractPlanner {
             LOG.info(ourRobot.getFrontSide().midpoint()
                     .dist(ball.getPosition()));
         }
-        strategy.step(controller, snapshot);
+        try {
+            strategy.step(controller, snapshot);
+        } catch (ConfusedException e) {
+            // If a strategy does not know what to do
+            LOG.error(e.toString());
+            // Default to goToBallPFN
+            goToBallPFN.step(controller, snapshot);
+        }
 
 		addDrawables(strategy.getDrawables());
     }
