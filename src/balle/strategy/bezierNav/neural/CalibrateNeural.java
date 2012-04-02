@@ -25,6 +25,7 @@ public class CalibrateNeural extends UserInputStrategy {
 	private final boolean PIVOT = false;
 
 	protected Robot lastRobot = null;
+	protected Robot currentRobot = null;
 
 	@FactoryMethod(designator = "CalibrateNeural", parameterNames = {})
 	public static CalibrateNeural calibrateNeuralFactory() {
@@ -46,6 +47,7 @@ public class CalibrateNeural extends UserInputStrategy {
 	public void onStep(Controller controller, Snapshot snapshot) {
 		if (lastRobot == null)
 			lastRobot = snapshot.getBalle();
+		currentRobot = snapshot.getBalle();
 
 		double velLeft, velRight;
 		velLeft = snapshot.getBalle().getLeftWheelSpeed();
@@ -63,7 +65,8 @@ public class CalibrateNeural extends UserInputStrategy {
 
 	protected void record(int gLeft, int gRight, double cLeft, double cRight,
 			double left, double right) {
-		double lastLeft = lastRobot.getLeftWheelSpeed(), lastRight = lastRobot.getRightWheelSpeed();
+		double lastLeft = lastRobot.getLeftWheelSpeed(), lastRight = lastRobot
+				.getRightWheelSpeed();
 
 		float perf = getFitness(desLeftCmd, desRightCmd, currLeft, currRight,
 				lastLeft, lastRight);
@@ -78,6 +81,7 @@ public class CalibrateNeural extends UserInputStrategy {
 		this.currRight = cRight;
 		this.desLeftCmd = gLeft;
 		this.desRightCmd = gRight;
+		this.lastRobot = currentRobot;
 
 		LOG.trace("Commands\n" + left + "\n" + right + "\n" + cLeft
 				+ "\n" + cRight + "\n" + gLeft + "\n" + gRight);

@@ -64,6 +64,8 @@ public class NeuralNetExecutor implements WheelSpeedExecutor {
 		neural.calculate();
 		gLeft = desLeft;
 		gRight = desRight;
+		cLeft = actLeft;
+		cRight = actRight;
 	}
 
 }
