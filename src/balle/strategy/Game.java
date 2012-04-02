@@ -23,7 +23,7 @@ import balle.strategy.planner.AbstractPlanner;
 import balle.strategy.planner.BackingOffStrategy;
 import balle.strategy.planner.GoToBall;
 import balle.strategy.planner.GoToBallSafeProportional;
-import balle.strategy.planner.InitialStrategy;
+import balle.strategy.planner.InitialBezierStrategy;
 import balle.strategy.planner.KickFromWall;
 import balle.strategy.planner.SimpleGoToBallFaceGoal;
 import balle.world.Coord;
@@ -44,8 +44,9 @@ public class Game extends AbstractPlanner {
     protected final BackingOffStrategy backingOffStrategy;
 	protected final RotateToOrientationExecutor turningExecutor;
     protected final Dribble kickingStrategy;
-    protected final InitialStrategy initialStrategy;
-	protected final Strategy goToBallPFN;
+    protected Strategy initialStrategy;
+
+    protected final Strategy goToBallPFN;
 	protected final Strategy goToBallBezier;
     protected final Strategy goToBallPrecision;
 
@@ -55,6 +56,14 @@ public class Game extends AbstractPlanner {
 
     public String getCurrentStrategy() {
         return currentStrategy;
+    }
+
+    public Strategy getInitialStrategy() {
+        return initialStrategy;
+    }
+
+    public void setInitialStrategy(Strategy initialStrategy) {
+        this.initialStrategy = initialStrategy;
     }
 
     @Override
@@ -79,6 +88,14 @@ public class Game extends AbstractPlanner {
         return g;
     }
 
+    @FactoryMethod(designator = "GameInitTest", parameterNames = { "angle (deg)" })
+    public static Game gameInitTest(double angle) {
+        Game g = new Game(true);
+        g.setTriggerHappy(true);
+        g.setInitialStrategy(new InitialBezierStrategy(angle));
+        return g;
+    }
+
     public void setTriggerHappy(boolean triggerHappy) {
         kickingStrategy.setTriggerHappy(triggerHappy);
     }
@@ -89,7 +106,7 @@ public class Game extends AbstractPlanner {
 		backingOffStrategy = new BackingOffStrategy();
         turningExecutor = new IncFaceAngle();
         kickingStrategy = new Dribble();
-        initialStrategy = new InitialStrategy();
+        initialStrategy = new InitialBezierStrategy();
 		goToBallPFN = new GoToBallSafeProportional();
 		goToBallBezier = new SimpleGoToBallFaceGoal(new BezierNav(
                 new SimplePathFinder(new CustomCHI())));
