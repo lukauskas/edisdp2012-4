@@ -1,8 +1,8 @@
 package balle.strategy.bezierNav.neural;
 
+import java.util.ArrayList;
+
 import org.apache.log4j.Logger;
-import org.neuroph.core.learning.TrainingElement;
-import org.neuroph.core.learning.TrainingSet;
 import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.nnet.learning.BackPropagation;
 
@@ -20,7 +20,7 @@ public class CalibrateNeural extends AbstractPlanner {
 	protected MultiLayerPerceptron mlp;
 	protected NeuralNetExecutor nne;
 
-	protected TrainingSet ts;
+	protected ArrayList<NeuralObj> data = new ArrayList<NeuralObj>();
 
 	private final boolean PIVOT = false;
 
@@ -39,8 +39,6 @@ public class CalibrateNeural extends AbstractPlanner {
 
 		nne = new NeuralNetExecutor(mlp);
 		nne.addlistener(this);
-
-		ts = new TrainingSet();
 	}
 
 	int leftWheelSpeed = -900;
@@ -76,16 +74,17 @@ public class CalibrateNeural extends AbstractPlanner {
 
 	protected int sentLeftCmd = 0, sentRightCmd = 0;
 	protected double currLeft = 0, currRight = 0;
-	protected double desLeftCmd = 0, desRightCmd = 0;
+	protected int desLeftCmd = 0, desRightCmd = 0;
 
 	protected void record(int gLeft, int gRight, double cLeft, double cRight,
 			double left, double right) {
 		double lastLeft = lastRobot.getLeftWheelSpeed(), lastRight = lastRobot.getRightWheelSpeed();
 
-		TrainingElement te = new TrainingElement(desLeftCmd, desRightCmd,
+		float perf = getFitness(desLeftCmd, desRightCmd, currLeft, currRight,
 				lastLeft, lastRight);
 
-		ts.addElement(te);
+		data.add(new NeuralObj(desLeftCmd, desRightCmd, currLeft, currRight,
+				perf));
 
 		// Update
 		this.sentLeftCmd = (int) left;
@@ -94,6 +93,11 @@ public class CalibrateNeural extends AbstractPlanner {
 		this.currRight = cRight;
 		this.desLeftCmd = gLeft;
 		this.desRightCmd = gRight;
+	}
+
+	protected float getFitness(int desLeftCmd, int desRightCmd,
+			double currLeft, double currRight, double oLeft, double oRight) {
+		return 0;
 	}
 
 	private double angularVelToWheelSpeed(double angVel) {
