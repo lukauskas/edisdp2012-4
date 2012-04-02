@@ -30,7 +30,11 @@ public class Dribble extends AbstractPlanner {
             / 2 + Globals.BALL_RADIUS - 0.02;
 
     private static final double FACING_WALL_THRESHOLD = Math.toRadians(25);
-    private static final double SPINNING_DISTANCE = Globals.ROBOT_LENGTH / 2 + 0.01;
+    private static final double SPINNING_DISTANCE = Globals.DISTANCE_TO_WALL;// Globals.ROBOT_LENGTH
+                                                                             // /
+                                                                             // 2
+                                                                             // +
+                                                                             // 0.02;
 
     private boolean triggerHappy;
 
@@ -152,7 +156,8 @@ public class Dribble extends AbstractPlanner {
 		double threshold = Math.toRadians(5);
 		
         boolean nearWall = snapshot.getBall().isNearWall(snapshot.getPitch());
-        boolean veryNearWall = snapshot.getBall().isNearWall(snapshot.getPitch(), SPINNING_DISTANCE);
+        boolean wereNearWall = snapshot.getBalle().isNearWall(
+                snapshot.getPitch(), SPINNING_DISTANCE);
 
         boolean closeToGoal = snapshot.getOpponentsGoal().getGoalLine()
                 .dist(snapshot.getBalle().getPosition()) < SPINNING_DISTANCE;
@@ -166,7 +171,7 @@ public class Dribble extends AbstractPlanner {
         if (nearWall)
             turnSpeedToUse *= 2;
         
-        if ((!closeToGoal) && (nearWall) && veryNearWall)
+        if ((!closeToGoal) && (nearWall) && wereNearWall)
         {
             Coord goalVector = snapshot.getOwnGoal().getGoalLine()
                     .midpoint().sub(ourPos);
