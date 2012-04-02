@@ -55,8 +55,8 @@ public class StrategyRunner extends AbstractWorldProcessor {
 	@Override
 	protected void actionOnChange() {
 
-		Strategy strategyA = currentStrategyA;
-		Strategy strategyB = currentStrategyB;
+		final Strategy strategyA = currentStrategyA;
+		final Strategy strategyB = currentStrategyB;
         long start = System.currentTimeMillis();
 		if (strategyA != null && strategyB != null) {
 			Snapshot snapshot = getSnapshot();
@@ -72,7 +72,7 @@ public class StrategyRunner extends AbstractWorldProcessor {
                 LOG.error("Strategy raised exception" + e.toString());
 
                 for (StackTraceElement se : e.getStackTrace())
-                    LOG.debug(se.toString());
+					LOG.error(se.toString());
 
                 controllerA.stop();
                 if (controllerB != null) {
