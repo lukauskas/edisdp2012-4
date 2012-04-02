@@ -102,16 +102,19 @@ public class SimplePathFinder implements PathFinder {
 
 		// find next obstacle
 		// Check for intersections.
-		Obstacle obsticle = isClear(currentCurve, s);
+		ArrayList<Obstacle> obsticle = isClear(currentCurve, s);
 
 		// if no obstacls of the path is getting too long, just stop
-		if (obsticle == null || currentDepth > 4) {
+		if (obsticle.size() == 0 || currentDepth > 4) {
 			return currentPathStack;
 		} else {
 
 			// get new waypoint(s) possibilities
-			Coord[][] possibleNextWaypoints = obsticle.getWaypoint(s,
-					pathStart, currentCurve);
+			ArrayList<Coord[]> possibleNextWaypoints = new ArrayList<Coord[]>();
+
+			for (Obstacle each : obsticle)
+				for (Coord[] pnw : each.getWaypoint(s, pathStart, currentCurve))
+					possibleNextWaypoints.add(pnw);
 
 			// add all options to the possible paths list
 			ArrayList<Stack<Coord>> possiblePaths = new ArrayList<Stack<Coord>>();
@@ -146,12 +149,12 @@ public class SimplePathFinder implements PathFinder {
 		}
 	}
 
-	protected Obstacle isClearSoFar(Curve c, Snapshot s, int len) {
+	protected ArrayList<Obstacle> isClearSoFar(Curve c, Snapshot s, int len) {
 		Spline curve = (Spline) c;
 		return isClear(curve.getSubSpline(0, len), s);
 	}
 
-	protected Obstacle isClear(Curve c, Snapshot s) {
+	protected ArrayList<Obstacle> isClear(Curve c, Snapshot s) {
         // TODO: Review
         if (s.getOpponent().getPosition() == null)
             return null;
@@ -248,6 +251,8 @@ public class SimplePathFinder implements PathFinder {
 		// Obstical.ROBOT_CLEARANCE)
 		};
 
+		ArrayList<Obstacle> out = new ArrayList<Obstacle>();
+
 		Coord pos = s.getBalle().getPosition();
 		for (Obstacle o : obstacles) {
 
@@ -257,7 +262,7 @@ public class SimplePathFinder implements PathFinder {
 			// clearance area
 			// this is not really an obstacle if our path is already moving away
 			if (!o.clear(start) && o.isMovingTowards(c)) {
-				return o;
+				out.add(o);
 			}
 
 			// (o.getSource() instanceof Pitch)
@@ -268,11 +273,11 @@ public class SimplePathFinder implements PathFinder {
 			for (double i = 0; i < 1; i += 0.01) {
 				boolean newIn = !o.clear(c.pos(i));
 				if (!in && newIn) {
-					return o;
+					out.add(o);
 				}
 			}
 		}
-		return null;
+		return out;
 	}
 
 	//
