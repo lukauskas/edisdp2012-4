@@ -2,6 +2,7 @@ package balle.strategy.planner;
 
 import balle.controller.Controller;
 import balle.main.drawable.Dot;
+import balle.strategy.ConfusedException;
 import balle.strategy.executor.movement.MovementExecutor;
 import balle.strategy.executor.turning.RotateToOrientationExecutor;
 import balle.world.Coord;
@@ -77,10 +78,18 @@ public class GoToFaceBall extends GoToBall {
 
         // If it says it is not finished, tell it to do something for a step.
         if (!executorStrategy.isFinished(snapshot)) {
-			executorStrategy.step(controller, snapshot);
+			try {
+				executorStrategy.step(controller, snapshot);
+			} catch (ConfusedException e) {
+				e.printStackTrace();
+			}
         } else if (!rotateStrategy.isFinished(snapshot)) {
         	executorStrategy.stop(controller);
-			rotateStrategy.step(controller, snapshot);
+			try {
+				rotateStrategy.step(controller, snapshot);
+			} catch (ConfusedException e) {
+				e.printStackTrace();
+			}
         } else {
             // Tell the strategy to stop doing whatever it was doing
             executorStrategy.stop(controller);

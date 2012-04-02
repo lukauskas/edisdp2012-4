@@ -179,7 +179,11 @@ public class Game extends AbstractPlanner {
 
         if (isInitial(snapshot)) {
             setCurrentStrategy(initialStrategy.getClass().getName());
-            initialStrategy.step(controller, snapshot);
+			try {
+				initialStrategy.step(controller, snapshot);
+			} catch (ConfusedException e) {
+				e.printStackTrace();
+			}
             addDrawables(initialStrategy.getDrawables());
             return;
         }
@@ -201,7 +205,11 @@ public class Game extends AbstractPlanner {
             LOG.info(ourRobot.getFrontSide().midpoint()
                     .dist(ball.getPosition()));
         }
-		strategy.step(controller, snapshot);
+		try {
+			strategy.step(controller, snapshot);
+		} catch (ConfusedException e) {
+			e.printStackTrace();
+		}
 		addDrawables(strategy.getDrawables());
     }
 

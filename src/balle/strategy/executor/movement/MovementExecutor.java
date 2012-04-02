@@ -1,6 +1,7 @@
 package balle.strategy.executor.movement;
 
 import balle.controller.Controller;
+import balle.strategy.ConfusedException;
 import balle.strategy.executor.Executor;
 import balle.world.Snapshot;
 import balle.world.objects.FieldObject;
@@ -26,7 +27,8 @@ public interface MovementExecutor extends Executor {
 	public boolean isPossible(Snapshot snapshot);
 
 	@Override
-	public void step(Controller controller, Snapshot snapshot);
+	public void step(Controller controller, Snapshot snapshot)
+			throws ConfusedException;
 
     public void setStopDistance(double stopDistance);
 

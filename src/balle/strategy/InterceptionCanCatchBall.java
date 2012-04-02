@@ -104,13 +104,21 @@ public class InterceptionCanCatchBall extends AbstractPlanner {
             if (movementExecutor != null) {
                 movementExecutor.updateTarget(new Point(intercept));
                 addDrawables(movementExecutor.getDrawables());
-                movementExecutor.step(controller, snapshot);
+				try {
+					movementExecutor.step(controller, snapshot);
+				} catch (ConfusedException e) {
+					e.printStackTrace();
+				}
             } else if (orientedMovementExecutor != null) {
                 orientedMovementExecutor.updateTarget(new Point(intercept),
                         snapshot.getOpponentsGoal().getGoalLine().midpoint()
                                 .sub(intercept).orientation());
                 addDrawables(orientedMovementExecutor.getDrawables());
-                orientedMovementExecutor.step(controller, snapshot);
+				try {
+					orientedMovementExecutor.step(controller, snapshot);
+				} catch (ConfusedException e) {
+					e.printStackTrace();
+				}
             }
         } else {
             setIAmDoing("Waiting");

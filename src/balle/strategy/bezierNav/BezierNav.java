@@ -14,6 +14,7 @@ import balle.main.drawable.Drawable;
 import balle.misc.Globals;
 import balle.simulator.SnapshotPredictor;
 import balle.simulator.WorldSimulator;
+import balle.strategy.ConfusedException;
 import balle.strategy.FactoryMethod;
 import balle.strategy.curve.Curve;
 import balle.strategy.curve.CustomCHI;
@@ -22,6 +23,7 @@ import balle.strategy.executor.movement.OrientedMovementExecutor;
 import balle.strategy.pathFinding.ForwardAndReversePathFinder;
 import balle.strategy.pathFinding.PathFinder;
 import balle.strategy.pathFinding.SimplePathFinder;
+import balle.strategy.pathFinding.ValidPathNotFoundException;
 import balle.strategy.pathFinding.path.Path;
 import balle.strategy.pathFinding.path.WheelAccelerationAwarePath;
 import balle.strategy.planner.SimpleGoToBallFaceGoal;
@@ -162,7 +164,9 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 	}
 
 	@Override
-	public void step(Controller controller, Snapshot snapshot) {
+	public void step(Controller controller, Snapshot snapshot)
+			throws ConfusedException {
+
 		// adjust for latency
 		SnapshotPredictor sp = snapshot.getSnapshotPredictor();
 		snapshot = sp.getSnapshotAfterTime(System.currentTimeMillis()
@@ -222,8 +226,13 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 		// }
 
 		// decide on a path to take
-		Path pathToTake = getBestPath(snapshot, angle);
-		c = pathToTake.getCurve();
+		Path pathToTake = null;
+		try {
+			pathToTake = getBestPath(snapshot, angle);
+			c = pathToTake.getCurve();
+		} catch (ValidPathNotFoundException e) {
+			throw new ConfusedException();
+		}
 
 		// calculate wheel speeds/powers
 		int[] pows = pathToTake.getPowers(robot, 0);
@@ -242,7 +251,8 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 				(int) right, System.currentTimeMillis()));
 	}
 	
-	private Path getBestPath(Snapshot s, Orientation finalOrient) {
+	private Path getBestPath(Snapshot s, Orientation finalOrient)
+			throws ValidPathNotFoundException {
 		// get candidate paths
 		Path[] paths = pathfinder.getPaths(s, pf, finalOrient);
 		for (int i = 0; i < paths.length; i++) {

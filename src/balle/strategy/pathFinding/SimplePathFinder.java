@@ -37,8 +37,8 @@ public class SimplePathFinder implements PathFinder {
 	}
 
 	@Override
-	public Path[] getPaths(Snapshot s, Coord end,
-			Orientation endAngle) {
+	public Path[] getPaths(Snapshot s, Coord end, Orientation endAngle)
+			throws ValidPathNotFoundException {
 		
 		Robot robot = s.getBalle();
 		Coord start = robot.getPosition();
@@ -48,7 +48,8 @@ public class SimplePathFinder implements PathFinder {
 	}
 
 	protected Path[] getPaths(Snapshot s, Coord start,
-			Orientation startAngle, Coord end, Orientation endAngle) {
+ Orientation startAngle,
+			Coord end, Orientation endAngle) throws ValidPathNotFoundException {
 		
 		drawables = new ArrayList<Drawable>();
 		// Initialise temporary variables.
@@ -84,13 +85,15 @@ public class SimplePathFinder implements PathFinder {
 	 * @param s
 	 *            current snapshot
 	 * @return new waypoints avoiding obstacles (includes pathStart and pathEnd)
+	 * @throws ValidPathNotFoundException
 	 */
-	public Stack<Coord> getPath(Coord pathStart, Coord pathEnd, Snapshot s) {
+	public Stack<Coord> getPath(Coord pathStart, Coord pathEnd, Snapshot s)
+			throws ValidPathNotFoundException {
 		return getPath(pathStart, pathEnd, s, 0);
 	}
 
 	private Stack<Coord> getPath(Coord pathStart, Coord pathEnd, Snapshot s,
-			int currentDepth) {
+			int currentDepth) throws ValidPathNotFoundException {
 
 		// get the curve without avoiding obstacles
 		Stack<Coord> currentPathStack = new Stack<Coord>();
@@ -137,6 +140,7 @@ public class SimplePathFinder implements PathFinder {
 				Stack<Coord> pathToAppend = getPath(recCallStart, recCallEnd,
 						s, currentDepth + 1);
 				// // appends the new part
+
 				while (pathToAppend.size() > 0)
 					newPath.push(pathToAppend.remove(0));
 
@@ -232,7 +236,8 @@ public class SimplePathFinder implements PathFinder {
 		return interpolator.getCurve(out, startAngle, endAngle);
 	}
 
-	protected Stack<Coord> best(ArrayList<Stack<Coord>> hopefulls) {
+	protected Stack<Coord> best(ArrayList<Stack<Coord>> hopefulls)
+			throws ValidPathNotFoundException {
 		Stack<Coord> currBest = null;
 		for (Stack<Coord> each : hopefulls) {
 
@@ -240,6 +245,10 @@ public class SimplePathFinder implements PathFinder {
 					|| getCurve(currBest).length() > getCurve(each).length())
 				currBest = each;
 		}
+
+		if (currBest == null)
+			throw new ValidPathNotFoundException();
+
 		return currBest;
 
 	}

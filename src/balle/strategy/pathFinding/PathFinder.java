@@ -10,7 +10,8 @@ import balle.world.Snapshot;
 
 public interface PathFinder {
 
-	public Path[] getPaths(Snapshot s, Coord end, Orientation endAngle);
+	public Path[] getPaths(Snapshot s, Coord end, Orientation endAngle)
+			throws ValidPathNotFoundException;
 
 	public ArrayList<Drawable> getDrawables();
 
