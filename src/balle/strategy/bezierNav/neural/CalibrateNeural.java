@@ -20,7 +20,8 @@ public class CalibrateNeural extends AbstractPlanner {
 
 	protected TrainingSet ts;
 
-	protected int leftCmd = 0, rightCmd = 0;
+	protected int sentLeftCmd = 0, sentRightCmd = 0;
+	protected double desLeftCmd = 0, desRightCmd = 0;
 
 	@FactoryMethod(designator = "CalibrateNeural", parameterNames = {})
 	public static CalibrateNeural calibrateNeuralFactory() {
@@ -45,12 +46,15 @@ public class CalibrateNeural extends AbstractPlanner {
 
 	}
 
-	protected void record(double left, double right, double fitness) {
-		LOG.trace(left + " " + right);
-
+	protected void record(int gLeft, int gRight, double left, double right) {
 		TrainingElement te = new TrainingElement(left, right);
-		
+
 		ts.addElement(te);
+
+		this.sentLeftCmd = (int) left;
+		this.sentRightCmd = (int) right;
+		this.desLeftCmd = gLeft;
+		this.desRightCmd = gRight;
 	}
 
 }
