@@ -92,7 +92,11 @@ public class Spline implements Curve {
 		for (int i = start; i < finish; i++)
 			curves.add(splines[i]);
 
-		return new Spline((Curve[]) curves.toArray());
+		Curve[] out = new Curve[curves.size()];
+		for (int i = 0; i < out.length; i++)
+			out[i] = curves.get(i);
+
+		return new Spline(out);
 
 	}
 

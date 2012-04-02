@@ -96,7 +96,8 @@ public class SimplePathFinder implements PathFinder {
 		Curve currentCurve = getCurve(currentPathStack);
 
 		// If path has already collided with an obstacle
-		if (isClearSoFar(currentCurve, s, currentPathLength) != null)
+		if (currentPathLength > 0
+				&& isClearSoFar(currentCurve, s, currentPathLength) != null)
 			return new Stack<Coord>();
 
 		// find next obstacle
