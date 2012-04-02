@@ -9,6 +9,7 @@ import balle.main.drawable.Dot;
 import balle.main.drawable.Drawable;
 import balle.strategy.curve.Curve;
 import balle.strategy.curve.Interpolator;
+import balle.strategy.curve.Spline;
 import balle.strategy.pathFinding.path.MaxSpeedPath;
 import balle.strategy.pathFinding.path.Path;
 import balle.world.Coord;
@@ -88,12 +89,14 @@ public class SimplePathFinder implements PathFinder {
 
 		// get the curve without avoiding obstacles
 		Stack<Coord> currentPathStack = new Stack<Coord>();
+		int currentPathLength = currentPathStack.size();
+
 		currentPathStack.push(pathStart);
 		currentPathStack.push(pathEnd);
 		Curve currentCurve = getCurve(currentPathStack);
 
 		// If path has already collided with an obstacle
-		if (isClearSoFar(currentCurve, s) != null)
+		if (isClearSoFar(currentCurve, s, currentPathLength) != null)
 			return new Stack<Coord>();
 
 		// find next obstacle
@@ -142,15 +145,12 @@ public class SimplePathFinder implements PathFinder {
 		}
 	}
 
-	protected Obstacle isClearSoFar(Curve c, Snapshot s) {
-		return isClear(c, s, true);
+	protected Obstacle isClearSoFar(Curve c, Snapshot s, int len) {
+		Spline curve = (Spline) c;
+		return isClear(curve.getSubSpline(0, len), s);
 	}
 
 	protected Obstacle isClear(Curve c, Snapshot s) {
-		return isClear(c, s, false);
-	}
-
-	protected Obstacle isClear(Curve c, Snapshot s, boolean b) {
         // TODO: Review
         if (s.getOpponent().getPosition() == null)
             return null;
