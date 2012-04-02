@@ -54,30 +54,33 @@ public class StrategyRunner extends AbstractWorldProcessor {
 
 	@Override
 	protected void actionOnChange() {
+
+		final Strategy strategyA = currentStrategyA;
+		final Strategy strategyB = currentStrategyB;
         long start = System.currentTimeMillis();
-		if (currentStrategyA != null && currentStrategyB != null) {
+		if (strategyA != null && strategyB != null) {
 			Snapshot snapshot = getSnapshot();
 
 			Snapshot snapshot2 = new OpponentSnapshot(snapshot);
 
             try {
-				currentStrategyA.step(controllerA, snapshot);
+				strategyA.step(controllerA, snapshot);
 				if (controllerB != null) {
-					currentStrategyB.step(controllerB, snapshot2);
+					strategyB.step(controllerB, snapshot2);
 				}
             } catch (Exception e) {
                 LOG.error("Strategy raised exception" + e.toString());
 
                 for (StackTraceElement se : e.getStackTrace())
-                    LOG.debug(se.toString());
+					LOG.error(se.toString());
 
                 controllerA.stop();
                 if (controllerB != null) {
                     controllerB.stop();
                 }
             }
-            ArrayList<Drawable> drawables = currentStrategyA.getDrawables();
-            ArrayList<Drawable> opponentDrawables = currentStrategyB
+			ArrayList<Drawable> drawables = strategyA.getDrawables();
+			ArrayList<Drawable> opponentDrawables = strategyB
                     .getDrawables();
             for (Drawable d : opponentDrawables) {
                 d.reduceVisibility();
