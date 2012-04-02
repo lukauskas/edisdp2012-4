@@ -1,6 +1,7 @@
 package balle.strategy.curve;
 
 import java.awt.Graphics;
+import java.util.ArrayList;
 
 import balle.world.Coord;
 import balle.world.Scaler;
@@ -81,6 +82,22 @@ public class Spline implements Curve {
 			sum += each.length();
 		}
 		return sum;
+	}
+
+	public Spline getSubSpline(int start, int finish) {
+		if (finish < 0)
+			finish += splines.length;
+
+		ArrayList<Curve> curves = new ArrayList<Curve>();
+		for (int i = start; i < finish; i++)
+			curves.add(splines[i]);
+
+		Curve[] out = new Curve[curves.size()];
+		for (int i = 0; i < out.length; i++)
+			out[i] = curves.get(i);
+
+		return new Spline(out);
+
 	}
 
     @Override
