@@ -30,7 +30,7 @@ public class Dribble extends AbstractPlanner {
             / 2 + Globals.BALL_RADIUS - 0.02;
 
     private static final double FACING_WALL_THRESHOLD = Math.toRadians(25);
-    private static final double SPINNING_DISTANCE = Globals.ROBOT_LENGTH / 2 + 0.05;
+    private static final double SPINNING_DISTANCE = Globals.ROBOT_LENGTH / 2 - 0.02;
 
     private boolean triggerHappy;
 
