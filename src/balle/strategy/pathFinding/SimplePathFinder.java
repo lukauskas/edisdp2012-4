@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Stack;
 import java.util.Vector;
 
+import org.apache.log4j.Logger;
+
 import balle.main.drawable.Dot;
 import balle.main.drawable.Drawable;
 import balle.strategy.curve.Curve;
@@ -19,6 +21,9 @@ import balle.world.objects.Pitch;
 import balle.world.objects.Robot;
 
 public class SimplePathFinder implements PathFinder {
+
+	// Logger
+	public static final Logger LOG = Logger.getLogger(SimplePathFinder.class);
 
 	// Instance variables.
 	protected Interpolator interpolator;
@@ -86,6 +91,8 @@ public class SimplePathFinder implements PathFinder {
 
 	private Stack<Coord> getPath(Coord pathStart, Coord pathEnd, Snapshot s,
 			int currentDepth) {
+
+		LOG.trace("ARG");
 
 		// get the curve without avoiding obstacles
 		Stack<Coord> currentPathStack = new Stack<Coord>();
@@ -159,102 +166,11 @@ public class SimplePathFinder implements PathFinder {
         if (s.getOpponent().getPosition() == null)
             return null;
 
-		Obstacle[] obstacles = new Obstacle[] {
-
-		new Obstacle(s.getOpponent(), Math.min(Obstacle.ROBOT_CLEARANCE, s
-				.getOpponent().getPosition().dist(end))) {
-			@Override
-			public boolean clear(Coord c) {
-				return c.dist(getPosition()) > clearance;
-			}
-		},
-		
-		new Obstacle(s.getPitch(), Obstacle.WALL_CLEARANCE) {
-					@Override
-					public boolean clear(Coord c) {
-						Pitch p = (Pitch) getSource();
-						if (c.getX() < p.getMinX() + clearance)
-							return false;
-						if (c.getX() > p.getMaxX() - clearance)
-							return false;
-						if (c.getY() < p.getMinY() + clearance)
-							return false;
-						if (c.getY() > p.getMaxY() - clearance)
-							return false;
-						return true;
-					}
-
-					private double distance(Coord c) {
-						double d, x = c.getX(), y = c.getY();
-
-						Pitch p = (Pitch) getSource();
-						d = Math.abs(p.getMinX() - x);
-						d = Math.min(d, Math.abs(p.getMaxX() - x));
-						d = Math.min(d, Math.abs(p.getMaxY() - y));
-						d = Math.min(d, Math.abs(p.getMinY() - y));
-						return d;
-					}
-
-				@Override
-					protected boolean isMovingTowards(Curve c) {
-						double initD = distance(c.pos(0));
-						for (double i = 0.01; i <= 1; i += 0.01)
-							if (distance(c.pos(i)) < initD)
-								return true;
-						return false;
-					}
-
-					public Coord constrain(Coord c, Pitch p) {
-						double x = c.getX(), y = c.getY(),
-
-						xmin = p.getMinX() + getClearance(), xmax = p.getMaxX()
-								- getClearance(), ymin = p.getMinY()
-								+ getClearance(), ymax = p.getMaxY()
-								- getClearance();
-
-						return new Coord(Math.min(xmax, Math.max(xmin, x)),
-								Math.min(ymax, Math.max(ymin, y)));
-					}
-
-					@Override
-					public Coord[][] getWaypoint(Snapshot s, Coord curr, Curve c) {
-
-						Pitch pitch = (Pitch) getSource();
-
-						ArrayList<Coord> waypoints = new ArrayList<Coord>();
-						for (double t = 0; t <= 1; t += 0.01) {
-							Coord point = c.pos(t);
-							Coord cons = constrain(point, pitch);
-							if (!point.equals(cons)) {
-								waypoints.add(cons);
-							}
-						}
-
-						if (waypoints.size() == 0) {
-							System.out
-									.println("aaaaaaaaaaaaaaaaaaaaaaaaaaa34dss7");
-							return new Coord[0][0];
-						}
-						if (waypoints.size() == 1) {
-							System.out
-									.println("bbbbbbbbbbbbbbbbbbbbbbbbbbbbw45732");
-							return new Coord[][] { new Coord[] { waypoints
-									.get(0) } };
-						}
-						Coord[] wpa = new Coord[] { waypoints.get(0),
-								waypoints.get(waypoints.size() - 1) };
-						return new Coord[][] { wpa };
-					}
-				}
-		 
-		// new Obstical(s.getBall().getPosition(),
-		// Obstical.ROBOT_CLEARANCE)
-		};
-
 		ArrayList<Obstacle> out = new ArrayList<Obstacle>();
 
 		Coord pos = s.getBalle().getPosition();
-		for (Obstacle o : obstacles) {
+		for (Obstacle o : getObstacles(s)) {
+			Obstacle adding = null;
 
 			// if we are inside the clearance area, just assume the obstical is
 			// in the way
@@ -262,20 +178,26 @@ public class SimplePathFinder implements PathFinder {
 			// clearance area
 			// this is not really an obstacle if our path is already moving away
 			if (!o.clear(start) && o.isMovingTowards(c)) {
-				out.add(o);
+				adding = o;
 			}
 
 			// (o.getSource() instanceof Pitch)
 
 			// check that the current path does not go from out of
 			// the object clearance to into the clearance
-			boolean in = !o.clear(pos);
-			for (double i = 0; i < 1; i += 0.01) {
-				boolean newIn = !o.clear(c.pos(i));
-				if (!in && newIn) {
-					out.add(o);
+			if (adding == null) {
+				boolean in = !o.clear(pos);
+				for (double i = 0; i < 1; i += 0.01) {
+					boolean newIn = !o.clear(c.pos(i));
+					if (!in && newIn) {
+						adding = o;
+						break;
+					}
 				}
 			}
+
+			if (adding != null)
+				out.add(adding);
 		}
 		return out;
 	}
@@ -328,6 +250,104 @@ public class SimplePathFinder implements PathFinder {
 
 	public ArrayList<Drawable> getDrawables() {
 		return drawables;
+	}
+
+	// Collisions
+
+	public Obstacle[] getObstacles(Snapshot s) {
+
+		return new Obstacle[] {
+
+				new Obstacle(s.getOpponent(), Math.min(
+						Obstacle.ROBOT_CLEARANCE, s.getOpponent().getPosition()
+								.dist(end))) {
+					@Override
+					public boolean clear(Coord c) {
+						return c.dist(getPosition()) > clearance;
+					}
+				},
+
+				new Obstacle(s.getPitch(), Obstacle.WALL_CLEARANCE) {
+					@Override
+					public boolean clear(Coord c) {
+						Pitch p = (Pitch) getSource();
+						if (c.getX() < p.getMinX() + clearance)
+							return false;
+						if (c.getX() > p.getMaxX() - clearance)
+							return false;
+						if (c.getY() < p.getMinY() + clearance)
+							return false;
+						if (c.getY() > p.getMaxY() - clearance)
+							return false;
+						return true;
+					}
+
+					private double distance(Coord c) {
+						double d, x = c.getX(), y = c.getY();
+
+						Pitch p = (Pitch) getSource();
+						d = Math.abs(p.getMinX() - x);
+						d = Math.min(d, Math.abs(p.getMaxX() - x));
+						d = Math.min(d, Math.abs(p.getMaxY() - y));
+						d = Math.min(d, Math.abs(p.getMinY() - y));
+						return d;
+					}
+
+					@Override
+					protected boolean isMovingTowards(Curve c) {
+						double initD = distance(c.pos(0));
+						for (double i = 0.01; i <= 1; i += 0.01)
+							if (distance(c.pos(i)) < initD)
+								return true;
+						return false;
+					}
+
+					public Coord constrain(Coord c, Pitch p) {
+						double x = c.getX(), y = c.getY(),
+
+						xmin = p.getMinX() + getClearance(), xmax = p.getMaxX()
+								- getClearance(), ymin = p.getMinY()
+								+ getClearance(), ymax = p.getMaxY()
+								- getClearance();
+
+						return new Coord(Math.min(xmax, Math.max(xmin, x)),
+								Math.min(ymax, Math.max(ymin, y)));
+					}
+
+					@Override
+					public Coord[][] getWaypoint(Snapshot s, Coord curr, Curve c) {
+
+						Pitch pitch = (Pitch) getSource();
+
+						ArrayList<Coord> waypoints = new ArrayList<Coord>();
+						for (double t = 0; t <= 1; t += 0.01) {
+							Coord point = c.pos(t);
+							Coord cons = constrain(point, pitch);
+							if (!point.equals(cons)) {
+								waypoints.add(cons);
+							}
+						}
+
+						if (waypoints.size() == 0) {
+							System.out
+									.println("aaaaaaaaaaaaaaaaaaaaaaaaaaa34dss7");
+							return new Coord[0][0];
+						}
+						if (waypoints.size() == 1) {
+							System.out
+									.println("bbbbbbbbbbbbbbbbbbbbbbbbbbbbw45732");
+							return new Coord[][] { new Coord[] { waypoints
+									.get(0) } };
+						}
+						Coord[] wpa = new Coord[] { waypoints.get(0),
+								waypoints.get(waypoints.size() - 1) };
+						return new Coord[][] { wpa };
+					}
+				}
+
+		// new Obstical(s.getBall().getPosition(),
+		// Obstical.ROBOT_CLEARANCE)
+		};
 	}
 
 }
