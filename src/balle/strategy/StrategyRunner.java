@@ -54,16 +54,19 @@ public class StrategyRunner extends AbstractWorldProcessor {
 
 	@Override
 	protected void actionOnChange() {
+
+		Strategy strategyA = currentStrategyA;
+		Strategy strategyB = currentStrategyB;
         long start = System.currentTimeMillis();
-		if (currentStrategyA != null && currentStrategyB != null) {
+		if (strategyA != null && strategyB != null) {
 			Snapshot snapshot = getSnapshot();
 
 			Snapshot snapshot2 = new OpponentSnapshot(snapshot);
 
             try {
-				currentStrategyA.step(controllerA, snapshot);
+				strategyA.step(controllerA, snapshot);
 				if (controllerB != null) {
-					currentStrategyB.step(controllerB, snapshot2);
+					strategyB.step(controllerB, snapshot2);
 				}
             } catch (Exception e) {
                 LOG.error("Strategy raised exception" + e.toString());
@@ -76,8 +79,8 @@ public class StrategyRunner extends AbstractWorldProcessor {
                     controllerB.stop();
                 }
             }
-            ArrayList<Drawable> drawables = currentStrategyA.getDrawables();
-            ArrayList<Drawable> opponentDrawables = currentStrategyB
+			ArrayList<Drawable> drawables = strategyA.getDrawables();
+			ArrayList<Drawable> opponentDrawables = strategyB
                     .getDrawables();
             for (Drawable d : opponentDrawables) {
                 d.reduceVisibility();
