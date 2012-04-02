@@ -13,7 +13,6 @@ import balle.strategy.planner.AbstractPlanner;
 import balle.world.Snapshot;
 import balle.world.objects.Robot;
 
-
 public class CalibrateNeural extends AbstractPlanner {
 
 	public static final Logger LOG = Logger.getLogger(CalibrateNeural.class);
@@ -24,9 +23,6 @@ public class CalibrateNeural extends AbstractPlanner {
 	protected TrainingSet ts;
 
 	private final boolean PIVOT = false;
-
-	protected int sentLeftCmd = 0, sentRightCmd = 0;
-	protected double desLeftCmd = 0, desRightCmd = 0;
 
 	protected Robot lastRobot = null;
 
@@ -74,18 +70,16 @@ public class CalibrateNeural extends AbstractPlanner {
 				}
 				
 			}
-}
-		
-		
+		}
 
 	}
 
-	private double angularVelToWheelSpeed(double angVel) {
-		return (angVel * Globals.ROBOT_TRACK_WIDTH) / (PIVOT ? 1 : 2);
-	}
+	protected int sentLeftCmd = 0, sentRightCmd = 0;
+	protected double currLeft = 0, currRight = 0;
+	protected double desLeftCmd = 0, desRightCmd = 0;
 
-
-	protected void record(int gLeft, int gRight, double left, double right) {
+	protected void record(int gLeft, int gRight, double cLeft, double cRight,
+			double left, double right) {
 		double lastLeft = lastRobot.getLeftWheelSpeed(), lastRight = lastRobot.getRightWheelSpeed();
 
 		TrainingElement te = new TrainingElement(desLeftCmd, desRightCmd,
@@ -93,10 +87,16 @@ public class CalibrateNeural extends AbstractPlanner {
 
 		ts.addElement(te);
 
+		// Update
 		this.sentLeftCmd = (int) left;
 		this.sentRightCmd = (int) right;
+		this.currLeft = cLeft;
+		this.currRight = cRight;
 		this.desLeftCmd = gLeft;
 		this.desRightCmd = gRight;
 	}
 
+	private double angularVelToWheelSpeed(double angVel) {
+		return (angVel * Globals.ROBOT_TRACK_WIDTH) / (PIVOT ? 1 : 2);
+	}
 }
