@@ -11,6 +11,7 @@ import balle.strategy.planner.AbstractPlanner;
 import balle.world.Coord;
 import balle.world.Orientation;
 import balle.world.Snapshot;
+import balle.world.objects.Robot;
 
 public class Calibrate extends AbstractPlanner {
 
@@ -145,6 +146,10 @@ public class Calibrate extends AbstractPlanner {
 	 */
 	private double angularVelToWheelSpeed(double angVel) {
 		return (angVel * Globals.ROBOT_TRACK_WIDTH) / (PIVOT ? 1 : 2);
+	}
+
+	private void getVelocityFromInputVelocities(Robot bot) {
+		// iterate through velocities
 	}
 
 }

@@ -1,19 +1,27 @@
 package balle.strategy.bezierNav.neural;
 
-import org.neuroph.core.learning.TrainingElement;
+import org.apache.log4j.Logger;
 import org.neuroph.core.learning.TrainingSet;
 import org.neuroph.nnet.MultiLayerPerceptron;
 
 import balle.controller.Controller;
+import balle.strategy.FactoryMethod;
 import balle.strategy.planner.AbstractPlanner;
 import balle.world.Snapshot;
 
 public class CalibrateNeural extends AbstractPlanner {
 
+	public static final Logger LOG = Logger.getLogger(CalibrateNeural.class);
+
 	protected MultiLayerPerceptron mlp;
 	protected NeuralNetExecutor nne;
 
 	protected TrainingSet ts;
+
+	@FactoryMethod(designator = "CalibrateNeural", parameterNames = {})
+	public static CalibrateNeural calibrateNeuralFactory() {
+		return new CalibrateNeural();
+	}
 
 	public CalibrateNeural() {
 		mlp = new MultiLayerPerceptron(4, 5, 5, 2);
@@ -31,8 +39,11 @@ public class CalibrateNeural extends AbstractPlanner {
 
 	}
 
-	public void listen(TrainingElement te) {
-		ts.addElement(te);
+	protected void record(double desLeft, double desRight, double actLeft,
+			double actRight, double fitness) {
+		LOG.trace(desLeft + " " + desRight);
+
+		// TODO
 	}
 
 }
