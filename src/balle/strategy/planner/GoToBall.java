@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
 import balle.main.drawable.Dot;
+import balle.strategy.ConfusedException;
 import balle.strategy.FactoryMethod;
 import balle.strategy.executor.movement.GoToObjectPFN;
 import balle.strategy.executor.movement.MovementExecutor;
@@ -324,7 +325,11 @@ public class GoToBall extends AbstractPlanner {
 
         // If it says it is not finished, tell it to do something for a step.
         if (!executorStrategy.isFinished(snapshot)) {
-			executorStrategy.step(controller, snapshot);
+			try {
+				executorStrategy.step(controller, snapshot);
+			} catch (ConfusedException e) {
+				e.printStackTrace();
+			}
             addDrawables(executorStrategy.getDrawables());
         } else {
             // Tell the strategy to stop doing whatever it was doing

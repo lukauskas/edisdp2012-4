@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import balle.controller.Controller;
 import balle.main.drawable.Drawable;
 import balle.misc.Globals;
+import balle.strategy.ConfusedException;
 import balle.strategy.curve.Curve;
 import balle.strategy.curve.Interpolator;
 import balle.strategy.executor.movement.MovementExecutor;
@@ -85,7 +86,11 @@ public class CurveNav implements OrientedMovementExecutor {
 
 		// Update Movement Executor.
 		movementExecutor.updateTarget(curve.pos(stepDist).getPoint());
-		movementExecutor.step(controller, snapshot);
+		try {
+			movementExecutor.step(controller, snapshot);
+		} catch (ConfusedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override

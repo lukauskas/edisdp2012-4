@@ -5,6 +5,7 @@ import java.awt.Color;
 import balle.controller.Controller;
 import balle.main.drawable.DrawableLine;
 import balle.misc.Globals;
+import balle.strategy.ConfusedException;
 import balle.strategy.FactoryMethod;
 import balle.strategy.executor.movement.GoToObjectPFN;
 import balle.strategy.executor.turning.FaceAngle;
@@ -200,7 +201,11 @@ public class GoToBallSafeProportional extends GoToBall {
 				isTurning = false;
 			}
 
-			turnExecutor.step(controller, snapshot);
+			try {
+				turnExecutor.step(controller, snapshot);
+			} catch (ConfusedException e) {
+				e.printStackTrace();
+			}
 
 		}
 

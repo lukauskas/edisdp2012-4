@@ -16,7 +16,8 @@ public class ForwardAndReversePathFinder extends SimplePathFinder {
 	}
 
 	@Override
-	public Path[] getPaths(Snapshot s, Coord end, Orientation endAngle) {
+	public Path[] getPaths(Snapshot s, Coord end, Orientation endAngle)
+			throws ValidPathNotFoundException {
 		Path[] paths = new AbstractPath[2];
 		Robot robot = s.getBalle();
 		// full forwards

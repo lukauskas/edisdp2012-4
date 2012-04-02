@@ -2,6 +2,7 @@ package balle.strategy.planner;
 
 import balle.controller.Controller;
 import balle.misc.Globals;
+import balle.strategy.ConfusedException;
 import balle.strategy.bezierNav.BezierNav;
 import balle.strategy.curve.CustomCHI;
 import balle.strategy.executor.movement.OrientedMovementExecutor;
@@ -67,7 +68,11 @@ public class InitialBezierStrategy extends AbstractPlanner {
         FieldObject target = getTarget(snapshot);
         Orientation desiredOrientation = getDesiredOrientation(target, snapshot);
         ome.updateTarget(target, desiredOrientation);
-        ome.step(controller, snapshot);
+		try {
+			ome.step(controller, snapshot);
+		} catch (ConfusedException e) {
+			e.printStackTrace();
+		}
     }
 
 }
