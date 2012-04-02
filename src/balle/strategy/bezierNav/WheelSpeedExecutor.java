@@ -4,6 +4,7 @@ import balle.strategy.executor.Executor;
 
 public interface WheelSpeedExecutor extends Executor {
 
-	public void update(int desLeft, int desRight);
+	public void update(double desLeft, double desRight, double actLeft,
+			double actRight);
 
 }
