@@ -3,6 +3,7 @@ package balle.strategy.bezierNav.neural;
 import org.neuroph.core.learning.TrainingElement;
 import org.neuroph.core.learning.TrainingSet;
 import org.neuroph.nnet.MultiLayerPerceptron;
+import org.neuroph.nnet.learning.BackPropagation;
 
 import balle.controller.Controller;
 import balle.strategy.planner.AbstractPlanner;
@@ -17,6 +18,8 @@ public class CalibrateNeural extends AbstractPlanner {
 
 	public CalibrateNeural() {
 		mlp = new MultiLayerPerceptron(4, 5, 5, 2);
+		mlp.setLearningRule(new BackPropagation());
+
 		mlp.initializeWeights(0.5);
 
 		nne = new NeuralNetExecutor(mlp);
