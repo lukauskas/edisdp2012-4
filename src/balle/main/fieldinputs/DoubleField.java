@@ -8,6 +8,8 @@ public class DoubleField extends TextField {
 
     public Object getValue() {
         String superValue = (String) super.getValue();
+        if ("".equals(superValue))
+            return 0;
         return Double.parseDouble(superValue);
     }
 

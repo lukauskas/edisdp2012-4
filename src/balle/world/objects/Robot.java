@@ -299,8 +299,8 @@ public class Robot extends RectangularObject {
             max = (new Coord(0, 0)).angleBetween(new Coord(10, 0), new Coord(
                     Globals.ROBOT_LENGTH, -Globals.ROBOT_WIDTH));
         }
-        System.out.println("max = " + max + ",\to = " + o + ",\tm-o = "
-                + max.sub(o));
+        // System.out.println("max = " + max + ",\to = " + o + ",\tm-o = "
+        // + max.sub(o));
 
         return max.sub(o);
 

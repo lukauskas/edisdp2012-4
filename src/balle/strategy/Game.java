@@ -21,6 +21,7 @@ import balle.strategy.executor.turning.RotateToOrientationExecutor;
 import balle.strategy.pathFinding.SimplePathFinder;
 import balle.strategy.planner.AbstractPlanner;
 import balle.strategy.planner.BackingOffStrategy;
+import balle.strategy.planner.DefensiveStrategy;
 import balle.strategy.planner.GoToBall;
 import balle.strategy.planner.GoToBallSafeProportional;
 import balle.strategy.planner.InitialBezierStrategy;
@@ -40,6 +41,7 @@ public class Game extends AbstractPlanner {
     private static final Logger LOG = Logger.getLogger(Game.class);
 	// Strategies that we will need make sure to call stop() for each of them
 	protected final Strategy defensiveStrategy;
+    protected final Strategy opponentKickDefendStrategy;
 	protected final Strategy pickBallFromWallStrategy;
     protected final BackingOffStrategy backingOffStrategy;
 	protected final RotateToOrientationExecutor turningExecutor;
@@ -102,6 +104,7 @@ public class Game extends AbstractPlanner {
 
     public Game() {
         defensiveStrategy = new GoToBallSafeProportional(0.5, 0.4, true);
+        opponentKickDefendStrategy = new DefensiveStrategy(new GoToObjectPFN(0));
         pickBallFromWallStrategy = new KickFromWall(new GoToObjectPFN(0));
 		backingOffStrategy = new BackingOffStrategy();
         turningExecutor = new IncFaceAngle();
@@ -232,6 +235,13 @@ public class Game extends AbstractPlanner {
                     new Coord(0.1, 0.1)), Color.CYAN));
             return kickingStrategy;
 		}
+
+        if ((opponent.getPosition() != null)
+                && (opponent.possessesBall(ball) && (opponent
+                        .isFacingGoal(ownGoal)))
+                && (!ourRobot.intersects(opponent.getBallKickLine(ball)))) {
+            return opponentKickDefendStrategy;
+        }
 
 		// Could the opponent be in the way? use bezier if so
 		RectangularObject corridor = new Line(ourRobot.getPosition(),
