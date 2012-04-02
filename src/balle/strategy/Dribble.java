@@ -9,6 +9,7 @@ import balle.main.drawable.Label;
 import balle.misc.Globals;
 import balle.strategy.planner.AbstractPlanner;
 import balle.world.Coord;
+import balle.world.Orientation;
 import balle.world.Snapshot;
 
 public class Dribble extends AbstractPlanner {
@@ -27,6 +28,9 @@ public class Dribble extends AbstractPlanner {
     private double MAX_DRIBBLE_LENGTH = 500; // ms
     private static final double ABOUT_TO_LOSE_BALL_THRESHOLD = Globals.ROBOT_WIDTH
             / 2 + Globals.BALL_RADIUS - 0.02;
+
+    private static final double FACING_WALL_THRESHOLD = Math.toRadians(25);
+    private static final double SPINNING_DISTANCE = Globals.ROBOT_LENGTH / 2 + 0.05;
 
     private boolean triggerHappy;
 
@@ -67,7 +71,19 @@ public class Dribble extends AbstractPlanner {
         return !isInactiveForAWhile()
                 && (!shouldStopDribblingDueToDribbleLength());
     }
+
+    public void spinLeft(Snapshot snapshot, Controller controller, int speed) {
+        controller.setWheelSpeeds(-speed, speed);
+        addDrawable(new Label("<---", snapshot.getBalle().getPosition(),
+                Color.CYAN));
+    }
 	
+    public void spinRight(Snapshot snapshot, Controller controller, int speed) {
+        controller.setWheelSpeeds(speed, -speed);
+        addDrawable(new Label("--->", snapshot.getBalle().getPosition(),
+                Color.CYAN));
+    }
+
 	@Override
 	public void onStep(Controller controller, Snapshot snapshot) {
 
@@ -136,10 +152,73 @@ public class Dribble extends AbstractPlanner {
 		double threshold = Math.toRadians(5);
 		
         boolean nearWall = snapshot.getBall().isNearWall(snapshot.getPitch());
+        boolean veryNearWall = snapshot.getBall().isNearWall(snapshot.getPitch(), SPINNING_DISTANCE);
 
+        boolean closeToGoal = snapshot.getOpponentsGoal().getGoalLine()
+                .dist(snapshot.getBalle().getPosition()) < SPINNING_DISTANCE;
+
+        // Actually it might be helpful to turn when we're in this situation
+        // close to our own goal
+        closeToGoal = closeToGoal
+                || snapshot.getOwnGoal().getGoalLine()
+                        .dist(snapshot.getBalle().getPosition()) < SPINNING_DISTANCE;
         // Turn twice as fast near walls
         if (nearWall)
             turnSpeedToUse *= 2;
+        
+        if ((!closeToGoal) && (nearWall) && veryNearWall)
+        {
+            Coord goalVector = snapshot.getOwnGoal().getGoalLine()
+                    .midpoint().sub(ourPos);
+            Orientation angleTowardsGoal = goalVector.orientation();
+
+            // Always turn opposite from own goal
+            boolean shouldTurnRight = !angleTowardsGoal.isFacingRight(0);
+
+            // If we're facing wall
+            if ((Math.abs(angle) <= FACING_WALL_THRESHOLD)
+                || (Math.abs(angle - Math.PI / 2) <= FACING_WALL_THRESHOLD)
+                || (Math.abs(angle - Math.PI) <= FACING_WALL_THRESHOLD)
+                    || (Math.abs(angle - 3 * Math.PI / 2) <= FACING_WALL_THRESHOLD)) {
+                LOG.info("Spinning!!!");
+
+                // If We are facing the bottom wall we should flip the spinning
+                // directions
+                if (Math.abs(angle - 3 * Math.PI / 2) <= FACING_WALL_THRESHOLD)
+                    shouldTurnRight = !shouldTurnRight;
+                else if ((Math.abs(angle) <= FACING_WALL_THRESHOLD)
+                        || (Math.abs(angle - Math.PI) <= FACING_WALL_THRESHOLD))
+                {
+                    // If we're facing one of the walls with goals
+                    boolean facingLeftWall = (Math.abs(angle) <= FACING_WALL_THRESHOLD);
+                    if (facingLeftWall) {
+                        shouldTurnRight = snapshot.getOpponentsGoal()
+                                .getGoalLine()
+                                .midpoint().getY() > ourPos.getY();
+                         
+                        // Turn away from own goal
+                        if (snapshot.getOwnGoal().isLeftGoal())
+                            shouldTurnRight = !shouldTurnRight;
+                    } else {
+                        shouldTurnRight = snapshot.getOpponentsGoal()
+                                .getGoalLine().midpoint().getY() < ourPos
+                                .getY();
+
+                        // Turn away from own goal
+                        if (snapshot.getOwnGoal().isRightGoal())
+                            shouldTurnRight = !shouldTurnRight;
+                    }
+                }
+                if (shouldTurnRight)
+                    spinRight(snapshot, controller, Globals.MAXIMUM_MOTOR_SPEED);
+                else
+                    spinLeft(snapshot, controller, Globals.MAXIMUM_MOTOR_SPEED);
+
+                return;
+            }
+  
+                
+        }
 
 		if (isLeftGoal) {
 			if (facingGoal) {
