@@ -10,6 +10,7 @@ import balle.controller.Controller;
 import balle.strategy.FactoryMethod;
 import balle.strategy.planner.AbstractPlanner;
 import balle.world.Snapshot;
+import balle.world.objects.Robot;
 
 public class CalibrateNeural extends AbstractPlanner {
 
@@ -22,6 +23,8 @@ public class CalibrateNeural extends AbstractPlanner {
 
 	protected int sentLeftCmd = 0, sentRightCmd = 0;
 	protected double desLeftCmd = 0, desRightCmd = 0;
+
+	protected Robot lastRobot = null;
 
 	@FactoryMethod(designator = "CalibrateNeural", parameterNames = {})
 	public static CalibrateNeural calibrateNeuralFactory() {
@@ -47,7 +50,9 @@ public class CalibrateNeural extends AbstractPlanner {
 	}
 
 	protected void record(int gLeft, int gRight, double left, double right) {
-		TrainingElement te = new TrainingElement(left, right);
+		double lastLeft = lastRobot.getLeftWheelSpeed(), lastRight = lastRobot.getRightWheelSpeed();
+		TrainingElement te = new TrainingElement(desLeftCmd, desRightCmd,
+				lastLeft, lastRight);
 
 		ts.addElement(te);
 
