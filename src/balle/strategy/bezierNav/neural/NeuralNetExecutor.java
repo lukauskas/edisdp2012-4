@@ -1,4 +1,4 @@
-package balle.strategy.bezierNav;
+package balle.strategy.bezierNav.neural;
 
 import java.util.ArrayList;
 
@@ -6,15 +6,22 @@ import org.neuroph.core.NeuralNetwork;
 
 import balle.controller.Controller;
 import balle.main.drawable.Drawable;
+import balle.strategy.bezierNav.WheelSpeedExecutor;
 import balle.world.Snapshot;
 
 public class NeuralNetExecutor implements WheelSpeedExecutor {
 
 	protected NeuralNetwork neural;
 
+	protected CalibrateNeural listener;
+
 
 	public NeuralNetExecutor(NeuralNetwork neural) {
 		this.neural = neural;
+	}
+
+	public void addlistener(CalibrateNeural cn) {
+		this.listener = cn;
 	}
 
 	@Override
