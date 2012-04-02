@@ -147,11 +147,7 @@ public class Game extends AbstractPlanner {
     public void onStep(Controller controller, Snapshot snapshot) {
 
         Robot ourRobot = snapshot.getBalle();
-        Robot opponent = snapshot.getOpponent();
         Ball ball = snapshot.getBall();
-        Goal ownGoal = snapshot.getOwnGoal();
-		Goal opponentsGoal = snapshot.getOpponentsGoal();
-        Pitch pitch = snapshot.getPitch();
 
         if ((ourRobot.getPosition() == null) || (ball.getPosition() == null))
             return;
@@ -220,7 +216,7 @@ public class Game extends AbstractPlanner {
             return kickingStrategy;
 		}
 
-		// Could the opponent be in the way? use pfn if so
+		// Could the opponent be in the way? use bezier if so
 		RectangularObject corridor = new Line(ourRobot.getPosition(),
 				ball.getPosition()).widen(0.5);
         addDrawable(new DrawableRectangularObject(corridor, Color.BLACK));
