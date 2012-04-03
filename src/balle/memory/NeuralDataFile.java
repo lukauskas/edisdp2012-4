@@ -24,7 +24,7 @@ public class NeuralDataFile extends FileReadWriterArray<NeuralObj> {
 
 	@Override
 	protected boolean isHeader(String header) {
-		return header.split("\t").equals(IDENTIFIER);
+		return true; // TODO header.split("\t").equals(IDENTIFIER);
 	}
 
 	@Override

@@ -9,6 +9,7 @@ import org.jbox2d.common.Vec2;
 
 import balle.main.Config;
 import balle.memory.FolderReader;
+import balle.memory.NeuralDataFile;
 import balle.memory.PowersConfigFile;
 import balle.world.AngularVelocity;
 import balle.world.Orientation;
@@ -88,7 +89,13 @@ public class Globals {
     public static final float ARBITRARY_BALL_VEL_SCALING = 100;
     public static final double VELOCITY_NOISE_THRESHOLD = 1e-8;
 
+	// FILE SYSTEM
+
 	public static final FolderReader resFolder = new FolderReader("res");
+	public static final NeuralDataFile neuralDataFile = new NeuralDataFile(
+			Globals.resFolder, "ndfFile.txt");
+
+	@Deprecated
 	public static final String configFolder = "initConfig.txt";
 
 

@@ -9,7 +9,6 @@ import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.nnet.learning.BackPropagation;
 
 import balle.controller.Controller;
-import balle.memory.NeuralDataFile;
 import balle.misc.Globals;
 import balle.strategy.FactoryMethod;
 import balle.strategy.UserInputStrategy;
@@ -34,7 +33,7 @@ public class CalibrateNeural extends UserInputStrategy {
 
 
 	public CalibrateNeural() {
-		mlp = new MultiLayerPerceptron(4, 5, 5, 2);
+		mlp = new MultiLayerPerceptron(4, 2);
 		mlp.setLearningRule(new BackPropagation());
 
 		mlp.initializeWeights(0.5);
@@ -64,9 +63,7 @@ public class CalibrateNeural extends UserInputStrategy {
 		super.stop(controller);
 
 		try {
-			NeuralDataFile ndf = new NeuralDataFile(Globals.resFolder,
-				"ndfFile.txt");
-			ndf.writeArray(data);
+			Globals.neuralDataFile.writeArray(data);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (ConcurrentModificationException e) {
