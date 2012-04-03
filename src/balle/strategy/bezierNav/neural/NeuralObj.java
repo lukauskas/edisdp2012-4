@@ -5,7 +5,9 @@ import java.util.List;
 import org.neuroph.core.learning.SupervisedTrainingElement;
 import org.neuroph.core.learning.TrainingSet;
 
-public class NeuralObj {
+import balle.memory.utility.Saves;
+
+public class NeuralObj implements Saves {
 	
 	protected final double currLeft, currRight;
 	protected final int    desLeft, desRight;
@@ -104,5 +106,24 @@ public class NeuralObj {
 		}
 
 		return ts;
+	}
+
+	// Saving/Loading
+
+	public static NeuralObj load(String line) {
+		String[] tokens = line.split(";");
+		return new NeuralObj(Double.parseDouble(tokens[0]),
+				Double.parseDouble(tokens[1]), Integer.parseInt(tokens[2]),
+				Integer.parseInt(tokens[3]), Integer.parseInt(tokens[4]),
+				Integer.parseInt(tokens[5]), Double.parseDouble(tokens[6]),
+				Double.parseDouble(tokens[7]));
+
+	}
+
+	@Override
+	public String save() {
+		return currLeft + ";" + currRight + ";" + desLeft + ";" + desRight
+				+ ";" + outLeft + ";" + outRight + ";" + actLeft + ";"
+				+ actRight + ";";
 	}
 }
