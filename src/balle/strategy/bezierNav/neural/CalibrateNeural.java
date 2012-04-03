@@ -7,7 +7,6 @@ import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.nnet.learning.BackPropagation;
 
 import balle.controller.Controller;
-import balle.misc.Globals;
 import balle.strategy.FactoryMethod;
 import balle.strategy.UserInputStrategy;
 import balle.world.Snapshot;
@@ -16,16 +15,13 @@ import balle.world.objects.Robot;
 public class CalibrateNeural extends UserInputStrategy {
 
 	public static final Logger LOG = Logger.getLogger(CalibrateNeural.class);
-	public static long lastCheck;
+
 	protected MultiLayerPerceptron mlp;
 	protected NeuralNetExecutor nne;
 
 	protected ArrayList<NeuralObj> data = new ArrayList<NeuralObj>();
 
-	private final boolean PIVOT = false;
-
-	protected Robot lastRobot = null;
-	protected Robot currentRobot = null;
+	protected Robot lastRobot = null, currentRobot = null;
 
 	@FactoryMethod(designator = "CalibrateNeural", parameterNames = {})
 	public static CalibrateNeural calibrateNeuralFactory() {
@@ -59,20 +55,23 @@ public class CalibrateNeural extends UserInputStrategy {
 
 	}
 
-	protected int sentLeftCmd = 0, sentRightCmd = 0;
+	@Override
+	public void stop(Controller controller) {
+		super.stop(controller);
+	}
+
 	protected double currLeft = 0, currRight = 0;
 	protected int desLeftCmd = 0, desRightCmd = 0;
+	protected int sentLeftCmd = 0, sentRightCmd = 0;
 
 	protected void record(int gLeft, int gRight, double cLeft, double cRight,
 			double left, double right) {
 		double lastLeft = lastRobot.getLeftWheelSpeed(), lastRight = lastRobot
 				.getRightWheelSpeed();
 
-		float perf = getFitness(desLeftCmd, desRightCmd, currLeft, currRight,
-				lastLeft, lastRight);
-
-		data.add(new NeuralObj(desLeftCmd, desRightCmd, currLeft, currRight,
-				perf));
+		// Log data
+		data.add(new NeuralObj(currLeft, currRight, desLeftCmd, desRightCmd,
+				sentLeftCmd, sentRightCmd, lastLeft, lastRight));
 
 		// Update
 		this.sentLeftCmd = (int) left;
@@ -83,19 +82,24 @@ public class CalibrateNeural extends UserInputStrategy {
 		this.desRightCmd = gRight;
 		this.lastRobot = currentRobot;
 
-		LOG.trace("Commands\n" + left + "\n" + right + "\n" + cLeft
-				+ "\n" + cRight + "\n" + gLeft + "\n" + gRight);
-
+		LOG.trace("Data size " + data.size() + "Commands\n" + left + "\n"
+				+ right + "\n" + cLeft + "\n" + cRight + "\n" + gLeft + "\n"
+				+ gRight);
 	}
+
+
 
 	protected float getFitness(int desLeftCmd, int desRightCmd,
 			double currLeft, double currRight, double oLeft, double oRight) {
 		return 0;
 	}
 
-	private double angularVelToWheelSpeed(double angVel) {
-		return (angVel * Globals.ROBOT_TRACK_WIDTH) / (PIVOT ? 1 : 2);
-	}
+	// public static long lastCheck;
+	// private final boolean PIVOT = false;
+
+	// private double angularVelToWheelSpeed(double angVel) {
+	// return (angVel * Globals.ROBOT_TRACK_WIDTH) / (PIVOT ? 1 : 2);
+	// }
 
 	// int leftWheelSpeed = -900;
 	// int rightWheelSpeed = -900;

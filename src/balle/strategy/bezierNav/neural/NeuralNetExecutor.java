@@ -68,4 +68,13 @@ public class NeuralNetExecutor implements WheelSpeedExecutor {
 		cRight = actRight;
 	}
 
+	public static double convert(int d) {
+		return ((double) (d + 900)) / 1800.0;
+	}
+
+	public static int convert(double d) {
+		return (int) ((d * 1800.0) - 900);
+	}
+
+
 }
