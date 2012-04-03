@@ -2,6 +2,7 @@ package balle.strategy.bezierNav;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jbox2d.common.Vec2;
@@ -254,32 +255,44 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 	private Path getBestPath(Snapshot s, Orientation finalOrient)
 			throws ValidPathNotFoundException {
 		// get candidate paths
-		Path[] paths = pathfinder.getPaths(s, pf, finalOrient);
-		for (int i = 0; i < paths.length; i++) {
-			paths[i] = new WheelAccelerationAwarePath(paths[i]);
+		List<Path> paths = pathfinder.getPaths(s, pf, finalOrient);
+
+		for (Path path : paths) {
+			path = new WheelAccelerationAwarePath(path);
 		}
-		boolean hasLastPathUsed = lastPathIndexUsed != -1;
-		Path best = paths[hasLastPathUsed ? lastPathIndexUsed : 0];
-		// look for the quickest time path
+
+		// Sorry don't know what your doing.
+
+		// boolean hasLastPathUsed = lastPathIndexUsed != -1;
+		// Path best = paths.get(hasLastPathUsed ? lastPathIndexUsed : 0);
+
 		Robot bot = s.getBalle();
-		double bestTime = best.getTimeToDrive(bot)
-				* (hasLastPathUsed ? (1 / CHANGEPATH_IMPROVEMENT_THRESHHOLD)
-						: 1); // make it seem
-															// better than it is
-															// to amke the path
-															// choice more
-															// consistent
-		for(int i = 1; i < paths.length; i++) {
-			Path curr = paths[i];
-			if (curr != null) {
-				double currTime = curr.getTimeToDrive(bot);
-				if (bestTime > currTime) {
-					best = curr;
-					bestTime = currTime;
-					lastPathIndexUsed = i;
-				}
-			}
+
+		// // look for the quickest time path
+		// double bestTime = best.getTimeToDrive(bot)
+		// * (hasLastPathUsed ? (1 / CHANGEPATH_IMPROVEMENT_THRESHHOLD)
+		// : 1); // make it seem
+		// // better than it is
+		// // to amke the path
+		// // choice more
+		// // consistent
+		// for (int i = 1; i < paths.size(); i++) {
+		// Path curr = paths.get(i);
+		// if (curr != null) {
+		// double currTime = curr.getTimeToDrive(bot);
+		// if (bestTime > currTime) {
+		// best = curr;
+		// bestTime = currTime;
+		// lastPathIndexUsed = i;
+		// }}}
+
+		Path best = null;
+		for (Path each : paths) {
+			if (best == null
+					|| each.getTimeToDrive(bot) < best.getTimeToDrive(bot))
+				best = each;
 		}
+
 		// save the unused paths for drawing
 		altCurves.clear();
 		for (Path p : paths) {

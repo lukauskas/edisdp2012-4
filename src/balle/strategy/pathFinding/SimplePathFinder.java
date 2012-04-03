@@ -2,6 +2,7 @@ package balle.strategy.pathFinding;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 import java.util.Vector;
 
@@ -38,19 +39,20 @@ public class SimplePathFinder implements PathFinder {
 	}
 
 	@Override
-	public Path[] getPaths(Snapshot s, Coord end, Orientation endAngle)
+	public List<Path> getPaths(Snapshot s, Coord end, Orientation endAngle)
 			throws ValidPathNotFoundException {
 		
 		Robot robot = s.getBalle();
 		Coord start = robot.getPosition();
 		Orientation startAngle = robot.getOrientation();
 
-		return getPaths(s, start, startAngle, end, endAngle);
+		List<Path> out = getPaths(s, start, startAngle, end, endAngle);
+		return out;
 	}
 
-	protected Path[] getPaths(Snapshot s, Coord start,
- Orientation startAngle,
-			Coord end, Orientation endAngle) throws ValidPathNotFoundException {
+	protected List<Path> getPaths(Snapshot s, Coord start,
+			Orientation startAngle, Coord end, Orientation endAngle)
+			throws ValidPathNotFoundException {
 		
 		drawables = new ArrayList<Drawable>();
 		// Initialise temporary variables.
@@ -73,11 +75,13 @@ public class SimplePathFinder implements PathFinder {
 		}
 
 		// Convert to a path.
-		return new Path[] { new MaxSpeedPath(getCurve(list)) };
+		ArrayList<Path> out = new ArrayList<Path>();
+		out.add(new MaxSpeedPath(getCurve(list)));
+		return out;
 	}
 
 	/**
-	 * Given the start/end waypoints for a path, modify it by avoiding
+	 * Given the start/end way-points for a path, modify it by avoiding
 	 * obstacles.
 	 * 
 	 * @param pathStart
@@ -155,7 +159,7 @@ public class SimplePathFinder implements PathFinder {
 						currentCurve))
 					possibleNextWaypoints.add(pnw);
 
-			// add all options to the possible paths list
+			// Add all options to the possible paths list.
 			ArrayList<Spline> possiblePaths = new ArrayList<Spline>();
 			ArrayList<ValidPathNotFoundException> failures = new ArrayList<ValidPathNotFoundException>();
 			for (Coord[] waypoints : possibleNextWaypoints) {
