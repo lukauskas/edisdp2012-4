@@ -26,7 +26,6 @@ import balle.strategy.pathFinding.PathFinder;
 import balle.strategy.pathFinding.SimplePathFinder;
 import balle.strategy.pathFinding.ValidPathNotFoundException;
 import balle.strategy.pathFinding.path.Path;
-import balle.strategy.pathFinding.path.WheelAccelerationAwarePath;
 import balle.strategy.planner.SimpleGoToBallFaceGoal;
 import balle.world.BasicWorld;
 import balle.world.Coord;
@@ -246,6 +245,7 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 		right = pows[1]; // Globals.velocityToPower((float) max);
 
 
+		LOG.trace(left + "," + right);
 		controller.setWheelSpeeds(left, right);
 		controllerHistory.add(new ControllerHistoryElement((int) left,
 				(int) right, System.currentTimeMillis()));
@@ -256,9 +256,9 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 		// get candidate paths
 		List<Path> paths = pathfinder.getPaths(s, pf, finalOrient);
 
-		for (Path path : paths) {
-			path = new WheelAccelerationAwarePath(path);
-		}
+		// for (Path path : paths) {
+		// path = new WheelAccelerationAwarePath(path);
+		// }
 
 		// Sorry don't know what your doing.
 
