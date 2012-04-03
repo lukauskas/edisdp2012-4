@@ -38,9 +38,7 @@ public class ForwardAndReversePathFinder extends SimplePathFinder {
 					.getOrientation().getOpposite(), end, endAngle);
 
 			for (Path each : sList)
-				each = new ReversePath(each);
-
-			list.addAll(sList);
+				list.add(new ReversePath(each));
 
 		} catch (ValidPathNotFoundException e) {
 			if (list.size() == 0)
