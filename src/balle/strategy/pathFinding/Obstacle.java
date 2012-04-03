@@ -11,12 +11,8 @@ public abstract class Obstacle {
 
 	public static final double ROBOT_CLEARANCE = 0.1 + Math.sqrt(Math.pow(
 			Globals.ROBOT_LENGTH, 2) + Math.pow(Globals.ROBOT_WIDTH, 2));
-	
-	public static final double WALL_CLEARANCE = 0;
-
-	// public static final double WALL_CLEARANCE = 0.1 + (Math.sqrt(Math.pow(
-	// Globals.ROBOT_LENGTH, 2) + Math.pow(Globals.ROBOT_WIDTH, 2)) / 2);
-			
+	public static final double WALL_CLEARANCE = 0.1 + (Math.sqrt(Math.pow(
+			Globals.ROBOT_LENGTH, 2) + Math.pow(Globals.ROBOT_WIDTH, 2)) / 2);
 	public static final double BALL_CLEARANCE = 0.05 + Globals.ROBOT_WIDTH
 			+ Globals.BALL_RADIUS;
 
