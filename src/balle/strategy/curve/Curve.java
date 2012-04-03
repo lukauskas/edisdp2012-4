@@ -54,6 +54,10 @@ public interface Curve extends Drawable {
 	
 	// Utility \\
 	
+	public abstract Coord getStart();
+	
+	public abstract Coord getEnd();
+
 	public abstract Coord closestPoint(Coord c);
 
 	public abstract double length();

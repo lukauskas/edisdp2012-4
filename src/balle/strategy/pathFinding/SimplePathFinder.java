@@ -31,6 +31,7 @@ public class SimplePathFinder implements PathFinder {
 	// Temporary
 	protected Coord start, end;
 	protected Orientation startAngle, endAngle;
+	protected Spline currentBest;
 
 	public SimplePathFinder(Interpolator i) {
 		this.interpolator = i;
@@ -58,7 +59,8 @@ public class SimplePathFinder implements PathFinder {
 		this.end = end;
 		this.endAngle = endAngle;
 
-		Stack<Coord> list = getPath(start, end, s);
+		Spline spline = getPath(start, end, s);
+		Stack<Coord> list = spline.getComponents();
 
 		// remove duplicates (in sequence)
 		Coord last = list.get(0);
@@ -87,80 +89,135 @@ public class SimplePathFinder implements PathFinder {
 	 * @return new waypoints avoiding obstacles (includes pathStart and pathEnd)
 	 * @throws ValidPathNotFoundException
 	 */
-	public Stack<Coord> getPath(Coord pathStart, Coord pathEnd, Snapshot s)
+	public Spline getPath(Coord pathStart, Coord pathEnd, Snapshot s)
 			throws ValidPathNotFoundException {
-		return getPath(pathStart, pathEnd, s, 0);
+		currentBest = null;
+		Stack<Coord> startPath = new Stack<Coord>();
+		startPath.add(pathStart);
+		return getPath(startPath, pathEnd, s, 0);
 	}
 
-	private Stack<Coord> getPath(Coord pathStart, Coord pathEnd, Snapshot s,
+	/**
+	 * GET PATH.
+	 * 
+	 * @param pathSoFar
+	 *            Preceding path to this decision. [ This is necessary for
+	 *            correct collision detection ]
+	 * 
+	 * @param pathEnd
+	 *            Desired end-point of path.
+	 * 
+	 * @param s
+	 *            Current Snapshot.
+	 * 
+	 * @param currentDepth
+	 *            How many recursions have happened already.
+	 * 
+	 * @return Best possible route from here onwards, null if no routes are
+	 *         valid.
+	 * 
+	 * @throws ValidPathNotFoundException
+	 *             When there are no possible routes.
+	 */
+	private Spline getPath(Stack<Coord> pathSoFar, Coord pathEnd, Snapshot s,
 			int currentDepth) throws ValidPathNotFoundException {
 
-		// get the curve without avoiding obstacles
-		Stack<Coord> currentPathStack = new Stack<Coord>();
-		int currentPathLength = currentPathStack.size();
-
-		currentPathStack.push(pathStart);
-		currentPathStack.push(pathEnd);
-		Curve currentCurve = getCurve(currentPathStack);
+		// Get current curve.
+		pathSoFar.push(pathEnd);
+		Spline currentCurve = getCurve(pathSoFar);
+		drawables.add(currentCurve);
+		pathSoFar.pop();
 
 		// If path has already collided with an obstacle
-		if (currentPathLength > 0
-				&& isClearSoFar(currentCurve, s, currentPathLength) != null)
-			return new Stack<Coord>();
+		if (!isClearSoFar(currentCurve, s, pathSoFar.size()))
+			throw new ValidPathNotFoundException(
+					"Already collided with obstacle.");
 
-		// find next obstacle
-		// Check for intersections.
+		// Find obstacles, if any.
 		ArrayList<Obstacle> obsticle = isClear(currentCurve, s);
 
-		// if no obstacls of the path is getting too long, just stop
-		if (obsticle.size() == 0 || currentDepth > 4) {
-			return currentPathStack;
+		if (obsticle.size() == 0) {
+
+			// END POINT! ______
+			return currentCurve;
+			// _________________
+
+		} else if (currentDepth > 4) {
+			throw new ValidPathNotFoundException("Current depth exceeds limit.");
+
 		} else {
 
-			// get new waypoint(s) possibilities
+			// Get new way-point(s) possibilities.
 			ArrayList<Coord[]> possibleNextWaypoints = new ArrayList<Coord[]>();
 
 			for (Obstacle each : obsticle)
-				for (Coord[] pnw : each.getWaypoint(s, pathStart, currentCurve))
+				for (Coord[] pnw : each.getWaypoint(s, pathSoFar.peek(),
+						currentCurve))
 					possibleNextWaypoints.add(pnw);
 
 			// add all options to the possible paths list
-			ArrayList<Stack<Coord>> possiblePaths = new ArrayList<Stack<Coord>>();
-			for (Coord[] waypoits : possibleNextWaypoints) {
+			ArrayList<Spline> possiblePaths = new ArrayList<Spline>();
+			ArrayList<ValidPathNotFoundException> failures = new ArrayList<ValidPathNotFoundException>();
+			for (Coord[] waypoints : possibleNextWaypoints) {
 
-				// reconstruct the path from the pathStart to the final waypoint
-				Stack<Coord> newPath = new Stack<Coord>();
-				newPath.push(pathStart);
-				for (Coord wp : waypoits)
+				// Recreate pathSoFar and add all way-points ready for next
+				// iteration.
+				@SuppressWarnings("unchecked")
+				Stack<Coord> newPath = (Stack<Coord>) pathSoFar.clone();
+				for (Coord wp : waypoints)
 					newPath.push(wp);
 
-				// recursivelly fill the gap from last waypoint to pathEnd
-				Coord recCallStart = newPath.peek();
-				Coord recCallEnd = pathEnd;
-				Stack<Coord> pathToAppend = getPath(recCallStart, recCallEnd,
-						s, currentDepth + 1);
-				// // appends the new part
+				try {
 
-				while (pathToAppend.size() > 0)
-					newPath.push(pathToAppend.remove(0));
+					// RECURSIVE CALL!_____________________________
+					// Depth first search, COMPLETE path comes out.
+					Spline validCurve = getPath(newPath, pathEnd, s,
+							currentDepth + 1);
+					// _____________________________________________
 
-				// finish for this possible path
-				possiblePaths.add(newPath);
+					// Add valid curve to hopefuls.
+					possiblePaths.add(validCurve);
 
-				// // add drawables
-				for (Coord each : waypoits) {
-					drawables.add(new Dot(each, Color.CYAN));
+					// Drawables
+					for (Coord each : waypoints)
+						drawables.add(new Dot(each, Color.CYAN));
+
+				} catch (ValidPathNotFoundException e) {
+					// Ignore path, hope others fill gap
+					// otherwise exception will be thrown again later
+					// [ :S fingers crossed ]
+					failures.add(e);
 				}
 			}
 
-			// return best possible path
-			return best(possiblePaths);
+			// These should be complete, going to the end.
+			Spline contender = best(possiblePaths);
+
+			// Debugging information.
+			if (contender == null) {
+				throw new ValidPathNotFoundException("This many failures "
+						+ failures.size()
+						+ ", and this many possible solutions "
+						+ possiblePaths.size() + ".");
+			}
+
+			if (currentBest == null
+					|| currentBest.length() > contender.length()) {
+
+				// Update currentBest.
+				currentBest = contender;
+				return contender;
+				
+			} else {
+				// Prune this branch.
+				throw new ValidPathNotFoundException(
+						"Current branch is being pruned.");
+			}
 		}
 	}
 
-	protected ArrayList<Obstacle> isClearSoFar(Curve c, Snapshot s, int len) {
-		Spline curve = (Spline) c;
-		return isClear(curve.getSubSpline(0, len), s);
+	protected boolean isClearSoFar(Spline c, Snapshot s, int len) {
+		return (len <= 1) || (isClear(c.getSubSpline(0, len), s) == null);
 	}
 
 	protected ArrayList<Obstacle> isClear(Curve c, Snapshot s) {
@@ -228,7 +285,7 @@ public class SimplePathFinder implements PathFinder {
 	// return c;
 	// }
 
-	protected Curve getCurve(Vector<Coord> path) {
+	protected Spline getCurve(Vector<Coord> path) {
 		// Convert to array.
 		Coord[] out = new Coord[path.size()];
 		for (int i = 0; i < out.length; i++)
@@ -236,21 +293,20 @@ public class SimplePathFinder implements PathFinder {
 		return interpolator.getCurve(out, startAngle, endAngle);
 	}
 
-	protected Stack<Coord> best(ArrayList<Stack<Coord>> hopefulls)
-			throws ValidPathNotFoundException {
-		Stack<Coord> currBest = null;
-		for (Stack<Coord> each : hopefulls) {
-
-			if (currBest == null
-					|| getCurve(currBest).length() > getCurve(each).length())
+	/**
+	 * CHOOSE BEST PATH OUT OF CURRENT SELECTION.
+	 * 
+	 * @param hopefulls
+	 *            Path possibilities
+	 * @return Best path out of this selection.
+	 * 
+	 */
+	protected Spline best(ArrayList<Spline> hopefulls) {
+		Spline currBest = null;
+		for (Spline each : hopefulls)
+			if (currBest == null || currBest.length() > each.length())
 				currBest = each;
-		}
-
-		if (currBest == null)
-			throw new ValidPathNotFoundException();
-
 		return currBest;
-
 	}
 
 	// Visual Output \\
