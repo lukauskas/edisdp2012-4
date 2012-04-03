@@ -1,12 +1,16 @@
 package balle.strategy.bezierNav.neural;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 
 import org.apache.log4j.Logger;
 import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.nnet.learning.BackPropagation;
 
 import balle.controller.Controller;
+import balle.memory.NeuralDataFile;
+import balle.misc.Globals;
 import balle.strategy.FactoryMethod;
 import balle.strategy.UserInputStrategy;
 import balle.world.Snapshot;
@@ -58,6 +62,17 @@ public class CalibrateNeural extends UserInputStrategy {
 	@Override
 	public void stop(Controller controller) {
 		super.stop(controller);
+
+		try {
+			NeuralDataFile ndf = new NeuralDataFile(Globals.resFolder,
+				"ndfFile.txt");
+			ndf.writeArray(data);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ConcurrentModificationException e) {
+			e.printStackTrace();
+			controller.stop();
+		}
 	}
 
 	protected double currLeft = 0, currRight = 0;
