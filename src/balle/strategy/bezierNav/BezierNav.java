@@ -247,6 +247,7 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 
 		LOG.trace(left + "," + right);
 		controller.setWheelSpeeds(left, right);
+		// controller.setWheelSpeeds(0, 0);
 		controllerHistory.add(new ControllerHistoryElement((int) left,
 				(int) right, System.currentTimeMillis()));
 	}

@@ -139,7 +139,6 @@ public class SimplePathFinder implements PathFinder {
 		// Find obstacles, if any.
 		ArrayList<Obstacle> obsticle = isClearGoingForward(currentCurve, s,
 				pathSoFar.size());
-		LOG.debug("MEH" + obsticle.size());
 
 		if (obsticle.size() == 0) {
 
@@ -245,7 +244,6 @@ public class SimplePathFinder implements PathFinder {
 			// this is not really an obstacle if our path is already moving away
 			if (!o.clear(end, pos, leniency) && o.isMovingTowards(c)) {
 				out.add(o);
-				LOG.trace("inside");
 				continue;
 			}
 
@@ -263,10 +261,8 @@ public class SimplePathFinder implements PathFinder {
 				}
 			}
 
-			if (adding != null) {
-				LOG.trace("outside");
+			if (adding != null)
 				out.add(adding);
-			}
 		}
 		return out;
 	}
@@ -323,8 +319,14 @@ public class SimplePathFinder implements PathFinder {
 
 			@Override
 				public boolean clear(Coord tar, Coord crd, boolean leniency) {
-					return crd.dist(getPosition()) > Math.min(getSource()
-							.getPosition().dist(tar), getClearance(leniency));
+					double clr, distTar;
+					distTar = getSource().getPosition().dist(tar) * 0.8;
+					if (!leniency) {
+						distTar *= 0.8;
+					}
+					clr = Math.min(getClearance(leniency), distTar);
+
+					return crd.dist(getPosition()) > clr;
 			}
 
 		});
