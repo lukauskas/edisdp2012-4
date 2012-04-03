@@ -1,6 +1,5 @@
 package balle.strategy.pathFinding;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -8,7 +7,6 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 
-import balle.main.drawable.Dot;
 import balle.main.drawable.Drawable;
 import balle.strategy.curve.Curve;
 import balle.strategy.curve.Interpolator;
@@ -32,7 +30,6 @@ public class SimplePathFinder implements PathFinder {
 	// Temporary
 	protected Coord start, end;
 	protected Orientation startAngle, endAngle;
-	protected Spline currentBest;
 
 	public SimplePathFinder(Interpolator i) {
 		this.interpolator = i;
@@ -95,7 +92,6 @@ public class SimplePathFinder implements PathFinder {
 	 */
 	public Spline getPath(Coord pathStart, Coord pathEnd, Snapshot s)
 			throws ValidPathNotFoundException {
-		currentBest = null;
 		Stack<Coord> startPath = new Stack<Coord>();
 		startPath.add(pathStart);
 		return getPath(startPath, pathEnd, s, 0);
@@ -129,16 +125,21 @@ public class SimplePathFinder implements PathFinder {
 		// Get current curve.
 		pathSoFar.push(pathEnd);
 		Spline currentCurve = getCurve(pathSoFar);
-		drawables.add(currentCurve);
 		pathSoFar.pop();
 
+		// drawables.add(currentCurve);
+
 		// If path has already collided with an obstacle
-		if (!isClearSoFar(currentCurve, s, pathSoFar.size()))
-			throw new ValidPathNotFoundException(
-					"Already collided with obstacle.");
+		ArrayList<Obstacle> obstacles = isClearSoFar(currentCurve, s,
+				pathSoFar.size());
+		if (obstacles.size() > 0)
+			throw new ValidPathNotFoundException("Already collided with "
+					+ obstacles.get(0));
 
 		// Find obstacles, if any.
-		ArrayList<Obstacle> obsticle = isClear(currentCurve, s);
+		ArrayList<Obstacle> obsticle = isClearGoingForward(currentCurve, s,
+				pathSoFar.size());
+		LOG.debug("MEH" + obsticle.size());
 
 		if (obsticle.size() == 0) {
 
@@ -183,10 +184,6 @@ public class SimplePathFinder implements PathFinder {
 					// Add valid curve to hopefuls.
 					possiblePaths.add(validCurve);
 
-					// Drawables
-					for (Coord each : waypoints)
-						drawables.add(new Dot(each, Color.CYAN));
-
 				} catch (ValidPathNotFoundException e) {
 					// Ignore path, hope others fill gap
 					// otherwise exception will be thrown again later
@@ -200,64 +197,76 @@ public class SimplePathFinder implements PathFinder {
 
 			// Debugging information.
 			if (contender == null) {
+				String errors = "";
+				for (ValidPathNotFoundException failure : failures)
+					errors += " " + failure.getMessage();
+
 				throw new ValidPathNotFoundException("This many failures "
 						+ failures.size()
 						+ ", and this many possible solutions "
-						+ possiblePaths.size() + ".");
+						+ possiblePaths.size() + ".\n" + errors);
 			}
 
-			if (currentBest == null
-					|| currentBest.length() > contender.length()) {
-
-				// Update currentBest.
-				currentBest = contender;
-				return contender;
-				
-			} else {
-				// Prune this branch.
-				throw new ValidPathNotFoundException(
-						"Current branch is being pruned.");
-			}
+			return contender;
 		}
 	}
 
-	protected boolean isClearSoFar(Spline c, Snapshot s, int len) {
-		return (len <= 1) || (isClear(c.getSubSpline(0, len), s) == null);
+	protected ArrayList<Obstacle> isClearSoFar(Spline c, Snapshot s, int len) {
+		if (len <= 1)
+			return new ArrayList<Obstacle>();
+
+		Spline sub = c.getSubSpline(0, len);
+
+		return isClear(sub, s, false);
 	}
 
-	protected ArrayList<Obstacle> isClear(Curve c, Snapshot s) {
+	protected ArrayList<Obstacle> isClearGoingForward(Spline c, Snapshot s,
+			int len) {
+		Curve sub = c.getLastCurve();
+
+		ArrayList<Obstacle> ans = isClear(sub, s, true);
+		if (ans.size() > 0)
+			drawables.add(sub);
+
+		return ans;
+
+	}
+
+	protected ArrayList<Obstacle> isClear(Curve c, Snapshot s, boolean leniency) {
 		ArrayList<Obstacle> out = new ArrayList<Obstacle>();
 
-		Coord pos = s.getBalle().getPosition();
+		Coord pos = c.getStart(); // s.getBalle().getPosition();
 		for (Obstacle o : getObstacles(s)) {
-			Obstacle adding = null;
 
-			// if we are inside the clearance area, just assume the obstical is
+			// if we are inside the clearance area, just assume the obstacle is
 			// in the way
 			// This is not applicable if the end point is also within the
 			// clearance area
 			// this is not really an obstacle if our path is already moving away
-			if (!o.clear(start) && o.isMovingTowards(c)) {
-				adding = o;
+			if (!o.clear(end, pos, leniency) && o.isMovingTowards(c)) {
+				out.add(o);
+				LOG.trace("inside");
+				continue;
 			}
 
 			// (o.getSource() instanceof Pitch)
 
 			// check that the current path does not go from out of
 			// the object clearance to into the clearance
-			if (adding == null) {
-				boolean in = !o.clear(pos);
-				for (double i = 0; i < 1; i += 0.01) {
-					boolean newIn = !o.clear(c.pos(i));
-					if (!in && newIn) {
-						adding = o;
-						break;
-					}
+			Obstacle adding = null;
+			boolean in = !o.clear(end, pos, leniency);
+			for (double i = 0; i < 1; i += 0.01) {
+				boolean newIn = !o.clear(end, c.pos(i), leniency);
+				if (!in && newIn) {
+					adding = o;
+					break;
 				}
 			}
 
-			if (adding != null)
+			if (adding != null) {
+				LOG.trace("outside");
 				out.add(adding);
+			}
 		}
 		return out;
 	}
@@ -313,8 +322,9 @@ public class SimplePathFinder implements PathFinder {
 				s.getOpponent().getPosition().dist(end))) {
 
 			@Override
-			public boolean clear(Coord c) {
-				return c.dist(getPosition()) > clearance;
+				public boolean clear(Coord tar, Coord crd, boolean leniency) {
+					return crd.dist(getPosition()) > Math.min(getSource()
+							.getPosition().dist(tar), getClearance(leniency));
 			}
 
 		});
@@ -322,15 +332,15 @@ public class SimplePathFinder implements PathFinder {
 		output.add(new Obstacle(s.getPitch(), Obstacle.WALL_CLEARANCE) {
 
 			@Override
-			public boolean clear(Coord c) {
+			public boolean clear(Coord strt, Coord c, boolean leniency) {
 				Pitch p = (Pitch) getSource();
-				if (c.getX() < p.getMinX() + clearance)
+				if (c.getX() < p.getMinX() + getClearance(leniency))
 					return false;
-				if (c.getX() > p.getMaxX() - clearance)
+				if (c.getX() > p.getMaxX() - getClearance(leniency))
 					return false;
-				if (c.getY() < p.getMinY() + clearance)
+				if (c.getY() < p.getMinY() + getClearance(leniency))
 					return false;
-				if (c.getY() > p.getMaxY() - clearance)
+				if (c.getY() > p.getMaxY() - getClearance(leniency))
 					return false;
 				return true;
 			}
@@ -358,9 +368,10 @@ public class SimplePathFinder implements PathFinder {
 			public Coord constrain(Coord c, Pitch p) {
 				double x = c.getX(), y = c.getY(),
 
-				xmin = p.getMinX() + getClearance(), xmax = p.getMaxX()
-						- getClearance(), ymin = p.getMinY() + getClearance(), ymax = p
-						.getMaxY() - getClearance();
+				xmin = p.getMinX() + getClearance(true), xmax = p.getMaxX()
+						- getClearance(true), ymin = p.getMinY()
+						+ getClearance(true), ymax = p.getMaxY()
+						- getClearance(true);
 
 				return new Coord(Math.min(xmax, Math.max(xmin, x)), Math.min(
 						ymax, Math.max(ymin, y)));
@@ -377,7 +388,7 @@ public class SimplePathFinder implements PathFinder {
 					Coord cons = constrain(point, pitch);
 					if (!point.equals(cons)) {
 						waypoints.add(cons);
-						}
+					}
 				}
 
 				if (waypoints.size() == 0) {
@@ -387,7 +398,7 @@ public class SimplePathFinder implements PathFinder {
 				if (waypoints.size() == 1) {
 					System.out.println("bbbbbbbbbbbbbbbbbbbbbbbbbbbbw45732");
 					return new Coord[][] { new Coord[] { waypoints.get(0) } };
-					}
+				}
 				Coord[] wpa = new Coord[] { waypoints.get(0),
 						waypoints.get(waypoints.size() - 1) };
 				return new Coord[][] { wpa };

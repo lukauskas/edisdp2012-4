@@ -124,5 +124,11 @@ public class Spline implements Curve {
         // TODO: implement!!!
     }
 
+	public Curve getLastCurve() {
+		if (splines.length > 0)
+			return splines[splines.length - 1];
+		else
+			return null;
+	}
 
 }

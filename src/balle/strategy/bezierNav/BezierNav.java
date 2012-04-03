@@ -181,8 +181,7 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 				} else {
 					controller.forward(Globals.MAXIMUM_MOTOR_SPEED);
 				}
-			}
- else {
+			} else {
 				controller.stop();
 			}
 			return;
@@ -232,7 +231,7 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 			pathToTake = getBestPath(snapshot, angle);
 			c = pathToTake.getCurve();
 		} catch (ValidPathNotFoundException e) {
-			throw new ConfusedException();
+			throw new ConfusedException(e);
 		}
 
 		// calculate wheel speeds/powers

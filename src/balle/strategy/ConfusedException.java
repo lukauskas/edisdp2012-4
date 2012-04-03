@@ -1,25 +1,22 @@
 package balle.strategy;
 
 public class ConfusedException extends Exception {
+	private static final long serialVersionUID = 2640531908864256322L;
 
-    public ConfusedException() {
+	public ConfusedException() {
         super();
-        // TODO Auto-generated constructor stub
     }
 
     public ConfusedException(String message, Throwable cause) {
         super(message, cause);
-        // TODO Auto-generated constructor stub
     }
 
     public ConfusedException(String message) {
         super(message);
-        // TODO Auto-generated constructor stub
     }
 
     public ConfusedException(Throwable cause) {
         super(cause);
-        // TODO Auto-generated constructor stub
     }
 
 }

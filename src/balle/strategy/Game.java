@@ -208,7 +208,7 @@ public class Game extends AbstractPlanner {
             strategy.step(controller, snapshot);
         } catch (ConfusedException e) {
             // If a strategy does not know what to do
-            LOG.error(e.toString());
+			LOG.error("Game catch block.", e);
             // Default to goToBallPFN
             goToBallPFN.step(controller, snapshot);
         }

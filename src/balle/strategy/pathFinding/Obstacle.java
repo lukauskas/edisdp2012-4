@@ -6,6 +6,8 @@ import balle.world.Coord;
 import balle.world.Orientation;
 import balle.world.Snapshot;
 import balle.world.objects.FieldObject;
+import balle.world.objects.Pitch;
+import balle.world.objects.Robot;
 
 public abstract class Obstacle {
 
@@ -22,7 +24,14 @@ public abstract class Obstacle {
 			+ Globals.BALL_RADIUS;
 
 	private FieldObject source;
-	protected double clearance;
+	protected double clearance, strictClearance;
+
+	public double getClearance(boolean leniency) {
+		if (leniency)
+			return clearance;
+		else
+			return strictClearance;
+	}
 
 	public FieldObject getSource() {
 		return source;
@@ -31,9 +40,7 @@ public abstract class Obstacle {
 	public Obstacle(FieldObject source, double clearance) {
 		this.source = source;
 		this.clearance = clearance;
-	}
-	protected double getClearance() {
-		return clearance;
+		this.strictClearance = Globals.ROBOT_WIDTH / 2;
 	}
 
 	protected FieldObject getFieldObjeect() {
@@ -55,10 +62,10 @@ public abstract class Obstacle {
 	 * @param c
 	 * @return
 	 */
-	public abstract boolean clear(Coord c);
+	public abstract boolean clear(Coord tar, Coord crd, boolean leniency);
 
 	public Coord[][] getWaypoint(Snapshot s, Coord curr, Curve curveSoFar) {
-		Coord c = new Coord(0, this.getClearance());
+		Coord c = new Coord(0, this.getClearance(true));
 		Orientation o = curveSoFar.pos(1).sub(curr).getOrientation();
 
 		return new Coord[][] { new Coord[] { c.rotate(o).add(getPosition()) },
@@ -77,6 +84,17 @@ public abstract class Obstacle {
 		// return new Coord[][] { new Coord[] { c.rotate(o).add(this) },
 		// new Coord[] { c.rotate(o.getOpposite()).add(this) } };
 		
+	}
+
+	@Override
+	public String toString() {
+		if (source instanceof Robot) {
+			return "Opponent";
+		} else if (source instanceof Pitch) {
+			return "Wall";
+		} else {
+			return "Something";
+		}
 	}
 
 }
