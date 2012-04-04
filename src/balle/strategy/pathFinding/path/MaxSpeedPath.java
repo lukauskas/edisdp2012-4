@@ -3,7 +3,6 @@ package balle.strategy.pathFinding.path;
 import org.apache.log4j.Logger;
 
 import balle.misc.Globals;
-import balle.strategy.bezierNav.BezierNav;
 import balle.strategy.curve.Curve;
 import balle.world.Coord;
 
@@ -23,7 +22,8 @@ public class MaxSpeedPath extends AbstractPath {
 														// ratio of max speed
 	private final double APPROACH_DISTANCE = 2; // Approaching if within this
 													// distance
-	private final double MAX_VELOCITY = Globals.powerToVelocity(900); // the
+	private final double MAX_VELOCITY = 1.0; // Globals.powerToVelocity(900); //
+												// the
 																		// maximum
 																		// wheel
 																		// velocity
