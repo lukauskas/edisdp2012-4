@@ -89,6 +89,8 @@ public class Globals {
     public static final float ARBITRARY_BALL_VEL_SCALING = 100;
     public static final double VELOCITY_NOISE_THRESHOLD = 1e-8;
 
+	public static final double MAX_WHEEL_SPEED = 6E-4;
+
 	// FILE SYSTEM
 
 	public static final FolderReader resFolder = new FolderReader("res");

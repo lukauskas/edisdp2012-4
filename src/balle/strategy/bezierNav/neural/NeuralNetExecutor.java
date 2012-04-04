@@ -15,7 +15,7 @@ public class NeuralNetExecutor implements WheelSpeedExecutor {
 
 	protected CalibrateNeural listener;
 
-	protected int gLeft = 0, gRight = 0;
+	protected double gLeft = 0, gRight = 0;
 	protected double cLeft = 0, cRight = 0;
 
 	public NeuralNetExecutor(NeuralNetwork neural) {
@@ -48,32 +48,39 @@ public class NeuralNetExecutor implements WheelSpeedExecutor {
 
 	@Override
 	public void step(Controller controller, Snapshot snapshot) {
-		int oLeft, oRight;
+		double oLeft, oRight;
 
-		oLeft = (int) neural.getOutput()[0];
-		oRight = (int) neural.getOutput()[1];
+		oLeft = neural.getOutput()[0];
+		oRight = neural.getOutput()[1];
 
-		controller.setWheelSpeeds(oLeft, oRight);
+		controller.setWheelSpeeds(convert(oLeft), convert(oRight));
 		listener.record(gLeft, gRight, cLeft, cRight, oLeft, oRight);
 	}
 
 	@Override
-	public void update(int desLeft, int desRight, double actLeft,
+	public void update(double desLeft, double desRight, double actLeft,
 			double actRight) {
-		neural.setInput(desLeft, actLeft, desRight, actRight);
+		double convDesLeft, convDesRight, convActLeft, convActRight;
+		convDesLeft = desLeft;
+		convDesRight = desRight;
+		convActLeft = actLeft;
+		convActRight = actRight;
+		
+		neural.setInput(convDesLeft, convActLeft, convDesRight, convActRight);
 		neural.calculate();
-		gLeft = desLeft;
-		gRight = desRight;
-		cLeft = actLeft;
-		cRight = actRight;
+
+		gLeft = convDesLeft;
+		gRight = convDesRight;
+		cLeft = convActLeft;
+		cRight = convActRight;
 	}
 
 	public static double convert(int d) {
-		return ((double) (d + 900)) / 1800.0;
+		return ((double) d) / 900.0;
 	}
 
 	public static int convert(double d) {
-		return (int) ((d * 1800.0) - 900);
+		return (int) Math.floor(d * 900.0);
 	}
 
 

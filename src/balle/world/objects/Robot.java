@@ -322,7 +322,12 @@ public class Robot extends RectangularObject {
 		double var = dAng.radians() / Math.PI;
 		double abs = delta.abs();
 
-		return abs + abs * var * cst;
+		double out = (abs + abs * var * cst) / Globals.MAX_WHEEL_SPEED;
+
+		if (delta.getY() < 0)
+			return out;
+		else
+			return out;
 	}
 
 	public double getLeftWheelSpeed() {

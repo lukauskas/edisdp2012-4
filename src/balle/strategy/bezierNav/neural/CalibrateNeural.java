@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 
 import org.apache.log4j.Logger;
+import org.neuroph.core.learning.SupervisedTrainingElement;
+import org.neuroph.core.learning.TrainingSet;
 import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.nnet.learning.BackPropagation;
 
@@ -20,6 +22,9 @@ public class CalibrateNeural extends UserInputStrategy {
 	public static final Logger LOG = Logger.getLogger(CalibrateNeural.class);
 
 	protected MultiLayerPerceptron mlp;
+	protected BackPropagation bp;
+	protected TrainingSet<SupervisedTrainingElement> ts;
+
 	protected NeuralNetExecutor nne;
 
 	protected ArrayList<NeuralObj> data = new ArrayList<NeuralObj>();
@@ -33,10 +38,14 @@ public class CalibrateNeural extends UserInputStrategy {
 
 
 	public CalibrateNeural() {
-		mlp = new MultiLayerPerceptron(4, 2);
-		mlp.setLearningRule(new BackPropagation());
+		ts = new TrainingSet<SupervisedTrainingElement>();
+		mlp = new MultiLayerPerceptron(4, 5, 2);
 
-		mlp.initializeWeights(0.5);
+		bp = new BackPropagation();
+		bp.setNeuralNetwork(mlp);
+		bp.setLearningRate(1.0);
+
+		mlp.randomizeWeights();
 
 		nne = new NeuralNetExecutor(mlp);
 		nne.addlistener(this);
@@ -52,7 +61,11 @@ public class CalibrateNeural extends UserInputStrategy {
 		velLeft = snapshot.getBalle().getLeftWheelSpeed();
 		velRight = snapshot.getBalle().getRightWheelSpeed();
 
-		nne.update((int) leftWheelPower, (int) rightWheelPower, velLeft,
+		// LOG.trace(velLeft + " " + velRight);
+		LOG.trace(leftWheelPower + " " + rightWheelPower);
+
+		// controller.setWheelSpeeds(900, 900);
+		nne.update(leftWheelPower, rightWheelPower, velLeft,
 				velRight);
 		nne.step(controller, snapshot);
 
@@ -73,30 +86,39 @@ public class CalibrateNeural extends UserInputStrategy {
 	}
 
 	protected double currLeft = 0, currRight = 0;
-	protected int desLeftCmd = 0, desRightCmd = 0;
-	protected int sentLeftCmd = 0, sentRightCmd = 0;
+	protected double desLeftCmd = 0, desRightCmd = 0;
+	protected double sentLeftCmd = 0, sentRightCmd = 0;
 
-	protected void record(int gLeft, int gRight, double cLeft, double cRight,
-			double left, double right) {
-		double lastLeft = lastRobot.getLeftWheelSpeed(), lastRight = lastRobot
+	protected void record(double gLeft, double gRight, double cLeft,
+			double cRight, double left, double right) {
+		double actLeft = currentRobot.getLeftWheelSpeed(), actRight = currentRobot
 				.getRightWheelSpeed();
 
 		// Log data
-		data.add(new NeuralObj(currLeft, currRight, desLeftCmd, desRightCmd,
-				sentLeftCmd, sentRightCmd, lastLeft, lastRight));
+		NeuralObj neural = new NeuralObj(currLeft, currRight, desLeftCmd,
+				desRightCmd, sentLeftCmd, sentRightCmd, actLeft, actRight);
+		data.add(neural);
+
+		ts.addElement(neural.ste());
+		bp.doOneLearningIteration(ts);
+
+		LOG.trace("Data size " + data.size() + "\nCommands " + neural.save()
+				+ "\nSentLeft " + sentLeftCmd + ", ActLeft " + actLeft
+				+ ", DesLeft " + desLeftCmd + ", ErrLeft "
+				+ neural.getErrLeft() + "\nSentRight " + sentRightCmd
+				+ ", ActRight " + actRight + ", DesRight " + desRightCmd
+				+ ", ErrRight " + neural.getErrRight() + "\n");
 
 		// Update
-		this.sentLeftCmd = (int) left;
-		this.sentRightCmd = (int) right;
+		this.sentLeftCmd = left;
+		this.sentRightCmd = right;
 		this.currLeft = cLeft;
 		this.currRight = cRight;
 		this.desLeftCmd = gLeft;
 		this.desRightCmd = gRight;
+
 		this.lastRobot = currentRobot;
 
-		LOG.trace("Data size " + data.size() + "Commands\n" + left + "\n"
-				+ right + "\n" + cLeft + "\n" + cRight + "\n" + gLeft + "\n"
-				+ gRight);
 	}
 
 
