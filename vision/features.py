@@ -81,7 +81,6 @@ class Features:
         #     and expected[2] < length < expected[3]
 
         if which == 'T':
-            print feature.minRectWidth()
             if feature.minRectWidth() < 15:
                 return False
 
