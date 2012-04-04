@@ -113,6 +113,9 @@ public class BasicWorld extends AbstractWorld {
 		Velocity themVel = theirRobotEstimator.getVelocity();
 		Velocity ballVel = ballEstimator.getVelocity();
 
+		// LOG.debug("BallVel = " + ballVel.abs() * 1000 + " "
+		// + ballPosition.isEstimated());
+
 		AngularVelocity oursAngVel = null, themAngVel = null;
 		if (ourOrientation == null) {
 			ourOrientation = prev.getBalle().getOrientation();
@@ -138,7 +141,6 @@ public class BasicWorld extends AbstractWorld {
 		them = new Robot(theirsPosition, themVel, themAngVel, theirsOrientation);
 		ours = new Robot(ourPosition, oursVel, oursAngVel, ourOrientation);
 		ball = new Ball(ballPosition, ballVel);
-
 
 		// Pack into a snapshot
 		Snapshot nextSnapshot = new Snapshot(this, them, ours, ball, timestamp);

@@ -245,7 +245,7 @@ public class SimpleWorldGUI extends AbstractWorldProcessor {
 			// Color.BLUE).draw(
 			// g, scaler);
 
-			Velocity vel = ball.getVelocity().mult(1000);
+			Velocity vel = ball.getVelocity().mult(10000);
 			DrawableVector vec = new DrawableVector(ball.getPosition(), vel,
 					Color.CYAN);
 			vec.draw(g, scaler);
