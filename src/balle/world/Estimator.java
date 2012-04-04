@@ -22,7 +22,7 @@ public class Estimator {
 	}
 
 	public static Estimator getBallEstimator() {
-		return new Estimator(0.7, 0.4);
+		return new Estimator(0.5, 0.4);
 	}
 
 	public static Estimator getRobotEstimator() {
@@ -74,6 +74,7 @@ public class Estimator {
 
 		velocity = new Velocity(velocityPredictor.predict((int) (1000 / dt))
 				.sub(pos), 1000);
+
 	}
 
 	public void reset() {
