@@ -71,7 +71,7 @@ public class Pitch extends StaticFieldObject {
 	 *            Point in the pitch.
 	 * @return True if on left, false otherwise.
 	 */
-	public Object getHalf(Coord position) {
+	public boolean getHalf(Coord position) {
 		return position.getX() < getPosition().getX();
 	}
 
