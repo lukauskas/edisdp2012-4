@@ -62,14 +62,14 @@ public class UserInputStrategy extends AbstractPlanner {
 
     @Override
     // TODO Change to rely on and react to JPanel thing
-    public void onStep(Controller controller, Snapshot snapshot) {
+	public void onStep(Controller controller, Snapshot snapshot)
+			throws ConfusedException {
 		controller.setWheelSpeeds(Math.round(leftWheelPower) * 900,
 				Math.round(rightWheelPower) * 900);
 
 		if (kick)
 			controller.kick();
         kick = false;
-
     }
 
     // Makes coordinates relative to robot

@@ -66,7 +66,8 @@ class Features:
         if entityblob is None:
             return Entity()
         
-        entity = Entity.fromFeature(entityblob, which != 'ball')
+        isBall = which != 'ball'
+        entity = Entity.fromFeature(entityblob, isBall, isBall)
 
         return entity
 
@@ -85,9 +86,12 @@ class Features:
 class Entity:
 
     @classmethod
-    def fromFeature(cls, feature, hasAngle):
+    def fromFeature(cls, feature, hasAngle, useBoundingBox = True):
         entity = Entity(hasAngle)
-        entity._coordinates = feature.coordinates()
+        if useBoundingBox:
+            entity._coordinates = feature.coordinates()
+        else:
+            entity._coordinates = feature.centroid();
         entity._feature = feature
 
         return entity

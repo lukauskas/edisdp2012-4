@@ -8,6 +8,7 @@ import balle.controller.Controller;
 import balle.main.drawable.DrawableLine;
 import balle.main.drawable.Label;
 import balle.misc.Globals;
+import balle.strategy.ConfusedException;
 import balle.strategy.FactoryMethod;
 import balle.strategy.executor.movement.GoToObjectPFN;
 import balle.strategy.executor.movement.MovementExecutor;
@@ -142,7 +143,7 @@ public class GoToBallSafe extends GoToBall {
     }
 
     @Override
-    protected void onStep(Controller controller, Snapshot snapshot) {
+    protected void onStep(Controller controller, Snapshot snapshot) throws ConfusedException {
         Robot ourRobot = snapshot.getBalle();
         Ball ball = snapshot.getBall();
 
@@ -156,6 +157,7 @@ public class GoToBallSafe extends GoToBall {
         if (stage == 2) {
             if (turnExecutor.isTurning()) {
                 turnExecutor.step(controller, snapshot);
+
                 LOG.trace("Still turning");
                 return;
             } else {
@@ -164,7 +166,9 @@ public class GoToBallSafe extends GoToBall {
                         .orientation();
                 LOG.info("Turning towards ball!");
                 turnExecutor.setTargetOrientation(targetOrientation);
+
                 turnExecutor.step(controller, snapshot);
+
                 return;
             }
 

@@ -23,7 +23,7 @@ public class GameFromPenaltyKick extends Game {
     }
 
 	@Override
-	public void onStep(Controller controller, Snapshot snapshot) {
+	public void onStep(Controller controller, Snapshot snapshot) throws ConfusedException {
 		if (timeToKick == 0) {
 			timeToKick = System.currentTimeMillis() + 1000;
 		} else if ((timeToKick <= System.currentTimeMillis())

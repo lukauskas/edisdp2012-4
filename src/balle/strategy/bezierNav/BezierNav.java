@@ -2,6 +2,7 @@ package balle.strategy.bezierNav;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jbox2d.common.Vec2;
@@ -14,6 +15,7 @@ import balle.main.drawable.Drawable;
 import balle.misc.Globals;
 import balle.simulator.SnapshotPredictor;
 import balle.simulator.WorldSimulator;
+import balle.strategy.ConfusedException;
 import balle.strategy.FactoryMethod;
 import balle.strategy.curve.Curve;
 import balle.strategy.curve.CustomCHI;
@@ -22,8 +24,8 @@ import balle.strategy.executor.movement.OrientedMovementExecutor;
 import balle.strategy.pathFinding.ForwardAndReversePathFinder;
 import balle.strategy.pathFinding.PathFinder;
 import balle.strategy.pathFinding.SimplePathFinder;
+import balle.strategy.pathFinding.ValidPathNotFoundException;
 import balle.strategy.pathFinding.path.Path;
-import balle.strategy.pathFinding.path.WheelAccelerationAwarePath;
 import balle.strategy.planner.SimpleGoToBallFaceGoal;
 import balle.world.BasicWorld;
 import balle.world.Coord;
@@ -162,7 +164,9 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 	}
 
 	@Override
-	public void step(Controller controller, Snapshot snapshot) {
+	public void step(Controller controller, Snapshot snapshot)
+			throws ConfusedException {
+
 		// adjust for latency
 		SnapshotPredictor sp = snapshot.getSnapshotPredictor();
 		snapshot = sp.getSnapshotAfterTime(System.currentTimeMillis()
@@ -176,8 +180,7 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 				} else {
 					controller.forward(Globals.MAXIMUM_MOTOR_SPEED);
 				}
-			}
- else {
+			} else {
 				controller.stop();
 			}
 			return;
@@ -222,8 +225,13 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 		// }
 
 		// decide on a path to take
-		Path pathToTake = getBestPath(snapshot, angle);
-		c = pathToTake.getCurve();
+		Path pathToTake = null;
+		try {
+			pathToTake = getBestPath(snapshot, angle);
+			c = pathToTake.getCurve();
+		} catch (ValidPathNotFoundException e) {
+			throw new ConfusedException(e);
+		}
 
 		// calculate wheel speeds/powers
 		int[] pows = pathToTake.getPowers(robot, 0);
@@ -237,39 +245,54 @@ public class BezierNav implements OrientedMovementExecutor, MovementExecutor {
 		right = pows[1]; // Globals.velocityToPower((float) max);
 
 
+		LOG.trace(left + "," + right);
 		controller.setWheelSpeeds(left, right);
+		// controller.setWheelSpeeds(0, 0);
 		controllerHistory.add(new ControllerHistoryElement((int) left,
 				(int) right, System.currentTimeMillis()));
 	}
 	
-	private Path getBestPath(Snapshot s, Orientation finalOrient) {
+	private Path getBestPath(Snapshot s, Orientation finalOrient)
+			throws ValidPathNotFoundException {
 		// get candidate paths
-		Path[] paths = pathfinder.getPaths(s, pf, finalOrient);
-		for (int i = 0; i < paths.length; i++) {
-			paths[i] = new WheelAccelerationAwarePath(paths[i]);
-		}
-		boolean hasLastPathUsed = lastPathIndexUsed != -1;
-		Path best = paths[hasLastPathUsed ? lastPathIndexUsed : 0];
-		// look for the quickest time path
+		List<Path> paths = pathfinder.getPaths(s, pf, finalOrient);
+
+		// for (Path path : paths) {
+		// path = new WheelAccelerationAwarePath(path);
+		// }
+
+		// Sorry don't know what your doing.
+
+		// boolean hasLastPathUsed = lastPathIndexUsed != -1;
+		// Path best = paths.get(hasLastPathUsed ? lastPathIndexUsed : 0);
+
 		Robot bot = s.getBalle();
-		double bestTime = best.getTimeToDrive(bot)
-				* (hasLastPathUsed ? (1 / CHANGEPATH_IMPROVEMENT_THRESHHOLD)
-						: 1); // make it seem
-															// better than it is
-															// to amke the path
-															// choice more
-															// consistent
-		for(int i = 1; i < paths.length; i++) {
-			Path curr = paths[i];
-			if (curr != null) {
-				double currTime = curr.getTimeToDrive(bot);
-				if (bestTime > currTime) {
-					best = curr;
-					bestTime = currTime;
-					lastPathIndexUsed = i;
-				}
-			}
+
+		// // look for the quickest time path
+		// double bestTime = best.getTimeToDrive(bot)
+		// * (hasLastPathUsed ? (1 / CHANGEPATH_IMPROVEMENT_THRESHHOLD)
+		// : 1); // make it seem
+		// // better than it is
+		// // to amke the path
+		// // choice more
+		// // consistent
+		// for (int i = 1; i < paths.size(); i++) {
+		// Path curr = paths.get(i);
+		// if (curr != null) {
+		// double currTime = curr.getTimeToDrive(bot);
+		// if (bestTime > currTime) {
+		// best = curr;
+		// bestTime = currTime;
+		// lastPathIndexUsed = i;
+		// }}}
+
+		Path best = null;
+		for (Path each : paths) {
+			if (best == null
+					|| each.getTimeToDrive(bot) < best.getTimeToDrive(bot))
+				best = each;
 		}
+
 		// save the unused paths for drawing
 		altCurves.clear();
 		for (Path p : paths) {

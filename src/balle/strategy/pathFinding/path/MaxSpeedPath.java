@@ -1,10 +1,13 @@
 package balle.strategy.pathFinding.path;
 
+import org.apache.log4j.Logger;
+
 import balle.misc.Globals;
 import balle.strategy.curve.Curve;
 import balle.world.Coord;
 
 public class MaxSpeedPath extends AbstractPath {
+	public static final Logger LOG = Logger.getLogger(MaxSpeedPath.class);
 
 	private final double MIN_SAFE_RADIUS = 0.75; // the smallest turning radius
 												// where moving at maximum speed
@@ -19,7 +22,8 @@ public class MaxSpeedPath extends AbstractPath {
 														// ratio of max speed
 	private final double APPROACH_DISTANCE = 2; // Approaching if within this
 													// distance
-	private final double MAX_VELOCITY = Globals.powerToVelocity(900); // the
+	private final double MAX_VELOCITY = 1.0; // Globals.powerToVelocity(900); //
+												// the
 																		// maximum
 																		// wheel
 																		// velocity
@@ -39,6 +43,9 @@ public class MaxSpeedPath extends AbstractPath {
 	@Override
 	public double[] getVelocities(double t, Curve c, double leftWheelVel,
 			double rightWheelVel) {
+		
+		LOG.trace(MAX_VELOCITY);
+		
 		// calculate turning radius
 		Coord a = c.acc(0);
 		double r = c.rad(0);
