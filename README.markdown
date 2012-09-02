@@ -7,11 +7,16 @@ All dependancies you will need should be installed by `install.sh` script.
 
 After the script is run verify that contents of the lib dir contain all the libraries specified in the bottom of the script.
 
+Software on the brick
+----------------------------------------------
+The software that has to be running on the brick in order for the
+robot to be controlled by our system can be compiled by ./compile-robot.sh .
+The main control program is `Roboto.nxj`, the `M1*.nxj` are a smaller submodules designed to pass milestone 1.
+
 The system design
 -----------------------------------------------
 
-The system is split into two modules that communicate between each other over TCP:
-the control subsystem and the vision subsystem.
+The system is split into two modules that communicate between each other over TCP: the control subsystem and the vision subsystem.
 
 Running the control subsystem.
 ------------------------------------------------
@@ -29,7 +34,8 @@ To run the control subsystem for the main pitch use
 
     ./run.sh -p0
 
-The system tries to connect to the robot automatically when the system is started. This can be bypassed by passing the --dummy parameter to run.sh.
+The system tries to connect to the robot automatically when the system is started. `Roboto.nxj` has to be running on the robot before the run script is started.
+If you do not want the controller to connect to the robot at all, this can be bypassed by passing the --dummy parameter to `run.sh`.
 
 You can specify the color and the goal with --color and --goal parameters respectively. This can also be done via the GUI.
 
