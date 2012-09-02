@@ -50,10 +50,11 @@ public class InitialStrategy extends GoToBall {
             goFromRight = !goFromRight;
 
         if (goFromRight)
-            target = new Point(new Coord(Globals.PITCH_WIDTH / 2, 0));
+			target = new Point(new Coord(Globals.PITCH_WIDTH / 2,
+					0 - Globals.PITCH_HEIGHT));
         else
             target = new Point(new Coord(Globals.PITCH_WIDTH / 2,
-                        Globals.PITCH_HEIGHT));
+					Globals.PITCH_HEIGHT * 2));
         
         // Extend the line so we're lightning fast
         Line lineToTarget = new Line(ourRobot.getPosition(), target.getPosition());

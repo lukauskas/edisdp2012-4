@@ -60,6 +60,10 @@ public class RectangularObject extends MovingPoint implements FieldObject {
 
     @Override
     public boolean isNearWall(Pitch p) {
+        return isNearWall(p, Globals.DISTANCE_TO_WALL);
+    }
+
+    public boolean isNearWall(Pitch p, double epsilon) {
         /*
          * Defines imaginary rectangle inside the pitch with size dependent on
          * the DISTANCE_TO_WALL constant. If the robot is within this rectangle
@@ -67,7 +71,7 @@ public class RectangularObject extends MovingPoint implements FieldObject {
          */
 
         for (Line wall : p.getWalls()) {
-            if (wall.dist(getPosition()) < Globals.DISTANCE_TO_WALL) {
+            if (wall.dist(getPosition()) < epsilon) {
                 return true;
             }
         }

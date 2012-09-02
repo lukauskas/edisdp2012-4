@@ -175,7 +175,7 @@ public class BrickController implements Controller {
 
     @Override
     public void penaltyKick() {
-        int turnAmount = 25;
+        int turnAmount = 27;
         if (Math.random() <= 0.5)
             turnAmount *= -1;
         rotate(turnAmount, 180);

@@ -20,10 +20,15 @@ public class FolderReader {
 
 	public FolderReader(String foldername) {
 		this.foldername = foldername;
+
+		// Ensure Folder exists
+		File folder = new File(foldername);
+		if (!folder.exists())
+			folder.mkdir();
 	}
 
 	public FolderReader(FolderReader parent, String foldername) {
-		this.foldername = parent.foldername + "/" + foldername;
+		this(parent.foldername + "/" + foldername);
 	}
 
 	// Interface
@@ -62,4 +67,7 @@ public class FolderReader {
 		for (String line : lines)
 			bw.append(line);
 	}
+
+	// Internal
+
 }

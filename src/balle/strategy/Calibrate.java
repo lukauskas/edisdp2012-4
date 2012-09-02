@@ -45,7 +45,7 @@ public class Calibrate extends AbstractPlanner {
      * Tell the strategy to do a step (e.g. move forward).
      * @param snapshot TODO
      */
-	public void onStep(Controller controller, Snapshot snapshot) {
+	public void onStep(Controller controller, Snapshot snapshot) throws ConfusedException {
 
 		// if (true) {
 		// controller.setWheelSpeeds(900, 900);
@@ -146,5 +146,6 @@ public class Calibrate extends AbstractPlanner {
 	private double angularVelToWheelSpeed(double angVel) {
 		return (angVel * Globals.ROBOT_TRACK_WIDTH) / (PIVOT ? 1 : 2);
 	}
+
 
 }

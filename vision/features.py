@@ -66,7 +66,8 @@ class Features:
         if entityblob is None:
             return Entity()
         
-        entity = Entity.fromFeature(entityblob, which != 'ball')
+        isBall = which != 'ball'
+        entity = Entity.fromFeature(entityblob, isBall, isBall)
 
         return entity
 
@@ -85,9 +86,12 @@ class Features:
 class Entity:
 
     @classmethod
-    def fromFeature(cls, feature, hasAngle):
+    def fromFeature(cls, feature, hasAngle, useBoundingBox = True):
         entity = Entity(hasAngle)
-        entity._coordinates = feature.coordinates()
+        if useBoundingBox:
+            entity._coordinates = feature.coordinates()
+        else:
+            entity._coordinates = feature.centroid();
         entity._feature = feature
 
         return entity
@@ -119,31 +123,30 @@ class Entity:
         if self._angle is None:
             # Use moments to do magic things.
             # (finds precise line through blob)
-            #mask = feature.crop().getGrayscaleMatrix()
 
-            mask = feature.getHullMask().getGrayscaleMatrix()
-
-            m = cv.Moments(mask, 1)
-
-            if m.m00 == 0:
-                m.m00 = 0.01
+            f = self._feature;
+            cx, cy = f.centroid()
+            m00 = f.m00
+            mu11 = f.m11 - cx * f.m01
+            mu20 = f.m20 - cx * f.m10
+            mu02 = f.m02 - cy * f.m01
             
-            # Intermediate values
-            a = m.mu20 / m.m00;
-            b = m.mu11 / m.m00;
-            c = m.mu02 / m.m00;
-            d = a + c;
-            e = math.sqrt((4 * b * b) + ((a - c) * (a - c)));
+            # Compute the blob's covariance matrix
+            # | a b |
+            # | b c |
+            a = mu20 / m00;
+            b = mu11 / m00;
+            c = mu02 / m00;
+ 
+            # Can derive the formula for the angle from the eigenvector associated with
+            # the largest eigenvalue
+            self._angle = 0.5 * math.atan2(2 * b, a - c)
 
-            self._angle = math.atan2(2 * b, a - c + e)
-                        
-            # Crudely find direction.
-
+            # We don't actually have the direction, so roughly calculate the angle
+            # using the difference between the center of the shape and the centroid,
+            # and flip the previous answer if necessary
             center = (feature.minRectX(), feature.minRectY())
-            centroid = feature.centroid()
-            self._centroid = centroid
-
-            roughAngle = math.atan2(center[1] - centroid[1], center[0] - centroid[0]) 
+            roughAngle = math.atan2(center[1] - cy, center[0] - cx) 
 
             if abs(self._angle - roughAngle) > (math.pi / 2):
                 self._angle += math.pi

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import balle.controller.Controller;
 import balle.main.drawable.Drawable;
 import balle.misc.Globals;
+import balle.strategy.ConfusedException;
 import balle.strategy.curve.Curve;
 import balle.strategy.curve.Interpolator;
 import balle.strategy.executor.movement.MovementExecutor;
@@ -72,7 +73,8 @@ public class CurveNav implements OrientedMovementExecutor {
 	}
 
 	@Override
-	public void step(Controller controller, Snapshot snapshot) {
+    public void step(Controller controller, Snapshot snapshot)
+            throws ConfusedException {
 		if (isFinished(snapshot)) {
 			stop(controller);
 			return;
@@ -85,7 +87,8 @@ public class CurveNav implements OrientedMovementExecutor {
 
 		// Update Movement Executor.
 		movementExecutor.updateTarget(curve.pos(stepDist).getPoint());
-		movementExecutor.step(controller, snapshot);
+			movementExecutor.step(controller, snapshot);
+
 	}
 
 	@Override

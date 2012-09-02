@@ -299,10 +299,42 @@ public class Robot extends RectangularObject {
             max = (new Coord(0, 0)).angleBetween(new Coord(10, 0), new Coord(
                     Globals.ROBOT_LENGTH, -Globals.ROBOT_WIDTH));
         }
-        System.out.println("max = " + max + ",\to = " + o + ",\tm-o = "
-                + max.sub(o));
+        // System.out.println("max = " + max + ",\to = " + o + ",\tm-o = "
+        // + max.sub(o));
 
         return max.sub(o);
 
     }
+
+	public static final Coord relL = new Coord(-Globals.ROBOT_TRACK_WIDTH / 2,
+			0);
+	public static final Coord relR = new Coord(Globals.ROBOT_TRACK_WIDTH / 2, 0);
+
+	private double helperWheelSpeed(Coord rel) {
+		Orientation dAng = new Orientation( getAngularVelocity().radians() );
+		
+		Coord s, f, delta;
+		s = rel;
+		f = getVelocity().add(rel.rotate(dAng));
+		delta = f.sub(s);
+
+		double cst = Math.PI - 2;
+		double var = dAng.radians() / Math.PI;
+		double abs = delta.abs();
+
+		double out = (abs + abs * var * cst) / Globals.MAX_WHEEL_SPEED;
+
+		if (delta.getY() < 0)
+			return out;
+		else
+			return out;
+	}
+
+	public double getLeftWheelSpeed() {
+		return helperWheelSpeed(relL);
+	}
+
+	public double getRightWheelSpeed() {
+		return helperWheelSpeed(relR);
+	}
 }

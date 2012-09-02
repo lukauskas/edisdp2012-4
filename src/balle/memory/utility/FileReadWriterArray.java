@@ -44,7 +44,8 @@ public abstract class FileReadWriterArray<E extends Saves> extends
 		ArrayList<E> list = new ArrayList<E>();
 
 		for (String line : lines)
-			list.add(readLine(line));
+			if (!line.startsWith("#"))
+				list.add(readLine(line));
 
 		SavesArray<E> output = new SavesArray<E>();
 		output.array = list;
