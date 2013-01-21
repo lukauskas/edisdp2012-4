@@ -3,7 +3,6 @@ package balle.strategy.planner;
 import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
-import balle.strategy.ConfusedException;
 import balle.strategy.executor.dribbling.DribbleStraight;
 import balle.world.Coord;
 import balle.world.Snapshot;
@@ -22,7 +21,7 @@ public class DribbleMilestone2 extends AbstractPlanner {
     }
 
     @Override
-    public void onStep(Controller controller, Snapshot snapshot) throws ConfusedException {
+    public void onStep(Controller controller, Snapshot snapshot) {
 
         if (startingCoordinate == null) {
             if (executor.isPossible(snapshot)) {

@@ -6,7 +6,6 @@ import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
 import balle.misc.Globals;
-import balle.strategy.ConfusedException;
 import balle.strategy.executor.movement.GoToObjectPFN;
 import balle.world.Coord;
 import balle.world.Line;
@@ -136,7 +135,7 @@ public class BackingOffStrategy extends GoToBall {
 	}
 
 	@Override
-	protected void onStep(Controller controller, Snapshot snapshot) throws ConfusedException {
+	protected void onStep(Controller controller, Snapshot snapshot) {
 
 
 

@@ -140,7 +140,7 @@ public class GameFromPenaltyDefence extends Game {
             
     }
 	@Override
-	public void onStep(Controller controller, Snapshot snapshot) throws ConfusedException {
+	public void onStep(Controller controller, Snapshot snapshot) {
 
 		if (finished || !isStillInPenaltyDefence(snapshot)) {
 			super.onStep(controller, snapshot);

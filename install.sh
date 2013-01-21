@@ -98,13 +98,6 @@ function install_reflections {
     && cp lib/* $LIB \
     && rm -rf $lTMP_REFLECTIONS_INSTALL_DIR
 }
-
-function install_neuroph {
-    local lTMP_NEUROPH="`mktemp -d /tmp/neuroph.XXXXX`"
-    wget -O "$lTMP_NEUROPH/neuroph-2.6.zip"  "http://sourceforge.net/projects/neuroph/files/neuroph%202.6/neuroph-2.6.zip/download"
-    unzip "$lTMP_NEUROPH/neuroph-2.6.zip" -d $LIB
-}
-
 cleanup
 install_lejos
 install_bluetooth
@@ -114,4 +107,3 @@ install_jbox2d
 install_mockito   # Mocking framework -- used in some JUnit tests
 install_joptsimple # Simple arguments parser
 install_reflections # For processing @Annotations
-install_neuroph # For bezier neural network controller

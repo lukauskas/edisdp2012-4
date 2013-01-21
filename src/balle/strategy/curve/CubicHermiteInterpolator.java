@@ -9,7 +9,7 @@ import balle.world.Orientation;
 public abstract class CubicHermiteInterpolator implements Interpolator {
 
 	@Override
-	public Spline getCurve(Coord[] controlPoints, Orientation start,
+	public Curve getCurve(Coord[] controlPoints, Orientation start,
 			Orientation end) {
 		Stack<Coord> stack = new Stack<Coord>();
 		for (Coord c : controlPoints)

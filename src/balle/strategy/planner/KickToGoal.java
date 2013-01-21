@@ -4,7 +4,6 @@ import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
 import balle.misc.Globals;
-import balle.strategy.ConfusedException;
 import balle.world.Snapshot;
 import balle.world.objects.Ball;
 import balle.world.objects.Goal;
@@ -24,7 +23,7 @@ public class KickToGoal extends AbstractPlanner {
 
 
     @Override
-    protected void onStep(Controller controller, Snapshot snapshot) throws ConfusedException {
+    protected void onStep(Controller controller, Snapshot snapshot) {
         Robot ourRobot = snapshot.getBalle();
         Robot opponent = snapshot.getOpponent();
         Ball ball = snapshot.getBall();

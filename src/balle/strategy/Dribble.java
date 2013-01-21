@@ -89,7 +89,7 @@ public class Dribble extends AbstractPlanner {
     }
 
 	@Override
-	public void onStep(Controller controller, Snapshot snapshot) throws ConfusedException {
+	public void onStep(Controller controller, Snapshot snapshot) {
 
         if (snapshot.getBalle().getPosition() == null)
             return;
@@ -171,7 +171,7 @@ public class Dribble extends AbstractPlanner {
         if (nearWall)
             turnSpeedToUse *= 2;
         
-        if ((!closeToGoal) && (nearWall) && wereNearWall)
+		if (isTriggerHappy() && (!closeToGoal) && (nearWall) && wereNearWall)
         {
             Coord goalVector = snapshot.getOwnGoal().getGoalLine()
                     .midpoint().sub(ourPos);

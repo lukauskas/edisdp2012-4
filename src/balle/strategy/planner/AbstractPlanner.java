@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import balle.controller.Controller;
 import balle.main.drawable.Drawable;
-import balle.strategy.ConfusedException;
 import balle.strategy.Strategy;
 import balle.world.Snapshot;
 
@@ -18,8 +17,7 @@ public abstract class AbstractPlanner implements Strategy {
      * @param snapshot
      */
     @Override
-    public final void step(Controller controller, Snapshot snapshot)
-            throws ConfusedException {
+	public final void step(Controller controller, Snapshot snapshot) {
         clearDrawables();
         onStep(controller, snapshot);
     }
@@ -60,7 +58,6 @@ public abstract class AbstractPlanner implements Strategy {
 		return false;
 	}
 
-    protected abstract void onStep(Controller controller, Snapshot snapshot)
-            throws ConfusedException;
+	protected abstract void onStep(Controller controller, Snapshot snapshot);
 
 }

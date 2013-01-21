@@ -80,6 +80,10 @@ class Features:
         # return expected[0] < width < expected[1] \
         #     and expected[2] < length < expected[3]
 
+        if which == 'T':
+            if feature.minRectWidth() < 15:
+                return False
+
         area = feature.area()
         return expected[0] < area < expected[1]
 

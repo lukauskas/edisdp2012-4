@@ -5,7 +5,6 @@ import java.awt.Color;
 import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
-import balle.strategy.ConfusedException;
 import balle.strategy.executor.movement.GoToObject;
 import balle.strategy.executor.movement.GoToObjectPFN;
 import balle.strategy.executor.movement.MovementExecutor;
@@ -123,8 +122,7 @@ public class KickFromWall extends GoToBall {
 	}
 
 	@Override
-    public void onStep(Controller controller, Snapshot snapshot)
-            throws ConfusedException {
+	public void onStep(Controller controller, Snapshot snapshot) {
 		if (snapshot.getBall().isNear(snapshot.getBalle())
 				&& goingToBall)
 			controller.kick();

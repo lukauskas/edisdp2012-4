@@ -7,7 +7,7 @@ import balle.world.Snapshot;
 public class JustKick extends AbstractPlanner {
 
     @Override
-    protected void onStep(Controller controller, Snapshot snapshot) throws ConfusedException {
+    protected void onStep(Controller controller, Snapshot snapshot) {
         controller.kick();
     }
 

@@ -19,7 +19,7 @@ public class DummyStrategy extends AbstractPlanner {
     long tt = 4000;
 
     @Override
-    public void onStep(Controller controller, Snapshot snapshot) throws ConfusedException {
+    public void onStep(Controller controller, Snapshot snapshot) {
         long t = System.currentTimeMillis();
         long dt = t - timer;
         if (dt > 0) {

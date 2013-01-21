@@ -36,7 +36,8 @@ public class BallNearWallFilter implements Filter {
 
             // Update ball position
             MutableSnapshot ms = s.unpack();
-            ms.setBall(new Ball(new Coord(newX, newY), ball.getVelocity()));
+			ms.setBall(new Ball(new Coord(newX, newY, ball.getPosition()
+					.getEstimatedFrames()), ball.getVelocity()));
             return ms.pack();
         } else
             return s;

@@ -14,7 +14,7 @@ public class Blocking extends AbstractPlanner {
     private boolean goingBackward = false;
 
     @Override
-    public void onStep(Controller controller, Snapshot snapshot) throws ConfusedException {
+    public void onStep(Controller controller, Snapshot snapshot) {
 		if (snapshot == null) {
             System.out.println("No Snapshot");
             return;

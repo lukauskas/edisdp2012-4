@@ -1,9 +1,7 @@
 package balle.strategy.pathFinding;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import balle.strategy.curve.Interpolator;
+import balle.strategy.pathFinding.path.AbstractPath;
 import balle.strategy.pathFinding.path.Path;
 import balle.strategy.pathFinding.path.ReversePath;
 import balle.world.Coord;
@@ -18,35 +16,17 @@ public class ForwardAndReversePathFinder extends SimplePathFinder {
 	}
 
 	@Override
-	public List<Path> getPaths(Snapshot s, Coord end, Orientation endAngle)
-			throws ValidPathNotFoundException {
+	public Path[] getPaths(Snapshot s, Coord end, Orientation endAngle) {
+		Path[] paths = new AbstractPath[2];
 		Robot robot = s.getBalle();
-
-		List<Path> list;
-
 		// full forwards
-		try {
-			list = super.getPaths(s, robot.getPosition(),
-					robot.getOrientation(), end, endAngle);
-		} catch (ValidPathNotFoundException e) {
-			list = new ArrayList<Path>();
-		}
-
+		paths[0] = super.getPaths(s, robot.getPosition(),
+				robot.getOrientation(), end, endAngle)[0];
 		// full backwards
-		try {
-			List<Path> sList = super.getPaths(s, robot.getPosition(), robot
-					.getOrientation().getOpposite(), end, endAngle);
+		paths[1] = new ReversePath(super.getPaths(s, robot.getPosition(), robot
+				.getOrientation().getOpposite(), end, endAngle)[0]);
 
-			for (Path each : sList)
-				list.add(new ReversePath(each));
-
-		} catch (ValidPathNotFoundException e) {
-			if (list.size() == 0)
-				throw new ValidPathNotFoundException(
-						"Neither backward or forward path found.");
-		}
-
-		return list;
+		return paths;
 	}
 
 }

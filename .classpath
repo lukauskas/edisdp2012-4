@@ -20,6 +20,5 @@
 	<classpathentry kind="lib" path="lib/reflections-0.9.5.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-api-1.6.4.jar"/>
 	<classpathentry kind="lib" path="lib/xml-apis-1.0.b2.jar"/>
-	<classpathentry kind="lib" path="lib/neuroph-2.6/neuroph-2.6.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -68,16 +68,6 @@ public abstract class SimpleCurve implements Curve {
 
 	}
 
-	@Override
-	public Coord getStart() {
-		return p[0];
-	}
-
-	@Override
-	public Coord getEnd() {
-		return p[p.length - 1];
-	}
-
     @Override
     public void reduceVisibility() {
         // TODO: implement!!!

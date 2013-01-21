@@ -21,6 +21,7 @@ import balle.strategy.executor.turning.RotateToOrientationExecutor;
 import balle.strategy.pathFinding.SimplePathFinder;
 import balle.strategy.planner.AbstractPlanner;
 import balle.strategy.planner.BackingOffStrategy;
+import balle.strategy.planner.DefenceInterceptStrategy;
 import balle.strategy.planner.DefensiveStrategy;
 import balle.strategy.planner.GoToBall;
 import balle.strategy.planner.GoToBallSafeProportional;
@@ -46,6 +47,7 @@ public class Game extends AbstractPlanner {
     protected final BackingOffStrategy backingOffStrategy;
 	protected final RotateToOrientationExecutor turningExecutor;
     protected final Dribble kickingStrategy;
+	protected final AbstractPlanner defenceInterceptStrategy;
     protected Strategy initialStrategy;
 
     protected final Strategy goToBallPFN;
@@ -104,6 +106,7 @@ public class Game extends AbstractPlanner {
 
     public Game() {
         defensiveStrategy = new GoToBallSafeProportional(0.5, 0.4, true);
+		defenceInterceptStrategy = new DefenceInterceptStrategy();
         opponentKickDefendStrategy = new DefensiveStrategy(new GoToObjectPFN(0));
         pickBallFromWallStrategy = new KickFromWall(new GoToObjectPFN(0));
 		backingOffStrategy = new BackingOffStrategy();
@@ -164,8 +167,7 @@ public class Game extends AbstractPlanner {
     }
 
     @Override
-    public void onStep(Controller controller, Snapshot snapshot)
-            throws ConfusedException {
+    public void onStep(Controller controller, Snapshot snapshot) {
 
         Robot ourRobot = snapshot.getBalle();
         Ball ball = snapshot.getBall();
@@ -180,9 +182,7 @@ public class Game extends AbstractPlanner {
 
         if (isInitial(snapshot)) {
             setCurrentStrategy(initialStrategy.getClass().getName());
-
             initialStrategy.step(controller, snapshot);
-
             addDrawables(initialStrategy.getDrawables());
             return;
         }
@@ -204,15 +204,8 @@ public class Game extends AbstractPlanner {
             LOG.info(ourRobot.getFrontSide().midpoint()
                     .dist(ball.getPosition()));
         }
-        try {
-            strategy.step(controller, snapshot);
-        } catch (ConfusedException e) {
-            // If a strategy does not know what to do
-			LOG.error("Game catch block.", e);
-            // Default to goToBallPFN
-            goToBallPFN.step(controller, snapshot);
-        }
 
+		strategy.step(controller, snapshot);
 		addDrawables(strategy.getDrawables());
     }
 
@@ -272,10 +265,12 @@ public class Game extends AbstractPlanner {
                 .extendBothDirections(0.5))) {
             return defensiveStrategy;
         }
-		    
 
-		if (!ourRobot.isApproachingTargetFromCorrectSide(ball, opponentsGoal,
-				25)) {
+		if (defenceInterceptStrategy.shouldStealStep(snapshot)) {
+			return defenceInterceptStrategy;
+		}
+
+		if (!ourRobot.isApproachingTargetFromCorrectSide(ball, opponentsGoal)) {
 			return goToBallPFN;
 		}
 

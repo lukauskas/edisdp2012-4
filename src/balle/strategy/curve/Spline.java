@@ -1,8 +1,6 @@
 package balle.strategy.curve;
 
 import java.awt.Graphics;
-import java.util.ArrayList;
-import java.util.Stack;
 
 import balle.world.Coord;
 import balle.world.Scaler;
@@ -85,50 +83,9 @@ public class Spline implements Curve {
 		return sum;
 	}
 
-	@Override
-	public Coord getStart() {
-		return splines[0].getStart();
-	}
-
-	@Override
-	public Coord getEnd() {
-		return splines[splines.length - 1].getEnd();
-	}
-
-	public Spline getSubSpline(int start, int finish) {
-		if (finish < 0)
-			finish += splines.length;
-
-		ArrayList<Curve> curves = new ArrayList<Curve>();
-		for (int i = start; i < finish; i++)
-			curves.add(splines[i]);
-
-		Curve[] out = new Curve[curves.size()];
-		for (int i = 0; i < out.length; i++)
-			out[i] = curves.get(i);
-
-		return new Spline(out);
-
-	}
-
-	public Stack<Coord> getComponents() {
-		Stack<Coord> components = new Stack<Coord>();
-		for (Curve c : splines)
-			components.add(c.getStart());
-		components.add(getEnd());
-		return components;
-	}
-
     @Override
     public void reduceVisibility() {
         // TODO: implement!!!
     }
-
-	public Curve getLastCurve() {
-		if (splines.length > 0)
-			return splines[splines.length - 1];
-		else
-			return null;
-	}
 
 }

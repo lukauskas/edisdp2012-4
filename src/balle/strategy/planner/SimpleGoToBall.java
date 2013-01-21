@@ -9,7 +9,6 @@ import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
 import balle.main.drawable.Dot;
-import balle.strategy.ConfusedException;
 import balle.strategy.executor.movement.MovementExecutor;
 import balle.world.Snapshot;
 import balle.world.objects.FieldObject;
@@ -45,7 +44,7 @@ public class SimpleGoToBall extends AbstractPlanner {
 	}
 
 	@Override
-	public void onStep(Controller controller, Snapshot snapshot) throws ConfusedException {
+	public void onStep(Controller controller, Snapshot snapshot) {
         FieldObject target = getTarget(snapshot);
 
 		if ((snapshot == null) || (snapshot.getBalle().getPosition() == null)
@@ -62,9 +61,7 @@ public class SimpleGoToBall extends AbstractPlanner {
 
 		// If it says it is not finished, tell it to do something for a step.
 		if (!executorStrategy.isFinished(snapshot)) {
-
-            executorStrategy.step(controller, snapshot);
-
+			executorStrategy.step(controller, snapshot);
 		} else {
 			// Tell the strategy to stop doing whatever it was doing
 			executorStrategy.stop(controller);

@@ -19,13 +19,8 @@ public class UserInputStrategy extends AbstractPlanner {
 
     private Screen screen;
     private int    mouseXPos = 10, mouseYPos = 4;
-
-	protected float leftWheelPower = 0, rightWheelPower = 0;
-
-	// Shouldn't keep references to the controller.
-	// private Controller controller;
-
-	protected boolean kick;
+    private float  leftWheelPower = 0, rightWheelPower = 0;
+	private Controller controller;
 
     @FactoryMethod(designator = "UserInput", parameterNames = {})
 	public static UserInputStrategy gameFactory() {
@@ -38,7 +33,7 @@ public class UserInputStrategy extends AbstractPlanner {
 
         JFrame frame = new JFrame("Controller");
         frame.setSize(500, 500);
-		// V Annoying: frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
 
         screen = new Screen();
@@ -62,14 +57,11 @@ public class UserInputStrategy extends AbstractPlanner {
 
     @Override
     // TODO Change to rely on and react to JPanel thing
-	public void onStep(Controller controller, Snapshot snapshot)
-			throws ConfusedException {
-		controller.setWheelSpeeds(Math.round(leftWheelPower) * 900,
-				Math.round(rightWheelPower) * 900);
+    public void onStep(Controller controller, Snapshot snapshot) {
+		this.controller = controller;
+        controller.setWheelSpeeds(Math.round(leftWheelPower),
+                Math.round(rightWheelPower));
 
-		if (kick)
-			controller.kick();
-        kick = false;
     }
 
     // Makes coordinates relative to robot
@@ -100,8 +92,8 @@ public class UserInputStrategy extends AbstractPlanner {
             int dX = (mouseXPos - screen.getWidth() / 2);
             int dY = (screen.getHeight() - mouseYPos)
                     - (screen.getHeight() / 2);
-			leftWheelPower = leftWheelTurn(dX, dY);
-			rightWheelPower = rightWheelTurn(dX, dY);
+			leftWheelPower = leftWheelTurn(dX, dY) * 500;
+			rightWheelPower = rightWheelTurn(dX, dY) * 500;
 
         }
 
@@ -116,7 +108,7 @@ public class UserInputStrategy extends AbstractPlanner {
         @Override
         public void mousePressed(MouseEvent arg0) {
 			if (arg0.getButton() == MouseEvent.BUTTON3) {
-				kick = true;
+				controller.kick();
 			}
 
         }
@@ -127,37 +119,31 @@ public class UserInputStrategy extends AbstractPlanner {
 
         // Calculates the amount
         public float leftWheelTurn(int dX, int dY) {
-			float abs = (float) Math.max(
-					Math.sqrt((dX * dX) + (dY * dY)) / 400, 1.0);
-
             if (dX > 0 && dY > 0) {
-				return abs * 1f;
+                return 1;
             } else if (dX > 0 && dY < 0) {
-				return abs * -1f;
+                return -1;
             } else {
                 float angleToClick = turningAngle(dX, dY);
                 if (dY < 0) {
-					return -angleToClick * abs;
+                    return -angleToClick;
                 } else {
-					return angleToClick * abs;
+                    return angleToClick;
                 }
             }
         }
 
         public float rightWheelTurn(int dX, int dY) {
-			float abs = (float) Math.max(
-					Math.sqrt((dX * dX) + (dY * dY)) / 400, 1.0);
-
             if (dX < 0 && dY > 0) {
-				return abs * 1f;
+                return 1;
             } else if (dX < 0 && dY < 0) {
-				return abs * -1f;
+                return -1;
             } else {
                 float angleToClick = turningAngle(dX, dY);
                 if (dY < 0) {
-					return -angleToClick * abs;
+                    return -angleToClick;
                 } else {
-					return angleToClick * abs;
+                    return angleToClick;
                 }
             }
         }

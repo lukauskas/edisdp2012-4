@@ -28,7 +28,7 @@ public class PFNavigation extends AbstractPlanner {
     PFPlanning                  plann = new PFPlanning(conf, 0.05, 0.4, 52, 80);
 
     @Override
-	public void onStep(Controller controller, Snapshot snapshot) throws ConfusedException {
+	public void onStep(Controller controller, Snapshot snapshot) {
         // TODO Auto-generated method stub
 
         if (snapshot != null) {

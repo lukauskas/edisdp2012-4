@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import balle.controller.Controller;
 import balle.main.drawable.Drawable;
-import balle.strategy.ConfusedException;
 import balle.strategy.executor.turning.RotateToOrientationExecutor;
 import balle.world.Coord;
 import balle.world.Orientation;
@@ -60,8 +59,7 @@ public class GoToObject implements MovementExecutor {
 	}
 
 	@Override
-    public void step(Controller controller, Snapshot snapshot)
-            throws ConfusedException {
+	public void step(Controller controller, Snapshot snapshot) {
 		// Fail quickly if state not set
 		if (snapshot == null)
 			return;
@@ -84,9 +82,7 @@ public class GoToObject implements MovementExecutor {
 
 			if (turningExecutor.isTurning()) // If we are still turning here
 			{
-
-                turningExecutor.step(controller, snapshot);
-
+				turningExecutor.step(controller, snapshot);
 				return; // Continue
 			} else {
 				Orientation orientationToTarget = targetCoord.sub(
@@ -107,8 +103,7 @@ public class GoToObject implements MovementExecutor {
 						isMoving = false;
 					}
 
-                    turningExecutor.step(controller, snapshot);
-
+					turningExecutor.step(controller, snapshot);
 				} else {
                     controller.forward(movementSpeed);
                     isMoving = true;

@@ -5,7 +5,6 @@ import java.awt.Color;
 import balle.controller.Controller;
 import balle.main.drawable.DrawableLine;
 import balle.misc.Globals;
-import balle.strategy.ConfusedException;
 import balle.strategy.FactoryMethod;
 import balle.strategy.executor.movement.GoToObjectPFN;
 import balle.strategy.executor.turning.FaceAngle;
@@ -113,7 +112,7 @@ public class GoToBallSafeProportional extends GoToBall {
     }
 
     @Override
-    protected void onStep(Controller controller, Snapshot snapshot) throws ConfusedException {
+    protected void onStep(Controller controller, Snapshot snapshot) {
         FieldObject ball = getOriginalTarget(snapshot);
         Robot ourRobot = snapshot.getBalle();
 
@@ -183,7 +182,7 @@ public class GoToBallSafeProportional extends GoToBall {
 		}
 
 		@Override
-		protected void onStep(Controller controller, Snapshot snapshot) throws ConfusedException {
+		protected void onStep(Controller controller, Snapshot snapshot) {
 
 			Robot ourRobot = snapshot.getBalle();
 			Ball ball = snapshot.getBall();
@@ -201,7 +200,7 @@ public class GoToBallSafeProportional extends GoToBall {
 				isTurning = false;
 			}
 
-            turnExecutor.step(controller, snapshot);
+			turnExecutor.step(controller, snapshot);
 
 		}
 
